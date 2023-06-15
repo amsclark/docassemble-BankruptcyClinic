@@ -1,0 +1,1107 @@
+question: |
+  Voluntary Petition for Individuals Filing for Bankruptcy
+subquestion: |
+  This interview is designed to help you fill out the required forms for Chapter 7 Bankruptcy. These questions are not intended to provide, and should not be understood to provide, legal advice. They are not designed to fully explain, or to be relied upon in interpreting, the law. 
+  
+  ### Read These Important Warnings
+  * Only an attorney can give you legal advice about what can happen as a result of filing for bankruptcy and what your options are. Although the law allows you to represent yourself in bankruptcy court, you should understand that many people find it difficult to represent themselves successfully.
+  
+  * Bankruptcy fraud is a serious crime; you could be fined and imprisoned if you commit fraud in your bankruptcy case. Making a false statement, concealing property, or obtaining money or property by fraud in connection with a bankruptcy case can result in fines up to $250,000, or imprisonment for up to 20 years, or both. 18 U.S.C. §§ 152, 1341, 1519, and 3571.
+  
+  Click continue to start filling out the Voluntary Petition for Individuals Filing for Bankruptcy.
+continue button field: introduction_screen
+---
+#Part 0: Location and Case
+section: district
+question: |
+  What district are you filing your bankruptcy case in?
+subquestion: |
+  Please specify the district you plan on submitting your bankruptcy case to. If you already have a case number (optional) please add that as well.
+fields:
+  - Bankruptcy Court District: current_district
+    default: District of Nebraska
+    code: courts_list
+  - Case number (if known): case_number
+    required: false
+  - Is this an ameded filing: amended_filing
+    datatype: yesnoradio
+    default: false
+---
+event: district_final
+section: district
+question: |
+  District Details
+subquestion: |
+  Bankruptcy Court District: ${ current_district }
+  
+  Case number (if known):    ${ case_number }
+  
+  % if amended_filing:
+    Amended Filing: Yes
+  % else:
+    Amended Filing: No
+  % endif
+continue button field: district_final
+---
+event: district
+section: district
+question: |
+  Review District Details
+review:
+  - Revisit: current_district
+    button: |
+      Bankruptcy Court District: ${ current_district }
+      
+      Case number (if known):    ${ case_number }
+      
+      % if amended_filing:
+        Amended Filing: Yes
+       % else:
+        Amended Filing: No
+      % endif
+---
+#Part 1: Identify Yourself
+
+table: debtor_table
+rows: debtor
+columns:
+  - First Name: row_item.name.first
+  - Middle Name: row_item.name.middle
+  - Last Name: row_item.name.last
+  - Suffix: row_item.name.suffix
+  - Aliases: row_item.alias
+edit:
+  - name.first
+  - name.middle
+  - name.last
+  - name.suffix
+  - alias
+---
+question: |
+  Basic Identity and Contact Information
+subquestion: |
+  First we need to gather some basic information about you (and spouse if you have one). Please complete the fields below related to your name, contact information, and tax id.
+fields:
+  - note: <strong>Basic Debtor Info</strong>
+  - First Name: debtor[i].name.first
+    default: "Dan"
+  - Middle Name: debtor[i].name.middle
+    required: False
+  - Last Name: debtor[i].name.last
+    default: "Fields"
+  - Suffix: debtor[i].name.suffix
+    required: False
+  - note: <strong>Address</strong>
+  - Address: debtor[i].address.address
+    default: "9999 333th St"
+  - City: debtor[i].address.city
+    default: "Tampa"
+  - State: debtor[i].address.state
+    default: "Florida"
+  - Zip Code: debtor[i].address.zip
+    default: "33593"
+  - County: debtor[i].address.unit
+    default: "Douglas County"
+    code: county_list
+  - Has separate mailing address: debtor[i].has_other_mailing_address
+    datatype: yesno
+    default: True
+  - Mail Number: debtor[i].mailing_number
+    datatype: number
+    default: 1111
+    show if: debtor[i].has_other_mailing_address
+  - Mail Street: debtor[i].mailing_street
+    default: 35th Ave NE
+    show if: debtor[i].has_other_mailing_address
+  - Mail City: debtor[i].mailing_city
+    default: Tampa
+    show if: debtor[i].has_other_mailing_address
+  - Mail State: debtor[i].mailing_state
+    default: Florida
+    show if: debtor[i].has_other_mailing_address
+  - Mail Zip: debtor[i].mailing_zip
+    datatype: number
+    default: 99999
+    show if: debtor[i].has_other_mailing_address
+  - note: |
+      <strong>Tax ID</strong><br>
+      [FILE ssn, 350px]
+  - ID Type: debtor[i].tax_id.tax_id_type
+    input type: radio
+    choices:
+      - Social Security Number: 1
+      - Individual Taxpayer Identification Number: 2
+    default: 1
+  - Tax ID (last 4 digits): debtor[i].tax_id.tax_id
+    datatype: integer
+    max: 9999
+    default: 9999
+  - note: <strong>Employer ID Number, if any</strong>
+  - EIN: debtor[i].tax_id.first_ein
+    required: False
+  - EIN: debtor[i].tax_id.second_ein
+    required: False
+
+post: |
+  % if len(debtor) > 1:
+  <br><br><br>
+  <strong>Current Debtors</strong>
+  ${ debtor_table }
+  % endif
+section: identify
+---
+question: |
+  Has ${ debtor[i].name.first } ${ debtor[i].name.last } lived in the specified district for over 180 days?
+yesno: debtor[i].district_info.is_current_district
+section: identify
+---
+question: |
+  What is your reason for specifying a district you haven't been living in?
+fields: 
+  - Reason: debtor[i].district_info.other_district_reason
+    input type: area
+section: identify
+---
+question: |
+  Does ${ debtor[i].name.first } ${ debtor[i].name.last } have any           other names they've used in the last 8 years?
+subquestion: |
+  Do not include the names of any separate legal entity such as a corporation, partnership, or LLC that is not filing this petition.
+yesno: debtor[i].alias.there_are_any
+section: identify
+---
+question: |
+  Add an alias for ${ debtor[i].name.first } ${ debtor[i].name.last } used   in the last 8 years.
+subquestion: |
+  Include married or maiden names and any assumed, trade names and doing     business as names.
+fields:
+  - First Name: debtor[i].alias[j].name.first
+    required: False
+  - Middle Name: debtor[i].alias[j].name.middle
+    required: False
+  - Last Name: debtor[i].alias[j].name.last
+    required: False
+  - Business: debtor[i].alias[j].business
+    required: False
+section: identify
+---
+question: |
+  Does ${ debtor[i].name.first } ${ debtor[i].name.last } have any           other names they've used in the last 8 years?
+yesno: debtor[i].alias.there_is_another
+section: identify
+---
+question: |
+  Are there more debtors to add?
+yesno: debtor.there_is_another
+under: |
+  <br><br><br>
+  <strong>Current Debtors</strong>
+  ${ debtor_table }
+section: identify
+---
+event: identify
+section: identify
+question: |
+  Review Debtor Info
+review:
+  - note: |
+      <br>
+      ### Part 1: Identify Yourself
+      % if len(debtor) > 0:
+      **Debtors**
+      ${ debtor_table }
+        
+      ${ debtor.add_action() }
+      % endif
+---
+event: debtor_final
+question: |
+  Debtor Summary
+subquestion: |
+  Here is a summary of basic debtor information.
+  ${ debtor_table }
+continue button field: debtor_final
+section: identify
+---
+#Part 2: Tell the Court About Your Bankruptcy Case
+table: previous_bankruptcy_table
+rows: case.previous_bankruptcy
+columns:
+  - District: row_item.district
+  - When: row_item.when
+  - Case: row_item.case_number
+edit:
+  - district
+  - when
+  - case_number
+---
+table: pending_bankruptcy_table
+rows: case.pending_bankruptcy
+columns:
+  - District: row_item.district
+  - When: row_item.when
+  - Case number: row_item.case_number
+edit:
+  - district
+  - when
+  - case_number
+---
+question: |
+  How are you planning on paying the fee?
+fields:
+  - Payment Method: case.payment_method
+    input type: radio
+    default: 1
+    choices:
+      - I will pay the entire fee when I file my petition: 1
+      - I need to pay the fee in installments: 2
+      - I request that my fee be waived: 3
+under: |
+  Note:
+  
+  If you choose to pay the entire fee please check with the clerk's office in your local court for more details about how you may pay.
+  
+  Be aware, you may only request that your fee be waived if you are filing for Chapter 7. By law, a judge may, but is not required to, waive your fee, and may do so only if your income is less than 15% of the official poverty line that applies to your family size and you are unable to pay the fee in installments.
+section: case_det
+---
+question: |
+  Have you filed for bankruptcy within the last 8 years?
+yesno: case.has_previous_bankruptcy
+section: case_det
+---
+question: |
+  Please provide the details of your previous bankruptcy in the previous 8 years.
+fields:
+  - District: case.previous_bankruptcy[i].district
+    default: District of Nebraska
+    code: courts_list
+  - When: case.previous_bankruptcy[i].when
+    default: 11/3/2018
+    datatype: date
+  - Case Number: case.previous_bankruptcy[i].case_number
+    default: abc1234ed
+section: case_det
+---
+question: |
+  Do you have any other bankruptcy cases filed in the last 8 years?
+under: |
+  ${ previous_bankruptcy_table }
+yesno: case.previous_bankruptcy.there_is_another
+section: case_det
+---
+question: |
+  Pending bankruptcies?
+subquestion: |
+  Are any bankruptcy cases pending or being filed by a spouse who is not filing this case with you, or by a business partner, or by an affiliate?
+yesno: case.has_pending_bankruptcy
+section: case_det
+---
+question: |
+  Please provide the details of your pending bankruptcy in the previous 8 years.
+fields:
+  - Debtor: case.pending_bankruptcy[i].debtor
+    default: Dan Fields
+  - Relationship: case.pending_bankruptcy[i].relationship
+    default: Self
+  - District: case.pending_bankruptcy[i].district
+    default: District of Nebraska
+    code: courts_list
+  - When: case.pending_bankruptcy[i].when
+    default: 11/03/20
+    datatype: date
+  - Case Number: case.pending_bankruptcy[i].case_number
+    default: 11222ddv2
+section: case_det
+---
+question: |
+  Do you have any other pending bankruptcy cases filed in the last 8 years?
+under: |
+  ${ pending_bankruptcy_table }
+yesno: case.pending_bankruptcy.there_is_another
+section: case_det
+---
+question: |
+  Do you rent your residence?
+yesno: case.rents_residence
+section: case_det
+---
+question: |
+  Has your landlord obtained an eviction judgement against you?
+yesno: case.eviction_judgement
+section: case_det
+---
+event: case_final
+question: |
+  Case Summary
+subquestion: |
+  Case Type: Chapter 7
+  
+  % if case.payment_method == '1':
+    Payment Method: Pay entire fee
+  % elif case.payment_method == '2':
+    Payment Method: Pay in installments
+  % elif case.payment_method == '3':
+    Payment Method: Request to have fee waived
+  % endif
+  
+  % if case.has_previous_bankruptcy:
+    Previous Bankruptcy Case: Yes
+    ${ previous_bankruptcy_table }
+  % else:
+    Pervious Bankruptcy Case: No
+  % endif
+  
+  % if case.has_pending_bankruptcy:
+    Pending Bankruptcy Case: Yes
+    ${ pending_bankruptcy_table }
+  % else:
+    Pending Bankruptcy Case: No
+  % endif
+  
+  % if case.rents_residence:
+    Rents Residence: Yes
+  % else:
+    Rents Residence: No
+  % endif
+  
+  % if case.eviction_judgement:
+    Eviction Judgement: Yes
+  % else:
+    Eviction Judgement: No
+  % endif
+continue button field: case_final
+section: case_det
+---
+event: case_det
+section: case_det
+question: |
+  Review Case Filing
+review:
+  - Revisit: case.payment_method
+    button: |
+        % if case.payment_method == '1':
+          **Payment Method:** Pay entire fee
+        % elif case.payment_method == '2':
+          **Payment Method:** Pay in installments
+        % elif case.payment_method == '3':
+          **Payment Method:** Request to have fee waived
+        % endif
+  - Revisit: case.rents_residence
+    button: |
+      % if case.rents_residence:
+        **Renter:** Yes
+      % else:
+        **Renter:** No
+      % endif
+  - Revisit: case.eviction_judgement
+    button: |
+      % if case.eviction_judgement:
+        **Eviction Judgement:** Yes
+      % else:
+        **Eviction Judgement:** No
+      % endif
+  - Revisit: case.has_previous_bankruptcy
+    button: |
+      % if case.has_previous_bankruptcy:
+        **Previous Bankruptcy:** Yes
+      % else:
+        **Previous Bankruptcy:** No
+      % endif
+  - note: |
+      % if case.has_previous_bankruptcy:
+        **Previous Bankruptcies** <br>
+        % if len(case.previous_bankruptcy) > 0:
+          ${ previous_bankruptcy_table }
+        % endif
+        ${ case.previous_bankruptcy.add_action() }
+      % endif
+  - Revisit: case.has_pending_bankruptcy
+    button: |
+      % if case.has_pending_bankruptcy:
+        **Pending Bankruptcy:** Yes
+      % else:
+        **Pending Bankruptcy:** No
+      % endif
+  - note: |
+      % if case.has_pending_bankruptcy:
+        **Pending Bankruptcies** <br>
+        % if len(case.pending_bankruptcy) > 0:
+          ${ pending_bankruptcy_table }
+        % endif
+        ${ case.pending_bankruptcy.add_action() }
+      % endif
+---
+#Part 3: Report About Any Businesses You Own as a Sole Proprietor
+
+---
+table: business_table
+rows: business.business
+columns:
+  - Name: row_item.name
+  - State: row_item.state
+  - Type: row_item.type_name
+edit:
+  - name
+  - state
+  - type_name
+---
+question: |
+  Are you a sole proprietor of any full- or part-time business?
+subquestion: |
+  A sole proprietorship is a business you operate as an individual, and is not a separate legal entity such as a corporation, partnership, or LLC.
+yesno: business.has_business
+section: sole_prop
+---
+question: |
+  Please fill in the name and location of your business.
+fields:
+  - Name: business.business[i].name
+    default: Acme
+  - Number: business.business[i].number
+    default: 55555
+  - Street: business.business[i].street
+    default: 35th pl
+  - City: business.business[i].city
+    default: Tampa
+  - State: business.business[i].state
+    default: Florida
+  - Zip: business.business[i].zip
+    default: 335548
+  - Type: business.business[i].type
+    input type: radio
+    choices:
+      - Health Care Business: 1
+      - Single Asset Real Estate: 2
+      - Stockbroker: 3
+      - Commodity Broker: 4
+      - None of the above: 5
+    default: 1
+section: sole_prop
+---
+question: |
+  Are you a sole proprietor of any **other** full- or part-time businesses?
+yesno: business.business.there_is_another
+under: |
+  <br><br><br>
+  ${ business_table }
+section: sole_prop
+---
+event: business_final
+question: |
+  Business Section Summary
+subquestion: |
+  %if business.has_business:
+    Has Business(s): Yes
+    ${ business_table }
+  %else:
+    Has Business(s): No
+  %endif
+continue button field: business_final
+section: sole_prop
+---
+event: sole_prop
+section: sole_prop
+question: |
+  Business Section Review
+review:
+  - Revisit: business.has_business
+    button: |
+      % if business.has_business:
+        **Business(s):** Yes
+      % else:
+        **Business(s):** No
+      % endif
+  - note: |
+      % if business.has_business:
+        **Business(s)** <br>
+        % if len(business.business) > 0:
+          ${ business_table }
+        % endif
+        ${ business.business.add_action() }
+      % endif
+---
+#Part 4: Report if You Own or Have Any Hazardous Property or Any Property That Needs Immediate Attention
+table: hazardous_property_table
+rows: hazardous_property.property
+columns:
+  - Hazard: row_item.hazard
+  - Reason: row_item.immediate_attention_reason
+  - Address Number: row_item.number
+edit:
+  - hazard
+  - immediate_attention_reason
+  - number
+---
+question: |
+  Hazardous property?
+subquestion: |
+  Do you own or have any property that poses or is alleged to pose a thread of imminent and identifiable hazard to public health or safety? Or do you won any property that needs immediate attention?
+yesno: hazardous_property.has_property
+section: haz_prop
+---
+question: |
+  Please fill in the name and location of your business.
+fields:
+  - Hazard: hazardous_property.property[i].hazard
+    default: Radioactive Waste
+  - Why is immediate attention required?: hazardous_property.property[i].immediate_attention_reason
+    required: false
+  - Address: hazardous_property.property[i].number
+  - Street: hazardous_property.property[i].street
+    default: 35th pl
+  - City: hazardous_property.property[i].city
+    default: Tampa
+  - State: hazardous_property.property[i].state
+    default: Florida
+  - Zip: hazardous_property.property[i].zip
+    default: 335548
+section: haz_prop
+---
+question: |
+  Are there any other hazardous properties you'd like to report?
+yesno: hazardous_property.property.there_is_another
+under: |
+  <br><br><br>
+  ${ hazardous_property_table }
+  ${ hazardous_property.property.add_action() }
+section: haz_prop
+---
+event: hazard_final
+question: |
+  Hazardous Property Summary
+subquestion: |
+  % if hazardous_property.has_property:
+     **Hazardous Property:** Yes
+     ${ hazardous_property_table }
+     ${ hazardous_property.property.add_action() }
+  % else:
+     **Hazardous Property:** No
+  %endif
+continue button field: hazard_final
+section: haz_prop
+---
+event: haz_prop
+section: haz_prop
+question: |
+  Hazardous Property Review
+review:
+  - Revisit: hazardous_property.has_property
+    button: |
+      % if hazardous_property.has_property:
+        **Hazardous Property:** Yes
+      % else:
+        **Hazardous Property:** No
+      %endif
+  - note: |
+      % if hazardous_property.has_property:
+        **Hazardous Property** <br>
+        ${ hazardous_property_table }
+
+        ${ hazardous_property.property.add_action() }
+      % endif
+---
+#Part 5: Explain Your Efforts to Receive a Briefing About Credit Counseling
+table: counseling_table
+rows: debtor
+columns:
+  - Counseling Status: row_item.counseling.counseling_type_name
+  - Reason: row_item.counseling.not_required_reason
+edit:
+  - counseling.counseling_type
+  - counseling.not_required_reason
+---
+question: |
+  Have ${ debtor[i].name } recieved any credit counseling?
+subquestion: |
+  The law requires that you receive a briefing about credit counseling before you file for bankruptcy.
+field: debtor[i].counseling.counseling_type
+choices:
+   - I received a briefing from an approved credit counseling agency within the 180 days before I filed this bankruptcy petition, and I received a certificate of completion.: 1
+   - I received a briefing from an approved credit counseling agency within the 180 days before I filed this bankruptcy petition, but I do not have a certificate of completion.: 2
+   - I certify that I asked for credit counseling services from an approved agency, but was unable to obtain those services during the 7 days after I made my request, and exigent circumstances merit a 30-day temporary waiver of the requirement: 3
+   - I am not required to receive a briefing about credit counseling.: 4
+default: 1
+section: credit_counsel
+---
+question: |
+  Reason credit breifing is not required?
+field: debtor[i].counseling.not_required_reason
+choices:
+  - Incapacity: 1
+  - Disability: 2
+  - Active duty: 3
+section: credit_counsel
+---
+event: counseling_final
+question: |
+  Credit Counseling Summary
+subquestion: |
+  ${ counseling_table }
+
+continue button field: counseling_final
+section: credit_counsel
+---
+event: credit_counsel
+section: credit_counsel
+question: |
+  Review Credit Couseling Choices
+review:
+  - note: |
+      ${ counseling_table }
+---
+#Part 6: Answer These Questions for Reporting Purposes
+question: |
+  What kind of debts do you have?
+fields:
+  - no label: reporting.reporting_type
+    input type: radio
+    choices:
+      - Primarily consumer debts: 1
+      - Primarily business debts: 2
+      - Other: 3
+  - Other type: reporting.other_debt_description
+    default: other type
+    required: false
+    show if:
+      variable: reporting.reporting_type
+      is: '3'
+section: report
+---
+question: |
+  State the type of debts you owe that are not consumer or business related.
+fields:
+  - Debt Type: reporting.custom_type
+section: report
+---
+question: |
+  Chapter 7 unsecured creditors
+subquestion: |
+  Do you estimate that after any exempt property is excluded and administrative expenses are paid that funds will be available to distribute to unsecured creditors?
+yesno: reporting.funds_for_creditors
+section: report
+---
+question: |
+  Report Estimated Amounts
+fields:
+  - How many creditors do you estimate that you owe?: reporting.creditor_estimate
+    datatype: number
+  - How much do you estimate your assets to be worth?: reporting.assets_estimate
+    datatype: currency
+  - how much do you estimate your liabilities to be?: reporting.liabilities_estimate
+    datatype: currency
+section: report
+---
+question: Form 101 output
+event: print_101
+continue button field: print_101
+attachment:
+  pdf template file: b_101.pdf
+  code: main
+  variable name: attach_101
+---
+code: |
+  debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
+  if len(debtor) > 1:
+    debtor2_name = debtor[1].name.first + " " + debtor[1].name.middle + " " + debtor[1].name.last
+  else:
+    debtor2_name = ''
+  main = {}
+  main['debtor1_name_1'] = debtor_name
+  main['debtor1_name_2'] = debtor_name
+  main['debtor1_name_3'] = debtor_name
+  main['debtor1_name_4'] = debtor_name
+  main['debtor1_name_5'] = debtor_name
+  main['debtor1_name_6'] = debtor_name
+  main['debtor1_name_7'] = debtor_name
+  main['debtor1_name_8'] = debtor_name
+  main['bankruptcy_district'] = current_district
+  main['case_number_1'] = case_number
+  main['case_number_2'] = case_number
+  main['case_number_3'] = case_number
+  main['case_number_4'] = case_number
+  main['case_number_5'] = case_number
+  main['case_number_6'] = case_number
+  main['case_number_7'] = case_number
+  main['case_number_8'] = case_number
+  main['case_number_9'] = case_number
+  main['isAmended'] = amended_filing
+  main['isCh7'] = True
+  main['isCh7-3'] = True
+  main['isCh11'] = False
+  main['isCh11-3'] = False
+  main['isCh12'] = False
+  main['isCh12-3'] = False
+  main['isCh13'] = False
+  main['isCh13-3'] = False
+  
+  i = 1
+  for debt in debtor:
+    main['debtor_first_name'+str(i)] = debt.name.first
+    main['debtor_middle_name'+str(i)] = debt.name.middle
+    main['debtor_last_name'+str(i)] = debt.name.last
+    main['debtor_suffix'+str(i)] = debt.name.suffix
+    
+    y = 1
+    for alias in debt.alias:
+    
+      main['debtor_first_othername'+str(y)+'-'+str(i)] = alias.name.first
+      main['debtor_middle_othername'+str(y)+'-'+str(i)] = alias.name.middle
+      main['debtor_last_othername'+str(y)+'-'+str(i)] = alias.name.last
+      main['debtor_business_name'+str(y)+'-'+str(i)] = alias.business
+      y += 1
+
+    if debt.tax_id.tax_id_type == '1':
+      main['debtor_ssn'+str(i)] = debt.tax_id.tax_id
+    else:
+      main['debtor_tax_id'+str(i)] = debt.tax_id.tax_id
+    
+    main['debtor_street'+str(i)] = debt.address.address
+    main['debtor_city'+str(i)] = debt.address.city
+    main['debtor_state'+str(i)] = debt.address.state
+    main['debtor_zip'+str(i)] = debt.address.zip
+    main['debtor_county'+str(i)] = debt.address.unit
+    main['debtor_mail_street'+str(i)] = str(debt.mailing_number) + " " + debt.mailing_street
+    main['debtor_mail_city'+str(i)] = debt.mailing_city
+    main['debtor_mail_state'+str(i)] = debt.mailing_state
+    main['debtor_mail_zip'+str(i)] = debt.mailing_zip
+    main['yesLivedInDistrict'+str(i)] = True if debt.district_info.is_current_district == True else False
+    main['noLivedInDistrict'+str(i)] = True if debt.district_info.is_current_district == False else False
+    main['debtor_ein'+str(i)+'-1'] = debt.tax_id.first_ein
+    main['debtor_ein'+str(i)+'-2'] = debt.tax_id.second_ein
+    if debt.district_info.is_current_district == False:
+      main['districtExplain'+str(i)+'-1'] = debt.district_info.other_district_reason
+    
+    i += 1
+
+  main['payEntireFee'] = True if case.payment_method == '1' else False
+  main['payInstallments'] = True if case.payment_method == '2' else False
+  main['payWaived'] = True if case.payment_method == '3' else False
+  main['test'] = 'test'
+  
+  
+  if case.has_previous_bankruptcy == True:
+    main['hasPrevBankruptcy_true'] = True
+    i = 1
+    for bank in case.previous_bankruptcy:
+      main['prevBankruptDistrict'+str(i)] = bank.district
+      main['prevBankruptWhen'+str(i)] = format_date(bank.when, format='MM/dd/yyyy')
+      main['prevBankruptCase'+str(i)] = bank.case_number
+      i += 1
+  else:
+    main['hasPrevBankruptcy_false'] = 1
+  
+  
+
+  
+  if case.has_pending_bankruptcy == True:
+    main['hasPendingBankruptcy_true'] = True
+    i = 1
+    for pend in case.pending_bankruptcy:
+      main['pendingBankDebtor'+str(i)] = pend.debtor
+      main['pendingBankRelation'+str(i)] = pend.relationship
+      main['pendingBankDistrict'+str(i)] = pend.district
+      main['pendingBankWhen'+str(i)] = format_date(pend.when, format='MM/dd/yyyy')
+      main['pendingBankCase'+str(i)] = pend.case_number
+      i += 1
+  else:
+    main['hasPendingBankruptcy_false'] = 1
+
+
+  
+
+  if case.rents_residence == True:
+    main['doesRent_true'] = True
+    if case.eviction_judgement == True:
+      main['hasEviction_true'] = True
+    else:
+      main['hasEviction_false'] = 1
+  else:
+    main['doesRent_false'] = 1
+  
+  if business.has_business == True:
+    main['hasBusiness_true'] = True
+    i = 1
+    for bus in business.business:
+      main['businessName'+str(i)] = bus.name
+      main['businessStreet'+str(i)] = str(bus.number) + " " + bus.street
+      main['businessCity'+str(i)] = bus.city
+      main['businessState'+str(i)] = bus.state
+      main['businessZip'+str(i)] = bus.zip
+      main['businessIsHealth'+str(i)] = True if bus.type == '1' else False
+      main['businessIsRealEstate'+str(i)] = True if bus.type == '2' else False
+      main['businessIsStockbroker'+str(i)] = True if bus.type == '3' else False
+      main['businessIsCommodity'+str(i)] = True if bus.type == '4' else False
+      main['businessIsNone'+str(i)] = True if bus.type == '5' else False
+      i += 1
+  else:
+    main['hasBusiness_false'] = 1
+
+
+    
+  main['notChapter11'] = True
+  if hazardous_property.has_property == True:
+    main['hazardousProp_true'] = 1
+  else:
+    main['hazardousProp_false'] = 1
+  if hazardous_property.has_property:
+    main['hazardDesc1'] = hazardous_property.property[0].hazard
+    main['hazardWhy1'] = hazardous_property.property[0].immediate_attention_reason
+    main['hazardAddress'] = str(hazardous_property.property[0].number) + " " + hazardous_property.property[0].street
+    main['hazardCity'] = hazardous_property.property[0].city
+    main['hazardState'] = hazardous_property.property[0].state
+    main['hazardZip'] = hazardous_property.property[0].zip
+  
+  i = 1
+  for debt in debtor:
+    main['recievedBriefing'+str(i)] = True if debt.counseling.counseling_type == '1' else False
+    main['noCert'+str(i)] = True if debt.counseling.counseling_type == '2' else False
+    main['noBriefing'+str(i)] = True if debt.counseling.counseling_type == '3' else False
+    main['notRequired'+str(i)] = True if debt.counseling.counseling_type == '4' else False
+    main['incapacity'+str(i)] = True if debt.counseling.not_required_reason == '1' else False
+    main['disability'+str(i)] = True if debt.counseling.not_required_reason == '2' else False
+    main['activeDuty'+str(i)] = True if debt.counseling.not_required_reason == '3' else False
+    i += 1
+  
+  if reporting.reporting_type == '1':
+    main['consumer_debts_true'] = True
+    main['business_debts_false'] = 1
+  if reporting.reporting_type == '2':
+    main['consumer_debts_false'] = 1
+    main['business_debts_true'] = True
+  if reporting.reporting_type == '3':
+    main['consumer_debts_false'] = 1
+    main['business_debts_false'] = 1
+    main['other_business_debts_type'] = reporting.other_debt_description
+  main['is_filing_ch7'] = True
+  
+  if reporting.funds_for_creditors == True:
+    main['unsecuredFunds_true'] = True
+  else:
+    main['unsecuredFunds_false'] = 1
+
+  
+  main["creditors_1_49"] = True if 1 <= reporting.creditor_estimate <= 49 else False
+  main["creditors_1000_5000"] = True if 1000 <= reporting.creditor_estimate <= 5000 else False
+  main["creditors_25000_50000"] = True if 25000 <= reporting.creditor_estimate <= 50000 else False
+  main["creditors_50_99"] = True if 50 <= reporting.creditor_estimate <= 99 else False
+  main["creditors_5001_10000"] = True if 5001 <= reporting.creditor_estimate <= 10000 else False
+  main["creditor_50000_100000"] = True if 50000 <= reporting.creditor_estimate <= 100000 else False
+  main["creditor_100_199"] = True if 100 <= reporting.creditor_estimate <= 199 else False
+  main["creditor_10000_25000"] = True if 10000 <= reporting.creditor_estimate <= 25000 else False
+  main["creditors_more"] = True if reporting.creditor_estimate > 100000 else False
+  main["creditors_200_999"] = True if 200 <= reporting.creditor_estimate <= 999 else False
+  main["assets_0_50000"] = True if 0 <= reporting.assets_estimate <= 50000 else False
+  main["assets_1000001_10m"] = True if 1000001 <= reporting.assets_estimate <= 10000000 else False
+  main["assets_5m_1b"] = True if 5000000 <= reporting.assets_estimate <= 1000000000 else False
+  main["assets_50k_100k"] = True if 50000 <= reporting.assets_estimate <= 100000 else False
+  main["assets_10m_50m"] = True if 10000000 <= reporting.assets_estimate <= 50000000 else False
+  main["assets_1b_10b"] = True if 1000000000 <= reporting.assets_estimate <= 10000000000 else False
+  main["assets_100k_500k"] = True if 100000 <= reporting.assets_estimate <= 500000 else False
+  main["assets_50m_100m"] = True if 50000000 <= reporting.assets_estimate <= 100000000 else False
+  main["assets_10b_50b"] = True if 10000000000 <= reporting.assets_estimate <= 50000000000 else False
+  main["assets_500k_1m"] = True if 500000 <= reporting.assets_estimate <= 1000000 else False
+  main["assets_100m_500m"] = True if 100000000 <= reporting.assets_estimate <= 500000000 else False
+  main["assets_more"] = True if reporting.assets_estimate > 50000000000 else False
+  main["liability_0_50k"] = True if 0 <= reporting.liabilities_estimate <= 50000 else False
+  main["liability_1m_10m"] = True if 1000000 <= reporting.liabilities_estimate <= 10000000 else False
+  main["liability_500m_1b"] = True if 500000000 <= reporting.liabilities_estimate <= 1000000000 else False
+  main["liability_50k_100k"] = True if 50000 <= reporting.liabilities_estimate <= 100000 else False
+  main["liability_10m_50m"] = True if 10000000 <= reporting.liabilities_estimate <= 50000000 else False
+  main["liability_1b_10b"] = True if 1000000000 <= reporting.liabilities_estimate <= 10000000000 else False
+  main["liability_100k_500k"] = True if 100000 <= reporting.liabilities_estimate <= 500000 else False
+  main["liability_50m_100m"] = True if 50000000 <= reporting.liabilities_estimate <= 100000000 else False
+  main["liability_10b_50b"] = True if 10000000000 <= reporting.liabilities_estimate <= 50000000000 else False
+  main["liability_500k_1m"] = True if 500000 <= reporting.liabilities_estimate <= 1000000 else False
+  main["liability_100m_500m"] = True if 100000000 <= reporting.liabilities_estimate <= 500000000 else False,
+  main["liability_more"] = True if reporting.liabilities_estimate > 50000000000 else False
+---
+event: report
+section: report
+question: |
+  Reporting Summary
+review:
+  - Revisit: reporting.reporting_type
+    button: |
+      % if reporting.reporting_type == '1':
+        **Primary Debt Type:** Consumer
+      % elif reporting.reporting_type == '2':
+        **Primary Debt Type:** Business
+      % elif reporting.reporting_type == '3':
+        **Primary Debt Type:** Custom (${ reporting.other_debt_description })
+      % endif
+  - Revisit: reporting.funds_for_creditors
+    button: |
+      % if reporting.funds_for_creditors:
+        **Will there be funds for creditors?** Yes
+      % else:
+        **Will there be funds for creditors?** No
+      % endif
+  - Revisit: reporting.creditor_estimate
+    button: |
+      **Estimated creditor count:** ${ reporting.creditor_estimate }
+  - Revisit: reporting.assets_estimate
+    button: |
+      **Estimated asset amount:** ${ reporting.assets_estimate }
+  - Revisit: reporting.liabilities_estimate
+    button: |
+      **Estimated liability amount:** ${ reporting.liabilities_estimate }
+---
+question: |
+  Voluntary Petition for Individuals Filing for Bankruptcy conclusion
+subquestion: |
+  conclusion
+attachment code: |
+  [ab_attach, c_attach, d_attach, ef_attach, g_attach, h_attach, i_attach, j_attach, attach_107, attach_108, attach_121, attach_122a, attach_101]
+continue button field: conclusion_screen
+section: fin
+---
+event: review_answers
+question: |
+  Revisit questions
+subquestion: |
+  Here are the questions you've answered so far. Click to revisit.
+review:
+  - Revisit: current_district
+    button: |
+      Bankruptcy Court District: ${ current_district }
+      
+      Case number (if known):    ${ case_number }
+      
+      % if amended_filing:
+        Amended Filing: Yes
+       % else:
+        Amended Filing: No
+      % endif
+  - note: |
+      <br>
+      ### Part 1: Identify Yourself
+      % if len(debtor) > 0:
+      **Debtors**
+      ${ debtor_table }
+        
+      ${ debtor.add_action() }
+      % endif
+  - note: |
+      <br>
+      ### Part 2: Tell the Court About Your Bankruptcy Case
+  - Revisit: case.payment_method
+    button: |
+        % if case.payment_method == '1':
+          **Payment Method:** Pay entire fee
+        % elif case.payment_method == '2':
+          **Payment Method:** Pay in installments
+        % elif case.payment_method == '3':
+          **Payment Method:** Request to have fee waived
+        % endif
+  - Revisit: case.rents_residence
+    button: |
+      % if case.rents_residence:
+        **Renter:** Yes
+      % else:
+        **Renter:** No
+      % endif
+  - Revisit: case.eviction_judgement
+    button: |
+      % if case.eviction_judgement:
+        **Eviction Judgement:** Yes
+      % else:
+        **Eviction Judgement:** No
+      % endif
+  - Revisit: case.has_previous_bankruptcy
+    button: |
+      % if case.has_previous_bankruptcy:
+        **Previous Bankruptcy:** Yes
+      % else:
+        **Previous Bankruptcy:** No
+      % endif
+  - note: |
+      % if case.has_previous_bankruptcy:
+        **Previous Bankruptcies** <br>
+        % if len(case.previous_bankruptcy) > 0:
+          ${ previous_bankruptcy_table }
+        % endif
+        ${ case.previous_bankruptcy.add_action() }
+      % endif
+  - Revisit: case.has_pending_bankruptcy
+    button: |
+      % if case.has_pending_bankruptcy:
+        **Pending Bankruptcy:** Yes
+      % else:
+        **Pending Bankruptcy:** No
+      % endif
+  - note: |
+      % if case.has_pending_bankruptcy:
+        **Pending Bankruptcies** <br>
+        % if len(case.pending_bankruptcy) > 0:
+          ${ pending_bankruptcy_table }
+        % endif
+        ${ case.pending_bankruptcy.add_action() }
+      % endif
+  - note: |
+      <br>
+      ### Part 3: Report About Any Business You Own as a Sole Proprietor
+  - Revisit: business.has_business
+    button: |
+      % if business.has_business:
+        **Business(s):** Yes
+      % else:
+        **Business(s):** No
+      % endif
+  - note: |
+      % if business.has_business:
+        **Business(s)** <br>
+        % if len(business.business) > 0:
+          ${ business_table }
+        % endif
+        ${ business.business.add_action() }
+      % endif
+  - note: |
+      <br>
+      ### Part 4: Report if You Own or Have Any Hazardous Property or Any Property That Needs Immediate Attention
+  - Revisit: hazardous_property.has_property
+    button: |
+      % if hazardous_property.has_property:
+        **Hazardous Property:** Yes
+      % else:
+        **Hazardous Property:** No
+      %endif
+  - note: |
+      % if hazardous_property.has_property:
+        **Hazardous Property** <br>
+        ${ hazardous_property_table }
+
+        ${ hazardous_property.property.add_action() }
+      % endif
+  - note: |
+      <br>
+      ### Part 5: Explain Your Efforts to Receive a Briefing About Credit Counseling
+  - note: |
+      ${ counseling_table }
+  - note: |
+      <br>
+      ### Part 6: Answer These Questions for Reporting Purposes
+  - Revisit: reporting.reporting_type
+    button: |
+      % if reporting.reporting_type == '1':
+        **Primary Debt Type:** Consumer
+      % elif reporting.reporting_type == '2':
+        **Primary Debt Type:** Business
+      % elif reporting.reporting_type == '3':
+        **Primary Debt Type:** Custom (${ reporting.other_debt_description })
+      % endif
+  - Revisit: reporting.funds_for_creditors
+    button: |
+      % if reporting.funds_for_creditors:
+        **Will there be funds for creditors?** Yes
+      % else:
+        **Will there be funds for creditors?** No
+      % endif
+  - Revisit: reporting.creditor_estimate
+    button: |
+      **Estimated creditor count:** ${ reporting.creditor_estimate }
+  - Revisit: reporting.assets_estimate
+    button: |
+      **Estimated asset amount:** ${ reporting.assets_estimate }
+  - Revisit: reporting.liabilities_estimate
+    button: |
+      **Estimated liability amount:** ${ reporting.liabilities_estimate }
+---

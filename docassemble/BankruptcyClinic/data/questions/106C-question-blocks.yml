@@ -1,0 +1,152 @@
+table: prop_exempt_table
+rows: prop.exempt_property.properties
+columns:
+  - Description: row_item.description
+  - Current Value: row_item.value
+  - Exemption Amount: row_item.exemption
+  - Laws: row_item.laws
+  - Line: row_item.line
+edit:
+  - description
+  - value
+  - exemption
+  - laws
+  - line
+---
+section: schedule_c
+question: |
+  Which set of exemptions are you claiming?
+fields: 
+  - no label: prop.exempt_property.exemption_type
+    choices:
+    - You are claiming state and federal nonbankruptcy exemptions.
+    - You are claiming federal exemptions.
+    default: You are claiming federal exemptions.
+---
+section: schedule_c
+question: |
+  Do you have any property to claim as exempt?
+yesno: prop.exempt_property.properties.there_are_any
+---
+section: schedule_c
+question: |
+  Do you have any more property to claim as exempt?
+yesno: prop.exempt_property.properties.there_is_another
+under: |
+  ${ prop_exempt_table }
+---
+section: schedule_c
+question: |
+  Tell us more about the property and claim for excemption
+fields:
+  - Description: prop.exempt_property.properties[i].description
+    input type: area
+    default: NA
+  - Current value of the portion you own: prop.exempt_property.properties[i].value
+    datatype: currency
+    default: 200
+  - Are you claiming less than 100% of fair market value?: prop.exempt_property.properties[i].not_full_exemption
+    datatype: yesnoradio
+    default: True
+  - Exemption being claimed: prop.exempt_property.properties[i].exemption
+    datatype: currency
+    default: 300
+    required: False
+    show if: prop.exempt_property.properties[i].not_full_exemption
+  - Specific laws that allow exemption: prop.exempt_property.properties[i].laws
+    input type: area
+    default: NA
+  - Schedule A/B line: prop.exempt_property.properties[i].line
+    datatype: number
+    default: 4
+---
+section: schedule_c
+question: |
+  Are you claiming a homestead exemption of more than $189,050?
+subquestion: |
+  (Subject to adjustment on 4/01/25 and every 3 years after that for cases filed on or after the date of adjustment.)
+fields:
+  - Claiming homestead exemption: prop.exempt_property.claim_homestead_exemption
+    datatype: yesnoradio
+    default: True
+  - Did you acquire the property within 1,215 days?: prop.exempt_property.homestead_within_timeframe
+    datatype: yesnoradio
+    required: False
+    default: False
+    show if: prop.exempt_property.claim_homestead_exemption
+---
+event: schedule_c
+section: schedule_c
+question: |
+  Review Exempt Property
+review:
+  - note: |
+      <br>
+      ### Exempt Property
+      % if len(prop.exempt_property.properties) > 0:
+        ${ prop_exempt_table }
+        ${ prop.exempt_property.properties.add_action() }
+      % else:
+        No exempt property listed
+        ${ prop.exempt_property.properties.add_action() }
+      % endif
+  - Revisit: prop.exempt_property.claim_homestead_exemption
+    button: |
+      % if prop.exempt_property.claim_homestead_exemption:
+        Claiming Homestead Exemption: Yes
+      % else:
+        Claiming Homestead Exemption: No
+      % endif
+      % if prop.exempt_property.homestead_within_timeframe:
+        Aquired within 1,215 days: Yes
+      % else:
+        Aquired within 1,215 days: No
+      % endif
+---
+code: |
+  debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
+  if len(debtor) > 1:
+    debtor2_name = debtor[1].name.first + " " + debtor[1].name.middle + " " + debtor[1].name.last
+---
+code: |
+  sc = {}
+  sc['debtor1_name_1'] = debtor_name
+  sc['debtor1_name_2'] = debtor_name
+  sc['debtor2_name_1'] = debtor2_name
+  sc['case_number_1'] = case_number
+  sc['case_number_2'] = case_number
+  sc['bankruptcy_district'] = current_district
+  sc['isAmended'] = amended_filing
+  sc['isStateAndFederalExempt'] = True if prop.exempt_property.exemption_type == 'You are claiming state and federal nonbankruptcy exemptions.' else False
+  sc['isFederalExempt'] = True if prop.exempt_property.exemption_type == 'You are claiming federal exemptions.' else False
+  
+  i = 1
+  for pro in prop.exempt_property.properties:
+    sc['desc'+str(i)] = pro.description
+    sc['currOwnedVal'+str(i)] = currency(pro.value)
+    sc['isCustExempt'+str(i)] = pro.not_full_exemption
+    sc['custExemptVal'+str(i)] = pro.exemption
+    sc['laws'+str(i)] = pro.laws
+    sc['isFairMarket'+str(i)] = True if pro.not_full_exemption == True else False
+    sc['line'+str(i)] = pro.line
+    
+    i += 1
+  
+  if prop.exempt_property.claim_homestead_exemption == True:
+    sc['hasHomestead'] = True
+  else:
+    sc['noHomestead'] = True
+  
+  if prop.exempt_property.homestead_within_timeframe == True:
+    sc['isWithinTime'] = True
+  else:
+    sc['notWithinTime'] = True
+---
+event: schedule_c_attach
+section: schedule_c
+question: Schedule C Attachment
+continue button field: schedule_c_attach
+attachment:
+  pdf template file: form_b_106c.pdf
+  variable name: c_attach
+  code: sc

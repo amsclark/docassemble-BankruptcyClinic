@@ -1,0 +1,301 @@
+section: form_122a
+question: |
+  Presumption of abuse & Means Test
+subquestion: |
+  Select the option that best suits your situation in order to determine if a Means Test Calculation is required.
+fields:
+  - no label: monthly_income.means_type
+    choices:
+      - There is no presumption of abuse.
+      - The calculation to determine if a presumption of abuse applies will be made under Chapter 7 Means Test Calculation.
+      - The Means Test does not apply now because of qualified military service but it could apply later.
+    default: There is no presumption of abuse.
+---
+section: form_122a
+question: |
+  Calculate your current monthly income
+subquestion: |
+  Be as complete and accurate as possible. If two married people are filing together, both are equally responsible for being accurate.
+fields:
+  - What is your marital and filing status?: monthly_income.filing_status
+    choices:
+      - Not married
+      - Married and your spouse is filing with you.
+      - Married and your spouse is NOT filing with you.
+    default: Married and your spouse is NOT filing with you.
+  - You and your spouse are: monthly_income.separated_status
+    choices:
+      - Living in the same household and not legally separated.
+      - Living separately or are legally separated
+    show if:
+      variable: monthly_income.filing_status
+      is: Married and your spouse is NOT filing with you.
+  - note: Income calculation Debtor 1
+  - Your gross wages, salary tips, bonuses, overtime, and comissions: monthly_income.gross_wages1
+    datatype: currency
+    default: 2500
+  - Alimony and maintenance payments: monthly_income.alimony1
+    datatype: currency
+    default: 300
+  - All amounts from any source which are regularly paid for household expenses of you or your dependents, including child support.: monthly_income.other_income1
+    datatype: currency
+    default: 200
+  - note: |
+      Net income from operating a business, profession, or farm.
+  - Gross receipts (before all deductions): monthly_income.business_gross_receipts1
+    datatype: currency
+    default: 0
+  - Ordinary and necessary operating expenses: monthly_income.business_operating_expenses1
+    datatype: currency
+    default: 0
+  - note: |
+      Net income from rental and other real property
+  - Gross receipts (before all deductions): monthly_income.rental_gross_receipts1
+    datatype: currency
+    default: 0
+  - Ordinary and necessary operating expenses: monthly_income.rental_operating_expenses1
+    datatype: currency
+    default: 0
+  - note: <br>
+  - Interest, dividends, and royalties: monthly_income.interest1
+    datatype: currency
+    default: 0
+  - Unemployment compensation: monthly_income.unemployment1
+    datatype: currency
+    default: 0
+  - Your Social Security Act compensation: monthly_income.social1
+    datatype: currency
+    default: 0
+  - Spouse Social Security Act compensation: monthly_income.spouse_social1
+    datatype: currency
+    default: 0
+  - note: |
+      Pension or retirement. Do not include any amount received that was a benefit under the Social Security Act. Also, except as stated in the next sentence, do not include any compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with disability, combat-related injury or disability, or death of a member of the uniformed services. If you recieved any retired pay paid under chapter 61 of title 10, then include that pay only to the extent that it does not exceed the amount of retired pay to which you would otherwise be entitled if retired under any provision of title 10 other than chapter 61 of that title.
+  - Pension or retirement: monthly_income.pension1
+    datatype: currency
+    default: 400
+  - note: |
+      Income from all other sources not listed. Specify the source and amount. Do not include any benefits received under the Social Security Act; payments received as a victim of a war crime, a crime against humanity, or international or domestic terrorism; or compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with a disability, combat-related injury or disability, or death of a member of the uniformed servies.
+  - Source 1: monthly_income.source1_1
+    default: first source
+  - Amount: monthly_income.source1_amount_1
+    datatype: currency
+    default: 100
+  - Source 2: monthly_income.source2_1
+    default: second source
+  - Amount: monthly_income.source2_amount_1
+    default: 100
+---
+section: form_122a
+question: |
+  Calculate Debtor 2 current monthly income
+subquestion: |
+  Be as complete and accurate as possible. If two married people are filing together, both are equally responsible for being accurate.
+fields:
+  - note: Income calculation Debtor 2
+  - Your gross wages, salary tips, bonuses, overtime, and comissions: monthly_income.gross_wages2
+    datatype: currency
+    default: 2500
+  - Alimony and maintenance payments: monthly_income.alimony2
+    datatype: currency
+    default: 300
+  - All amounts from any source which are regularly paid for household expenses of you or your dependents, including child support.: monthly_income.other_income2
+    datatype: currency
+    default: 200
+  - note: |
+      Net income from operating a business, profession, or farm.
+  - Gross receipts (before all deductions): monthly_income.business_gross_receipts2
+    datatype: currency
+    default: 0
+  - Ordinary and necessary operating expenses: monthly_income.business_operating_expenses2
+    datatype: currency
+    default: 0
+  - note: |
+      Net income from rental and other real property
+  - Gross receipts (before all deductions): monthly_income.rental_gross_receipts2
+    datatype: currency
+    default: 0
+  - Ordinary and necessary operating expenses: monthly_income.rental_operating_expenses2
+    datatype: currency
+    default: 0
+  - note: <br>
+  - Interest, dividends, and royalties: monthly_income.interest2
+    datatype: currency
+    default: 0
+  - Unemployment compensation: monthly_income.unemployment2
+    datatype: currency
+    default: 0
+  - Your Social Security Act compensation: monthly_income.social2
+    datatype: currency
+    default: 0
+  - Spouse Social Security Act compensation: monthly_income.spouse_social2
+    datatype: currency
+    default: 0
+  - note: |
+      Pension or retirement. Do not include any amount received that was a benefit under the Social Security Act. Also, except as stated in the next sentence, do not include any compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with disability, combat-related injury or disability, or death of a member of the uniformed services. If you recieved any retired pay paid under chapter 61 of title 10, then include that pay only to the extent that it does not exceed the amount of retired pay to which you would otherwise be entitled if retired under any provision of title 10 other than chapter 61 of that title.
+  - Pension or retirement: monthly_income.pension2
+    datatype: currency
+    default: 400
+  - note: |
+      Income from all other sources not listed. Specify the source and amount. Do not include any benefits received under the Social Security Act; payments received as a victim of a war crime, a crime against humanity, or international or domestic terrorism; or compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with a disability, combat-related injury or disability, or death of a member of the uniformed servies.
+  - Source 1: monthly_income.source1_2
+    default: first source
+  - Amount: monthly_income.source1_amount_2
+    datatype: currency
+    default: 100
+  - Source 2: monthly_income.source2_2
+    default: second source
+  - Amount: monthly_income.source2_amount_2
+    default: 100
+---
+question: |
+  Calculate the median family income that applies to you.
+fields:
+  - State in which you live: monthly_income.median_state
+    default: Florida
+  - Number of people in your household: monthly_income.median_dependents
+    datatype: number
+    default: 2
+  - Median family income for your state and size of household: monthly_income.median_income
+    datatype: currency
+    default: 40000
+---
+event: form_122a
+section: form_122a
+question: |
+  Review Montly Income Answers
+review:
+  - Revisit: monthly_income.filing_status
+    button: |
+      Marital and Filing Status: monthly_income.filing_status
+  - Revisit: monthly_income.gross_wages1
+    button: |
+      Income Type     | Amount
+      ----------------|-------
+      Gross wages.    | ${ monthly_income.gross_wages1 }
+      Alimony & Maint.| ${ monthly_income.alimony1 }
+      Outside source. | ${ monthly_income.other_income1 }
+      Business        |
+      Gross receipts  | ${ monthly_income.business_gross_receipts1 }
+      Operating Exp.  | ${ monthly_income.business_operating_expenses1 }
+      Rental & Prop.  |
+      Gross receipts  | ${ monthly_income.rental_gross_receipts1 }
+      Operating Exp.  | ${ monthly_income.rental_operating_expenses1 }
+                      |
+      Interest & Divd | ${ monthly_income.interest1 }
+      Unemployment    | ${ monthly_income.unemployment1 }
+      SSA Comp        | ${ monthly_income.social1 }
+      Spouse SSA      | ${ monthly_income.spouse_social1 }
+      Pension         | ${ monthly_income.pension1 }
+      Source 1        | ${ monthly_income.source1_amount_1 }
+      Source 2        | ${ monthly_income.source2_amount_1 }
+  - Revisit: monthly_income.gross_wages2
+    button: |
+      Income Type     | Amount
+      ----------------|-------
+      Gross wages.    | ${ monthly_income.gross_wages2 }
+      Alimony & Maint.| ${ monthly_income.alimony2 }
+      Outside source. | ${ monthly_income.other_income2 }
+      Business        |
+      Gross receipts  | ${ monthly_income.business_gross_receipts2 }
+      Operating Exp.  | ${ monthly_income.business_operating_expenses2 }
+      Rental & Prop.  |
+      Gross receipts  | ${ monthly_income.rental_gross_receipts2 }
+      Operating Exp.  | ${ monthly_income.rental_operating_expenses2 }
+                      |
+      Interest & Divd | ${ monthly_income.interest2 }
+      Unemployment    | ${ monthly_income.unemployment2 }
+      SSA Comp        | ${ monthly_income.social2 }
+      Spouse SSA      | ${ monthly_income.spouse_social2 }
+      Pension         | ${ monthly_income.pension2 }
+      Source 1        | ${ monthly_income.source1_amount_2 }
+      Source 2        | ${ monthly_income.source2_amount_2 }
+---
+event: form_122a_attach
+section: form_122a
+question: Form 122a Attachment
+continue button field: form_122a_attach
+attachment:
+  pdf template file: b_122a-1.pdf
+  variable name: attach_122a
+  code: income
+---
+code: |
+  debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
+  if len(debtor) > 1:
+    debtor2_name = debtor[1].name.first + " " + debtor[1].name.middle + " " + debtor[1].name.last
+  else:
+    debtor2_name = ''
+  income = {}
+  income['debtor1_name_1'] = debtor_name
+  income['debtor1_name_2'] = debtor_name
+  income['debtor1_name_3'] = debtor_name
+  income['debtor2_name_1'] = debtor2_name
+  income['bankruptcy_district'] = current_district
+  income['case_number_1'] = case_number
+  income['case_number_2'] = case_number
+  income['case_number_2'] = case_number
+  income['isAmended'] = amended_filing
+  
+  income['noPresumedAbuse'] = True if monthly_income.means_type == 'There is no presumption of abuse.' else False
+  income['meansTest'] = True if monthly_income.means_type == 'The calculation to determine if a presumption of abuse applies will be made under Chapter 7 Means Test Calculation.' else False
+  income['noMeansTest'] = True if monthly_income.means_type == 'The Means Test does not apply now because of qualified military service but it could apply later.' else False
+
+  income['notMarried'] = True if monthly_income.filing_status == 'Not married' else False
+  income['marriedFiling'] = True if monthly_income.filing_status == 'Married and your spouse is filing with you.' else False
+  income['marriedNotFiling'] = True if monthly_income.filing_status == 'Married and your spouse is NOT filing with you.' else False
+  income['sameHouse'] = True if monthly_income.filing_status == 'Married and your spouse is NOT filing with you.' and monthly_income.separated_status == 'Living in the same household and not legally separated.' else False
+  income['separateHouse'] = True if monthly_income.separated_status == 'Living separately or are legally separated' else False
+  
+  income['wages1'] = currency(monthly_income.gross_wages1)
+  income['alimony1'] = currency(monthly_income.alimony1)
+  income['amounts1'] = currency(monthly_income.other_income1)
+  income['grossBusReceipts1'] = currency(monthly_income.business_gross_receipts1)
+  income['ordinaryBus1'] = currency(monthly_income.business_operating_expenses1)
+  income['netIncomeBus1'] = currency(monthly_income.business_gross_receipts1 - monthly_income.business_operating_expenses1)
+  income['netIncomeBus1-1'] = currency(monthly_income.business_gross_receipts1 - monthly_income.business_operating_expenses1)
+  income['grossRentReceipts1'] = currency(monthly_income.rental_gross_receipts1)
+  income['ordinaryRent1'] = currency(monthly_income.rental_operating_expenses1)
+  income['netIncomeRent1'] = currency(monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1)
+  income['netIncomeRent1-1'] = currency(monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1)
+  income['interest1'] = currency(monthly_income.interest1)
+  income['unemployment1'] = currency(monthly_income.unemployment1)
+  income['unemploymentForYou'] = currency(monthly_income.social1)
+  income['pension1'] = currency(monthly_income.pension1)
+  income['source1'] = monthly_income.source1_1
+  income['other1Amt1'] = currency(monthly_income.source1_amount_1)
+  income['source2'] = monthly_income.source2_1
+  income['other2Amt1'] = currency(monthly_income.source2_amount_1)
+  income['total1'] = currency(monthly_income.source1_amount_1 + monthly_income.source2_amount_1)
+  income['totalMonthly1'] = currency(monthly_income.gross_wages1 + monthly_income.alimony1 + monthly_income.other_income1 + (monthly_income.business_gross_receipts1 - monthly_income.business_operating_expenses1) + (monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1) + monthly_income.interest1 + monthly_income.unemployment1 + monthly_income.social1 + monthly_income.pension1 + monthly_income.source1_amount_1 + monthly_income.source2_amount_1)
+  
+  income['wages2'] = currency(monthly_income.gross_wages2)
+  income['alimony2'] = currency(monthly_income.alimony2)
+  income['amounts2'] = currency(monthly_income.other_income2)
+  income['grossBusReceipts2'] = currency(monthly_income.business_gross_receipts2)
+  income['ordinaryBus2'] = currency(monthly_income.business_operating_expenses2)
+  income['netIncomeBus2'] = currency(monthly_income.business_gross_receipts2 - monthly_income.business_operating_expenses2)
+  income['netIncomeBus2-1'] = currency(monthly_income.business_gross_receipts2 - monthly_income.business_operating_expenses2)
+  income['grossRentReceipts2'] = currency(monthly_income.rental_gross_receipts2)
+  income['ordinaryRent2'] = currency(monthly_income.rental_operating_expenses2)
+  income['netIncomeRent2'] = currency(monthly_income.rental_gross_receipts2 - monthly_income.rental_operating_expenses2)
+  income['netIncomeRent2-1'] = currency(monthly_income.rental_gross_receipts2 - monthly_income.rental_operating_expenses2)
+  income['interest2'] = currency(monthly_income.interest2)
+  income['unemployment2'] = currency(monthly_income.unemployment2)
+  income['unemploymentForSpouse'] = currency(monthly_income.spouse_social2)
+  income['pension2'] = currency(monthly_income.pension2)
+  income['source2'] = currency(monthly_income.source1_2)
+  income['other1Amt2'] = currency(monthly_income.source1_amount_2)
+  income['source2'] = currency(monthly_income.source2_2)
+  income['other2Amt2'] = currency(monthly_income.source2_amount_2)
+  income['total2'] = currency(monthly_income.source1_amount_2 + monthly_income.source2_amount_2)
+  income['totalMonthly2'] = currency(monthly_income.gross_wages2 + monthly_income.alimony2 + monthly_income.other_income2 + (monthly_income.business_gross_receipts2 - monthly_income.business_operating_expenses2) + (monthly_income.rental_gross_receipts2 - monthly_income.rental_operating_expenses2) + monthly_income.interest2 + monthly_income.unemployment2 + monthly_income.spouse_social2 + monthly_income.pension2 + monthly_income.source1_amount_2 + monthly_income.source2_amount_2)
+  
+  income['overallTotalMonthly'] = currency((monthly_income.gross_wages1 + monthly_income.alimony1 + monthly_income.other_income1 + (monthly_income.business_gross_receipts1 - monthly_income.business_operating_expenses1) + (monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1) + monthly_income.interest1 + monthly_income.unemployment1 + monthly_income.social1 + monthly_income.pension1 + monthly_income.source1_amount_1 + monthly_income.source2_amount_1) + (monthly_income.gross_wages2 + monthly_income.alimony2 + monthly_income.other_income2 + (monthly_income.business_gross_receipts2 - monthly_income.business_operating_expenses2) + (monthly_income.rental_gross_receipts2 - monthly_income.rental_operating_expenses2) + monthly_income.interest2 + monthly_income.unemployment2 + monthly_income.spouse_social2 + monthly_income.pension2 + monthly_income.source1_amount_2 + monthly_income.source2_amount_2))
+  income['overallTotalMonthly-1'] = currency((monthly_income.gross_wages1 + monthly_income.alimony1 + monthly_income.other_income1 + (monthly_income.business_gross_receipts1 - monthly_income.business_operating_expenses1) + (monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1) + monthly_income.interest1 + monthly_income.unemployment1 + monthly_income.social1 + monthly_income.pension1 + monthly_income.source1_amount_1 + monthly_income.source2_amount_1) + (monthly_income.gross_wages2 + monthly_income.alimony2 + monthly_income.other_income2 + (monthly_income.business_gross_receipts2 - monthly_income.business_operating_expenses2) + (monthly_income.rental_gross_receipts2 - monthly_income.rental_operating_expenses2) + monthly_income.interest2 + monthly_income.unemployment2 + monthly_income.spouse_social2 + monthly_income.pension2 + monthly_income.source1_amount_2 + monthly_income.source2_amount_2))
+  income['overallTotalYear'] = currency(((monthly_income.gross_wages1 + monthly_income.alimony1 + monthly_income.other_income1 + (monthly_income.business_gross_receipts1 - monthly_income.business_operating_expenses1) + (monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1) + monthly_income.interest1 + monthly_income.unemployment1 + monthly_income.social1 + monthly_income.pension1 + monthly_income.source1_amount_1 + monthly_income.source2_amount_1) + (monthly_income.gross_wages2 + monthly_income.alimony2 + monthly_income.other_income2 + (monthly_income.business_gross_receipts2 - monthly_income.business_operating_expenses2) + (monthly_income.rental_gross_receipts2 - monthly_income.rental_operating_expenses2) + monthly_income.interest2 + monthly_income.unemployment2 + monthly_income.spouse_social2 + monthly_income.pension2 + monthly_income.source1_amount_2 + monthly_income.source2_amount_2)) * 12)
+  income['state'] = monthly_income.median_state
+  income['dependents'] = monthly_income.median_dependents
+  income['medianIncome'] = monthly_income.median_income
+  income['lessThan'] = True if ((monthly_income.gross_wages1 + monthly_income.alimony1 + monthly_income.other_income1 + (monthly_income.business_gross_receipts1 - monthly_income.business_operating_expenses1) + (monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1) + monthly_income.interest1 + monthly_income.unemployment1 + monthly_income.social1 + monthly_income.pension1 + monthly_income.source1_amount_1 + monthly_income.source2_amount_1) + (monthly_income.gross_wages2 + monthly_income.alimony2 + monthly_income.other_income2 + (monthly_income.business_gross_receipts2 - monthly_income.business_operating_expenses2) + (monthly_income.rental_gross_receipts2 - monthly_income.rental_operating_expenses2) + monthly_income.interest2 + monthly_income.unemployment2 + monthly_income.spouse_social2 + monthly_income.pension2 + monthly_income.source1_amount_2 + monthly_income.source2_amount_2) < monthly_income.median_income) else False
+  income['moreThan'] = True if ((monthly_income.gross_wages1 + monthly_income.alimony1 + monthly_income.other_income1 + (monthly_income.business_gross_receipts1 - monthly_income.business_operating_expenses1) + (monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1) + monthly_income.interest1 + monthly_income.unemployment1 + monthly_income.social1 + monthly_income.pension1 + monthly_income.source1_amount_1 + monthly_income.source2_amount_1) + (monthly_income.gross_wages2 + monthly_income.alimony2 + monthly_income.other_income2 + (monthly_income.business_gross_receipts2 - monthly_income.business_operating_expenses2) + (monthly_income.rental_gross_receipts2 - monthly_income.rental_operating_expenses2) + monthly_income.interest2 + monthly_income.unemployment2 + monthly_income.spouse_social2 + monthly_income.pension2 + monthly_income.source1_amount_2 + monthly_income.source2_amount_2) > monthly_income.median_income) else False

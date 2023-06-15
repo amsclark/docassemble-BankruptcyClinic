@@ -1,0 +1,39 @@
+div {
+  font-family: Roboto;
+  font-weight: 300;
+}
+
+h1, h2, h3, h4, h5{
+  font-family: Roboto;
+  font-weight: 400;
+}
+
+a.nav-link.danavlink.active{
+ background-color: #92191C; 
+}
+
+a.nav-link.danavlink{
+ color: #92191C; 
+}
+
+button.btn.btn-da.btn-primary{
+  background-color: #595959;
+  border-color: #101820;
+}
+
+label.form-label.text-start.btn.dalabelauty.btn-primary{
+  background-color: #595959;
+  border-color: #101820;
+}
+
+div.progress-bar{
+  background-color: #CB1F2B; 
+}
+
+span.input-group-text{
+  background-color: #DBDBDB; 
+}
+
+div.navbar.fixed-top.navbar-expand-md.bg-dark{
+  background-image: url(https://www.legalaidofnebraska.org/wp-content/uploads/2018/08/top-nav-textured-bg.jpg);
+}

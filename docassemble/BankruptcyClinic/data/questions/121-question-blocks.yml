@@ -1,0 +1,110 @@
+section: form_121
+question: |
+  Statement About Your Social Security Numbers
+subquestion: |
+  Use this form to tell the court about any Social Security or federal Individual Taxpayer Identification numbers you have used. Do not file this form as part of the public case file. This form must be submitted separately and must not be included in the court’s public electronic records. Please consult local court procedures for submission requirements.
+  <br><br>
+  To protect your privacy, the court will not make this form available to the public. You should not include a full Social Security Number or Individual Taxpayer Number on any other document filed with the court. The court will make only the last four digits of your numbers known to the public. However, the full numbers will be available to your creditors, the U.S. Trustee or bankruptcy administrator, and the trustee assigned to your case.  
+  <br><br>
+  Making a false statement, concealing property, or obtaining money or property by fraud in connection with a bankruptcy case can result in fines up to $250,000, or imprisonment for up to 20 years, or both.  18 U.S.C. §§ 152, 1341, 1519, and 3571. 
+fields:
+  - note: |
+      Tell the court about all your Social Security or Federal Individual Taxpayer Identification Numbers
+  - Debtor 1 has no SSN: debtor1_no_ssn
+    datatype: yesnoradio
+    default: False
+  - Debtor 1 SSN: debtor1_ssn_1
+    required: False
+    default: 999 55 9999
+    show if:
+      variable: debtor1_no_ssn
+      is: False
+  - Debtor 1 SSN: debtor1_ssn_2
+    required: False
+    default: 999 55 9998
+    show if:
+      variable: debtor1_no_ssn
+      is: False
+  - Debtor 1 has no ITIN: debtor1_no_itin
+    datatype: yesnoradio
+    default: False
+  - Debtor 1 ITIN: debtor1_itin_1
+    required: False
+    default: 555 55 5555
+    show if:
+      variable: debtor1_no_itin
+      is: False
+  - Debtor 1 ITIN: debtor1_itin_2
+    required: False
+    default: 555 55 5554
+    show if:
+      variable: debtor1_no_itin
+      is: False
+  - Debtor 2 has no SSN: debtor2_no_ssn
+    datatype: yesnoradio
+    default: False
+  - Debtor 2 SSN: debtor2_ssn_1
+    required: False
+    default: 999 55 9999
+    show if:
+      variable: debtor2_no_ssn
+      is: False
+  - Debtor 2 SSN: debtor2_ssn_2
+    required: False
+    default: 999 55 9998
+    show if:
+      variable: debtor2_no_ssn
+      is: False
+  - Debtor 2 has no ITIN: debtor2_no_itin
+    datatype: yesnoradio
+    default: False
+  - Debtor 2 ITIN: debtor2_itin_1
+    required: False
+    default: 555 55 5555
+    show if:
+      variable: debtor2_no_itin
+      is: False
+  - Debtor 2 ITIN: debtor2_itin_2
+    required: False
+    default: 555 55 5554
+    show if:
+      variable: debtor2_no_itin
+      is: False
+---
+code: |
+  ssn = {}
+  ssn['bankruptcy_district'] = current_district
+  ssn['case_number'] = case_number
+  ssn['debtor1_first_name'] = debtor[0].name.first
+  ssn['debtor1_middle_name'] = debtor[0].name.middle
+  ssn['debtor1_last_name'] = debtor[0].name.last
+  ssn['debtor1_no_itin'] = True if debtor1_no_itin == True else False
+  ssn['debtor1_no_ssn'] = True if debtor1_no_ssn == True else False
+  if debtor1_no_ssn == False:
+    ssn['debtor1_ssn_1'] = debtor1_ssn_1
+    ssn['debtor1_ssn_2'] = debtor1_ssn_2
+  if debtor1_no_itin == False:
+    ssn['debtor1_itin_1'] = debtor1_itin_1
+    ssn['debtor1_itin_2'] = debtor1_itin_2
+  if len(debtor) > 1:
+    ssn['debtor2_first_name'] = debtor[1].name.first
+    ssn['debtor2_middle_name'] = debtor[1].name.middle
+    ssn['debtor2_last_name'] = debtor[1].name.last
+    ssn['debtor2_no_itin'] = True if debtor2_no_itin == True else False
+    ssn['debtor2_no_ssn'] = True if debtor2_no_ssn == True else False
+    if debtor2_no_ssn == False:
+      ssn['debtor2_ssn_1'] = debtor2_ssn_1
+      ssn['debtor2_ssn_2'] = debtor2_ssn_2
+    if debtor2_no_itin == False:
+      ssn['debtor2_itin_1'] = debtor2_itin_1
+      ssn['debtor2_itin_2'] = debtor2_itin_2
+---
+event: form_121_attach
+section: form_121
+question: Form 121 Attachment
+continue button field: form_121_attach
+attachment:
+  pdf template file: form_b121.pdf
+  variable name: attach_121
+  code: ssn
+---

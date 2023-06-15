@@ -1,0 +1,4 @@
+mandatory: True
+code: |
+  menu_items = [ action_menu_item('Review Answers', 'review_answers') ]
+---

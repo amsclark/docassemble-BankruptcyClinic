@@ -1,0 +1,650 @@
+#Part 0 - Intro
+section: waive_fee
+event: waive_fee_intro
+question: |
+  Application to Have the Chapter 7 Filing Fee Waived
+subquestion: |
+  The fee for filing a bankruptcy case under chapter 7 is $335. Because you cannot afford to pay the entire fee now in full or in installments within 120 days, you are asking the court to waive your fee. After reviewing your application, the court may waive your fee, set a hearing for further invetigation, or require you to pay the fee in isntallments.
+continue button field: waive_fee_intro
+---
+#Part 1 - Tell the court about your family and your family's income
+section: waive_fee
+question: |
+  Tell the court about your family and income
+subquestion: |
+  Your family includes you, your spouse, and any dependents listed on Schedule J: Your Expenses.
+fields:
+  - You: family.you
+    datatype: yesno
+    default: True
+  - Your spouce: family.has_spouce
+    datatype: yesno
+    default: True
+  - Your dependents: family.has_dependents
+    datatype: yesno
+  - How many dependents: family.dependent_count
+    datatype: number
+    default: 0
+  - Total number of people: family.total_number
+    datatype: number
+    default: 2
+  - note: |
+      <br>
+      ### Income Information
+      
+      Make sure to include the value (if known) of any non-cash governmental assistance that you receive, such as food stamps (benefits under the Supplemental Nutrition Assistance Program) or housing subsidies.
+  - Your income: family.you_income
+    datatype: currency
+    default: 50000
+  - Your spouces income: family.spouse_income
+    datatype: currency
+    required: False
+    default: 30000
+  - Non-cash assistance: family.assistance_income
+    datatype: currency
+    default: 5000
+  - note: |
+      <br><br>
+      Tell the court about income changes and assistance
+  - Received governmental assistance: family.governmental_assistance
+    datatype: yesno
+  - Explain: family.governmental_assistance_explain
+    input type: area
+    required: false
+    show if: family.governmental_assistance
+  - note: |
+      <br><br>
+      Do you expect your family's average monthly net income to increase or decrease by more       than 10% during the next 6 months?
+  - Income Change: family.income_change
+    datatype: yesno
+  - Explain: family.income_change_explain
+    input type: area
+    required: False
+    show if: family.income_change
+  - note: |
+      <br><br>
+      Tell the court why you are unable to pay the filing fee in installments within 120 days. If you have some additional circumstances that cause you not to be able to pay your filing fee in installments, explain them.
+  - Explain: family.cannot_pay_explain
+    input type: area
+    default: |
+      NA
+---
+#Part 2 - Tell the court about your monthly expenses
+section: waive_fee
+question: |
+  Estimate your average monthly expenses.
+subquestion: |
+  Include amounts paid by any government assistance that you reported earlier.
+fields: 
+  - Average Monthly Expense: family.average_monthly_expenses
+    datatype: currency
+    default: 3500
+  - note: |
+      <br><br>
+      Do these expenses cover anyone who is not included in your family as reported earlier?
+  - Others covered: family.has_others_with_expenses
+    datatype: yesno
+  - Explain: family.others_with_expenses_explain
+    input type: area
+    default: |
+      NA
+    show if: family.has_others_with_expenses
+  - note: |
+      <br><br>
+      Does anyone other than you regularly pay any of these expenses?
+  - Other payers: family.has_other_expense_payers
+    datatype: yesno
+  - Amount: family.other_expense_payers_amount
+    datatype: number
+    default: 0
+    show if: family.has_other_expense_payers
+  - note: |
+      <br><br>
+      Do you expect your average monthly expenses to increase or decrease by more than 10% during the next 6 months?
+  - Expense Change: family.expense_changes
+    datatype: yesno
+  - Explain: family.expense_changes_explain
+    input type: area
+    default: |
+      NA
+    show if: family.expense_changes
+---
+# Part 3 - Tell the court about your property
+table: prop_accounts_table
+rows: prop.accounts
+columns:
+  - Type: row_item.type
+  - Institution: row_item.institution
+  - Amount: row_item.amount
+edit:
+  - type
+  - institution
+  - amount
+---
+section: waive_fee
+question: |
+  How much cash do you have?
+subquestion: |
+  Examples: Money you have in your wallet, in your home, and on hand when you file this application.
+fields: 
+  - Cash on Hand: prop.cash_on_hand
+    datatype: currency
+    default: 2000
+---
+section: waive_fee
+question: |
+  Do you have bank accounts and other deposits of money?
+subquestion: |
+  Examples: Checking, savings, money market, or other finacial accounts; certificates of deposit; shares in banks, credit unions, brokerage houses, and other similar institutions. If you have more than one account with the same institution, list each when asked.
+  
+  Do not include 401(k) and IRA accounts.
+yesno: prop.has_bank_accounts
+---
+section: waive_fee
+question: |
+  Provide details about account.
+fields:
+  - Account Type: prop.accounts[i].type
+    choices: 
+      - Checking
+      - Savings
+      - Other
+  - Institution Name: prop.accounts[i].institution
+    default: BECU
+  - Amount: prop.accounts[i].amount
+    default: 1000
+    datatype: currency
+under: |
+  ${ prop_accounts_table }
+---
+section: waive_fee
+question: |
+  Do you have any other bank accounts or deposits of money?
+yesno: prop.accounts.there_is_another
+under: |
+  ${ prop_accounts_table }
+---
+section: waive_fee
+question: |
+  Your home?
+subquestion: |
+  Do you own a home outright or are you in the process of purchasing one now?
+fields: 
+  - Owns home: prop.has_home
+    datatype: yesnoradio
+    default: False
+  - Number: prop.mortgage_number
+    default: 1111
+    show if: prop.has_home
+  - Street: prop.mortgage_street
+    default: |
+      56 Pl
+    show if: prop.has_home
+  - City: prop.mortgage_city
+    default: |
+      Tampa
+    show if: prop.has_home
+  - State: prop.mortgage_state
+    default: |
+      Florida
+    show if: prop.has_home
+  - Zip: prop.mortgage_zip
+    default: |
+      99999
+    show if: prop.has_home
+  - Current Value: prop.mortgage_current_value
+    datatype: currency
+    default: 150000
+    show if: prop.has_home
+  - Amount owed: prop.mortgage_amount_owed
+    datatype: currency
+    default: 90000
+    show if: prop.has_home
+---
+section: waive_fee
+question: |
+  Other real estate?
+subquestion: |
+  Do you own any other real estate assets?
+fields: 
+  - Has other real estate: prop.has_other_real_estate
+    datatype: yesnoradio
+    default: False
+  - Number: prop.other_mortgage_number
+    default: |
+      1111
+    show if: prop.has_other_real_estate
+  - Street: prop.other_mortgage_street
+    default: |
+      56th Pl
+    show if: prop.has_other_real_estate
+  - City: prop.other_mortgage_city
+    default: |
+      Tampa
+    show if: prop.has_other_real_estate
+  - State: prop.other_mortgage_state
+    default: |
+      Florida
+    show if: prop.has_other_real_estate
+  - Zip: prop.other_mortgage_zip
+    default: |
+      99999
+    show if: prop.has_other_real_estate
+  - Current Value: prop.other_mortgage_current_value
+    default: 300000
+    datatype: currency
+    show if: prop.has_other_real_estate
+  - Amount owed: prop.other_mortgage_amount_owed
+    default: 250000
+    datatype: currency
+    show if: prop.has_other_real_estate
+---
+table: prop_vehicles_table
+rows: prop.vehicles
+columns:
+  - Make: row_item.make
+  - Model: row_item.model
+  - Year: row_item.year
+  - Milage: row_item.milage
+  - Value: row_item.current_value
+  - Owed: row_item.amount_owed
+edit:
+  - make
+  - model
+  - year
+  - milage
+  - current_value
+  - amount_owed
+---
+section: waive_fee
+question: |
+  Vehicles?
+subquestion: |
+  Do you own any vehicles? Examples: Cars, vans, trucks, sports utility vehicles, motorcycles, tractors, boats.
+yesno: prop.vehicles.there_are_any
+---
+section: waive_fee
+question: |
+  Do you own any more vehicles?
+yesno: prop.vehicles.there_is_another
+under: |
+  ${ prop_vehicles_table }
+---
+section: waive_fee
+question: |
+  Enter vehicle information
+fields:
+  - Make: prop.vehicles[i].make
+    default: |
+      Toyota
+  - Model: prop.vehicles[i].model
+    default: |
+      Corolla
+  - Year: prop.vehicles[i].year
+    default: |
+      2015
+  - Milage: prop.vehicles[i].milage
+    datatype: number
+    default: 200000
+  - note: |
+      Tell us about the vehicles value and liens.
+  - Current Value: prop.vehicles[i].current_value
+    default: 8000
+    datatype: currency
+  - Amount owed: prop.vehicles[i].amount_owed
+    default: 14000
+    datatype: currency
+---
+section: waive_fee
+question: |
+  Other assets
+subquestion: |
+  What other assets do you own aside from household items and clothing?
+fields:
+  - Describe other assets: prop.other_asset_description
+    input type: area
+    default: |
+      Something else
+  - Current Value: prop.other_asset_value
+    datatype: currency
+    default: 1000
+  - Amount owed: prop.other_asset_owed
+    datatype: currency
+    default: 500
+---
+table: prop_owers_table
+rows: prop.owers
+columns:
+  - Name: row_item.name
+  - Amount: row_item.amount
+edit:
+  - name
+  - amount
+---
+section: waive_fee
+question: |
+  Money or property due you?
+subquestion: |
+  Examples: Tax refunds, past due or lump sum alimony, spousal support, child support, maintenance, divorce or property settlements, Social Security benefits, workers' compensation, personal injury recovery.
+yesno: prop.owers.there_are_any
+---
+section: waive_fee
+question: |
+  Do you have any other property due?
+yesno: prop.owers.there_is_another
+under: |
+  ${ prop_owers_table }
+---
+section: waive_fee
+question: |
+  Tell us about the ower.
+fields:
+  - Ower Name: prop.owers[i].name
+    default: |
+      Cindy
+  - How much?: prop.owers[i].amount
+    datatype: currency
+    default: |
+      500
+under: |
+  ${ prop_owers_table }
+---
+section: waive_fee
+question: |
+  Receiving payment?
+fields:
+  - Do you believe you will likely receive payment in the next 180 days?: prop.will_receive_ower_payment
+    datatype: yesnoradio
+    default: True
+  - Explain: prop.ower_payment_explain
+    required: false
+    input type: area
+---
+#Part 4: Answer these additional questions
+section: waive_fee
+question: |
+  Who's paid for filing services?
+fields:
+  - note: |
+      <br><br>
+      Have you paid anyone for services for this case, including filling out this application, the bankruptcy filing package, or the schedules?
+  - Paid?: additional.paid_for_services
+    datatype: yesnoradio
+    default: False
+  - Whom did you pay?: additional.paid_for_services_who
+    datatype: checkboxes
+    choices: 
+      - An attorney
+      - A bankruptcy petition preparer, paralegal, or typing service
+      - Someone else
+    show if: additional.paid_for_services
+  - Describe who: additional.paid_for_services_who_describe
+    default: |
+      Family Friend
+    show if: additional.paid_for_services
+  - How much?: additional.paid_for_services_amount
+    default: 1000
+    datatype: currency
+    show if: additional.paid_for_services
+  - note: |
+      <br><br>
+      Have you promised to pay or do you expect to pay someone for services for your bankruptcy case?
+  - Promised to pay?: additional.promised_for_services
+    datatype: yesnoradio
+    default: False
+  - Whom did you pay?: additional.promised_for_services_who
+    datatype: checkboxes
+    choices: 
+      - An attorney
+      - A bankruptcy petition preparer, paralegal, or typing service
+      - Someone else
+    show if: additional.promised_for_services
+  - Describe who: additional.promised_for_services_who_describe
+    default: |
+      Family Friend
+    show if: additional.promised_for_services
+  - How much?: additional.promised_for_services_amount
+    default: 1000
+    datatype: currency
+    show if: additional.promised_for_services
+  - note: |
+      <br><br>
+      Has anyone paid someone on your behalf for services for this case?
+  - Has anyone else paid on your behalf?: additional.behalf_for_services
+    datatype: yesnoradio
+    default: False
+  - Whom was paid?: additional.behalf_for_services_who
+    datatype: checkboxes
+    choices: 
+      - An attorney
+      - A bankruptcy petition preparer, paralegal, or typing service
+      - Someone else
+    show if: additional.behalf_for_services
+  - Who paid?: additional.behalf_for_services_paid
+    datatype: checkboxes
+    choices:
+      - Parent
+      - Brother or sister
+      - Friend
+      - Pastor or clergy
+      - Someone else
+    show if: additional.behalf_for_services
+  - Other payer: additional.behalf_other_payer
+    default: |
+      Someone else
+    show if: additional.behalf_for_services
+  - How much was paid?: additional.behalf_for_services_amount
+    default: 1000
+    datatype: currency
+    show if: additional.behalf_for_services
+---
+table: add_bankruptcy_table
+rows: additional.bankruptcies
+columns:
+  - District: row_item.district
+  - When: row_item.when
+  - Case Number: row_item.case_number
+edit:
+  - district
+  - when
+  - case_number
+---
+question: |
+  Have you filied for bankruptcy in the last 8 years?
+yesno: additional.bankruptcies.there_are_any
+---
+question: |
+  Do you have any other bankruptcies in the last 8 years to report?
+yesno: additional.bankruptcies.there_is_another
+under: |
+  ${ add_bankruptcy_table }
+---
+question: |
+  Tell the court about your previous bankruptcy case.
+fields:
+  - District: additional.bankruptcies[i].district
+    default: 'District of Nebraska'
+    code: courts_list
+  - When: additional.bankruptcies[i].when
+    default: 01/01/23
+    datatype: date
+  - Case Number: additional.bankruptcies[i].case_number
+    datatype: number
+    default: 111111
+---
+event: form_103b_attach
+section: waive_fee
+question: Form 103b Attachment
+continue button field: form_103b_attach
+attachment:
+  pdf template file: form_b103b.pdf
+  code: waive
+---
+code: |
+  debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
+  if len(debtor) > 1:
+    debtor2_name = debtor[1].name.first + " " + debtor[1].name.middle + " " + debtor[1].name.last
+  else:
+    debtor2_name = ''
+  waive = {}
+  waive['debtor1_name_1'] = debtor_name
+  waive['debtor1_name_2'] = debtor_name
+  waive['debtor1_name_3'] = debtor_name
+  waive['debtor1_name_4'] = debtor_name
+  waive['debtor1_name_5'] = debtor_name
+  waive['debtor2_name_1'] = debtor2_name
+  waive['debtor2_name_4'] = debtor2_name
+  waive['bankruptcy_district'] = current_district
+  waive['bankruptcy_district_4'] = current_district
+  waive['case_number_1'] = case_number
+  waive['case_number_2'] = case_number
+  waive['case_number_3'] = case_number
+  waive['case_number_4'] = case_number
+  waive['isAmended'] = amended_filing
+  waive['sizeYou'] = True if family.you == True else False
+  waive['sizeSpouse'] = True if family.has_spouce == True else False
+  waive['sizeDependents'] = True if family.has_dependents == True else False
+  waive['dependentCount'] = family.dependent_count if family.has_dependents == True else None
+  waive['sizeTotal'] = family.total_number
+  waive['monthly_income_you'] = currency(family.you_income)
+  waive['monthly_income_spouse'] = currency(family.spouse_income)
+  waive['monthly_subtotal'] = currency(family.you_income + family.spouse_income)
+  waive['monthly_govt_assist'] = currency(family.assistance_income)
+  waive['monthly_net_income'] = currency((family.you_income + family.spouse_income) - family.assistance_income)
+  
+  if family.governmental_assistance == True:
+    waive['yesGovtAssist'] = True
+    waive['typeGovtAssist'] = family.governmental_assistance_explain
+  else:
+    waive['noGovtAssist'] = True
+
+  if family.income_change == True:
+    waive['yesIncomeChange'] = True
+    waive['typeIncomeChange'] = family.income_change_explain
+  else:
+    waive['noIncomeChange'] = True
+
+  waive['typeAdditionalInfo'] = family.cannot_pay_explain
+  waive['avgMonthlyExpenses'] = currency(family.average_monthly_expenses)
+  
+  if family.has_others_with_expenses == True:
+    waive['yesOutsideFamily'] = True
+    waive['whoOutsideFamily'] = family.others_with_expenses_explain
+  else:
+    waive['noOutsideFamily'] = True
+
+  if family.has_other_expense_payers == True:
+    waive['yesOutsidePayers'] = True
+    waive['amountOutsidePayers'] = currency(family.other_expense_payers_amount)
+  else:
+    waive['noOutsidePayers'] = True
+    
+  if family.expense_changes == True:
+    waive['yesExpenseChange'] = True
+    waive['explainExpenseChange'] = family.expense_changes_explain
+  else:
+    waive['noExpenseChange'] = True
+
+  waive['cashOnHand'] = currency(prop.cash_on_hand)
+
+  if prop.has_home == True:
+    waive['homeAddress'] = str(prop.mortgage_number) + " " + prop.mortgage_street
+    waive['homeValue'] = currency(prop.mortgage_current_value)
+    waive['homeCityStateZip'] = prop.mortgage_city + ", " + prop.mortgage_state + " " + prop.mortgage_zip
+    waive['homeOwed'] = currency(prop.mortgage_amount_owed)
+  
+    if prop.has_other_real_estate == True:
+      waive['otherHomeAddress'] = str(prop.other_mortgage_number) + " " + prop.other_mortgage_street
+      waive['otherHomeValue'] = currency(prop.other_mortgage_current_value)
+      waive['otherHomeCityStateZip'] = prop.other_mortgage_city + ", " + prop.other_mortgage_state + " " + prop.other_mortgage_zip
+      waive['otherHomeOwed'] = currency(prop.other_mortgage_amount_owed)
+  
+  if len(prop.vehicles) > 0:
+    i = 1
+    for car in prop.vehicles:
+      waive['carMake'+str(i)] = car.make
+      waive['carModel'+str(i)] = car.model
+      waive['carValue'+str(i)] = currency(car.current_value)
+      waive['carYear'+str(i)] = car.year
+      waive['carMilage'+str(i)] = car.milage
+      waive['carOwed'+str(i)] = currency(car.amount_owed)
+      i += 1
+  
+  waive['otherAssetsDescription'] = prop.other_asset_description
+  waive['otherAssetsValue'] = currency(prop.other_asset_value)
+  waive['otherAssetsOwed'] = currency(prop.other_asset_owed)
+  
+  if len(prop.owers) > 0:
+    i = 1
+    for ower in prop.owers:
+      waive['owedName'+str(i)] = ower.name
+      waive['owedValue'+str(i)] = currency(ower.amount)
+      if prop.will_receive_ower_payment == True:
+        waive['owedYesPaymentSoon'] = True
+        waive['owedExplain'] = prop.ower_payment_explain
+      else:
+        waive['owedNoPaymentSoon'] = True
+      i += 1
+  
+
+    
+  if additional.paid_for_services == True:
+    waive['yesPaidServices'] = True
+    waive['paidAmount'] = currency(additional.paid_for_services_amount)
+    waive['paidAttorney'] = True if 'An attorney' in additional.paid_for_services_who else False
+    waive['paidPreparer'] = True if 'A bankruptcy petition preparer, paralegal, or typing service' in additional.paid_for_services_who else False
+    waive['paidSomeone'] = True if 'Someone else' in additional.paid_for_services_who else False
+    waive['paidWho'] = additional.paid_for_services_who_describe
+  else:
+    waive['noPaidServices'] = True
+  
+  if additional.promised_for_services == True:
+    waive['yesPromised'] = True
+    waive['promisedAttorney'] = True if 'An attorney' in additional.promised_for_services_who else False
+    waive['promisedPreparer'] = True if 'A bankruptcy petition preparer, paralegal, or typing service' in additional.promised_for_services_who else False
+    waive['promisedSomeone'] = True if additional.promised_for_services_who == 'Someone else' else False
+    waive['promisedAmount'] = currency(additional.promised_for_services_amount)
+    waive['promisedWho'] = additional.promised_for_services_who_describe
+  else:
+    waive['noPromised'] = True
+
+  if additional.behalf_for_services == True:
+    waive['yesBehalf'] = True
+    waive['behalfAmount'] = currency(additional.behalf_for_services_amount)
+    waive['behalfAttorney'] = True if 'An attorney' in additional.behalf_for_services_who else False
+    waive['behalfParent'] = True if 'Parent' in additional.behalf_for_services_paid else False
+    waive['behalfPreparer'] = True if 'A bankruptcy petition preparer, paralegal, or typing service' in additional.behalf_for_services_who else False
+    waive['behalfBrother'] = True if 'Brother or sister' in additional.behalf_for_services_paid else False
+    waive['behalfFriend'] = True if 'Friend' in additional.behalf_for_services_paid  else False
+    waive['behalfWhoElse'] = True if 'Someone else' in additional.behalf_for_services_who  else False
+    waive['behalfWho'] = additional.behalf_for_services_paid
+    waive['behalfPastor'] = True if 'Pastor' in additional.behalf_for_services_paid  else False
+    waive['behalfSomeone'] = True if 'Someone else' in additional.behalf_for_services_paid else False
+    waive['behalfSomeoneName'] = additional.behalf_other_payer
+  else:
+    waive['noBehalf'] = True
+
+  if len(additional.bankruptcies) > 0:
+    waive['yesBankruptcy'] = True
+    i = 1
+    for bankruptcy in additional.bankruptcies:
+      waive['bankruptcyDistrict'+str(i)] = bankruptcy.district
+      waive['bankruptcyWhen'+str(i)] = format_date(bankruptcy.when, format='MM/dd/yyyy')
+      waive['bankruptcyCase'+str(i)] = bankruptcy.case_number
+      i += 1
+  else:
+    waive['noBankruptcy'] = True
+    
+  if len(prop.accounts) > 0:
+    if len(list(filter(lambda x: x.type == 'Checking', prop.accounts))) > 0:
+      waive['checkingInstitution'] = list(filter(lambda x: x.type == 'Checking', prop.accounts))[0].institution
+      waive['checkingAmount'] = currency(list(filter(lambda x: x.type == 'Checking', prop.accounts))[0].amount)
+    if len(list(filter(lambda x: x.type == 'Savings', prop.accounts))) > 0: 
+      waive['savingsInstitution'] = list(filter(lambda x: x.type == 'Savings', prop.accounts))[0].institution
+      waive['savingsAmount'] = currency(list(filter(lambda x: x.type == 'Savings', prop.accounts))[0].amount)
+    if len(list(filter(lambda x: x.type == 'Other', prop.accounts))) > 0:
+      waive['otherInstitution1'] = list(filter(lambda x: x.type == 'Other', prop.accounts))[0].institution
+      waive['otherAmount1'] = currency(list(filter(lambda x: x.type == 'Other', prop.accounts))[0].amount)
+    if len(list(filter(lambda x: x.type == 'Other', prop.accounts))) > 1:
+      waive['otherInstitution2'] = list(filter(lambda x: x.type == 'Other', prop.accounts))[1].institution
+      waive['otherAmount2'] = currency(list(filter(lambda x: x.type == 'Other', prop.accounts))[1].amount)

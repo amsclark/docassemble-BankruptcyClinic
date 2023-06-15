@@ -1,0 +1,476 @@
+section: schedule_i
+question: |
+  Fill in your employment information.
+subquestion: |
+  Include part-time, seasonal, or self-employed work. Occupation may include student or homemaker, if it applies.
+fields:
+  - Employment Status: debtor[0].income.employment
+    choices:
+      - Employed
+      - Not employed
+  - Occupation: debtor[0].income.occupation
+    default: Hair Stylist
+    show if:
+      variable: debtor[0].income.employment
+      is: Employed
+  - Employer Name: debtor[0].income.employer
+    default: SuperCuts
+    show if:
+      variable: debtor[0].income.employment
+      is: Employed
+  - note: Employer Address
+    show if:
+      variable: debtor[0].income.employment
+      is: Employed
+  - Number: debtor[0].income.employer_number
+    default: 1111
+    show if:
+      variable: debtor[0].income.employment
+      is: Employed
+  - Street: debtor[0].income.employer_street
+    default: 22nd Ave NE
+    show if:
+      variable: debtor[0].income.employment
+      is: Employed
+  - City: debtor[0].income.employer_city
+    default: Tacoma
+    show if:
+      variable: debtor[0].income.employment
+      is: Employed
+  - State: debtor[0].income.employer_state
+    default: Washington
+    show if:
+      variable: debtor[0].income.employment
+      is: Employed
+  - Zip: debtor[0].income.employer_zip
+    default: 98166
+    show if:
+      variable: debtor[0].income.employment
+      is: Employed
+  - How long employed there?: debtor[0].income.employment_length
+    show if:
+      variable: debtor[0].income.employment
+      is: Employed
+  - note: |
+      Give details about monthly income
+      
+      Estimate monthly income as of the date you file this form. If you have nothing to report ofr any line, write 0 in the space. Include your non-filing spouse unless you are separated.
+      
+      If you or your non-filing spouce have more than one employer, combine the information for all employers for that person on the lines below.
+  - Monthly gross wages, slarary, and comissions: debtor[0].income.income_amount
+    datatype: currency
+    default: 25000
+  - Estimate and list monthly overtime pay: debtor[0].income.overtime_pay
+    datatype: currency
+    default: 3000
+  - note: List all payroll deductions
+  - Tax, Medicare, and Social Security deductions: debtor[0].income.tax_deduction
+    datatype: currency
+    default: 300
+  - Mandator contributions for retirement plans: debtor[0].income.mandatory_contributions
+    datatype: currency
+    default: 500
+  - Voluntary contributions for retirement plans: debtor[0].income.voluntary_contributions
+    datatype: currency
+    default: 1000
+  - Required repayment of retirement fund loans: debtor[0].income.fund_loans
+    datatype: currency
+    default: 0
+  - Insurance: debtor[0].income.insurance
+    datatype: currency
+    default: 0
+  - Domestic support obligations: debtor[0].income.domestic_support
+    datatype: currency
+    default: 0
+  - Union dues: debtor[0].income.union_dues
+    datatype: currency
+    default: 300
+  - Other deduction?: debtor[0].income.other_deduction
+    datatype: yesnoradio
+    default: True
+  - Specify deduction: debtor[0].income.specify_other_deduction
+    default: Other
+    show if: debtor[0].income.other_deduction
+  - Deduction amount: debtor[0].income.other_deduction_amount
+    datatype: currency
+    default: 0
+    show if: debtor[0].income.other_deduction
+  - note: List all other income regularly received
+  - Net income from rental property and from operating a business, profession, or farm: debtor[0].income.net_rental_business
+    datatype: currency
+    default: 0
+  - Interest and dividends: debtor[0].income.interest_and_dividends
+    datatype: currency
+    default: 0
+  - Family support payments that you, a non-filing spouse, or a dependent regularly recieve: debtor[0].income.family_support
+    datatype: currency
+    default: 0
+  - Unemployment compensation: debtor[0].income.unemployment
+    datatype: currency
+    default: 0
+  - Social Security: debtor[0].income.social_security
+    datatype: currency
+    default: 0
+  - Other government assistance that you regularly receive: debtor[0].income.other_govt_assist
+    datatype: currency
+    default: 0
+  - Pension or retirement income: debtor[0].income.pension
+    datatype: currency
+    default: 0
+  - Do you have other monthly income?: debtor[0].income.other_monthly_income
+    datatype: yesnoradio
+    default: True
+  - Specify income type: debtor[0].income.specify_monthly_income
+    default: Other
+    show if: debtor[0].income.other_monthly_income
+  - Income amount: debtor[0].income.other_monthly_amount
+    datatype: currency
+    default: 0
+    show if: debtor[0].income.other_monthly_income
+---
+section: schedule_i
+question: |
+  Fill in employment information for other debtor.
+subquestion: |
+  Include part-time, seasonal, or self-employed work. Occupation may include student or homemaker, if it applies.
+fields:
+  - Employment Status: debtor[1].income.employment
+    choices:
+      - Employed
+      - Not employed
+    default: Employed
+  - Occupation: debtor[1].income.occupation
+    default: Plumber
+    show if:
+      variable: debtor[1].income.employment
+      is: Employed
+  - Employer Name: debtor[1].income.employer
+    default: RotoRoots
+    show if:
+      variable: debtor[1].income.employment
+      is: Employed
+  - note: Employer Address
+    show if:
+      variable: debtor[1].income.employment
+      is: Employed
+  - Number: debtor[1].income.employer_number
+    default: 1111
+    show if:
+      variable: debtor[1].income.employment
+      is: Employed
+  - Street: debtor[1].income.employer_street
+    default: 22nd Ave NE
+    show if:
+      variable: debtor[1].income.employment
+      is: Employed
+  - City: debtor[1].income.employer_city
+    default: Tacoma
+    show if:
+      variable: debtor[1].income.employment
+      is: Employed
+  - State: debtor[1].income.employer_state
+    default: Washington
+    show if:
+      variable: debtor[1].income.employment
+      is: Employed
+  - Zip: debtor[1].income.employer_zip
+    default: 98166
+    show if:
+      variable: debtor[1].income.employment
+      is: Employed
+  - How long employed there?: debtor[1].income.employment_length
+    show if:
+      variable: debtor[1].income.employment
+      is: Employed
+  - note: |
+      Give details about monthly income
+      
+      Estimate monthly income as of the date you file this form. If you have nothing to report ofr any line, write 0 in the space. Include your non-filing spouse unless you are separated.
+      
+      If you or your non-filing spouce have more than one employer, combine the information for all employers for that person on the lines below.
+  - Monthly gross wages, slarary, and comissions: debtor[1].income.income_amount
+    datatype: currency
+    default: 25000
+  - Estimate and list monthly overtime pay: debtor[1].income.overtime_pay
+    datatype: currency
+    default: 3000
+  - note: List all payroll deductions
+  - Tax, Medicare, and Social Security deductions: debtor[1].income.tax_deduction
+    datatype: currency
+    default: 300
+  - Mandator contributions for retirement plans: debtor[1].income.mandatory_contributions
+    datatype: currency
+    default: 500
+  - Voluntary contributions for retirement plans: debtor[1].income.voluntary_contributions
+    datatype: currency
+    default: 1000
+  - Required repayment of retirement fund loans: debtor[1].income.fund_loans
+    datatype: currency
+    default: 0
+  - Insurance: debtor[1].income.insurance
+    datatype: currency
+    default: 0
+  - Domestic support obligations: debtor[1].income.domestic_support
+    datatype: currency
+    default: 0
+  - Union dues: debtor[1].income.union_dues
+    datatype: currency
+    default: 300
+  - Other deduction?: debtor[1].income.other_deduction
+    datatype: yesnoradio
+    default: True
+  - Specify deduction: debtor[1].income.specify_other_deduction
+    default: Other
+    show if: debtor[1].income.other_deduction
+  - Deduction amount: debtor[1].income.other_deduction_amount
+    datatype: currency
+    default: 0
+    show if: debtor[1].income.other_deduction
+  - note: List all other income regularly received
+  - Net income from rental property and from operating a business, profession, or farm: debtor[1].income.net_rental_business
+    datatype: currency
+    default: 0
+  - Interest and dividends: debtor[1].income.interest_and_dividends
+    datatype: currency
+    default: 0
+  - Family support payments that you, a non-filing spouse, or a dependent regularly recieve: debtor[1].income.family_support
+    datatype: currency
+    default: 0
+  - Unemployment compensation: debtor[1].income.unemployment
+    datatype: currency
+    default: 0
+  - Social Security: debtor[1].income.social_security
+    datatype: currency
+    default: 0
+  - Other government assistance that you regularly receive: debtor[1].income.other_govt_assist
+    datatype: currency
+    default: 0
+  - Pension or retirement income: debtor[1].income.pension
+    datatype: currency
+    default: 0
+  - Do you have other monthly income?: debtor[1].income.other_monthly_income
+    datatype: yesnoradio
+    default: True
+  - Specify income type: debtor[1].income.specify_monthly_income
+    default: Other
+    show if: debtor[1].income.other_monthly_income
+  - Income amount: debtor[1].income.other_monthly_amount
+    datatype: currency
+    default: 0
+    show if: debtor[1].income.other_monthly_income
+---
+section: schedule_i
+question: |
+  State all other regular contributions to the expenses that you list in Schedule J.
+subquestion: |
+  Include contributions from an unmarried partner, members of your household, your dependents, your roommates, and other friends or relatives.
+  
+  Do not include any amounts already included previously or amounts that are not available to pay expenses listed in Schedule J.
+fields:
+  - Do you have other regular contributions?: debtor[0].income.other_regular_contributions
+    datatype: yesnoradio
+    default: True
+  - Specify: debtor[0].income.specify_other_regular_contributions
+    default: Other Type
+    show if: debtor[0].income.other_regular_contributions
+  - Amount: debtor[0].income.other_regular_contributions_amount
+    datatype: currency
+    default: 0
+    show if: debtor[0].income.other_regular_contributions
+  - Do you expect an increase or decrease of income within the year after you file this form?: debtor[0].income.expect_year_delta
+    datatype: yesnoradio
+    default: True
+  - Explain: debtor[0].income.year_delta_explain
+    default: Explanation
+    show if: debtor[0].income.expect_year_delta
+---
+event: schedule_i
+section: schedule_i
+question: |
+  Review Employment Information
+review:
+  - note: |
+      <br>
+      ### Your employement
+      Employment Status: ${ debtor[0].income.employment }
+      % if debtor[0].income.employment:
+        Occupation: ${ debtor[0].income.occupation }
+        Employer: ${ debtor[0].income.employer }
+        Employment Length: ${ debtor[0].income.employment_length }
+        
+        Employer Address
+        Number: ${ debtor[0].income.employer_number }
+        Street: ${ debtor[0].income.employer_street }
+        City: ${ debtor[0].income.employer_city }
+        State: ${ debtor[0].income.employer_state }
+        Zip: ${ debtor[0].income.employer_zip }
+      % endif
+        
+      ### Income
+      Monthly gross wages: ${ debtor[0].income.income_amount }
+      Overtime pay: ${ debtor[0].income.overtime_pay }
+      Tax Deduction: ${ debtor[0].income.tax_deduction }
+      Mandatory Contributions: ${ debtor[0].income.mandatory_contributions } 
+      Voluntary Contributions: ${ debtor[0].income.voluntary_contributions } 
+      Retirement Fund Loans: ${ debtor[0].income.fund_loans }
+      Insurance: ${ debtor[0].income.insurance }
+      Domestic support obligations: ${ debtor[0].income.domestic_support }
+      Union dues: ${ debtor[0].income.union_dues }
+      
+      % if debtor[0].income.other_deduction:
+        Has other deductions: Yes
+        Other deductions:
+        ${ debtor[0].income.specify_other_deduction }
+        Other deductions Value: ${ debtor[0].income.other_deduction_amount }
+      % else:
+        Has other deductions: No
+      % endif
+      
+      Regular Income
+      Rental Property Income: ${ debtor[0].income.net_rental_business }
+      Interest and dividends: ${ debtor[0].income.interest_and_dividends }
+      Family Support: ${ debtor[0].income.family_support }
+      Unemployment: ${ debtor[0].income.unemployment }
+      Social Security: ${ debtor[0].income.social_security }
+      Other Govt Assistance: ${ debtor[0].income.other_govt_assist }
+      Pension: ${ debtor[0].income.pension }
+      
+      Other Income
+      % if debtor[0].income.other_monthly_income:
+        Has other monthly income: Yes
+        Income Type:
+        ${ debtor[0].income.specify_monthly_income }
+        Income Amount: ${ debtor[0].income.other_monthly_amount }
+      % else:
+        Has other monthly income: No
+      % endif
+  - note: |
+      <br>
+      ### Other Debtor
+      Employment Status: ${ debtor[1].income.employment }
+      % if debtor[1].income.employment:
+        Occupation: ${ debtor[1].income.occupation }
+        Employer: ${ debtor[1].income.employer }
+        Employment Length: ${ debtor[1].income.employment_length }
+        
+        Employer Address
+        Number: ${ debtor[1].income.employer_number }
+        Street: ${ debtor[1].income.employer_street }
+        City: ${ debtor[1].income.employer_city }
+        State: ${ debtor[1].income.employer_state }
+        Zip: ${ debtor[1].income.employer_zip }
+      % endif
+        
+      ### Income
+      Monthly gross wages: ${ debtor[1].income.income_amount }
+      Overtime pay: ${ debtor[1].income.overtime_pay }
+      Tax Deduction: ${ debtor[1].income.tax_deduction }
+      Mandatory Contributions: ${ debtor[1].income.mandatory_contributions } 
+      Voluntary Contributions: ${ debtor[1].income.voluntary_contributions } 
+      Retirement Fund Loans: ${ debtor[1].income.fund_loans }
+      Insurance: ${ debtor[1].income.insurance }
+      Domestic support obligations: ${ debtor[1].income.domestic_support }
+      Union dues: ${ debtor[1].income.union_dues }
+      
+      % if debtor[1].income.other_deduction:
+        Has other deductions: Yes
+        Other deductions:
+        ${ debtor[1].income.specify_other_deduction }
+        Other deductions Value: ${ debtor[1].income.other_deduction_amount }
+      % else:
+        Has other deductions: No
+      % endif
+      
+      Regular Income
+      Rental Property Income: ${ debtor[1].income.net_rental_business }
+      Interest and dividends: ${ debtor[1].income.interest_and_dividends }
+      Family Support: ${ debtor[1].income.family_support }
+      Unemployment: ${ debtor[1].income.unemployment }
+      Social Security: ${ debtor[1].income.social_security }
+      Other Govt Assistance: ${ debtor[1].income.other_govt_assist }
+      Pension: ${ debtor[1].income.pension }
+      
+      Other Income
+      % if debtor[1].income.other_monthly_income:
+        Has other monthly income: Yes
+        Income Type:
+        ${ debtor[1].income.specify_monthly_income }
+        Income Amount: ${ debtor[1].income.other_monthly_amount }
+      % else:
+        Has other monthly income: No
+      % endif
+  
+    show if: debtor[1]
+---
+event: schedule_i_attach
+section: schedule_i
+question: Schedule i Attachment
+continue button field: schedule_i_attach
+attachment:
+  pdf template file: form_b106i.pdf
+  variable name: i_attach
+  code: income1
+---
+code: |
+  debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
+  if len(debtor) > 1:
+    debtor2_name = debtor[1].name.first + " " + debtor[1].name.middle + " " + debtor[1].name.last
+  else:
+    debtor2_name = ''
+  income1 = {}
+  
+  income1['debtor1_name_1'] = debtor_name
+  income1['debtor1_name_2'] = debtor_name
+  income1['debtor2_name_1'] = debtor2_name
+  income1['bankruptcy_district'] = current_district
+  income1['case_number_1'] = case_number
+  income1['case_number_2'] = case_number
+  income1['isAmended'] = amended_filing
+  
+  i=1
+  for debt in debtor:
+    income1['isEmployed'+str(i)] = True if debt.income.employment == 'Employed' else False
+    income1['notEmployed'+str(i)] = True if debt.income.employment == 'Not employed' else False
+    income1['occupation'+str(i)] = debt.income.occupation
+    income1['employer'+str(i)] = debt.income.employer
+    income1['address'+str(i)] = str(debt.income.employer_number) + " " + debt.income.employer_street
+    income1['city'+str(i)] = debt.income.employer_city
+    income1['state'+str(i)] = debt.income.employer_state
+    income1['zip'+str(i)] = debt.income.employer_zip
+    income1['time'+str(i)] = debt.income.employment_length
+    income1['wages'+str(i)] = currency(debt.income.income_amount)
+    income1['overtime'+str(i)] = currency(debt.income.overtime_pay)
+    income1['gross'+str(i)] = currency(debt.income.income_amount + debt.income.overtime_pay)
+    income1['gross'+str(i)+'-2'] = currency(debt.income.income_amount + debt.income.overtime_pay)
+    income1['tax'+str(i)] = currency(debt.income.tax_deduction)
+    income1['mandatory'+str(i)] = currency(debt.income.mandatory_contributions)
+    income1['voluntary'+str(i)] = currency(debt.income.voluntary_contributions)
+    income1['required'+str(i)] = currency(debt.income.fund_loans)
+    income1['insurance'+str(i)] = currency(debt.income.insurance)
+    income1['domestic'+str(i)] = currency(debt.income.domestic_support)
+    income1['union'+str(i)] = currency(debt.income.union_dues)
+    income1['otherDesc'] = debt.income.specify_other_deduction if debt.income.other_deduction else None
+    income1['other'+str(i)] = debt.income.other_deduction_amount if debt.income.other_deduction else None
+    income1['totalPayrollDeductions'+str(i)] = currency(debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount)
+    income1['takeHome'+str(i)] = currency((debt.income.income_amount + debt.income.overtime_pay) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount))
+    income1['rental'+str(i)] = currency(debt.income.net_rental_business)
+    income1['interest'+str(i)] = currency(debt.income.interest_and_dividends)
+    income1['family'+str(i)] = currency(debt.income.family_support)
+    income1['unemployment'+str(i)] = currency(debt.income.unemployment)
+    income1['social'+str(i)] = currency(debt.income.social_security)
+    income1['otherAssis'+str(i)] = currency(debt.income.other_govt_assist)
+    income1['pension'+str(i)] = currency(debt.income.pension)
+    income1['otherIncomeDesc'] = currency(debt.income.specify_monthly_income)
+    income1['totalOtherIncome'+str(i)] = currency(debt.income.other_monthly_amount)
+    income1['totalIncome'+str(i)] = currency((debt.income.net_rental_business + debt.income.family_support + debt.income.interest_and_dividends + debt.income.unemployment + debt.income.social_security + debt.income.other_govt_assist + debt.income.pension + debt.income.other_monthly_amount) + (debt.income.income_amount + debt.income.overtime_pay) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount))
+    
+    i += 1
+  income1['overallIncome'] = currency(sum((debt.income.net_rental_business + debt.income.family_support + debt.income.interest_and_dividends + debt.income.unemployment + debt.income.social_security + debt.income.other_govt_assist + debt.income.pension + debt.income.other_monthly_amount) + (debt.income.income_amount + debt.income.overtime_pay) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount) for debt in debtor))
+  income1['otherAssistanceDesc'] = debtor[0].income.specify_other_regular_contributions if debtor[0].income.other_regular_contributions == True else None
+  income1['otherAssistanceTotal'] = currency(debtor[0].income.other_regular_contributions_amount)
+  income1['combinedMonthlyTotal'] = currency(sum((debt.income.net_rental_business + debt.income.family_support + debt.income.interest_and_dividends + debt.income.unemployment + debt.income.social_security + debt.income.other_govt_assist + debt.income.pension + debt.income.other_monthly_amount) + (debt.income.income_amount + debt.income.overtime_pay) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount) for debt in debtor) + debtor[0].income.other_regular_contributions_amount)
+  income1['noIncrease'] = True if debtor[0].income.expect_year_delta == False else False
+  income1['hasIncrease'] = True if debtor[0].income.expect_year_delta == True else False
+  income1['increaseExplain'] = debtor[0].income.year_delta_explain if debtor[0].income.expect_year_delta == True else None
+
+continue button field: test

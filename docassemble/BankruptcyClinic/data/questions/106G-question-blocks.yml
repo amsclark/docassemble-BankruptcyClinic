@@ -1,0 +1,96 @@
+table: prop_contracts_and_leases_table
+rows: prop.contracts_and_leases
+columns:
+  - Name: row_item.name
+  - Date Incurred: row_item.description
+edit:
+  - name
+  - description
+---
+section: schedule_g
+question: |
+  Do you have any executory contracts or unexpired leases?
+yesno: prop.contracts_and_leases.there_are_any
+---
+section: schedule_g
+question: |
+  Do you have any more executory contracts or unexpired leases?
+yesno: prop.contracts_and_leases.there_is_another
+under: |
+  ${ prop_contracts_and_leases_table }
+---
+section: schedule_g
+question: |
+  Tell the court about the executory contract or unexpired lease
+fields: 
+  - note: Person or company with whom you have contract or lease
+  - Name: prop.contracts_and_leases[i].name
+    default: Contract Holder
+  - Number: prop.contracts_and_leases[i].number
+    default: 1111
+  - Street: prop.contracts_and_leases[i].street
+    default: 34th ave NE
+  - City: prop.contracts_and_leases[i].city
+    default: Seattle
+  - State: prop.contracts_and_leases[i].state
+    default: Washington
+  - Zip: prop.contracts_and_leases[i].zip
+    default: 11111
+  - note: State what the contract or lease is for
+  - Description: prop.contracts_and_leases[i].description
+    input type: area
+    default: Some decription
+---  
+event: schedule_g
+section: schedule_g
+question: |
+  Review executory contracts or unexpired leases
+review:
+  - note: |
+      <br>
+      ### Executory contracts or unexpired leases
+      % if len(prop.contracts_and_leases) > 0:
+        ${ prop_contracts_and_leases_table }
+        ${ prop.contracts_and_leases.add_action() }
+      % else:
+        No executory contracts or unexpired leases
+        ${ prop.contracts_and_leases.add_action() }
+      % endif
+---
+event: schedule_g_attach
+section: schedule_g
+question: Schedule G Attachment
+continue button field: schedule_g_attach
+attachment:
+  pdf template file: form_b106g.pdf
+  variable name: g_attach
+  code: contracts
+---
+code: |
+  debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
+  if len(debtor) > 1:
+    debtor2_name = debtor[1].name.first + " " + debtor[1].name.middle + " " + debtor[1].name.last
+  else:
+    debtor2_name = ''
+  contracts = {}
+  contracts['debtor1_name_1'] = debtor_name
+  contracts['debtor1_name_2'] = debtor_name
+  contracts['debtor2_name_1'] = debtor2_name
+  contracts['bankruptcy_district'] = current_district
+  contracts['case_number_1'] = case_number
+  contracts['case_number_2'] = case_number
+  contracts['isAmendment'] = amended_filing
+  contracts['noContracts'] = True if len(prop.contracts_and_leases) == 0 else False
+  contracts['hasContracts'] = True if len(prop.contracts_and_leases) > 0 else False
+  
+  i = 1
+  for contract in prop.contracts_and_leases:
+    contracts['name'+str(i)] = contract.name
+    contracts['contractInfo'+str(i)] = contract.description
+    contracts['address'+str(i)] = str(contract.number) + " " + contract.street
+    contracts['city'+str(i)] = contract.city
+    contracts['state'+str(i)] = contract.state
+    contracts['zip'+str(i)] = contract.zip
+    
+    i += 1
+    

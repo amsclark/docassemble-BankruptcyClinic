@@ -1,0 +1,12 @@
+@charset "UTF-8";/*!
+* Theme: legal-aid-nebraska
+* Copyright 2023 Legal Aid of Nebraska
+* Licensed under MIT
+* Based on Bootstrap
+*//*!
+*/:root{
+  --bs-body-bg:#ffffff;
+  --bs-body-color:#000000;
+  --bs-heading-color:#000000;
+  --bs-secondary-color: #595959;
+}
