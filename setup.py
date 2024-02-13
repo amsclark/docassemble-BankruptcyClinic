@@ -44,7 +44,7 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
     return out
 
 setup(name='docassemble.BankruptcyClinic',
-      version='1.0',
+      version='1.1',
       description=('playground backup'),
       long_description='readme',
       long_description_content_type='text/markdown',
