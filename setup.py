@@ -44,13 +44,13 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
     return out
 
 setup(name='docassemble.BankruptcyClinic',
-      version='1.1',
-      description=('playground backup'),
-      long_description='readme',
+      version='0.0.3',
+      description=('A docassemble extension.'),
+      long_description='# docassemble.BankruptcyClinic2\r\n\r\nA docassemble extension.\r\n\r\n## Author\r\n\r\nAlex Clark, alex@metatheria.solutions\r\n\r\n',
       long_description_content_type='text/markdown',
-      author='Cole',
+      author='Alex Clark',
       author_email='alex@metatheria.solutions',
-      license='MIT',
+      license='The MIT License (MIT)',
       url='https://docassemble.org',
       packages=find_packages(),
       namespace_packages=['docassemble'],
