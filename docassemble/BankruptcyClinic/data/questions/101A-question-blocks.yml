@@ -9,12 +9,9 @@ fields:
       Jerry Lewis
   - note: |
       Landlord's address:
-  - Number: landlord_number
+  - Address: landlord_street
     default: |
-      33495
-  - Street: landlord_street
-    default: |
-      56th SE
+      53349 56th SE
   - City: landlord_city
     default: |
       Meris
@@ -22,8 +19,10 @@ fields:
     default: |
       KY
   - zip: landlord_zip
-    default: |
-      95839
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
   - note: |
       <strong>Certification About Applicable Law and Deposit of Rent</strong>
       I certify under penalty of perjury that:
@@ -45,21 +44,17 @@ fields:
     datatype: yesnoradio
     default: False
 ---
-question: Form 101-B output
-section: form_101a
-event: attach_101b
-continue button field: attach_101b
 attachment:
+  filename: form_b101b.pdf
   pdf template file: form_b101b.pdf
   code: evict2
+  variable name: attach_101b
 ---
-question: Form 101-A output
-section: form_101a
-event: attach_101a
-continue button field: attach_101a
 attachment:
+  filename: form_b101a.pdf
   pdf template file: form_b101a.pdf
   code: evict
+  variable name: attach_101a
 ---
 code: |
   debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
@@ -74,7 +69,6 @@ code: |
   evict['bankruptcy_state'] = debtor[0].mailing_state
   evict['case_number'] = case_number
   evict['landlord_name'] = landlord_name
-  evict['landlord_number'] = landlord_number
   evict['landlord_street'] = landlord_street
   evict['landlord_city'] = landlord_city
   evict['landlord_state'] = landlord_state
@@ -97,7 +91,6 @@ code: |
   evict2['bankruptcy_state'] = debtor[0].mailing_state
   evict2['case_number'] = case_number
   evict2['landlord_name'] = landlord_name
-  evict2['landlord_number'] = landlord_number
   evict2['landlord_street'] = landlord_street
   evict2['landlord_city'] = landlord_city
   evict2['landlord_state'] = landlord_state
@@ -106,4 +99,4 @@ code: |
     evict2['right_to_stay'] = 1
   if certify_deposit_paid == True:
     evict2['deposit_paid'] = True
-  
+

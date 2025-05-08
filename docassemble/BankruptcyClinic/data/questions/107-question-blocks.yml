@@ -4,7 +4,7 @@ question: |
 subquestion: |
   Be as complete and accurate as possible. If two married people are filing together, both are equally responsible for supplying correct information.
 fields:
-  - What is your current marital status?: financial_affairs.marital_status
+  - Are you currently married?: financial_affairs.marital_status
     datatype: yesnoradio
     default: True
   - During the last 3 years, have you lived anywhere other than where you live now?: financial_affairs.lived_elsewhere
@@ -14,11 +14,8 @@ fields:
     show if: financial_affairs.lived_elsewhere
   - note: Address 1
     show if: financial_affairs.lived_elsewhere
-  - Number: financial_affairs.address_number_1
-    default: 111
-    show if: financial_affairs.lived_elsewhere
-  - Street: financial_affairs.address_street_1
-    default: 36th pl
+  - Address/PO Box: financial_affairs.address_street_1
+    default: 1111 36th pl
     show if: financial_affairs.lived_elsewhere
   - City: financial_affairs.address_city_1
     default: Seattle
@@ -27,9 +24,13 @@ fields:
     default: Washington
     show if: financial_affairs.lived_elsewhere
   - Zip: financial_affairs.address_zip_1
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: financial_affairs.lived_elsewhere
   - note: Dates you lived there
+    show if: financial_affairs.lived_elsewhere
   - From: financial_affairs.address_from_1
     datatype: date
     default: 01/01/23
@@ -39,7 +40,7 @@ fields:
     default: 04/01/23
     show if: financial_affairs.lived_elsewhere
   - note: Debtor 2 Address
-    show if: 
+    show if:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
@@ -48,23 +49,15 @@ fields:
   - Same address as you?: financial_affairs.address_same_1
     datatype: yesnoradio
     default: False
-    show if: 
+    show if:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
       variable: financial_affairs.lived_elsewhere
       is: False
-  - Number: financial_affairs.debtor2_address_number_1
-    default: 111
-    show if: 
-      code: |
-        financial_affairs.debtor_count > 1
-    hide if:
-      variable: financial_affairs.address_same_1
-      is: True
-  - Street: financial_affairs.debtor2_address_street_1
-    default: 36th pl
-    show if: 
+  - Address/PO Box: financial_affairs.debtor2_address_street_1
+    default: 1111 36th pl
+    show if:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
@@ -72,7 +65,7 @@ fields:
       is: True
   - City: financial_affairs.debtor2_address_city_1
     default: Seattle
-    show if: 
+    show if:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
@@ -80,15 +73,18 @@ fields:
       is: True
   - State: financial_affairs.debtor2_address_state_1
     default: Washington
-    show if: 
+    show if:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
       variable: financial_affairs.address_same_1
       is: True
   - Zip: financial_affairs.debtor2_address_zip_1
-    default: 99999
-    show if: 
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
+    show if:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
@@ -97,61 +93,69 @@ fields:
   - Same time period as you?: financial_affairs.address_same_dates_1
     datatype: yesnoradio
     default: False
-    show if: 
+    show if:
       code: |
         financial_affairs.debtor_count > 1
-    hide if:
-      variable: financial_affairs.address_same_1
-      is: False
   - From: financial_affairs.debtor2_address_from_1
     datatype: date
     default: 01/01/23
-    show if: 
+    show if:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
       variable: financial_affairs.address_same_dates_1
-      is: False
+      is: True
   - To: financial_affairs.debtor2_address_to_1
     datatype: date
     default: 04/01/23
-    show if: 
+    show if:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
       variable: financial_affairs.address_same_dates_1
-      is: False
+      is: True
   - Has second address: financial_affairs.has_second_address
     datatype: yesnoradio
     default: True
+    show if: financial_affairs.lived_elsewhere
   - note: Address 2
     show if: financial_affairs.has_second_address
-  - Number: financial_affairs.address_number_2
-    default: 111
+  - Address/PO Box: financial_affairs.address_street_2
+    default: 11111 36th pl
     show if: financial_affairs.has_second_address
-  - Street: financial_affairs.address_street_2
-    default: 36th pl
-    show if: financial_affairs.has_second_address
+    required: False
   - City: financial_affairs.address_city_2
     default: Seattle
     show if: financial_affairs.has_second_address
+    required: False
   - State: financial_affairs.address_state_2
     default: Washington
     show if: financial_affairs.has_second_address
+    required: False
   - Zip: financial_affairs.address_zip_2
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: financial_affairs.has_second_address
+    required: False
   - note: Dates you lived there
+    show if: financial_affairs.lived_elsewhere
+    hide if:
+      variable: financial_affairs.has_second_address
+      is: False
   - From: financial_affairs.address_from_2
     datatype: date
     default: 01/01/23
     show if: financial_affairs.has_second_address
+    required: False
   - To: financial_affairs.address_to_2
     datatype: date
     default: 04/01/23
     show if: financial_affairs.has_second_address
+    required: False
   - note: Debtor 2 Address
-    show if: 
+    show if:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
@@ -160,79 +164,539 @@ fields:
   - Same address as you?: financial_affairs.address_same_2
     datatype: yesnoradio
     default: False
-    show if: 
+    show if:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
       variable: financial_affairs.has_second_address
       is: False
-  - Number: financial_affairs.debtor2_address_number_2
-    default: 111
-    show if: 
-      code: |
-        financial_affairs.debtor_count > 1
+    required: False
+  - Address/PO Box: financial_affairs.debtor2_address_street_2
+    default: 1111 36th pl
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_2") === false
     hide if:
-      variable: financial_affairs.address_same_2
-      is: True
-  - Street: financial_affairs.debtor2_address_street_2
-    default: 36th pl
-    show if: 
       code: |
-        financial_affairs.debtor_count > 1
-    hide if:
-      variable: financial_affairs.address_same_2
-      is: True
+        financial_affairs.debtor_count < 2
+    required: False
   - City: financial_affairs.debtor2_address_city_2
     default: Seattle
-    show if: 
-      code: |
-        financial_affairs.debtor_count > 1
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_2") === false
     hide if:
-      variable: financial_affairs.address_same_2
-      is: True
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
   - State: financial_affairs.debtor2_address_state_2
     default: Washington
-    show if: 
-      code: |
-        financial_affairs.debtor_count > 1
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_2") === false
     hide if:
-      variable: financial_affairs.address_same_2
-      is: True
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
   - Zip: financial_affairs.debtor2_address_zip_2
-    default: 99999
-    show if: 
-      code: |
-        financial_affairs.debtor_count > 1
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_2") === false
     hide if:
-      variable: financial_affairs.address_same_2
-      is: True
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
   - Same time period as you?: financial_affairs.address_same_dates_2
     datatype: yesnoradio
     default: False
-    show if: 
-      code: |
-        financial_affairs.debtor_count > 1
+    js show if:
+      val("financial_affairs.has_second_address") === true
     hide if:
-      variable: financial_affairs.address_same_2
-      is: False
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
   - From: financial_affairs.debtor2_address_from_2
     datatype: date
     default: 01/01/23
-    show if: 
-      code: |
-        financial_affairs.debtor_count > 1
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_2") === false
     hide if:
-      variable: financial_affairs.address_dates_2
-      is: False
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
   - To: financial_affairs.debtor2_address_to_2
     datatype: date
     default: 04/01/23
-    show if: 
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_2") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+
+  - note: Address 3
+    show if: financial_affairs.has_second_address
+  - Address/PO Box: financial_affairs.address_street_3
+    default: 1111 36th pl
+    show if: financial_affairs.has_second_address
+    required: False
+  - City: financial_affairs.address_city_3
+    default: Seattle
+    show if: financial_affairs.has_second_address
+    required: False
+  - State: financial_affairs.address_state_3
+    default: Washington
+    show if: financial_affairs.has_second_address
+    required: False
+  - Zip: financial_affairs.address_zip_3
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
+    show if: financial_affairs.has_second_address
+    required: False
+  - note: Dates you lived there
+    show if: financial_affairs.lived_elsewhere
+    hide if:
+      variable: financial_affairs.has_second_address
+      is: False
+  - From: financial_affairs.address_from_3
+    datatype: date
+    default: 01/01/23
+    show if: financial_affairs.has_second_address
+    required: False
+  - To: financial_affairs.address_to_3
+    datatype: date
+    default: 04/01/23
+    show if: financial_affairs.has_second_address
+    required: False
+  - note: Debtor 2 Address
+    show if:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
-      variable: financial_affairs.address_dates_2
+      variable: financial_affairs.has_second_address
       is: False
+  - Same address as you?: financial_affairs.address_same_3
+    datatype: yesnoradio
+    default: False
+    show if:
+      code: |
+        financial_affairs.debtor_count > 1
+    hide if:
+      variable: financial_affairs.has_second_address
+      is: False
+    required: False
+  - Address/PO Box: financial_affairs.debtor2_address_street_3
+    default: 1111 36th pl
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_3") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - City: financial_affairs.debtor2_address_city_3
+    default: Seattle
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_3") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - State: financial_affairs.debtor2_address_state_3
+    default: Washington
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_3") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - Zip: financial_affairs.debtor2_address_zip_3
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_3") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - Same time period as you?: financial_affairs.address_same_dates_3
+    datatype: yesnoradio
+    default: False
+    js show if:
+      val("financial_affairs.has_second_address") === true
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - From: financial_affairs.debtor2_address_from_3
+    datatype: date
+    default: 01/01/23
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_3") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - To: financial_affairs.debtor2_address_to_3
+    datatype: date
+    default: 04/01/23
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_3") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+
+  - note: Address 4
+    show if: financial_affairs.has_second_address
+  - Address/PO Box: financial_affairs.address_street_4
+    default: 1111 36th pl
+    show if: financial_affairs.has_second_address
+    required: False
+  - City: financial_affairs.address_city_4
+    default: Seattle
+    show if: financial_affairs.has_second_address
+    required: False
+  - State: financial_affairs.address_state_4
+    default: Washington
+    show if: financial_affairs.has_second_address
+    required: False
+  - Zip: financial_affairs.address_zip_4
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
+    show if: financial_affairs.has_second_address
+    required: False
+  - note: Dates you lived there
+    show if: financial_affairs.lived_elsewhere
+    hide if:
+      variable: financial_affairs.has_second_address
+      is: False
+  - From: financial_affairs.address_from_4
+    datatype: date
+    default: 01/01/23
+    show if: financial_affairs.has_second_address
+    required: False
+  - To: financial_affairs.address_to_4
+    datatype: date
+    default: 04/01/23
+    show if: financial_affairs.has_second_address
+    required: False
+  - note: Debtor 2 Address
+    show if:
+      code: |
+        financial_affairs.debtor_count > 1
+    hide if:
+      variable: financial_affairs.has_second_address
+      is: False
+  - Same address as you?: financial_affairs.address_same_4
+    datatype: yesnoradio
+    default: False
+    show if:
+      code: |
+        financial_affairs.debtor_count > 1
+    hide if:
+      variable: financial_affairs.has_second_address
+      is: False
+    required: False
+  - Address/PO Box: financial_affairs.debtor2_address_street_4
+    default: 1111 36th pl
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_4") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - City: financial_affairs.debtor2_address_city_4
+    default: Seattle
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_4") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - State: financial_affairs.debtor2_address_state_4
+    default: Washington
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_4") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - Zip: financial_affairs.debtor2_address_zip_4
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_4") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - Same time period as you?: financial_affairs.address_same_dates_4
+    datatype: yesnoradio
+    default: False
+    js show if:
+      val("financial_affairs.has_second_address") === true
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - From: financial_affairs.debtor2_address_from_4
+    datatype: date
+    default: 01/01/23
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_4") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - To: financial_affairs.debtor2_address_to_4
+    datatype: date
+    default: 04/01/23
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_4") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+
+  - note: Address 5
+    show if: financial_affairs.has_second_address
+  - Address/PO Box: financial_affairs.address_street_5
+    default: 1111 36th pl
+    show if: financial_affairs.has_second_address
+    required: False
+  - City: financial_affairs.address_city_5
+    default: Seattle
+    show if: financial_affairs.has_second_address
+    required: False
+  - State: financial_affairs.address_state_5
+    default: Washington
+    show if: financial_affairs.has_second_address
+    required: False
+  - Zip: financial_affairs.address_zip_5
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
+    show if: financial_affairs.has_second_address
+    required: False
+  - note: Dates you lived there
+    show if: financial_affairs.lived_elsewhere
+    hide if:
+      variable: financial_affairs.has_second_address
+      is: False
+  - From: financial_affairs.address_from_5
+    datatype: date
+    default: 01/01/23
+    show if: financial_affairs.has_second_address
+    required: False
+  - To: financial_affairs.address_to_5
+    datatype: date
+    default: 04/01/23
+    show if: financial_affairs.has_second_address
+    required: False
+  - note: Debtor 2 Address
+    show if:
+      code: |
+        financial_affairs.debtor_count > 1
+    hide if:
+      variable: financial_affairs.has_second_address
+      is: False
+  - Same address as you?: financial_affairs.address_same_5
+    datatype: yesnoradio
+    default: False
+    show if:
+      code: |
+        financial_affairs.debtor_count > 1
+    hide if:
+      variable: financial_affairs.has_second_address
+      is: False
+    required: False
+  - Address/PO Box: financial_affairs.debtor2_address_street_5
+    default: 1111 36th pl
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_5") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - City: financial_affairs.debtor2_address_city_5
+    default: Seattle
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_5") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - State: financial_affairs.debtor2_address_state_5
+    default: Washington
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_5") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - Zip: financial_affairs.debtor2_address_zip_5
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_5") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - Same time period as you?: financial_affairs.address_same_dates_5
+    datatype: yesnoradio
+    default: False
+    js show if:
+      val("financial_affairs.has_second_address") === true
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - From: financial_affairs.debtor2_address_from_5
+    datatype: date
+    default: 01/01/23
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_5") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - To: financial_affairs.debtor2_address_to_5
+    datatype: date
+    default: 04/01/23
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_5") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+
+  - note: Address 6
+    show if: financial_affairs.has_second_address
+  - Address/PO Box: financial_affairs.address_street_6
+    default: 1111 36th pl
+    show if: financial_affairs.has_second_address
+    required: False
+  - City: financial_affairs.address_city_6
+    default: Seattle
+    show if: financial_affairs.has_second_address
+    required: False
+  - State: financial_affairs.address_state_6
+    default: Washington
+    show if: financial_affairs.has_second_address
+    required: False
+  - Zip: financial_affairs.address_zip_6
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
+    show if: financial_affairs.has_second_address
+    required: False
+  - note: Dates you lived there
+    show if: financial_affairs.has_second_address
+    hide if:
+      variable: financial_affairs.has_second_address
+      is: False
+  - From: financial_affairs.address_from_6
+    datatype: date
+    default: 01/01/23
+    show if: financial_affairs.has_second_address
+    required: False
+  - To: financial_affairs.address_to_6
+    datatype: date
+    default: 04/01/23
+    show if: financial_affairs.has_second_address
+    required: False
+  - note: Debtor 2 Address
+    show if:
+      code: |
+        financial_affairs.debtor_count > 1
+    hide if:
+      variable: financial_affairs.has_second_address
+      is: False
+  - Same address as you?: financial_affairs.address_same_6
+    datatype: yesnoradio
+    default: False
+    show if:
+      code: |
+        financial_affairs.debtor_count > 1
+    hide if:
+      variable: financial_affairs.has_second_address
+      is: False
+    required: False
+  - Address/PO Box: financial_affairs.debtor2_address_street_6
+    default: 1111 36th pl
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_6") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - City: financial_affairs.debtor2_address_city_6
+    default: Seattle
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_6") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - State: financial_affairs.debtor2_address_state_6
+    default: Washington
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_6") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - Zip: financial_affairs.debtor2_address_zip_6
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_6") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - Same time period as you?: financial_affairs.address_same_dates_6
+    datatype: yesnoradio
+    default: False
+    js show if:
+      val("financial_affairs.has_second_address") === true
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - From: financial_affairs.debtor2_address_from_6
+    datatype: date
+    default: 01/01/23
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_6") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
+  - To: financial_affairs.debtor2_address_to_6
+    datatype: date
+    default: 04/01/23
+    js show if:
+      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_6") === false
+    hide if:
+      code: |
+        financial_affairs.debtor_count < 2
+    required: False
   - note: |
       Within the last 8 years, did you ever live with a spouce or legal equivalent in a community property state or territory? (Community property states and territories include Arizona, California, Idaho, Louisiana, Nevada, New Mexico, Puerto Rico, Texas, Washington, and Wisconsin.
   - no label: financial_affairs.lived_with_spouse
@@ -447,7 +911,7 @@ fields:
     show if: financial_affairs.had_other_income
   - Source 1: financial_affairs.before_other_source_1
     default: Income source
-    show if: financial_affiars.had_other_income
+    show if: financial_affairs.had_other_income
     required: False
   - Amount: financial_affairs.before_other_source_amount_1
     datatype: currency
@@ -572,7 +1036,7 @@ fields:
 ---
 table: consumer_debts_table
 rows: financial_affairs.consumer_debt_payments
-columns: 
+columns:
   - Creditor Name: row_item.creditor_name
   - Total Amount Paid: row_item.total_amount
   - Amount still owed: row_item.amount_owed
@@ -588,8 +1052,8 @@ question: |
 yesno: financial_affairs.primarily_consumer_debts
 ---
 question: |
-  Did either Debtor 1's or Debtor 2's have any debts above $7,575?
-yesno: financial_affairs.large_debt_payments
+  Did either Debtor 1 or Debtor 2 pay a consumer creditor a total of $600 or a non-consumer creditor a total of $7,575 in the last 90 days?
+yesno: financial_affairs.consumer_debt_payments.there_are_any
 ---
 question: |
   Any other creditors you would like to add?
@@ -602,27 +1066,27 @@ question: |
 fields:
   - Creditor Name: financial_affairs.consumer_debt_payments[i].creditor_name
     default: creditor name
-  - Number: financial_affairs.consumer_debt_payments[i].creditor_number
-    default: 11111
-  - Street: financial_affairs.consumer_debt_payments[i].creditor_street
-    default: 34th Ave
+  - Address/PO Box: financial_affairs.consumer_debt_payments[i].creditor_street
+    default: 1111 34th Ave
   - City: financial_affairs.consumer_debt_payments[i].creditor_city
     default: Seattle
   - State: financial_affairs.consumer_debt_payments[i].creditor_state
     default: Washington
   - Zip: financial_affairs.consumer_debt_payments[i].creditor_zip
-    default: 999999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
   - note: Tell the court about payments you made.
-  - Payment Date 1: financial_affairs.consumer_debt_payments[i].payment_date_1
-    datatype: date
-    default: 01/01/23
-  - Payment Date 2: financial_affairs.consumer_debt_payments[i].payment_date_2
-    datatype: date
-    default: 01/01/23
-    required: False
-  - Payment Date 3: financial_affairs.consumer_debt_payments[i].payment_date_3
-    datatype: date
-    default: 01/01/23
+  - Payment Dates: financial_affairs.consumer_debt_payments[i].paymentDates
+    input type: area
+    rows: 7
+    default: |
+      9/1/23 $595.55
+      8/4/23 $585.77
+      7/3/23 $590.33
+      6/2/23 $588.33
+      5/3/23 %591.44
     required: False
   - Total Amount Paid: financial_affairs.consumer_debt_payments[i].total_amount
     datatype: currency
@@ -647,7 +1111,7 @@ fields:
 ---
 table: insider_payments_table
 rows: financial_affairs.insider_payments
-columns: 
+columns:
   - Insider Name: row_item.insider_name
   - Total Amount: row_item.total_amount
   - Amount still owed: row_item.amount_owed
@@ -674,28 +1138,27 @@ question: |
 fields:
   - Insider Name: financial_affairs.insider_payments[i].insider_name
     default: Bill
-  - Number: financial_affairs.insider_payments[i].number
-    default: 1111
-  - Street: financial_affairs.insider_payments[i].street
-    default: 34th Ave
+  - Address/PO Box: financial_affairs.insider_payments[i].street
+    default: 111 34th Ave
   - City: financial_affairs.insider_payments[i].city
     default: Seattle
   - State: financial_affairs.insider_payments[i].state
     default: Washington
   - Zip: financial_affairs.insider_payments[i].zip
-    default: 999999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
   - note: Tell the court more about the payment
-  - Payment Date 1: financial_affairs.insider_payments[i].payment_date_1
-    datatype: date
-    default: 01/01/23
-  - Payment Date 2: financial_affairs.insider_payments[i].payment_date_2
-    datatype: date
-    default: 01/02/23
-    required: False
-  - Payment Date 3: financial_affairs.insider_payments[i].payment_date_3
-    datatype: date
-    default: 01/02/23
-    required: False
+  - Payment Dates: financial_affairs.insider_payments[i].paymentDates
+    input type: area
+    required: false
+    default: |
+      9/1/23 $500.23
+      8/2/23 $523.33
+      7/1/23 $602.23
+      6/4/23 $543.33
+      5/3/23 $333.33
   - Total amount paid: financial_affairs.insider_payments[i].total_amount
     datatype: currency
     default: 1000
@@ -724,8 +1187,10 @@ under: |
   ${ insider_benefits_table }
 ---
 question: |
-  Within 1 year before you filed for bankruptcy, did you make any payments or transfer any property on account of a debt that benefited an insider?
+  Insider Benefit
 subquestion: |
+  Within 1 year before you filed for bankruptcy, did you make any payments or transfer any property on account of a debt that benefited an insider?
+
   Include payments on debts guaranteed to cosigned by an insider.
 yesno: financial_affairs.insider_benefits.there_are_any
 ---
@@ -734,16 +1199,17 @@ question: |
 fields:
   - Insider Name: financial_affairs.insider_benefits[i].insider_name
     default: Bill
-  - Number: financial_affairs.insider_benefits[i].number
-    default: 1111
-  - Street: financial_affairs.insider_benefits[i].street
-    default: 34th Ave
+  - Address/PO Box: financial_affairs.insider_benefits[i].street
+    default: 1111 34th Ave
   - City: financial_affairs.insider_benefits[i].city
     default: Seattle
   - State: financial_affairs.insider_benefits[i].state
     default: Washington
   - Zip: financial_affairs.insider_benefits[i].zip
-    default: 999999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
   - note: Tell the court more about the payment
   - Payment Date 1: financial_affairs.insider_benefits[i].payment_date_1
     datatype: date
@@ -778,8 +1244,10 @@ edit:
   - case_status
 ---
 question: |
-  Within 1 year before you filed for bankruptcy, were you a party in any lawsuit, court action, or administrative proceeding?
+  Lawsuits
 subquestion: |
+  Within 1 year before you filed for bankruptcy, were you a party in any lawsuit, court action, or administrative proceeding?
+
   Including personal injury cases, small claims actions, divorces, collection suits, paternity actions, support or custody modifications, and contract disputes.
 yesno: financial_affairs.lawsuits.there_are_any
 ---
@@ -795,6 +1263,7 @@ fields:
   - Case Title: financial_affairs.lawsuits[i].case_title
     default: case name
   - Case Number: financial_affairs.lawsuits[i].case_number
+    datatype: string
     default: 2249453
   - note: Nature of the case
   - no label: financial_affairs.lawsuits[i].nature_of_case
@@ -803,16 +1272,17 @@ fields:
   - note: Court Info
   - Name: financial_affairs.lawsuits[i].court_name
     default: Big court
-  - Number: financial_affairs.lawsuits[i].court_number
-    default: 11111
-  - Street: financial_affairs.lawsuits[i].court_street
-    default: 34th Ave
+  - Address/PO Box: financial_affairs.lawsuits[i].court_street
+    default: 1111 34th Ave
   - City: financial_affairs.lawsuits[i].court_city
     default: Seattle
   - State: financial_affairs.lawsuits[i].court_state
     default: Washington
   - Zip: financial_affairs.lawsuits[i].court_zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
   - Case Status: financial_affairs.lawsuits[i].case_status
     choices:
       - Pending
@@ -832,6 +1302,8 @@ edit:
   - property_action
 ---
 question: |
+  Repossesed Property
+subquestion: |
   Within 1 year before you filed for bankruptcy, was any of your property repossessed, foreclosed, garnished, attached, seized, or levied?
 yesno: financial_affairs.levies.there_are_any
 ---
@@ -842,20 +1314,21 @@ under: |
   ${ levies_table }
 ---
 question: |
-  Tell the court about a repossessed, foreclosed, garnished, attached, seized, or levied property.
+  Tell the court about a repossessed, foreclosed, garnished, attached, seized, or levied property in the last year.
 fields:
   - Creditor Name: financial_affairs.levies[i].creditor_name
     default: Bill
-  - Number: financial_affairs.levies[i].creditor_number
-    default: 11111
-  - Street: financial_affairs.levies[i].creditor_street
-    default: 34th Ave
+  - Address/PO Box: financial_affairs.levies[i].creditor_street
+    default: 1111 34th Ave
   - City: financial_affairs.levies[i].creditor_city
     default: Seattle
   - State: financial_affairs.levies[i].creditor_state
     default: Washington
   - Zip: financial_affairs.levies[i].creditor_zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
   - Property Description: financial_affairs.levies[i].property_description
     input type: area
     default: Description
@@ -866,14 +1339,23 @@ fields:
       - Property was garnished
       - Property was attached, seized, or levied
     default: Property was repossessed
+  - Dates in description?: financial_affairs.levies[i].date_in_description
+    datatype: yesnoradio
+    default: True
   - Date: financial_affairs.levies[i].date
     datatype: date
     default: 01/01/23
+    show if:
+      variable: financial_affairs.levies[i].date_in_description
+      is: False
+    required: False
   - Property Value: financial_affairs.levies[i].property_value
     datatype: currency
     default: 30000
 ---
 question: |
+  Payment Refusal
+subquestion: |
   Within 90 days before you filed for bankruptcy, did any creditor, including a bank or financial institution, set off any amounts from your accounts or refuse to make a payment because you owed a debt?
 fields:
   - no label: financial_affairs.has_refusal
@@ -882,11 +1364,8 @@ fields:
   - Creditors Name: financial_affairs.refusal_creditor_name
     default: Bill
     show if: financial_affairs.has_refusal
-  - Number: financial_affairs.refusal_creditor_number
-    default: 1111
-    show if: financial_affairs.has_refusal
-  - Street: financial_affairs.refusal_creditor_street
-    default: 34th Ave NE
+  - Address/PO Box: financial_affairs.refusal_creditor_street
+    default: 111 34th Ave NE
     show if: financial_affairs.has_refusal
   - City: financial_affairs.refusal_creditor_city
     default: Seattle
@@ -895,7 +1374,10 @@ fields:
     default: Washington
     show if: financial_affairs.has_refusal
   - Zip: financial_affairs.refusal_creditor_zip
-    default: 999999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: financial_affairs.has_refusal
   - note: Describe the action the creditor took
     show if: financial_affairs.has_refusal
@@ -906,16 +1388,20 @@ fields:
   - Last 4 digits of account number XXXX-: financial_affairs.refusal_account_number
     default: 1111
     show if: financial_affairs.has_refusal
+    required: False
   - Date action was taken: financial_affairs.refusal_date
     datatype: date
     default: 01/01/23
     show if: financial_affairs.has_refusal
+    required: False
   - Amount: financial_affairs.refusal_amount
     datatype: currency
     default: 3000
     show if: financial_affairs.has_refusal
 ---
 question: |
+  Property Assignee
+subquestion: |
   Within 1 year before you filed for bankruptcy, was any of your property in the possession of an assignee for the benefit of creditors, a court-appointed receiver, a custodian, or another official?
 yesno: financial_affairs.other_assignee
 ---
@@ -931,11 +1417,13 @@ edit:
   - value_1
 ---
 question: |
+  Gifts to other people
+subquestion: |
   Within 2 years before you filed for bankruptcy, did you give any gifts with a total value of more than $600 per person?
 yesno: financial_affairs.gifts.there_are_any
 ---
 question: |
-  Did you recieve any other gifts over $600 within 2 years before you filed for bankruptcy?
+  Did you make any other gifts over $600 within 2 years before you filed for bankruptcy?
 yesno: financial_affairs.gifts.there_is_another
 under: |
   ${ gifts_table }
@@ -945,16 +1433,17 @@ question: |
 fields:
   - Person to whom you gave the gift: financial_affairs.gifts[i].person_name
     default: Gifter
-  - Number: financial_affairs.gifts[i].number
-    default: 11111
-  - Street: financial_affairs.gifts[i].street
-    default: 22nd
+  - Address/PO Box: financial_affairs.gifts[i].street
+    default: 111 22nd
   - City: financial_affairs.gifts[i].city
     default: Seattle
   - State: financial_affairs.gifts[i].state
     default: Washington
   - Zip: financial_affairs.gifts[i].zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
   - Persons relationship to you: financial_affairs.gifts[i].relationship
     default: Parent
   - note: Describe the gift
@@ -963,11 +1452,8 @@ fields:
     default: Description
   - note: Dates you gave the gifts
   - no label: financial_affairs.gifts[i].date_1
-    datatype: date
     default: 01/01/23
-  - no label: financial_affairs.gifts[i].date_2
-    datatype: date
-    required: False
+    input type: area
   - note: Value
   - no label: financial_affairs.gifts[i].value_1
     datatype: currency
@@ -977,6 +1463,8 @@ fields:
     required: False
 ---
 question: |
+  Charitable Contributions Made
+subquestion: |
   Within 2 years before you filed for bankruptcy, did you give any gifts or contributions with a total value of more than 600 to any charity?
 fields:
   - no label: financial_affairs.has_charity
@@ -985,11 +1473,8 @@ fields:
   - Charity name: financial_affairs.charity_name
     default: Charity
     show if: financial_affairs.has_charity
-  - Number: financial_affairs.charity_number
-    default: 11111
-    show if: financial_affairs.has_charity
-  - Street: financial_affairs.charity_street
-    default: 55th Ave NE
+  - Address/PO Box: financial_affairs.charity_street
+    default: 1111 55th Ave NE
     show if: financial_affairs.has_charity
   - City: financial_affairs.charity_city
     default: Seattle
@@ -998,7 +1483,10 @@ fields:
     default: Washington
     show if: financial_affairs.has_charity
   - Zip: financial_affairs.charity_zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: financial_affairs.has_charity
   - note: Describe what you contributed
     show if: financial_affairs.has_charity
@@ -1009,12 +1497,8 @@ fields:
   - note: Dates you contributed
     show if: financial_affairs.has_charity
   - no label: financial_affairs.charity_date_1
-    datatype: date
     default: 01/01/23
-    show if: financial_affairs.has_charity
-  - no label: financial_affairs.charity_date_2
-    datatype: date
-    required: False
+    input type: area
     show if: financial_affairs.has_charity
   - note: Values
     show if: financial_affairs.has_charity
@@ -1028,6 +1512,8 @@ fields:
     show if: financial_affairs.has_charity
 ---
 question: |
+  Theft or Disaster Losses
+subquestion: |
   Within 1 year before you filed for bankruptcy or since you filed for bankruptcy, did you lose anything because of theft, fire, other disaster, or gambling?
 fields:
   - no label: financial_affairs.has_disaster
@@ -1047,8 +1533,8 @@ fields:
     default: Insurance
     show if: financial_affairs.has_disaster
   - Date of your loss: financial_affairs.disaster_date
-    datatype: date
-    default: 01/01/23
+    input type: area
+    default: 01/01/23 with some details
     show if: financial_affairs.has_disaster
   - Value of property lost: financial_affairs.disaster_value
     datatype: currency
@@ -1067,8 +1553,10 @@ edit:
   - date_1
 ---
 question: |
-  Within 1 year before you filed for bankruptcy, did you or anyone else acting your your behalf pay or transfer any property to anyone you consulted about seeking bankruptcy or preparing a bankruptcy petition?
+  Bankruptcy Consultation Payment
 subquestion: |
+  Within 1 year before you filed for bankruptcy, did you or anyone else acting on your behalf pay or transfer any property to anyone you consulted about seeking bankruptcy or preparing a bankruptcy petition?
+
   Include any attourneys, bankruptcy petition preparers, or credit counseling agencies for services required in your bankruptcy.
 yesno: financial_affairs.bankruptcy_payments.there_are_any
 ---
@@ -1083,16 +1571,17 @@ question: |
 fields:
   - Person who was paid: financial_affairs.bankruptcy_payments[i].name
     default: Jimbo
-  - Number: financial_affairs.bankruptcy_payments[i].number
-    default: 11111
-  - Street: financial_affairs.bankruptcy_payments[i].street
-    default: 34th Ave
+  - Address/PO Box: financial_affairs.bankruptcy_payments[i].street
+    default: 111 34th Ave
   - City: financial_affairs.bankruptcy_payments[i].city
     default: Seattle
   - State: financial_affairs.bankruptcy_payments[i].state
     default: washington
   - Zip: financial_affairs.bankruptcy_payments[i].zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
   - Email or website: financial_affairs.bankruptcy_payments[i].email_or_website
     default: www.bankruptcyconsultants.net
   - Person who made the payment if not you: financial_affairs.bankruptcy_payments[i].payment_person
@@ -1117,8 +1606,10 @@ fields:
     required: False
 ---
 question: |
-  Within 1 year before you filed for bankruptcy, did you or anyone else acting on your behalf pay or transfer any property to anyone who promised to help you deal with your creditors or to make payments to your creditors.
+  Bankruptcy Agent Payments
 subquestion: |
+  Within 1 year before you filed for bankruptcy, did you or anyone else acting on your behalf pay or transfer any property to anyone who promised to help you deal with your creditors or to make payments to your creditors.
+
   Do not include any payment or transfers you already listed in the last question.
 fields:
   - no label: financial_affairs.has_creditor_help
@@ -1127,11 +1618,8 @@ fields:
   - Person who was paid: financial_affairs.creditor_help.name
     default: Bill
     show if: financial_affairs.has_creditor_help
-  - Number: financial_affairs.creditor_help.number
-    default: 1111
-    show if: financial_affairs.has_creditor_help
-  - Street: financial_affairs.creditor_help.street
-    default: 54th Ave NE
+  - Address/PO Box: financial_affairs.creditor_help.street
+    default: 1111 54th Ave NE
     show if: financial_affairs.has_creditor_help
   - City: financial_affairs.creditor_help.city
     default: Seattle
@@ -1140,7 +1628,10 @@ fields:
     default: Washington
     show if: financial_affairs.has_creditor_help
   - Zip: financial_affairs.creditor_help.zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: financial_affairs.has_creditor_help
   - note: Description and value of any property transferred
     show if: financial_affairs.has_creditor_help
@@ -1181,8 +1672,10 @@ edit:
   - date
 ---
 question: |
-  Within 2 years before you filed for bankruptcy, did you sell, trade, or otherwise transfer any property to anyone, other than property transferred in the ordinary course of your business or financial affairs?
+  Other Transfers
 subquestion: |
+  Within 2 years before you filed for bankruptcy, did you sell, trade, or otherwise transfer any property to anyone, other than property transferred in the ordinary course of your business or financial affairs?
+
   Include both outright transfers and transfers made as security ( such as the granting of a security interest or mortgage on your property). Do not include gifts and transfers that you have already listed in previous questions.
 yesno: financial_affairs.other_transfers.there_are_any
 ---
@@ -1197,16 +1690,17 @@ question: |
 fields:
   - Person who received transfer: financial_affairs.other_transfers[i].name
     default: Billy
-  - Number: financial_affairs.other_transfers[i].number
-    default: 11111
-  - Street: financial_affairs.other_transfers[i].street
-    default: 23rd ave ne
+  - Address/PO Box: financial_affairs.other_transfers[i].street
+    default: 1111 23rd ave ne
   - City: financial_affairs.other_transfers[i].city
     default: Seattle
   - State: financial_affairs.other_transfers[i].state
     default: Washington
   - Zip: financial_affairs.other_transfers[i].zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
   - Persons realtionship to you: financial_affairs.other_transfers[i].relationship
     default: Father
   - note: Description and value of property transferred
@@ -1222,6 +1716,8 @@ fields:
     default: 01/01/23
 ---
 question: |
+  Self-settled Trusts
+subquestion: |
   Within 10 years before you filed for bankruptcy, did you transfer any property to a self-settled trust or similar device of which you are a beneficiary? (These are often called asset-protection devices.)
 fields:
   - no label: financial_affairs.has_self_settled_trust
@@ -1254,7 +1750,10 @@ edit:
   - date
 ---
 question: |
+  Financial Account Changes
+subquestion: |
   Within 1 year before you filed for bankruptcy, were any financial accounts or instruments held in your name, or for your benefit, closed, sold, moved, or transferred?
+
   Include checking, savings, money market, or other financial accounts; certificates of deposit; shares in banks, credit unions, brokerage houses, pension funds, cooperatives, associations, and other financial institutions
 yesno: financial_affairs.instruments.there_are_any
 ---
@@ -1269,19 +1768,22 @@ question: |
 fields:
   - Name of financial institution: financial_affairs.instruments[i].name
     default: Big bank
-  - Number: financial_affairs.instruments[i].number
-    default: 11111
-  - Street: financial_affairs.instruments[i].street
-    default: 21st St S
+  - Address/PO Box: financial_affairs.instruments[i].street
+    default: 1111 21st St S
   - City: financial_affairs.instruments[i].city
     default: seattle
   - State: financial_affairs.instruments[i].state
     default: Washington
   - Zip: financial_affairs.instruments[i].zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
   - note: Last 4 digits of account number
   - no label: financial_affairs.instruments[i].account_number
+    datatype: string
     default: 1111
+    required: False
   - note: Type of account or instrument
   - no label: financial_affairs.instruments[i].account_type
     choices:
@@ -1298,14 +1800,16 @@ fields:
       is: Other
   - note: Date account was closed, sold, moved, or trasferred
   - no label: financial_affairs.instruments[i].date
-    datatype: date
     default: 01/01/23
+    input type: area
   - note: Last balance before closing or transfer
   - no label: financial_affairs.instruments[i].last_balance
     datatype: currency
     default: 3000
 ---
 question: |
+  Safe Deposit Box
+subquestion: |
   Do you now have, or did you have within 1 year before you filed for bankruptcy, any safe deposit box or other depository for securities, cash, or other valuables?
 fields:
   - no label: financial_affairs.has_deposit_box
@@ -1314,11 +1818,8 @@ fields:
   - Name of financial institution: financial_affairs.deposit_box.name
     default: BECU
     show if: financial_affairs.has_deposit_box
-  - Number: financial_affairs.deposit_box.number
-    default: 11111
-    show if: financial_affairs.has_deposit_box
-  - Street: financial_affairs.deposit_box.street
-    default: 25th Ave NE
+  - Address/PO Box: financial_affairs.deposit_box.street
+    default: 1111 25th Ave NE
     show if: financial_affairs.has_deposit_box
   - City: financial_affairs.deposit_box.city
     default: Seattle
@@ -1327,7 +1828,10 @@ fields:
     default: Washington
     show if: financial_affairs.has_deposit_box
   - Zip: financial_affairs.deposit_box.zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: financial_affairs.has_deposit_box
   - note: Who else had access to it?
     show if: financial_affairs.has_deposit_box
@@ -1335,11 +1839,7 @@ fields:
     required: False
     default: Jan
     show if: financial_affairs.has_deposit_box
-  - Number: financial_affairs.deposit_box.other_number
-    default: 22222
-    required: False
-    show if: financial_affairs.has_deposit_box
-  - Street: financial_affairs.deposit_box.other_street
+  - Address/PO Box: financial_affairs.deposit_box.other_street
     default: 54rd ave ne
     required: False
     show if: financial_affairs.has_deposit_box
@@ -1352,7 +1852,10 @@ fields:
     required: False
     show if: financial_affairs.has_deposit_box
   - Zip: financial_affairs.deposit_box.other_zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     required: False
     show if: financial_affairs.has_deposit_box
   - note: Describe the contents
@@ -1367,6 +1870,8 @@ fields:
     show if: financial_affairs.has_deposit_box
 ---
 question: |
+  Storage Unit
+subquestion: |
   Have you stored property in a storage unit or place other than your home within 1 year befor eyou filed for bankruptcy?
 fields:
   - no label: financial_affairs.has_storage_unit
@@ -1375,11 +1880,8 @@ fields:
   - Name of storage facility: financial_affairs.storage_unit.name
     default: BECU
     show if: financial_affairs.has_storage_unit
-  - Number: financial_affairs.storage_unit.number
-    default: 11111
-    show if: financial_affairs.has_storage_unit
-  - Street: financial_affairs.storage_unit.street
-    default: 25th Ave NE
+  - Address/PO Box: financial_affairs.storage_unit.street
+    default: 1111 25th Ave NE
     show if: financial_affairs.has_storage_unit
   - City: financial_affairs.storage_unit.city
     default: Seattle
@@ -1388,7 +1890,10 @@ fields:
     default: Washington
     show if: financial_affairs.has_storage_unit
   - Zip: financial_affairs.storage_unit.zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: financial_affairs.has_storage_unit
   - note: Who else had access to it?
     show if: financial_affairs.has_storage_unit
@@ -1396,12 +1901,8 @@ fields:
     required: False
     default: Jan
     show if: financial_affairs.has_storage_unit
-  - Number: financial_affairs.storage_unit.other_number
-    default: 22222
-    required: False
-    show if: financial_affairs.has_storage_unit
-  - Street: financial_affairs.storage_unit.other_street
-    default: 54rd ave ne
+  - Address/PO Box: financial_affairs.storage_unit.other_street
+    default: 1111 54rd ave ne
     required: False
     show if: financial_affairs.has_storage_unit
   - City: financial_affairs.storage_unit.other_city
@@ -1413,10 +1914,13 @@ fields:
     required: False
     show if: financial_affairs.has_storage_unit
   - Zip: financial_affairs.storage_unit.other_zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     required: False
     show if: financial_affairs.has_storage_unit
-  - note: Describe the contents
+  - note: Describe the contents and list value
     show if: financial_affairs.has_storage_unit
   - no label: financial_affairs.storage_unit.contents
     default: Deposit box contents
@@ -1428,6 +1932,8 @@ fields:
     show if: financial_affairs.has_storage_unit
 ---
 question: |
+  Borrowed Property
+subquestion: |
   Do you hold or control any property that someone else owns? Include any property you borrowed from, are storing for, or hold in trust for someone.
 fields:
   - no label: financial_affairs.has_held_property
@@ -1436,10 +1942,7 @@ fields:
   - Owners name: financial_affairs.held_property.name
     default: Craig
     show if: financial_affairs.has_held_property
-  - Number: financial_affairs.held_property.number
-    default: 11111
-    show if: financial_affairs.has_held_property
-  - Street: financial_affairs.held_property.street
+  - Address/PO Box: financial_affairs.held_property.street
     default: 34th Ave NE
     show if: financial_affairs.has_held_property
   - City: financial_affairs.held_property.city
@@ -1449,15 +1952,15 @@ fields:
     default: Washington
     show if: financial_affairs.has_held_property
   - Zip: financial_affairs.held_property.zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: financial_affairs.has_held_property
   - note: Where is the property?
     show if: financial_affairs.has_held_property
-  - Number: financial_affairs.held_property.prop_number
-    default: 11111
-    show if: financial_affairs.has_held_property
-  - Street: financial_affairs.held_property.prop_street
-    default: 1st Ave
+  - Address/PO Box: financial_affairs.held_property.prop_street
+    default: 1111 1st Ave
     show if: financial_affairs.has_held_property
   - City: financial_affairs.held_property.prop_city
     default: Seattle
@@ -1466,7 +1969,10 @@ fields:
     default: Washington
     show if: financial_affairs.has_held_property
   - Zip: financial_affairs.held_property.prop_zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: financial_affairs.has_held_property
   - note: Describe the property
     show if: financial_affairs.has_held_property
@@ -1480,16 +1986,18 @@ fields:
     show if: financial_affairs.has_held_property
 ---
 question: |
-  For the purpose of the next few questions the following definitions apply:
-  
-  Environmental law means any federal, state, or local statute or regulation concerning pollution, contamination, release of hazardous or toxic substances, wastes, or material inot the air, land, soil, surface wather, groundwater, or other medium, including statues or regulations controlling the cleanup of these substances, wastes, or material.
-  
-  Site means any location, facility, or property as defined under any environmental law, whether you now own, operate, or utilize it or used to own, operate, or utilize it, including disposal sites.
-  
-  Hazaradous material means anything an environmental law defines as a hazardous waste, hazardous substance, toxic substance, hazardous material, pollutant, containmant, or similar term.
-  
-  Report all notices, releases, and proceedings that you know about, regardless of when they occurred.
+  Environmental Law Liability
 subquestion: |
+  For the purpose of the next few questions the following definitions apply:
+
+  Environmental law means any federal, state, or local statute or regulation concerning pollution, contamination, release of hazardous or toxic substances, wastes, or material inot the air, land, soil, surface wather, groundwater, or other medium, including statues or regulations controlling the cleanup of these substances, wastes, or material.
+
+  Site means any location, facility, or property as defined under any environmental law, whether you now own, operate, or utilize it or used to own, operate, or utilize it, including disposal sites.
+
+  Hazaradous material means anything an environmental law defines as a hazardous waste, hazardous substance, toxic substance, hazardous material, pollutant, containmant, or similar term.
+
+  Report all notices, releases, and proceedings that you know about, regardless of when they occurred.
+
   Has any government unit notified you that you may be liable or potentially liable under or in violation of an environmental law?
 fields:
   - no label: financial_affairs.environment.has_liability
@@ -1498,11 +2006,8 @@ fields:
   - Name of site: financial_affairs.environment.liability_name
     default: Site
     show if: financial_affairs.environment.has_liability
-  - Number: financial_affairs.environment.liability_number
-    default: 1111
-    show if: financial_affairs.environment.has_liability
-  - Street: financial_affairs.environment.liability_street
-    default: 54th Ave
+  - Address/PO Box: financial_affairs.environment.liability_street
+    default: 1111 54th Ave
     show if: financial_affairs.environment.has_liability
   - City: financial_affairs.environment.liability_city
     default: Seattle
@@ -1511,18 +2016,18 @@ fields:
     default: Washington
     show if: financial_affairs.environment.has_liability
   - Zip: financial_affairs.environment.liability_zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: financial_affairs.environment.has_liability
   - note: Government Unit
     show if: financial_affairs.environment.has_liability
   - Name: financial_affairs.environment.liability_unit_name
     default: Govt Unit
     show if: financial_affairs.environment.has_liability
-  - Number: financial_affairs.environment.liability_unit_number
-    default: 11111
-    show if: financial_affairs.environment.has_liability
-  - Street: financial_affairs.environment.liability_unit_street
-    default: 23rd Ave NE
+  - Address/PO Box: financial_affairs.environment.liability_unit_street
+    default: 1111 23rd Ave NE
     show if: financial_affairs.environment.has_liability
   - City: financial_affairs.environment.liability_unit_city
     default: Seattle
@@ -1531,7 +2036,10 @@ fields:
     default: Washington
     show if: financial_affairs.environment.has_liability
   - Zip: financial_affairs.environment.liability_unit_zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: financial_affairs.environment.has_liability
   - note: Environmental law, if you know it
     show if: financial_affairs.environment.has_liability
@@ -1547,6 +2055,8 @@ fields:
     show if: financial_affairs.environment.has_liability
 ---
 question: |
+  Hazardous Material
+subquestion: |
   Have you notified any governmental unit of any realease of hazardous material?
 fields:
   - no label: financial_affairs.environment.has_release
@@ -1555,11 +2065,8 @@ fields:
   - Name of site: financial_affairs.environment.release_name
     default: Site
     show if: financial_affairs.environment.has_release
-  - Number: financial_affairs.environment.release_number
-    default: 1111
-    show if: financial_affairs.environment.has_release
-  - Street: financial_affairs.environment.release_street
-    default: 54th Ave
+  - Address/PO Box: financial_affairs.environment.release_street
+    default: 111 54th Ave
     show if: financial_affairs.environment.has_release
   - City: financial_affairs.environment.release_city
     default: Seattle
@@ -1568,18 +2075,18 @@ fields:
     default: Washington
     show if: financial_affairs.environment.has_release
   - Zip: financial_affairs.environment.release_zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: financial_affairs.environment.has_release
   - note: Government Unit
     show if: financial_affairs.environment.has_release
   - Name: financial_affairs.environment.release_unit_name
     default: Govt Unit
     show if: financial_affairs.environment.has_release
-  - Number: financial_affairs.environment.release_unit_number
-    default: 11111
-    show if: financial_affairs.environment.has_release
-  - Street: financial_affairs.environment.release_unit_street
-    default: 23rd Ave NE
+  - Address/PO Box: financial_affairs.environment.release_unit_street
+    default: 1111 23rd Ave NE
     show if: financial_affairs.environment.has_release
   - City: financial_affairs.environment.release_unit_city
     default: Seattle
@@ -1588,7 +2095,10 @@ fields:
     default: Washington
     show if: financial_affairs.environment.has_release
   - Zip: financial_affairs.environment.release_unit_zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: financial_affairs.environment.has_release
   - note: Environmental law, if you know it
     show if: financial_affairs.environment.has_release
@@ -1604,6 +2114,8 @@ fields:
     show if: financial_affairs.environment.has_release
 ---
 question: |
+  Environmental Judicial Proceeding
+subquestion: |
   Have you been a party in any judicial or administrative proceeding under any environmental law? Include settlements and orders.
 fields:
   - no label: financial_affairs.environment.has_proceeding
@@ -1614,18 +2126,15 @@ fields:
     default: Case Title
     show if: financial_affairs.environment.has_proceeding
   - Case number: financial_affairs.environment.proceeding_case_number
-    datatype: number
+    datatype: string
     default: 3343902
     show if: financial_affairs.environment.has_proceeding
   - note: Court or agency
   - Court Name: financial_affairs.environment.proceeding_court_name
     default: Court Name
     show if: financial_affairs.environment.has_proceeding
-  - Number: financial_affairs.environment.proceeding_court_number
-    default: 1111
-    show if: financial_affairs.environment.has_proceeding
-  - Street: financial_affairs.environment.proceeding_court_street
-    default: 34th Ave NE
+  - Address/PO Box: financial_affairs.environment.proceeding_court_street
+    default: 1111 34th Ave NE
     show if: financial_affairs.environment.has_proceeding
   - City: financial_affairs.environment.proceeding_court_city
     default: Seattle
@@ -1634,7 +2143,10 @@ fields:
     default: Washington
     show if: financial_affairs.environment.has_proceeding
   - Zip: financial_affairs.environment.proceeding_court_zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: financial_affairs.environment.has_proceeding
   - note: Nature of the case
     show if: financial_affairs.environment.has_proceeding
@@ -1651,6 +2163,8 @@ fields:
     show if: financial_affairs.environment.has_proceeding
 ---
 question: |
+  Business Connections
+subquestion: |
   Within 4 years before you filed for bankruptcy, did you own a business or have any of the following connections to any business?
 fields:
   - no label: financial_affairs.business_types
@@ -1688,16 +2202,17 @@ question: |
 fields:
   - Business Name: financial_affairs.businesses[i].name
     default: business name
-  - Number: financial_affairs.businesses[i].number
-    default: 111111
-  - Street: financial_affairs.businesses[i].street
+  - Address/PO Box: financial_affairs.businesses[i].street
     default: 34th Ave NE
   - City: financial_affairs.businesses[i].city
     default: Seattle
   - State: financial_affairs.businesses[i].state
     default: Washington
   - Zip: financial_affairs.businesses[i].zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
   - note: Describe the nature of the business
   - no label: financial_affairs.businesses[i].nature
     input type: area
@@ -1720,6 +2235,8 @@ fields:
     default: 01/01/23
 ---
 question: |
+  Financial Statements
+subquestion: |
   Within 2 years before you filed for bankruptcy, did you give a financial statement to anyone about your business? Include all financial institutions, creditors, or other parties.
 fields:
   - no label: financial_affairs.has_statement
@@ -1728,11 +2245,8 @@ fields:
   - Name: financial_affairs.statement_name
     default: Name
     show if: financial_affairs.has_statement
-  - Number: financial_affairs.statement_number
-    default: 11111
-    show if: financial_affairs.has_statement
-  - Street: financial_affairs.statement_street
-    default: 34th Ave NE
+  - Address/PO Box: financial_affairs.statement_street
+    default: 1111 34th Ave NE
     show if: financial_affairs.has_statement
   - City: financial_affairs.statement_city
     default: Seattle
@@ -1741,22 +2255,45 @@ fields:
     default: Washington
     show if: financial_affairs.has_statement
   - Zip: financial_affairs.statement_zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: financial_affairs.has_statement
   - note: Date issued
     show if: financial_affairs.has_statement
   - no label: financial_affairs.statement_date
     datatype: date
     default: 01/01/23
+    required: False
 ---
-event: form_107_attach
-section: form_107
-question: Form 107 Attachment
-continue button field: form_107_attach
 attachment:
-  pdf template file: form_b_107.pdf
-  variable name: attach_107
-  code: fin
+  - name: Form 107Ext1
+    filename: form_b107ext1.pdf
+    pdf template file: form_b_107_ext1.pdf
+    variable name: form_107_ext1
+    code: fin
+---
+attachment:
+  - name: Form 107Ext2
+    filename: form_b107ext2.pdf
+    pdf template file: form_b_107_ext2.pdf
+    variable name: form_107_ext2
+    code: fin
+---
+attachment:
+  - name: Form 107
+    filename: form_b107_v2.pdf
+    pdf template file: form_b_107_v2.pdf
+    variable name: form_107_temp
+    code: fin
+---
+attachment:
+  - name: Form 107Ext3
+    filename: form_b107ext3.pdf
+    pdf template file: form_b_107_ext3.pdf
+    variable name: form_107_ext3
+    code: fin
 ---
 code: |
   debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
@@ -1765,7 +2302,7 @@ code: |
   else:
     debtor2_name = ''
   fin = {}
-  
+
   fin['debtor1_name_1'] = debtor_name
   fin['debtor1_name_2'] = debtor_name
   fin['debtor1_name_3'] = debtor_name
@@ -1793,12 +2330,12 @@ code: |
   fin['case_number_11'] = case_number
   fin['case_number_12'] = case_number
   fin['isAmended'] = amended_filing
-  
+
   fin['yesMarried'] = True if financial_affairs.marital_status == True else False
   fin['noMarried'] = True if financial_affairs.marital_status == False else False
   fin['noLivedElsewhere'] = True if financial_affairs.lived_elsewhere == False else False
   fin['yesLivedElsewhere'] = True if financial_affairs.lived_elsewhere == True else False
-  fin['add1_D1_address'] = str(financial_affairs.address_number_1) + ' ' + financial_affairs.address_street_1
+  fin['add1_D1_address'] = financial_affairs.address_street_1
   fin['add1_D1_from'] = format_date(financial_affairs.address_from_1, format='MM/dd/yyyy')
   fin['add1_D1_to'] = format_date(financial_affairs.address_to_1, format='MM/dd/yyyy')
   fin['add1_D1_city'] = financial_affairs.address_city_1
@@ -1809,6 +2346,28 @@ code: |
   fin['add2_D1_city'] = financial_affairs.address_city_2
   fin['add2_D1_state'] = financial_affairs.address_state_2
   fin['add2_D1_zip'] = financial_affairs.address_zip_2
+  fin['add3_D1_address'] = financial_affairs.address_street_3
+  fin['add3_D1_from'] = format_date(financial_affairs.address_from_3, format='MM/dd/yyyy')
+  fin['add3_D1_to'] = format_date(financial_affairs.address_to_3, format='MM/dd/yyyy')
+  fin['add3_D1_city'] = financial_affairs.address_city_3
+  fin['add3_D1_state'] = financial_affairs.address_state_3
+  fin['add3_D1_zip'] = financial_affairs.address_zip_3
+  fin['add4_D1_from'] = format_date(financial_affairs.address_from_4, format='MM/dd/yyyy')
+  fin['add4_D1_to'] = format_date(financial_affairs.address_to_4, format='MM/dd/yyyy')
+  fin['add4_D1_city'] = financial_affairs.address_city_4
+  fin['add4_D1_state'] = financial_affairs.address_state_4
+  fin['add4_D1_zip'] = financial_affairs.address_zip_4
+  fin['add5_D1_address'] = financial_affairs.address_street_5
+  fin['add5_D1_from'] = format_date(financial_affairs.address_from_5, format='MM/dd/yyyy')
+  fin['add5_D1_to'] = format_date(financial_affairs.address_to_5, format='MM/dd/yyyy')
+  fin['add5_D1_city'] = financial_affairs.address_city_5
+  fin['add5_D1_state'] = financial_affairs.address_state_5
+  fin['add5_D1_zip'] = financial_affairs.address_zip_5
+  fin['add6_D1_from'] = format_date(financial_affairs.address_from_6, format='MM/dd/yyyy')
+  fin['add6_D1_to'] = format_date(financial_affairs.address_to_6, format='MM/dd/yyyy')
+  fin['add6_D1_city'] = financial_affairs.address_city_6
+  fin['add6_D1_state'] = financial_affairs.address_state_6
+  fin['add6_D1_zip'] = financial_affairs.address_zip_6
   fin['noCommunity'] = True if financial_affairs.lived_with_spouse == False else False
   fin['yesCommunity'] = True if financial_affairs.lived_with_spouse == True else False
   fin['noRegularIncome'] = True if financial_affairs.employed == False else False
@@ -1857,9 +2416,9 @@ code: |
       if financial_affairs.address_same_dates_1 == False:
         fin['add1_D2_from'] = format_date(financial_affairs.debtor2_address_from_1, format='MM/dd/yyyy')
         fin['add1_D2_to'] = format_date(financial_affairs.debtor2_address_to_1, format='MM/dd/yyyy')
-        
+
     else:
-      fin['add1_D2_address'] = str(financial_affairs.debtor2_address_number_1) + ' ' + financial_affairs.debtor2_address_street_1
+      fin['add1_D2_address'] = financial_affairs.debtor2_address_street_1
       fin['add1_D2_city'] = financial_affairs.debtor2_address_city_1
       fin['add1_D2_state'] = financial_affairs.debtor2_address_state_1
       fin['add1_D2_zip'] = financial_affairs.debtor2_address_zip_1
@@ -1870,19 +2429,69 @@ code: |
         fin['add2_D2_from'] = format_date(financial_affairs.debtor2_address_from_2, format='MM/dd/yyyy')
         fin['add2_D2_to'] = format_date(financial_affairs.debtor2_address_to_2, format='MM/dd/yyyy')
     else:
-      fin['add2_D2_address'] = str(financial_affairs.debtor2_address_number_2) + financial_affairs.debtor2_address_street_2
+      fin['add2_D2_address'] = financial_affairs.debtor2_address_street_2
       fin['add2_D2_city'] = financial_affairs.debtor2_address_city_2
       fin['add2_D2_state'] = financial_affairs.debtor2_address_state_2
       fin['add2_D2_zip'] = financial_affairs.debtor2_address_zip_2
-      
-    fin['add2_D1_address'] = str(financial_affairs.address_number_2) + ' ' + financial_affairs.address_street_2
+    fin['add2_D1_address'] = financial_affairs.address_street_2
+    #end first
+    fin['add3_D2_SameAddress'] = True if financial_affairs.address_same_3 == True else False
+    if financial_affairs.address_same_3 == True:
+      fin['add3_D2_SameTime'] = True if financial_affairs.address_same_dates_3 == True else False
+      if financial_affairs.address_same_dates_3 == False:
+        fin['add3_D2_from'] = format_date(financial_affairs.debtor2_address_from_3, format='MM/dd/yyyy')
+        fin['add3_D2_to'] = format_date(financial_affairs.debtor2_address_to_3, format='MM/dd/yyyy')
+
+    else:
+      fin['add3_D2_address'] = financial_affairs.debtor2_address_street_3
+      fin['add3_D2_city'] = financial_affairs.debtor2_address_city_3
+      fin['add3_D2_state'] = financial_affairs.debtor2_address_state_3
+      fin['add3_D2_zip'] = financial_affairs.debtor2_address_zip_3
+    fin['add4_D2_SameAddress'] = True if financial_affairs.address_same_4 == True else False
+    if financial_affairs.address_same_4 == True:
+      fin['add4_D2_SameTime'] = True if financial_affairs.address_same_dates_4 == True else False
+      if finacial_affairs.address_same_dates4 == False:
+        fin['add4_D2_from'] = format_date(financial_affairs.debtor2_address_from_4, format='MM/dd/yyyy')
+        fin['add4_D2_to'] = format_date(financial_affairs.debtor2_address_to_4, format='MM/dd/yyyy')
+    else:
+      fin['add4_D2_address'] = financial_affairs.debtor2_address_street_4
+      fin['add4_D2_city'] = financial_affairs.debtor2_address_city_4
+      fin['add4_D2_state'] = financial_affairs.debtor2_address_state_4
+      fin['add4_D2_zip'] = financial_affairs.debtor2_address_zip_4
+    fin['add4_D1_address'] = financial_affairs.address_street_4
+   #end set 2
+    fin['add5_D2_SameAddress'] = True if financial_affairs.address_same_5 == True else False
+    if financial_affairs.address_same_3 == True:
+      fin['add5_D2_SameTime'] = True if financial_affairs.address_same_dates_5 == True else False
+      if financial_affairs.address_same_dates_5 == False:
+        fin['add5_D2_from'] = format_date(financial_affairs.debtor2_address_from_5, format='MM/dd/yyyy')
+        fin['add5_D2_to'] = format_date(financial_affairs.debtor2_address_to_5, format='MM/dd/yyyy')
+
+    else:
+      fin['add5_D2_address'] = financial_affairs.debtor2_address_street_3
+      fin['add5_D2_city'] = financial_affairs.debtor2_address_city_5
+      fin['add5_D2_state'] = financial_affairs.debtor2_address_state_5
+      fin['add5_D2_zip'] = financial_affairs.debtor2_address_zip_5
+    fin['add6_D2_SameAddress'] = True if financial_affairs.address_same_6 == True else False
+    if financial_affairs.address_same_6 == True:
+      fin['add6_D2_SameTime'] = True if financial_affairs.address_same_dates_6 == True else False
+      if finacial_affairs.address_same_dates6 == False:
+        fin['add6_D2_from'] = format_date(financial_affairs.debtor2_address_from_6, format='MM/dd/yyyy')
+        fin['add6_D2_to'] = format_date(financial_affairs.debtor2_address_to_6, format='MM/dd/yyyy')
+    else:
+      fin['add6_D2_address'] = financial_affairs.debtor2_address_street_6
+      fin['add6_D2_city'] = financial_affairs.debtor2_address_city_6
+      fin['add6_D2_state'] = financial_affairs.debtor2_address_state_6
+      fin['add6_D2_zip'] = financial_affairs.debtor2_address_zip_6
+    fin['add6_D1_address'] = financial_affairs.address_street_6
+
     fin['curr_D2_HasWages'] = True if 'Wages, commissions, bonuses, tips' in financial_affairs.debtor2_current_income_sources else False
     fin['curr_D2_GrossIncome'] = currency(financial_affairs.debtor2_current_gross_income)
     fin['curr_D2_HasBus'] = True if financial_affairs.debtor2_current_income_sources == 'Operating a business' else False
     fin['last_D2_HasWages'] = True if financial_affairs.debtor2_last_income_sources == 'Wages, commissions, bonuses, tips' else False
     fin['last_D2_GrossIncome'] = currency(financial_affairs.debtor2_last_gross_income)
     fin['before_D2_HasWages'] = True if financial_affairs.debtor2_before_income_sources == 'Wages, commissions, bonuses, tips' else False
-    fin['before_D2_GrossIncome'] = currency(financial_affairs.debtor2_before_gross_income)  
+    fin['before_D2_GrossIncome'] = currency(financial_affairs.debtor2_before_gross_income)
     fin['last_D2_HasBus'] = True if financial_affairs.debtor2_last_income_sources == 'Operating a business' else False
     fin['before_D2_HasWages'] = True if financial_affairs.debtor2_before_income_sources == 'Wages, commissions, bonuses, tips' else False
     fin['before_D2_Gross_income'] = currency(financial_affairs.debtor2_before_gross_income)
@@ -1890,7 +2499,7 @@ code: |
     fin['curr_D2_Source1'] = financial_affairs.debtor2_current_other_source_1
     fin['curr_D2_Amt1'] = currency(financial_affairs.debtor2_current_other_source_amount_1)
     fin['curr_D2_Source2'] = financial_affairs.debtor2_current_other_source_2
-    fin['curr_D2_Amt2'] = currency(financial_affairs.debtor2_current_other_source_amount_2)  
+    fin['curr_D2_Amt2'] = currency(financial_affairs.debtor2_current_other_source_amount_2)
     fin['curr_D2_Source3'] = financial_affairs.debtor2_current_other_source_3
     fin['curr_D2_Amt3'] = currency(financial_affairs.debtor2_current_other_source_amount_3)
     fin['last_D2_Source1'] = financial_affairs.debtor2_last_other_source_1
@@ -1910,24 +2519,19 @@ code: |
     fin['yesBothConsumerDebts'] = True
   else:
     fin['noBothConsumerDebts'] = True
-    if financial_affairs.large_debt_payments == True:
-      fin['yesConsumerPayments'] = True
-    else:
-      fin['noConsumerPayments'] = True
+    fin['yesConsumerPayments'] = True
 
-  
+
   x=1
   for payment in financial_affairs.consumer_debt_payments:
     fin['creditor'+str(x)] = payment.creditor_name
-    fin['creditor_payment1_'+str(x)] = format_date(payment.payment_date_1, format='MM/dd/yyyy')
     fin['creditor_totalPaid'+str(x)] = currency(payment.total_amount)
     fin['creditor_amountOwed'+str(x)] = currency(payment.amount_owed)
     fin['creditor_isMortgage'+str(x)] = True if payment.payment_for == 'Mortgage' else False
-    fin['creditor_address'+str(x)] = str(payment.creditor_number) + ' ' + payment.creditor_street
-    fin['creditor_payment2_'+str(x)] = format_date(payment.payment_date_2, format='MM/dd/yyyy')
+    fin['creditor_address'+str(x)] = payment.creditor_street
+    fin['creditor_paymentDates'+str(x)] = payment.paymentDates
     fin['creditor_isCar'+str(x)] = True if payment.payment_for == 'Car' else False
     fin['creditor_isCC'+str(x)] = True if payment.payment_for == 'Credit Card' else False
-    fin['creditor_payment3_'+str(x)] = format_date(payment.payment_date_3, format='MM/dd/yyyy')
     fin['creditor_isLoan'+str(x)] = True if payment.payment_for == 'Load repayment' else False
     fin['creditor_isVendor'+str(x)] = True if payment.payment_for == 'Suppliers or vendors' else False
     fin['creditor_city'+str(x)] = payment.creditor_city
@@ -1935,7 +2539,7 @@ code: |
     fin['creditor_zip'+str(x)] = payment.creditor_zip
     fin['creditor_isOther'+str(x)] = True if payment.payment_for == 'Other' else False
     fin['creditor_other'+str(x)] = payment.payment_for
-    
+
     x += 1
 
   fin['noInsiderPayments'] = True if financial_affairs.insider_payments.there_are_any == False else False
@@ -1943,25 +2547,23 @@ code: |
   x = 1
   for payment in financial_affairs.insider_payments:
     fin['insider'+str(x)] = payment.insider_name
-    fin['insider_address'+str(x)] = str(payment.number) + payment.street
+    fin['insider_address'+str(x)] = payment.street
     fin['insider_city'+str(x)] = payment.city
     fin['insider_state'+str(x)] = payment.state
     fin['insider_zip'+str(x)] = payment.zip
-    fin['insider_payment1_'+str(x)] = format_date(payment.payment_date_1, format='MM/dd/yyyy')
-    fin['insider_payment2_'+str(x)] = format_date(payment.payment_date_2, format='MM/dd/yyyy')
-    fin['insider_payment3_'+str(x)] = format_date(payment.payment_date_3, format='MM/dd/yyyy')
+    fin['insider_paymentDates'+str(x)] = payment.paymentDates
     fin['insider_totalPaid'+str(x)] = currency(payment.total_amount)
     fin['insider_amountOwed'+str(x)] = currency(payment.amount_owed)
     fin['insider_reason'+str(x)] = payment.reason
-    
+
     x += 1
-  
+
   fin['noBenefitPayments'] = True if financial_affairs.insider_benefits.there_are_any == False else False
   fin['yesBenefitPayments'] = True if financial_affairs.insider_benefits.there_are_any == True else False
   x = 1
   for payment in financial_affairs.insider_benefits:
     fin['benefit'+str(x)] = payment.insider_name
-    fin['benefit_address'+str(x)] = str(payment.number) + payment.street
+    fin['benefit_address'+str(x)] = payment.street
     fin['benefit_city'+str(x)] = payment.city
     fin['benefit_state'+str(x)] = payment.state
     fin['benefit_zip'+str(x)] = payment.zip
@@ -1971,49 +2573,52 @@ code: |
     fin['benefit_totalPaid'+str(x)] = currency(payment.total_amount)
     fin['benefit_amountOwed'+str(x)] = currency(payment.amount_owed)
     fin['benefit_reason'+str(x)] = payment.reason
-    
+
     x += 1
-  
+
   fin['noLawsuit'] = True if financial_affairs.lawsuits.there_are_any == False else False
   fin['yesLawsuit'] = True if financial_affairs.lawsuits.there_are_any == True else False
   x = 1
-  for case in financial_affairs.lawsuits:
-    fin['case_nature'+str(x)] = case.nature_of_case
-    fin['case_title1-'+str(x)] = case.case_title
-    fin['case_court'+str(x)] = case.court_name
-    fin['case_isPending'+str(x)] = True if case.case_status == 'Pending' else False
-    fin['case_isAppeal'+str(x)] = True if case.case_status == 'On appeal' else False
-    fin['case_isConcluded'+str(x)] = True if case.case_status == 'Concluded' else False
-    fin['case_number'+str(x)] = case.case_number
-    fin['case_address'+str(x)] = str(case.court_number) + ' ' + case.court_street
-    fin['case_city'+str(x)] = case.court_city
-    fin['case_state'+str(x)] = case.court_state
-    fin['case_zip'+str(x)] = case.court_zip
+  for lawsuit in financial_affairs.lawsuits:
+    fin['case_nature'+str(x)] = lawsuit.nature_of_case
+    fin['case_title1-'+str(x)] = lawsuit.case_title
+    fin['case_court'+str(x)] = lawsuit.court_name
+    fin['case_isPending'+str(x)] = True if lawsuit.case_status == 'Pending' else False
+    fin['case_isAppeal'+str(x)] = True if lawsuit.case_status == 'On appeal' else False
+    fin['case_isConcluded'+str(x)] = True if lawsuit.case_status == 'Concluded' else False
+    fin['case_number'+str(x)] = lawsuit.case_number
+    fin['case_address'+str(x)] = lawsuit.court_street
+    fin['case_city'+str(x)] = lawsuit.court_city
+    fin['case_state'+str(x)] = lawsuit.court_state
+    fin['case_zip'+str(x)] = lawsuit.court_zip
     x += 1
-  
+
   fin['noSeized'] = True if financial_affairs.levies.there_are_any == False else False
   fin['yesSeized'] = True if financial_affairs.levies.there_are_any == True else False
   x = 1
   for levy in financial_affairs.levies:
     fin['seized_creditor'+str(x)] = levy.creditor_name
-    fin['seized_address'+str(x)] = str(levy.creditor_number) + ' ' + levy.creditor_street
+    fin['seized_address'+str(x)] = levy.creditor_street
     fin['seized_city'+str(x)] = levy.creditor_city
     fin['seized_state'+str(x)] = levy.creditor_state
     fin['seized_zip'+str(x)] = levy.creditor_zip
     fin['seized_property'+str(x)] = levy.property_description
-    fin['seized_date'+str(x)] = format_date(levy.date, format='MM/dd/yyyy')
+    if levy.date_in_description:
+      fin['seized_date'+str(x)] = 'Various'
+    else:
+      fin['seized_date'+str(x)] = format_date(levy.date, format='MM/dd/yyyy')
     fin['seized_value'+str(x)] = currency(levy.property_value)
     fin['seized_isRepossessed'+str(x)] = True if levy.property_action == 'Property was repossessed' else False
     fin['seized_isForeclosed'+str(x)] = True if levy.property_action == 'Property was foreclosed' else False
     fin['seized_isGarnished'+str(x)] = True if levy.property_action == 'Property was garnished' else False
     fin['seized_isAttached'+str(x)] = True if levy.property_action == 'Property was attached, seized, or levied' else False
-    
+
     x += 1
-  
+
   fin['noBankAction'] = True if financial_affairs.has_refusal == False else False
   fin['yesBankAction'] = True if financial_affairs.has_refusal == True else False
   fin['bank_name1'] = financial_affairs.refusal_creditor_name
-  fin['bank_address1'] = str(financial_affairs.refusal_creditor_number) + ' ' + financial_affairs.refusal_creditor_street
+  fin['bank_address1'] = financial_affairs.refusal_creditor_street
   fin['bank_city1'] = financial_affairs.refusal_creditor_city
   fin['bank_state1'] = financial_affairs.refusal_creditor_state
   fin['bank_zip1'] = financial_affairs.refusal_creditor_zip
@@ -2021,86 +2626,86 @@ code: |
   fin['bank_date1'] = format_date(financial_affairs.refusal_date, format='MM/dd/yyyy')
   fin['bank_amount1'] = currency(financial_affairs.refusal_amount)
   fin['bank_acct1'] = financial_affairs.refusal_account_number
-  
+
   fin['noAssignee'] = True if financial_affairs.other_assignee == False else False
   fin['yesAssignee'] = True if financial_affairs.other_assignee == True else False
-  
+
   fin['noGifts'] = True if financial_affairs.gifts.there_are_any == False else False
   fin['yesGifts'] = True if financial_affairs.gifts.there_are_any == True else False
   x = 1
   for gift in financial_affairs.gifts:
     fin['gift_name'+str(x)] = gift.person_name
-    fin['gift_address'+str(x)] = str(gift.number) + ' ' + gift.street
+    fin['gift_address'+str(x)] = gift.street
     fin['gift_city'+str(x)] = gift.city
     fin['gift_state'+str(x)] = gift.state
     fin['gift_zip'+str(x)] = gift.zip
     fin['gift_relation'+str(x)] = gift.relationship
-    fin['gift_date1-'+str(x)] = format_date(gift.date_1, format='MM/dd/yyyy')
-    fin['gift_date2-'+str(x)] = format_date(gift.date_2, format='MM/dd/yyyy')
+    fin['gift_date1-'+str(x)] = gift.date_1
     fin['gift'+str(x)] = gift.description
     fin['gift_amt1-'+str(x)] = currency(gift.value_1)
     fin['gift_amt2-'+str(x)] = currency(gift.value_2)
-    
+
     x += 1
-  
+
   fin['noCharity'] = True if financial_affairs.has_charity == False else False
   fin['yesCharity'] = True if financial_affairs.has_charity == True else False
   fin['charity_desc1'] = financial_affairs.charity_description
   fin['charity1'] = financial_affairs.charity_name
-  fin['charity_date1-1'] = format_date(financial_affairs.charity_date_1, format='MM/dd/yyyy')
-  fin['charity_date2-1'] = format_date(financial_affairs.charity_date_2, format='MM/dd/yyyy')
+  fin['charity_date1-1'] = financial_affairs.charity_date_1
   fin['charity_amt1-1'] = currency(financial_affairs.charity_value_1)
   fin['charity_amt2-1'] = currency(financial_affairs.charity_value_2)
-  fin['charity_address1'] = str(financial_affairs.charity_number) + ' ' + financial_affairs.charity_street
+  fin['charity_address1'] = financial_affairs.charity_street
   fin['charity_city1'] = financial_affairs.charity_city
   fin['charity_state1'] = financial_affairs.charity_state
   fin['charity_zip1'] = financial_affairs.charity_zip
-  
+
   fin['noLoss'] = True if financial_affairs.has_disaster == False else False
   fin['yesLoss'] = True if financial_affairs.has_disaster == True else False
   fin['loss_prop_desc'] = financial_affairs.disaster_description
   fin['loss_insurance_desc'] = financial_affairs.disaster_insurance
-  fin['loss_date'] = format_date(financial_affairs.disaster_date, format='MM/dd/yyyy')
+  fin['loss_date'] = financial_affairs.disaster_date
   fin['loss_amount'] = currency(financial_affairs.disaster_value)
-  
+
   fin['noConsulting'] = True if financial_affairs.bankruptcy_payments.there_are_any == False else False
   fin['yesConsulting'] = True if financial_affairs.bankruptcy_payments.there_are_any == True else False
   x = 1
   for payment in financial_affairs.bankruptcy_payments:
     fin['consult_name'+str(x)] = payment.name
-    fin['consult_address'+str(x)] = str(payment.number) + ' ' + payment.street
+    fin['consult_address'+str(x)] = payment.street
     fin['consult_city'+str(x)] = payment.city
     fin['consult_state'+str(x)] = payment.state
     fin['consult_zip'+str(x)] = payment.zip
     fin['consult_email'+str(x)] = payment.email_or_website
     fin['consult_date1-'+str(x)] = format_date(payment.date_1, format='MM/dd/yyyy')
-    fin['consult_date2-'+str(x)] = format_date(payment.date_2, format='MM/dd/yyyy')
     fin['consult_amt1-'+str(x)] = currency(payment.value_1)
-    fin['consult_amt2-'+str(x)] = currency(payment.value_2)
+    if payment.value_2 > 0:
+      fin['consult_date2-'+str(x)] = format_date(payment.date_2, format='MM/dd/yyyy')
+      fin['consult_amt2-'+str(x)] = currency(payment.value_2)
     fin['consult_who'+str(x)] = payment.payment_person
     fin['consult_describe'+str(x)] = payment.property_description
 
     x += 1
-  
+
   fin['noAid'] = True if financial_affairs.has_creditor_help == False else False
   fin['yesAid'] = True if financial_affairs.has_creditor_help == True else False
   fin['aid_name1'] = financial_affairs.creditor_help.name
   fin['aid_describe1'] = financial_affairs.creditor_help.property_description
-  fin['aid_address1'] = str(financial_affairs.creditor_help.number) + ' ' + financial_affairs.creditor_help.street
+  fin['aid_address1'] = financial_affairs.creditor_help.street
   fin['aid_city1'] = financial_affairs.creditor_help.city
   fin['aid_state1'] = financial_affairs.creditor_help.state
   fin['aid_zip1'] = financial_affairs.creditor_help.zip
   fin['aid_date1-1'] = format_date(financial_affairs.creditor_help.date_1, format='MM/dd/yyyy')
-  fin['aid_date2-1'] = format_date(financial_affairs.creditor_help.date_2, format='MM/dd/yyyy')
   fin['aid_amt1-1'] = currency(financial_affairs.creditor_help.value_1)
-  fin['aid_amt2-1'] = currency(financial_affairs.creditor_help.value_2)
-  
+  if financial_affairs.creditor_help.value_2 > 0:
+    fin['aid_date2-1'] = format_date(financial_affairs.creditor_help.date_2, format='MM/dd/yyyy')
+    fin['aid_amt2-1'] = currency(financial_affairs.creditor_help.value_2)
+
   fin['noOrdinary'] = True if financial_affairs.other_transfers.there_are_any == False else False
   fin['yesOrdinary'] = True if financial_affairs.other_transfers.there_are_any == True else False
   x = 1
   for transfer in financial_affairs.other_transfers:
     fin['ordinary_name'+str(x)] = transfer.name
-    fin['ordinary_address'+str(x)] = str(transfer.number) + ' ' + transfer.street
+    fin['ordinary_address'+str(x)] = transfer.street
     fin['ordinary_city'+str(x)] = transfer.city
     fin['ordinary_state'+str(x)] = transfer.state
     fin['ordinary_zip'+str(x)] = transfer.zip
@@ -2108,26 +2713,26 @@ code: |
     fin['ordinary_describe'+str(x)] = transfer.property_description
     fin['ordinary_relation'+str(x)] = transfer.relationship
     fin['ordinary_payments'+str(x)] = transfer.exchange_description
-    
+
     x += 1
-  
+
   fin['noTrust'] = True if financial_affairs.has_self_settled_trust == False else False
   fin['yesTrust'] = True if financial_affairs.has_self_settled_trust == True else False
   fin['trust_describe'] = financial_affairs.self_settled_trust.description
   fin['trust_name'] = financial_affairs.self_settled_trust.name
   fin['trust_date'] = format_date(financial_affairs.self_settled_trust.date, format='MM/dd/yyyy')
-  
+
   fin['noAccounts'] = True if financial_affairs.instruments.there_are_any == False else False
   fin['yesAccounts'] = True if financial_affairs.instruments.there_are_any == True else False
   x = 1
   for acct in financial_affairs.instruments:
     fin['account_name'+str(x)] = acct.name
-    fin['account_address'+str(x)] = str(acct.number) + ' ' + acct.street
+    fin['account_address'+str(x)] = acct.street
     fin['account_city'+str(x)] = acct.city
     fin['account_state'+str(x)] = acct.state
     fin['account_zip'+str(x)] = acct.zip
     fin['account_number'+str(x)] = acct.account_number
-    fin['account_date'+str(x)] = format_date(acct.date, format='MM/dd/yyyy')
+    fin['account_date'+str(x)] = acct.date
     fin['account_balance'+str(x)] = currency(acct.last_balance)
     fin['account_isChecking'+str(x)] = True if acct.account_type == 'Checking' else False
     fin['account_isSavings'+str(x)] = True if acct.account_type == 'Savings' else False
@@ -2135,18 +2740,18 @@ code: |
     fin['account_isBrokerage'+str(x)] = True if acct.account_type == 'Brokerage' else False
     fin['account_isOther'+str(x)] = True if acct.account_type == 'Other' else False
     fin['account_other'+str(x)] = acct.account_type
-    
+
     x += 1
-  
+
   fin['noSafe'] = True if financial_affairs.has_deposit_box == False else False
   fin['yesSafe'] = True if financial_affairs.has_deposit_box == True else False
   fin['safe_bank_name1'] = financial_affairs.deposit_box.name
-  fin['safe_bank_address1'] = str(financial_affairs.deposit_box.number) + ' ' + financial_affairs.deposit_box.street
+  fin['safe_bank_address1'] = financial_affairs.deposit_box.street
   fin['safe_bank_city1'] = financial_affairs.deposit_box.city
   fin['safe_bank_state1'] = financial_affairs.deposit_box.state
   fin['safe_bank_zip1'] = financial_affairs.deposit_box.zip
   fin['safe_who_name1'] = financial_affairs.deposit_box.other_name
-  fin['safe_who_address1'] = str(financial_affairs.deposit_box.other_number) + ' ' + financial_affairs.deposit_box.other_street
+  fin['safe_who_address1'] = financial_affairs.deposit_box.other_street
   fin['safe_who_city1'] = financial_affairs.deposit_box.other_city
   fin['safe_who_state1'] = financial_affairs.deposit_box.other_state
   fin['safe_who_zip1'] = financial_affairs.deposit_box.other_zip
@@ -2155,48 +2760,48 @@ code: |
     fin['safe_yesHave1'] = True
   else:
     fin['save_noHave1'] = True
-  
+
   fin['noStorage'] = True if financial_affairs.has_storage_unit == False else False
   fin['yesStorage'] = True if financial_affairs.has_storage_unit == True else False
   fin['storage_bank_name1'] = financial_affairs.storage_unit.name
-  fin['storage_bank_address1'] = str(financial_affairs.storage_unit.number) + ' ' + financial_affairs.storage_unit.street
+  fin['storage_bank_address1'] = financial_affairs.storage_unit.street
   fin['storage_bank_city1'] = financial_affairs.storage_unit.city
   fin['storage_bank_state1'] = financial_affairs.storage_unit.state
   fin['storage_bank_zip1'] = financial_affairs.storage_unit.zip
   fin['storage_who_name1'] = financial_affairs.storage_unit.other_name
-  fin['storage_who_address1'] = str(financial_affairs.storage_unit.other_number) + ' ' + financial_affairs.storage_unit.other_street
+  fin['storage_who_address1'] = financial_affairs.storage_unit.other_street
   fin['storage_who_city1'] = financial_affairs.storage_unit.other_city
   fin['storage_who_state1'] = financial_affairs.storage_unit.other_state
   fin['storage_who_zip1'] = financial_affairs.storage_unit.other_zip
   fin['storage_describe1'] = financial_affairs.storage_unit.contents
   fin['storage_noHave1'] = True if financial_affairs.storage_unit.still_owns == False else False
   fin['storage_yesHave1'] = True if financial_affairs.storage_unit.still_owns == True else False
-  
+
   fin['noControl'] = True if financial_affairs.has_held_property == False else False
   fin['yesControl'] = True if financial_affairs.has_held_property == True else False
   fin['control_owner'] = financial_affairs.held_property.name
-  fin['control_owner_address'] = str(financial_affairs.held_property.number) + ' ' + financial_affairs.held_property.street
+  fin['control_owner_address'] = financial_affairs.held_property.street
   fin['control_owner_city'] = financial_affairs.held_property.city
   fin['control_owner_state'] = financial_affairs.held_property.state
   fin['control_owner_zip'] = financial_affairs.held_property.zip
-  fin['control_prop_address'] = str(financial_affairs.held_property.prop_number) + ' ' + financial_affairs.held_property.prop_street
+  fin['control_prop_address'] = financial_affairs.held_property.prop_street
   fin['control_prop_city'] = financial_affairs.held_property.prop_city
   fin['control_prop_state'] = financial_affairs.held_property.prop_state
   fin['control_prop_zip'] = financial_affairs.held_property.prop_zip
   fin['control_describe'] = financial_affairs.held_property.property_description
   fin['control_value'] = currency(financial_affairs.held_property.value)
-  
+
   fin['noLiability'] = True if financial_affairs.environment.has_liability == False else False
   fin['yesLiability'] = True if financial_affairs.environment.has_liability == True else False
   fin['liability_describe'] = financial_affairs.environment.liability_law
   fin['liability_date'] = format_date(financial_affairs.environment.liability_date, format='MM/dd/yyyy')
   fin['liability_site'] = financial_affairs.environment.liability_name
-  fin['liability_site_address'] = str(financial_affairs.environment.liability_number) + ' ' + financial_affairs.environment.liability_street
+  fin['liability_site_address'] = financial_affairs.environment.liability_street
   fin['liability_site_city'] = financial_affairs.environment.liability_city
   fin['liability_site_state'] = financial_affairs.environment.liability_state
   fin['liability_site_zip'] = financial_affairs.environment.liability_zip
   fin['liability_unit'] = financial_affairs.environment.liability_unit_name
-  fin['liability_unit_address'] = str(financial_affairs.environment.liability_unit_number) + ' ' + financial_affairs.environment.liability_unit_street
+  fin['liability_unit_address'] = financial_affairs.environment.liability_unit_street
   fin['liability_unit_city'] = financial_affairs.environment.liability_unit_city
   fin['liability_unit_state'] = financial_affairs.environment.liability_unit_state
   fin['liability_unit_zip'] = financial_affairs.environment.liability_unit_zip
@@ -2207,21 +2812,21 @@ code: |
   fin['hazard_unit'] = financial_affairs.environment.release_unit_name
   fin['hazard_describe'] = financial_affairs.environment.release_law
   fin['hazard_date'] = format_date(financial_affairs.environment.release_date, format='MM/dd/yyyy')
-  fin['hazard_address'] = str(financial_affairs.environment.release_number) + ' ' + financial_affairs.environment.release_street
+  fin['hazard_address'] = financial_affairs.environment.release_street
   fin['hazard_city'] = financial_affairs.environment.release_city
   fin['hazard_state'] = financial_affairs.environment.release_state
   fin['hazard_zip'] = financial_affairs.environment.release_zip
-  fin['hazard_unit_address'] = str(financial_affairs.environment.release_unit_number) + ' ' + financial_affairs.environment.release_unit_street
+  fin['hazard_unit_address'] = financial_affairs.environment.release_unit_street
   fin['hazard_unit_city'] = financial_affairs.environment.release_unit_city
   fin['hazard_unit_state'] = financial_affairs.environment.release_unit_state
   fin['hazard_unit_zip'] = financial_affairs.environment.release_unit_zip
-  
+
   fin['noEnvLaw'] = True if financial_affairs.environment.has_proceeding == False else False
   fin['yesEnvLaw'] = True if financial_affairs.environment.has_proceeding == True else False
   fin['env_title'] = financial_affairs.environment.proceeding_case_title
   fin['env_caseNumber'] = financial_affairs.environment.proceeding_case_number
   fin['env_court'] = financial_affairs.environment.proceeding_court_name
-  fin['env_court_address'] = str(financial_affairs.environment.proceeding_court_number) + ' ' + financial_affairs.environment.proceeding_court_street
+  fin['env_court_address'] = financial_affairs.environment.proceeding_court_street
   fin['env_court_city'] = financial_affairs.environment.proceeding_court_city
   fin['env_court_state'] = financial_affairs.environment.proceeding_court_state
   fin['env_court_zip'] = financial_affairs.environment.proceeding_court_zip
@@ -2229,39 +2834,39 @@ code: |
   fin['env_isPending'] = True if financial_affairs.environment.proceeding_status == 'Pending' else False
   fin['env_isAppeal'] = True if financial_affairs.environment.proceeding_status == 'On appeal' else False
   fin['env_isConcluded'] = True if financial_affairs.environment.proceeding_status == 'Concluded' else False
-  
-  fin['yesSole'] = True if 'A sole proprietor or self-employed in a trade, profession, or other activity, either full-time or part-time' in financial_affairs.business_types else False
-  fin['yesLLC'] = True if 'A member of a limited liability company (LLC) or limited liability partnership (LLP)' in financial_affairs.business_types else False
-  fin['yesPartner'] = True if 'A partner in a partnership' in financial_affairs.business_types else False
-  fin['yesOfficer'] = True if 'An officer, director, or managing executive of a corporation' in financial_affairs.business_types else False
-  fin['yesOwner'] = True if 'An owner of at least 5% of the voting or equity securities of a corporation' in financial_affairs.business_types else False
-  
+
+  fin['yesSole'] = financial_affairs.business_types['A sole proprietor or self-employed in a trade, profession, or other activity, either full-time or part-time']
+  fin['yesLLC'] = financial_affairs.business_types['A member of a limited liability company (LLC) or limited liability partnership (LLP)']
+  fin['yesPartner'] = financial_affairs.business_types['A partner in a partnership']
+  fin['yesOfficer'] = financial_affairs.business_types['An officer, director, or managing executive of a corporation']
+  fin['yesOwner'] = financial_affairs.business_types['An owner of at least 5% of the voting or equity securities of a corporation']
+
   if fin['yesSole'] == True or fin['yesLLC'] == True or fin['yesPartner'] == True or fin['yesOfficer'] == True or fin['yesOwner'] == True:
     fin['yesAbove'] = True
   else:
     fin['noneAbove'] = True
-  
+
   x = 1
-  for business in financial_affairs.businesses:
-    fin['business_name'+str(x)] = business.name
-    fin['business_address'+str(x)] = str(business.number) + ' ' + business.street
-    fin['business_city'+str(x)] = business.city
-    fin['business_state'+str(x)] = business.state
-    fin['business_zip'+str(x)] = business.zip
-    fin['business_nature'+str(x)] = business.nature
-    fin['business_accountant'+str(x)] = business.accountant
-    fin['business_ein'+str(x)] = business.ein
-    fin['business_from'+str(x)] = format_date(business.from_date, format='MM/dd/yyyy')
-    fin['business_to'+str(x)] = format_date(business.to, format='MM/dd/yyyy')
-    
+  for bus in financial_affairs.businesses:
+    fin['business_name'+str(x)] = bus.name
+    fin['business_address'+str(x)] = bus.street
+    fin['business_city'+str(x)] = bus.city
+    fin['business_state'+str(x)] = bus.state
+    fin['business_zip'+str(x)] = bus.zip
+    fin['business_nature'+str(x)] = bus.nature
+    fin['business_accountant'+str(x)] = bus.accountant
+    fin['business_ein'+str(x)] = bus.ein
+    fin['business_from'+str(x)] = format_date(bus.from_date, format='MM/dd/yyyy')
+    fin['business_to'+str(x)] = format_date(bus.to, format='MM/dd/yyyy')
+
     x += 1
-    
+
   fin['noFinancials'] = True if financial_affairs.has_statement == False else False
   fin['yesFinancials'] = True if financial_affairs.has_statement == True else False
   fin['financials_name'] = financial_affairs.statement_name
   fin['financials_date'] = format_date(financial_affairs.statement_date, format='MM/dd/yyyy')
-  fin['financials_address'] = str(financial_affairs.statement_number) + ' ' + financial_affairs.statement_street
+  fin['financials_address'] = financial_affairs.statement_street
   fin['financials_state'] = financial_affairs.statement_state
   fin['financials_city'] = financial_affairs.statement_city
   fin['financials_zip'] = financial_affairs.statement_zip
-  
+

@@ -105,14 +105,12 @@ review:
       ${ personal_leases.add_action() }
      % endif
 ---
-event: form_108_attach
-section: form_108
-question: form 108 Attachment
-continue button field: form_108_attach
 attachment:
-  pdf template file: form_b108.pdf
-  variable name: attach_108
-  code: leases
+  - name: Form 108
+    filename: form_b108.pdf
+    pdf template file: form_b108.pdf
+    variable name: attach_108
+    code: leases
 ---
 code: |
   debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last

@@ -13,9 +13,22 @@ fields:
 ---
 section: form_122a
 question: |
-  Calculate your current monthly income
-subquestion: |
-  Be as complete and accurate as possible. If two married people are filing together, both are equally responsible for being accurate.
+  Identify any exemptions from Presumption of Abuse.
+fields:
+  - Are your debts primarily non-consumer?: monthly_income.non_consumer_debts
+    datatype: yesnoradio
+    default: False
+  - Are you a disabled veteran?: monthly_income.disabled_veteran
+    datatype: yesnoradio
+    default: False
+  - Are you in the Reservists or National Guard?: monthly_income.reservists
+    datatype: yesnoradio
+    default: False
+
+---
+section: form_122a
+question: |
+  Tell the court about your household and dependents so we can calulate median income.
 fields:
   - What is your marital and filing status?: monthly_income.filing_status
     choices:
@@ -30,6 +43,16 @@ fields:
     show if:
       variable: monthly_income.filing_status
       is: Married and your spouse is NOT filing with you.
+  - How many dependents?: monthly_income.dependents
+    datatype: number
+    default: 2
+---
+section: form_122a
+question: |
+  Calculate your current monthly income
+subquestion: |
+  Be as complete and accurate as possible. If two married people are filing together, both are equally responsible for being accurate.
+fields:
   - note: Income calculation Debtor 1
   - Your gross wages, salary tips, bonuses, overtime, and comissions: monthly_income.gross_wages1
     datatype: currency
@@ -148,6 +171,79 @@ fields:
   - Amount: monthly_income.source2_amount_2
     default: 100
 ---
+event: review_122
+question: |
+  Note:
+  
+  Your current overall income is estimated to be: ${ currency(overall_means_income) }
+  <br><br>
+  
+  150% of poverty level based on ${ int(monthly_income.dependents) } dependents is: ${ currency(povertyAmt) }
+  <br><br>
+  % if overall_means_income < povertyAmt:
+   Chapter 7 OK with NO Presumption of Abuse. Means Test Form is Complete. Form 122A-2 is not required.
+  % else:
+  Please fill out Form 122A-2 and submit it with your bankruptcy filing.
+  % endif
+continue button field: monthly_income.reviewed
+---
+code: |
+  debtor_1_income = (monthly_income.gross_wages1 + 
+                          monthly_income.alimony1 + 
+                          monthly_income.other_income1 +
+                          monthly_income.business_gross_receipts1  +
+                          monthly_income.rental_gross_receipts1 +
+                          monthly_income.interest1 +
+                          monthly_income.unemployment1 +
+                          monthly_income.social1 +
+                          monthly_income.pension1 +
+                          monthly_income.source1_amount_1 +
+                          monthly_income.source2_amount_1
+                          ) - (
+                           monthly_income.business_operating_expenses1 +
+                           monthly_income.rental_operating_expenses1
+                          )
+  debtor_2_income = 0
+  if len(debtor) > 1:
+    debtor_2_income = (monthly_income.gross_wages1 + 
+                            monthly_income.alimony1 + 
+                            monthly_income.other_income1 +
+                            monthly_income.business_gross_receipts1 +
+                            monthly_income.rental_gross_receipts1 +
+                            monthly_income.interest1 +
+                            monthly_income.unemployment1 +
+                            monthly_income.social1 +
+                            monthly_income.pension1 +
+                            monthly_income.source1_amount_1 +
+                            monthly_income.source2_amount_1
+                            ) - (
+                             monthly_income.business_operating_expenses1 +
+                             monthly_income.rental_operating_expenses1
+                            )
+
+
+  overall_means_income = debtor_1_income + debtor_2_income
+
+  if monthly_income.dependents == 0.0:
+    povertyAmt = 14580 * 1.5
+  if monthly_income.dependents == 1.0:
+    povertyAmt = 19720 * 1.5
+  if monthly_income.dependents == 2.0:
+    povertyAmt = 24860 * 1.5
+  if monthly_income.dependents == 3.0:
+    povertyAmt = 30000 * 1.5
+  if monthly_income.dependents == 4.0:
+    povertyAmt = 35140 * 1.5
+  if monthly_income.dependents == 5.0:
+    povertyAmt = 40280 * 1.5
+  if monthly_income.dependents == 6.0:
+    povertyAmt = 45420 * 1.5
+  if monthly_income.dependents == 7.0:
+    povertyAmt = 50560 * 1.5
+  if monthly_income.dependents > 7.0:
+    countAbove = monthly_income.median_dependents - 7
+    povertyAmt = (50560 + (countAbove*5140))*1.5
+---
 question: |
   Calculate the median family income that applies to you.
 fields:
@@ -211,14 +307,12 @@ review:
       Source 1        | ${ monthly_income.source1_amount_2 }
       Source 2        | ${ monthly_income.source2_amount_2 }
 ---
-event: form_122a_attach
-section: form_122a
-question: Form 122a Attachment
-continue button field: form_122a_attach
 attachment:
-  pdf template file: b_122a-1.pdf
-  variable name: attach_122a
-  code: income
+  - name: Form 122a
+    filename: form_b22a-1.pdf
+    pdf template file: b_122a-1.pdf
+    variable name: attach_122a
+    code: income
 ---
 code: |
   debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
@@ -299,3 +393,4 @@ code: |
   income['medianIncome'] = monthly_income.median_income
   income['lessThan'] = True if ((monthly_income.gross_wages1 + monthly_income.alimony1 + monthly_income.other_income1 + (monthly_income.business_gross_receipts1 - monthly_income.business_operating_expenses1) + (monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1) + monthly_income.interest1 + monthly_income.unemployment1 + monthly_income.social1 + monthly_income.pension1 + monthly_income.source1_amount_1 + monthly_income.source2_amount_1) + (monthly_income.gross_wages2 + monthly_income.alimony2 + monthly_income.other_income2 + (monthly_income.business_gross_receipts2 - monthly_income.business_operating_expenses2) + (monthly_income.rental_gross_receipts2 - monthly_income.rental_operating_expenses2) + monthly_income.interest2 + monthly_income.unemployment2 + monthly_income.spouse_social2 + monthly_income.pension2 + monthly_income.source1_amount_2 + monthly_income.source2_amount_2) < monthly_income.median_income) else False
   income['moreThan'] = True if ((monthly_income.gross_wages1 + monthly_income.alimony1 + monthly_income.other_income1 + (monthly_income.business_gross_receipts1 - monthly_income.business_operating_expenses1) + (monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1) + monthly_income.interest1 + monthly_income.unemployment1 + monthly_income.social1 + monthly_income.pension1 + monthly_income.source1_amount_1 + monthly_income.source2_amount_1) + (monthly_income.gross_wages2 + monthly_income.alimony2 + monthly_income.other_income2 + (monthly_income.business_gross_receipts2 - monthly_income.business_operating_expenses2) + (monthly_income.rental_gross_receipts2 - monthly_income.rental_operating_expenses2) + monthly_income.interest2 + monthly_income.unemployment2 + monthly_income.spouse_social2 + monthly_income.pension2 + monthly_income.source1_amount_2 + monthly_income.source2_amount_2) > monthly_income.median_income) else False
+

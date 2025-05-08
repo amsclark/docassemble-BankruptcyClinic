@@ -12,9 +12,6 @@ edit:
 section: schedule_j
 question: Describe your household
 fields:
-  - Is this a join case?: debtor[0].expenses.joint_case
-    datatype: yesnoradio
-    default: True
   - Does debtor 2 live in a separate household: debtor[0].expenses.other_household
     datatype: yesnoradio
     default: True
@@ -36,7 +33,7 @@ fields:
   - Dependent relationship to debtor: debtor[0].expenses.dependents[i].relationship
     default: Child
   - Dependent age: debtor[0].expenses.dependents[i].age
-    datatype: number
+    datatype: string
     default: 12
   - Does the dependent live with you?: debtor[0].expenses.dependents[i].same_residence
     datatype: yesnoradio
@@ -54,29 +51,37 @@ fields:
   - Real estate taxes: debtor[0].expenses.real_estate_taxes
     datatype: currency
     default: 0
+    required: False
   - Property, homeowners, or renters insurance: debtor[0].expenses.renters_insurance
     datatype: currency
     default: 0
+    required: False
   - Home maintenance, repair, and upkeep expenses: debtor[0].expenses.upkeep_expenses
     datatype: currency
     default: 0
+    required: False
   - Homeowners association or condominium dues: debtor[0].expenses.owners_dues
     datatype: currency
     default: 0
+    required: False
   - note: <br>
   - Additional mortgage payments for your residence: debtor[0].expenses.additional_mortgage_payments
     datatype: currency
     default: 0
+    required: False
   - note: Utilities
   - Electricity, heat, natural gas: debtor[0].expenses.util_electric
     datatype: currency
     default: 0
+    required: False
   - Water, sewer, garbage collection: debtor[0].expenses.util_garbage
     datatype: currency
     default: 0
+    required: False
   - Telephone, cell phone, internet, satellite, and cable services: debtor[0].expenses.telephone
     datatype: currency
     default: 0
+    required: False
   - Do you have other utility expenses: debtor[0].expenses.util_other
     datatype: yesnoradio
     default: True
@@ -91,107 +96,172 @@ fields:
   - Food and housekeeping supplies: debtor[0].expenses.house_supplies
     default: 0
     datatype: currency
+    required: False
   - Childcare and childrens education costs: debtor[0].expenses.childcare
     datatype: currency
     default: 0
+    required: False
   - Clothing, laundry, and dry cleaning: debtor[0].expenses.clothing
     datatype: currency
     default: 0
+    required: False
   - Personal care products and services: debtor[0].expenses.personal_care
     datatype: currency
     default: 0
+    required: False
   - Medical and dental expenses: debtor[0].expenses.medical
     datatype: currency
     default: 0
+    required: False
   - Transportation: debtor[0].expenses.transportation
     datatype: currency
     default: 0
+    required: False
   - Entertainment, clubs, recreation, newspapers, magazines, and books: debtor[0].expenses.entertainment
     datatype: currency
     default: 0
+    required: False
   - Charitable contributions and religious donations: debtor[0].expenses.charity
     datatype: currency
     default: 0
+    required: False
   - note: Insurance
   - Life insurance: debtor[0].expenses.life_insurance
     datatype: currency
     default: 0
+    required: False
   - Health insurance: debtor[0].expenses.health_insurance
     datatype: currency
     default: 0
+    required: False
   - Vehicle insurance: debtor[0].expenses.vehicle_insurance
     datatype: currency
     default: 0
+    required: False
   - Do you have other insurance?: debtor[0].expenses.other_insurance
     datatype: yesnoradio
     default: True
+    required: False
   - Specify: debtor[0].expenses.other_insurance_specify
     default: Other insurance
     show if: debtor[0].expenses.other_insurance
   - Amount: debtor[0].expenses.other_insurance_amount
     datatype: currency
     default: 0
+    required: False
     show if: debtor[0].expenses.other_insurance
   - note: |
       Taxes. Do not include taxes deducted from your pay or already included amounts
   - Specify: debtor[0].expenses.other_tax_specify
     default: Other taxes
+    required: False
   - Amount: debtor[0].expenses.other_tax_amount
     datatype: currency
     default: 0
+    required: False
   - note: |
       Installment or lease payments
   - Car payments for Vehicle 1: debtor[0].expenses.vehicle1_payments
     datatype: currency
     default: 300
+    required: False
   - Car payments for Vehicle 2: debtor[0].expenses.vehicle2_payments
     datatype: currency
     default: 300
+    required: False
   - Other Payment: debtor[0].expenses.other_payment1_specify
     default: Other Payment 1
+    required: False
   - Other Amount: debtor[0].expenses.other_payment1_amount
     datatype: currency
     default: 0
+    required: False
   - Other Payment: debtor[0].expenses.other_payment2_specify
     default: Other Payment 2
+    required: False
   - Other Amount: debtor[0].expenses.other_payment2_amount
     datatype: currency
     default: 0
+    required: False
   - note: <br>
   - Your payments of alimony, maintenance, and support that you did not report as deducted from pay: debtor[0].expenses.alimony
     datatype: currency
     default: 0
   - note: |
       Other payments you make to support others who do not live with you
+    show if: debtor[0].expenses.other_people_expenses
   - Specify: debtor[0].expenses.other_support_specify
     default: Other payments
+    show if: debtor[0].expenses.other_people_expenses
   - Amount: debtor[0].expenses.other_support_amount
     datatype: currency
     default: 0
-  - note: |
-      Other real property expenses not already included
-  - Mortgages on other property: debtor[0].expenses.other_mortgage
-    datatype: currency
-    default: 0
-  - Real estate taxes: debtor[0].expenses.other_real_estate_taxes
-    datatype: currency
-    default: 0
-  - Property, homeonwers, or renters insurance: debtor[0].expenses.other_property_insurance
-    datatype: currency
-    default: 0
-  - Maintenance, repair, and upkeep expenses: debtor[0].expenses.other_maintenance
-    datatype: currency
-    default: 0
-  - Homeowners association or condominium dues: debtor[0].expenses.other_homeowners_dues
-    datatype: currency
-    default: 0
-  - Other Specify: debtor[0].expenses.overall_other_description
+    required: False
+    show if: debtor[0].expenses.other_people_expenses
+
+  - Do you have other custom expenses to add?: debtor[0].expenses.has_other_expenses
+    datatype: yesnoradio
+    default: False
+
+  - note: Other Custom Expense 1
+    show if: debtor[0].expenses.has_other_expenses
+  - Custom Expense description: debtor[0].expenses.overall_other_description_1
     default: Other
     required: False
-  - Amount: debtor[0].expenses.overall_other_amount
+    show if: debtor[0].expenses.has_other_expenses
+  - Amount: debtor[0].expenses.overall_other_amount_1
     default: 300
     datatype: currency
     required: False
+    show if: debtor[0].expenses.has_other_expenses
+
+  - note: Other Custom Expense 2
+    show if: debtor[0].expenses.has_other_expenses
+  - Custom Expense description: debtor[0].expenses.overall_other_description_2
+    default: Other
+    required: False
+    show if: debtor[0].expenses.has_other_expenses
+  - Amount: debtor[0].expenses.overall_other_amount_2
+    default: 300
+    datatype: currency
+    required: False
+    show if: debtor[0].expenses.has_other_expenses
+
+  - note: Other Custom Expense 3
+    show if: debtor[0].expenses.has_other_expenses
+  - Custom Expense description: debtor[0].expenses.overall_other_description_3
+    default: Other
+    required: False
+    show if: debtor[0].expenses.has_other_expenses
+  - Amount: debtor[0].expenses.overall_other_amount_3
+    default: 300
+    datatype: currency
+    required: False
+    show if: debtor[0].expenses.has_other_expenses
+
+  - note: Other Custom Expense 4
+    show if: debtor[0].expenses.has_other_expenses
+  - Custom Expense description: debtor[0].expenses.overall_other_description_4
+    default: Other
+    required: False
+    show if: debtor[0].expenses.has_other_expenses
+  - Amount: debtor[0].expenses.overall_other_amount_4
+    default: 300
+    datatype: currency
+    required: False
+    show if: debtor[0].expenses.has_other_expenses
+
+  - note: Other Custom Expense 5
+    show if: debtor[0].expenses.has_other_expenses
+  - Custom Expense description: debtor[0].expenses.overall_other_description_5
+    default: Other
+    required: False
+    show if: debtor[0].expenses.has_other_expenses
+  - Amount: debtor[0].expenses.overall_other_amount_5
+    default: 300
+    datatype: currency
+    required: False
+    show if: debtor[0].expenses.has_other_expenses
 ---
 section: schedule_j
 question: |
@@ -204,7 +274,7 @@ fields:
     default: True
   - Explain: debtor[0].expenses.change_explainer
     default: Some expense to explain
-    show if: debtor[0].expenses.change_in_expense
+    required: False
 ---
 event: schedule_j
 section: schedule_j
@@ -239,12 +309,12 @@ review:
       Home Maintenance: ${ debtor[0].expenses.upkeep_expenses }
       Homeowns Dues: ${ debtor[0].expenses.owners_dues }
       Additional Mortgage Payments: ${ debtor[0].expenses.additional_mortgage_payments }
-      
+
       Utilities
       Electicity, heat, natural gas: ${ debtor[0].expenses.util_electric }
       Water, sewer, garbage collection: ${ debtor[0].expenses.util_garbage }
       Telephone, internet, cable: ${ debtor[0].expenses.telephone }
-      
+
       % if debtor[0].expenses.util_other:
         Has other utility expenses: Yes
         Explain: ${ debtor[0].expenses.util_other_specify }
@@ -252,7 +322,7 @@ review:
       % else:
         Has other utility expenses: No
       % endif
-      
+
       Food and housekeeping supplies: ${ debtor[0].expenses.house_supplies }
       Childcare: ${ debtor[0].expenses.childcare }
       Clothing: ${ debtor[0].expenses.clothing }
@@ -260,7 +330,7 @@ review:
       Medical and Dental: ${ debtor[0].expenses.medical }
       Entertainment: ${ debtor[0].expenses.entertainment }
       Charitable Contributions: ${ debtor[0].expenses.charity }
-      
+
       Insurance
       Life insurance: ${ debtor[0].expenses.life_insurance }
       Health insurance: ${ debtor[0].expenses.health_insurance }
@@ -272,11 +342,11 @@ review:
       % else:
         Has other insurance: No
       % endif
-      
+
       Taxes
       ${ debtor[0].expenses.other_tax_specify }
       Amount: ${ debtor[0].expenses.other_tax_amount }
-      
+
       Installment or lease payments
       Car payment 1: ${ debtor[0].expenses.vehicle1_payments }
       Car payment 2: ${ debtor[0].expenses.vehicle2_payments }
@@ -286,17 +356,13 @@ review:
       Other payment 2:
       ${ debtor[0].expenses.other_payment2_specify }
       Amount: ${ debtor[0].expenses.other_payment2_amount }
-      
+
       Payments of alimony: ${ debtor[0].expenses.alimony }
-      
+
       Other types of support payments:
       ${ debtor[0].expenses.other_support_specify }
       Amount: ${ debtor[0].expenses.other_support_amount }
-      
-      Mortgage on other property: ${ debtor[0].expenses.other_mortgage }
-      Other real estate taxes: ${ debtor[0].expenses.other_real_estate_taxes }
-      Other property insurance: ${ debtor[0].expenses.other_property_insurance }
-      Other maintenance: ${ debtor[0].expenses.other_maintenance }
+
   - Revisit: debtor[0].expenses.change_in_expense
     button: |
       % if debtor[0].expenses.change_in_expense:
@@ -306,14 +372,12 @@ review:
         Increase or decrease of expenses: No
       % endif
 ---
-event: schedule_j_attach
-section: schedule_j
-question: Schedule j Attachment
-continue button field: schedule_j_attach
 attachment:
-  pdf template file: form_b106j.pdf
-  variable name: j_attach
-  code: expenses
+  - name: Form 106J
+    filename: form_b106j.pdf
+    pdf template file: form_b106j.pdf
+    variable name: j_attach
+    code: expenses
 ---
 code: |
   debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
@@ -337,16 +401,16 @@ code: |
   expenses['isSameHouse'] = True if debtor[0].expenses.other_household == True else False
   expenses['noDependents'] = True if len(debtor[0].expenses.dependents) == 0 else False
   expenses['hasDependents'] = True if len(debtor[0].expenses.dependents) > 0 else False
-  
+
   i = 1
   for dep in debtor[0].expenses.dependents:
     expenses['relation'+str(i)] = dep.relationship
     expenses['age'+str(i)] = dep.age
     expenses['noLivesWith'+str(i)] = True if dep.same_residence == False else False
     expenses['yesLivesWith'+str(i)] = True if dep.same_residence == True else False
-    
+
     i += 1
-  
+
   expenses['rentExpense'] = currency(debtor[0].expenses.rent_expense)
   expenses['taxes'] = currency(debtor[0].expenses.real_estate_taxes)
   expenses['propInsurance'] = currency(debtor[0].expenses.renters_insurance)
@@ -382,24 +446,63 @@ code: |
   expenses['alimony'] = currency(debtor[0].expenses.alimony)
   expenses['otherOutsiderPayDesc'] = debtor[0].expenses.other_support_specify
   expenses['otherOutsiderPayAmount'] = currency(debtor[0].expenses.other_support_amount)
-  expenses['otherMortgage'] = currency(debtor[0].expenses.other_mortgage)
-  expenses['otherRealestateTaxes'] = currency(debtor[0].expenses.other_real_estate_taxes)
-  expenses['otherHomeIns'] = currency(debtor[0].expenses.other_property_insurance)
-  expenses['otherRepair'] = currency(debtor[0].expenses.other_maintenance)
-  expenses['otherHomeowners'] = currency(debtor[0].expenses.other_homeowners_dues)
-  expenses['otherCatchDesc'] = debtor[0].expenses.overall_other_description
-  expenses['otherCatchAmount'] = currency(debtor[0].expenses.overall_other_amount)
-  
-  expenses['debtor1Total'] = currency(debtor[0].expenses.rent_expense + debtor[0].expenses.real_estate_taxes + debtor[0].expenses.renters_insurance + debtor[0].expenses.upkeep_expenses + debtor[0].expenses.owners_dues + debtor[0].expenses.additional_mortgage_payments + debtor[0].expenses.util_electric + debtor[0].expenses.util_garbage + debtor[0].expenses.telephone + debtor[0].expenses.util_other_amount + debtor[0].expenses.house_supplies + debtor[0].expenses.childcare + debtor[0].expenses.clothing + debtor[0].expenses.personal_care + debtor[0].expenses.medical + debtor[0].expenses.transportation + debtor[0].expenses.entertainment + debtor[0].expenses.charity + debtor[0].expenses.life_insurance + debtor[0].expenses.health_insurance + debtor[0].expenses.vehicle_insurance + debtor[0].expenses.other_insurance_amount + debtor[0].expenses.other_tax_amount + debtor[0].expenses.vehicle1_payments + debtor[0].expenses.vehicle2_payments + debtor[0].expenses.other_payment1_amount + debtor[0].expenses.other_payment2_amount + debtor[0].expenses.alimony + debtor[0].expenses.other_support_amount + debtor[0].expenses.other_mortgage + debtor[0].expenses.other_real_estate_taxes + debtor[0].expenses.other_property_insurance + debtor[0].expenses.other_maintenance + debtor[0].expenses.other_homeowners_dues +  debtor[0].expenses.overall_other_amount)
-  
+  overall_other_description = ";\n".join([debtor[0].expenses.overall_other_description_1, debtor[0].expenses.overall_other_description_2, debtor[0].expenses.overall_other_description_3, debtor[0].expenses.overall_other_description_4, debtor[0].expenses.overall_other_description_5])
+  overall_other_amount = debtor[0].expenses.overall_other_amount_1 + debtor[0].expenses.overall_other_amount_2 + debtor[0].expenses.overall_other_amount_3 + debtor[0].expenses.overall_other_amount_4 + debtor[0].expenses.overall_other_amount_5
+  expenses['otherCatchDesc'] = overall_other_description
+  expenses['otherCatchAmount'] = overall_other_amount
+
+  debtor[0].expenses.other_mortgage = 0
+  debtor[0].expenses.other_real_estate_taxes = 0
+  debtor[0].expenses.other_property_insurance = 0
+  debtor[0].expenses.other_maintenance = 0
+  debtor[0].expenses.other_homeowners_dues = 0
+
+  debtor1Total = (debtor[0].expenses.rent_expense +
+                  debtor[0].expenses.real_estate_taxes +
+                  debtor[0].expenses.renters_insurance +
+                  debtor[0].expenses.upkeep_expenses +
+                  debtor[0].expenses.owners_dues +
+                  debtor[0].expenses.additional_mortgage_payments +
+                  debtor[0].expenses.util_electric +
+                  debtor[0].expenses.util_garbage +
+                  debtor[0].expenses.telephone +
+                  debtor[0].expenses.util_other_amount +
+                  debtor[0].expenses.house_supplies +
+                  debtor[0].expenses.childcare +
+                  debtor[0].expenses.clothing +
+                  debtor[0].expenses.personal_care +
+                  debtor[0].expenses.medical +
+                  debtor[0].expenses.transportation +
+                  debtor[0].expenses.entertainment +
+                  debtor[0].expenses.charity +
+                  debtor[0].expenses.life_insurance +
+                  debtor[0].expenses.health_insurance +
+                  debtor[0].expenses.vehicle_insurance +
+                  debtor[0].expenses.other_insurance_amount +
+                  debtor[0].expenses.other_tax_amount +
+                  debtor[0].expenses.vehicle1_payments +
+                  debtor[0].expenses.vehicle2_payments +
+                  debtor[0].expenses.other_payment1_amount +
+                  debtor[0].expenses.other_payment2_amount +
+                  debtor[0].expenses.alimony +
+                  debtor[0].expenses.other_support_amount +
+                  debtor[0].expenses.other_mortgage +
+                  debtor[0].expenses.other_real_estate_taxes +
+                  debtor[0].expenses.other_property_insurance +
+                  debtor[0].expenses.other_maintenance +
+                  debtor[0].expenses.other_homeowners_dues +
+                  overall_other_amount)
+  expenses['debtor1Total'] = currency(debtor1Total)
+
   #TODO: redo form questions to interate over debtors if more than one.. Maybe just duplicate the question blocks and put the pdf after both?
   expenses['debtor2Total'] = currency(0)
-  expenses['overallTotal'] = currency((debtor[0].expenses.rent_expense + debtor[0].expenses.real_estate_taxes + debtor[0].expenses.renters_insurance + debtor[0].expenses.upkeep_expenses + debtor[0].expenses.owners_dues + debtor[0].expenses.additional_mortgage_payments + debtor[0].expenses.util_electric + debtor[0].expenses.util_garbage + debtor[0].expenses.telephone + debtor[0].expenses.util_other_amount + debtor[0].expenses.house_supplies + debtor[0].expenses.childcare + debtor[0].expenses.clothing + debtor[0].expenses.personal_care + debtor[0].expenses.medical + debtor[0].expenses.transportation + debtor[0].expenses.entertainment + debtor[0].expenses.charity + debtor[0].expenses.life_insurance + debtor[0].expenses.health_insurance + debtor[0].expenses.vehicle_insurance + debtor[0].expenses.other_insurance_amount + debtor[0].expenses.other_tax_amount + debtor[0].expenses.vehicle1_payments + debtor[0].expenses.vehicle2_payments + debtor[0].expenses.other_payment1_amount + debtor[0].expenses.other_payment2_amount + debtor[0].expenses.alimony + debtor[0].expenses.other_support_amount + debtor[0].expenses.other_mortgage + debtor[0].expenses.other_real_estate_taxes + debtor[0].expenses.other_property_insurance + debtor[0].expenses.other_maintenance + debtor[0].expenses.other_homeowners_dues +  debtor[0].expenses.overall_other_amount))
-  expenses['overallTotal2'] = currency((debtor[0].expenses.rent_expense + debtor[0].expenses.real_estate_taxes + debtor[0].expenses.renters_insurance + debtor[0].expenses.upkeep_expenses + debtor[0].expenses.owners_dues + debtor[0].expenses.additional_mortgage_payments + debtor[0].expenses.util_electric + debtor[0].expenses.util_garbage + debtor[0].expenses.telephone + debtor[0].expenses.util_other_amount + debtor[0].expenses.house_supplies + debtor[0].expenses.childcare + debtor[0].expenses.clothing + debtor[0].expenses.personal_care + debtor[0].expenses.medical + debtor[0].expenses.transportation + debtor[0].expenses.entertainment + debtor[0].expenses.charity + debtor[0].expenses.life_insurance + debtor[0].expenses.health_insurance + debtor[0].expenses.vehicle_insurance + debtor[0].expenses.other_insurance_amount + debtor[0].expenses.other_tax_amount + debtor[0].expenses.vehicle1_payments + debtor[0].expenses.vehicle2_payments + debtor[0].expenses.other_payment1_amount + debtor[0].expenses.other_payment2_amount + debtor[0].expenses.alimony + debtor[0].expenses.other_support_amount + debtor[0].expenses.other_mortgage + debtor[0].expenses.other_real_estate_taxes + debtor[0].expenses.other_property_insurance + debtor[0].expenses.other_maintenance + debtor[0].expenses.other_homeowners_dues +  debtor[0].expenses.overall_other_amount))
-  expenses['incomeTotal'] = currency(sum((debt.income.net_rental_business + debt.income.family_support + debt.income.interest_and_dividends + debt.income.unemployment + debt.income.social_security + debt.income.other_govt_assist + debt.income.pension + debt.income.other_monthly_amount) + (debt.income.income_amount + debt.income.overtime_pay) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount) for debt in debtor))
-  expenses['netTotal'] = currency(sum((debt.income.net_rental_business + debt.income.family_support + debt.income.interest_and_dividends + debt.income.unemployment + debt.income.social_security + debt.income.other_govt_assist + debt.income.pension + debt.income.other_monthly_amount) + (debt.income.income_amount + debt.income.overtime_pay) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount) for debt in debtor) - ((debtor[0].expenses.rent_expense + debtor[0].expenses.real_estate_taxes + debtor[0].expenses.renters_insurance + debtor[0].expenses.upkeep_expenses + debtor[0].expenses.owners_dues + debtor[0].expenses.additional_mortgage_payments + debtor[0].expenses.util_electric + debtor[0].expenses.util_garbage + debtor[0].expenses.telephone + debtor[0].expenses.util_other_amount + debtor[0].expenses.house_supplies + debtor[0].expenses.childcare + debtor[0].expenses.clothing + debtor[0].expenses.personal_care + debtor[0].expenses.medical + debtor[0].expenses.transportation + debtor[0].expenses.entertainment + debtor[0].expenses.charity + debtor[0].expenses.life_insurance + debtor[0].expenses.health_insurance + debtor[0].expenses.vehicle_insurance + debtor[0].expenses.other_insurance_amount + debtor[0].expenses.other_tax_amount + debtor[0].expenses.vehicle1_payments + debtor[0].expenses.vehicle2_payments + debtor[0].expenses.other_payment1_amount + debtor[0].expenses.other_payment2_amount + debtor[0].expenses.alimony + debtor[0].expenses.other_support_amount + debtor[0].expenses.other_mortgage + debtor[0].expenses.other_real_estate_taxes + debtor[0].expenses.other_property_insurance + debtor[0].expenses.other_maintenance + debtor[0].expenses.other_homeowners_dues +  debtor[0].expenses.overall_other_amount)))
+  expenses['overallTotal'] = expenses['debtor1Total']
+  expenses['overallTotal2'] = expenses['debtor1Total']
+  incomeTotal = sum((debt.income.net_rental_business + debt.income.family_support + debt.income.interest_and_dividends + debt.income.unemployment + debt.income.social_security + debt.income.other_govt_assist + debt.income.pension + debt.income.other_monthly_amount) + (income_amount + overtime_pay) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount) for debt in debtor)
+  expenses['incomeTotal'] = currency(incomeTotal)
+  expenses['netTotal'] = currency(incomeTotal - debtor1Total)
   expenses['noDelta'] = True if debtor[0].expenses.change_in_expense == False else False
   expenses['yesDelta'] = True if debtor[0].expenses.change_in_expense == True else False
   expenses['deltaExplain'] = debtor[0].expenses.change_explainer if debtor[0].expenses.change_in_expense == True else None
-  
-  
+
+

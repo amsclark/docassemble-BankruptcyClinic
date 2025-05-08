@@ -115,12 +115,12 @@ under: |
   ${ installment_payment_table }
   ${ payment.payments.add_action() }
 ---
-question: Form 101 output
-event: form_103a_attach
-continue button field: form_103a_attach
 attachment:
+  name: Form 103a
+  filename: form_b103a.pdf
   pdf template file: form_b103a.pdf
   code: pymts
+  variable name: attach_103a
 ---
 code: |
   debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last

@@ -142,11 +142,9 @@ code: |
   else:
     sc['notWithinTime'] = True
 ---
-event: schedule_c_attach
-section: schedule_c
-question: Schedule C Attachment
-continue button field: schedule_c_attach
 attachment:
-  pdf template file: form_b_106c.pdf
-  variable name: c_attach
-  code: sc
+  - name: Form 106C
+    filename: form_b106c.pdf
+    pdf template file: form_b_106c.pdf
+    variable name: c_attach
+    code: sc

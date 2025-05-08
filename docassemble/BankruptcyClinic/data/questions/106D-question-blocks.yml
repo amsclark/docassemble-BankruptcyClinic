@@ -1,3 +1,20 @@
+code: |
+  prop_options = []
+  if len(prop.interests) > 0:
+    for interest in prop.interests:
+      prop_options.append(f'{interest.type} - {interest.street} {interest.city}, {interest.state}')
+  if len(prop.ab_vehicles) > 0:
+    for vehicle in prop.ab_vehicles:
+      prop_options.append(f'Vehicle - {vehicle.make} {vehicle.model} {vehicle.year}')
+  if len(prop.ab_other_vehicles) > 0:
+    for vehicle in prop.ab_other_vehicles:
+      prop_options.append(f'Vehicle - {vehicle.make} {vehicle.model} {vehicle.year}')
+  if prop.has_secured_household_goods:
+    prop_options.append(f'Household Goods')
+  if prop.farming_property.has_property:
+    prop_options.append(f'Farming Property')
+
+---
 table: prop_creditors_table
 rows: prop.creditors
 columns:
@@ -10,6 +27,17 @@ edit:
   - claim_amount
   - name
   - incurred_date
+---
+table: prop_creditors_notify_table
+rows: prop.creditors[i].notify
+columns:
+  - Name: row_item.other_name
+  - City: row_item.other_city
+  - State: row_item.other_state
+edit:
+  - other_name
+  - other_city
+  - other_state
 ---
 section: schedule_d
 question: |
@@ -25,24 +53,79 @@ under: |
 ---
 section: schedule_d
 question: |
+  Are there any others to be notifed for this debt such as collection agencies or other creditors?
+subquestion: |
+  Only specify others to be notified about your bankruptcy for your most recent debt.
+yesno: prop.creditors[i].notify.there_are_any
+---
+section: schedule_d
+question: |
+  Are there any more parties to be notifed?
+yesno: prop.creditors[i].notify.there_is_another
+under: |
+  ${ prop_creditors_notify_table }
+---
+section: schedule_d
+question: |
+  Tell the court about other parties to be notifed about this debt.
+fields:
+  - Name: prop.creditors[i].notify[j].other_name
+    default: Other org
+    required: False
+  - Address/PO Box: prop.creditors[i].notify[j].other_street
+    default: 1111 33rd S
+    required: False
+  - City: prop.creditors[i].notify[j].other_city
+    default: Tampa
+    required: False
+  - State: prop.creditors[i].notify[j].other_state
+    default: Florida
+    required: False
+  - Zip: prop.creditors[i].notify[j].other_zip
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
+    required: False
+---
+mandatory: True
+code: |
+  unsecured_claim = 0
+---
+event: track_unsecured_claim
+code: |
+  if action_argument('prop.creditors[i].claim_amount') and action_argument('prop.creditors[i].collateral_value'):
+    unsecured_claim = int(action_argument('prop.creditors[i].claim_amount')) - int(action_argument('prop.creditors[i].collateral_value'))
+---
+template: unsecured_claim_amount
+content: |
+  % if action_argument('prop.creditors[i].claim_amount') and action_argument('prop.creditors[i].collateral_value'):
+  ${int(action_argument('prop.creditors[i].claim_amount')) - int(action_argument('prop.creditors[i].collateral_value'))}
+  % endif
+target: unsecured_claim_text
+---
+section: schedule_d
+question: |
   Tell the court about your secured claim.
 subquestion: |
   If a creditor has more than one secured claim, list the creditor separately for each claim.
+check in: unsecured_claim_amount
 fields:
   - Creditor Name: prop.creditors[i].name
     default: Some creditor
   - note: |
       Creditor Address
-  - Number: prop.creditors[i].number
-    default: 1111
-  - Street: prop.creditors[i].street
-    default: 45th pl
+  - Address/PO Box: prop.creditors[i].street
+    default: 1111 45th pl
   - City: prop.creditors[i].city
     default: Tampa
   - State: prop.creditors[i].state
     default: Florida
   - Zip: prop.creditors[i].zip
-    default: 99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
   - note: |
       Decribe the debt
   - Who owes the debt?: prop.creditors[i].who
@@ -51,18 +134,26 @@ fields:
       - Debtor 2 only
       - Debtor 1 and Debtor 2 only
       - At least one of the debtors and another
+    show if: financial_affairs.lived_elsewhere and len(debtor) > 1
+    default: Debtor 1 only
+  - Who owes the debt?: prop.creditors[i].who
+    choices:
+      - Debtor 1 only
+      - At least one of the debtors and another
+    show if: not financial_affairs.lived_elsewhere
     default: Debtor 1 only
   - Does this claim relate to community debt?: prop.creditors[i].community_debt
     datatype: yesnoradio
     default: False
   - Date debt was incurred: prop.creditors[i].incurred_date
-    datatype: date
     default: 03/02/23
+    input type: area
+    required: False
   - note: |
       Describe the property that secures the claim
   - Description: prop.creditors[i].prop_description
-    input type: area
-    default: NA
+    choices:
+      code: prop_options
   - note: As of the date you file, the claim is
   - Contingent: prop.creditors[i].contingent
     datatype: yesno
@@ -84,7 +175,8 @@ fields:
     required: False
     show if: prop.creditors[i].has_other_lien_type
   - Last 4 digits of account number: prop.creditors[i].account_number
-    default: 9999
+    default: testid4389999
+    required: False
   - note: Tell the court about the value of this secured claim
   - Amount of claim: prop.creditors[i].claim_amount
     datatype: currency
@@ -92,32 +184,57 @@ fields:
   - Value of collateral that supports this claim: prop.creditors[i].collateral_value
     datatype: currency
     default: 300
-  - Unsecured portion of claim: prop.creditors[i].unsecured_portion
-    datatype: currency
-    default: 100
-  - Are there others to be notified for this debt?: prop.creditors[i].other_notify
+  - note: |
+      Unsecured claim portion -    [TARGET unsecured_claim_text]
+
+  - What do you intend to do with the property that secures the debt?: prop.creditors[i].property_action
+    choices:
+      - Surrender the property
+      - Retain the property and redeem it
+      - Retain the property and enter into a Reaffirmation Agreement
+      - Retain the property and do something else
+    default: Retain the property and do something else
+  - What will you do with the property?: prop.creditors[i].property_action_other
+    show if:
+      variable: prop.creditors[i].property_action
+      is: Retain the property and do something else
+    default: something
+  - Did you claim the property as exempt on Schedule C?: prop.creditors[i].exempt
+    datatype: yesnoradio
+    default: False
+
+  - Is there a codebtor for this debt?: prop.creditors[i].has_codebtor
     datatype: yesnoradio
     default: True
-  - note: Tell the court who should be notified
-    show if: prop.creditors[i].other_notify
-  - Name: prop.creditors[i].other_name
-    default: Other org
-    show if: prop.creditors[i].other_notify
-  - Number: prop.creditors[i].other_number
-    default: 1111
-    show if: prop.creditors[i].other_notify
-  - Street: prop.creditors[i].other_street
-    default: 33rd S
-    show if: prop.creditors[i].other_notify
-  - City: prop.creditors[i].other_city
+  - note: Codebtor Address Information
+  - Name: prop.creditors[i].codebtor_name
+    default: Janna
+    show if:
+      variable: prop.creditors[i].has_codebtor
+      is: True
+  - Address/PO Box: prop.creditors[i].codebtor_street
+    default: 1111 36th Ave ne
+    show if:
+      variable: prop.creditors[i].has_codebtor
+      is: True
+  - City: prop.creditors[i].codebtor_city
     default: Tampa
-    show if: prop.creditors[i].other_notify
-  - State: prop.creditors[i].other_state
+    show if:
+      variable: prop.creditors[i].has_codebtor
+      is: True
+  - State: prop.creditors[i].codebtor_state
     default: Florida
-    show if: prop.creditors[i].other_notify
-  - Zip: prop.creditors[i].other_zip
-    default: 99999
-    show if: prop.creditors[i].other_zip
+    show if:
+      variable: prop.creditors[i].has_codebtor
+      is: True
+  - Zip: prop.creditors[i].codebtor_zip
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
+    show if:
+      variable: prop.creditors[i].has_codebtor
+      is: True
 ---
 event: schedule_d
 section: schedule_d
@@ -135,24 +252,33 @@ review:
         ${ prop.creditors.add_action() }
       % endif
 ---
-event: schedule_d_attach
-section: schedule_d
-question: Schedule D Attachment
-continue button field: schedule_d_attach
 attachment:
-  pdf template file: form_b106d.pdf
-  code: claims
-  variable name: d_attach
+  - name: Form 106D
+    filename: form_b106d.pdf
+    pdf template file: form_b106d.pdf
+    code: claims
+    variable name: d_attach
 ---
 code: |
   debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
   if len(debtor) > 1:
     debtor2_name = debtor[1].name.first + " " + debtor[1].name.middle + " " + debtor[1].name.last
   claims = {}
+  leases = {}
+  codebtors = {}
+  codebtor_count = 1
+  leases['debtor1_name_1'] = debtor_name
+  leases['debtor1_name_2'] = debtor_name
+  leases['bankruptcy_district'] = current_district
+  leases['case_number_1'] = case_number
+  leases['case_number_2'] = case_number
+  leases['isAmended'] = amended_filing
   claims['debtor1_name_1'] = debtor_name
   claims['debtor1_name_2'] = debtor_name
   claims['debtor1_name_3'] = debtor_name
-  claims['debtor2_name_1'] = debtor2_name
+  if len(debtor) > 1:
+    leases['debtor2_name_1'] = debtor2_name
+    claims['debtor2_name_1'] = debtor2_name
   claims['case_number_1'] = case_number
   claims['case_number_2'] = case_number
   claims['case_number_3'] = case_number
@@ -160,20 +286,20 @@ code: |
   claims['isAmended'] = amended_filing
   claims['noSecuredClaims'] = True if len(prop.creditors) == 0 else False
   claims['hasSecuredClaims'] = True if len(prop.creditors) > 0 else False
-  
+
   i=0
   for creditor in prop.creditors:
     claims['name'+str(i+1)] = prop.creditors[i].name
-    claims['street'+str(i+1)] = str(creditor.number) + " " + creditor.street
+    claims['street'+str(i+1)] = creditor.street
     claims['city'+str(i+1)] = creditor.city
     claims['state'+str(i+1)] = creditor.state
     claims['zip'+str(i+1)] = creditor.zip
-    claims['isDebtor1Only'+str(i+1)] = True if creditor.who == 'Debtor 1 only' else False
+    claims['isDebtor1Only'+str(i+1)] = True if creditor.who == 'Debtor 1 only' or len(debtor) == 1 else False
     claims['isDebtor2Only'+str(i+1)] = True if creditor.who == 'Debtor 2 only' else False
     claims['isBothDebtorsOnly'+str(i+1)] = True if creditor.who == 'Debtor 1 and Debtor 2 only' else False
     claims['isOneOtherDebtor'+str(i+1)] = True if creditor.who == 'At least one of the debtors and another' else False
     claims['isCommunityDebt'+str(i+1)] = True if creditor.community_debt == True else False
-    claims['dateIncurred'+str(i+1)] = format_date(creditor.incurred_date, format='MM/dd/yyyy')
+    claims['dateIncurred'+str(i+1)] = creditor.incurred_date
     claims['propDescription'+str(i+1)] = creditor.prop_description
     claims['isContingent'+str(i+1)] = True if creditor.contingent == True else False
     claims['isUnliquidated'+str(i+1)] = True if creditor.unliquidated == True else False
@@ -183,24 +309,35 @@ code: |
     claims['isJudgement'+str(i+1)] = True if creditor.lawsuit == True else False
     claims['isOther'+str(i+1)] = True if creditor.has_other_lien_type == True else False
     claims['otherDesc'+str(i+1)] = creditor.other_lien_type if creditor.has_other_lien_type == True else None
-    claims['acct'+str(i+1)] = creditor.account_number
+    claims['acct'+str(i+1)] = creditor.account_number[:-4]
     claims['claimAmount'+str(i+1)] = currency(creditor.claim_amount)
     claims['collateral'+str(i+1)] = currency(creditor.collateral_value)
-    claims['unsecured'+str(i+1)] = currency(creditor.unsecured_portion)
+    claims['unsecured'+str(i+1)] = currency(creditor.claim_amount - creditor.collateral_value)
+
+    leases['name'+str(i)] = creditor.name
+    leases['desc'+str(i)] = creditor.prop_description
+
+    leases['surrender'+str(i)] = True if creditor.property_action == 'Surrender the property' else False
+    leases['redeem'+str(i)] = True if creditor.property_action == 'Retain the property and redeem it' else False
+    leases['reaffirm'+str(i)] = True if creditor.property_action == 'Retain the property and enter into a Reaffirmation Agreement' else False
+    leases['other'+str(i)] = True if creditor.property_action == 'Retain the property and do something else' else False
+    leases['otherDesc'+str(i)] = creditor.property_action_other if creditor.property_action == 'Retain the property and do something else' else None
+    leases['noClaim'+str(i)] = True if creditor.exempt == False else False
+    leases['yesClaim'+str(i)] = True if creditor.exempt == True else False
     i += 1
 
   lineNum = 1
   y=1
   for creditor in prop.creditors:
-    if creditor.other_notify:
+    for notify in creditor.notify:
       claims['notiLineId'+str(lineNum)] = lineNum
-      claims['notiName'+str(lineNum)] = creditor.other_name
-      claims['notiAddress'+str(lineNum)] = str(creditor.other_number) + " " + creditor.other_street
-      claims['notiCity'+str(lineNum)] = creditor.other_city
-      claims['notiState'+str(lineNum)] = creditor.other_state
-      claims['notiZip'+str(lineNum)] = creditor.other_zip
+      claims['notiName'+str(lineNum)] = notify.other_name
+      claims['notiAddress'+str(lineNum)] = notify.other_street
+      claims['notiCity'+str(lineNum)] = notify.other_city
+      claims['notiState'+str(lineNum)] = notify.other_state
+      claims['notiZip'+str(lineNum)] = notify.other_zip
       claims['notiCreditorLine'+str(lineNum)] = str(y)
-      claims['notiAcct'+str(lineNum)] = creditor.account_number
+      claims['notiAcct'+str(lineNum)] = creditor.account_number[:-4]
       lineNum += 1
     y += 1
 reconsider: True

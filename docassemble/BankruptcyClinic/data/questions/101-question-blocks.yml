@@ -1,13 +1,13 @@
 question: |
   Voluntary Petition for Individuals Filing for Bankruptcy
 subquestion: |
-  This interview is designed to help you fill out the required forms for Chapter 7 Bankruptcy. These questions are not intended to provide, and should not be understood to provide, legal advice. They are not designed to fully explain, or to be relied upon in interpreting, the law. 
-  
+  This interview is designed to help you fill out the required forms for Chapter 7 Bankruptcy. These questions are not intended to provide, and should not be understood to provide, legal advice. They are not designed to fully explain, or to be relied upon in interpreting, the law.
+
   ### Read These Important Warnings
   * Only an attorney can give you legal advice about what can happen as a result of filing for bankruptcy and what your options are. Although the law allows you to represent yourself in bankruptcy court, you should understand that many people find it difficult to represent themselves successfully.
-  
+
   * Bankruptcy fraud is a serious crime; you could be fined and imprisoned if you commit fraud in your bankruptcy case. Making a false statement, concealing property, or obtaining money or property by fraud in connection with a bankruptcy case can result in fines up to $250,000, or imprisonment for up to 20 years, or both. 18 U.S.C. §§ 152, 1341, 1519, and 3571.
-  
+
   Click continue to start filling out the Voluntary Petition for Individuals Filing for Bankruptcy.
 continue button field: introduction_screen
 ---
@@ -16,16 +16,23 @@ section: district
 question: |
   What district are you filing your bankruptcy case in?
 subquestion: |
-  Please specify the district you plan on submitting your bankruptcy case to. If you already have a case number (optional) please add that as well.
+  Please specify the district you plan on submitting your bankruptcy case to.
 fields:
   - Bankruptcy Court District: current_district
     default: District of Nebraska
     code: courts_list
+---
+section: district
+question: |
+  Are you updating a bankruptcy filing that has already been submitted to the court?
+yesno: amended_filing
+---
+section: district
+question: |
+  Please provide the case number for your previously submitted bankruptcy claim.
+fields:
   - Case number (if known): case_number
     required: false
-  - Is this an ameded filing: amended_filing
-    datatype: yesnoradio
-    default: false
 ---
 event: district_final
 section: district
@@ -33,9 +40,7 @@ question: |
   District Details
 subquestion: |
   Bankruptcy Court District: ${ current_district }
-  
-  Case number (if known):    ${ case_number }
-  
+
   % if amended_filing:
     Amended Filing: Yes
   % else:
@@ -51,9 +56,6 @@ review:
   - Revisit: current_district
     button: |
       Bankruptcy Court District: ${ current_district }
-      
-      Case number (if known):    ${ case_number }
-      
       % if amended_filing:
         Amended Filing: Yes
        % else:
@@ -62,6 +64,14 @@ review:
 ---
 #Part 1: Identify Yourself
 
+question: |
+  Are you filing individually or with a spouce?
+field: filing_status
+choices:
+  - Filing individually
+  - Filing with spouce
+---
+
 table: debtor_table
 rows: debtor
 columns:
@@ -69,13 +79,18 @@ columns:
   - Middle Name: row_item.name.middle
   - Last Name: row_item.name.last
   - Suffix: row_item.name.suffix
-  - Aliases: row_item.alias
 edit:
   - name.first
   - name.middle
   - name.last
   - name.suffix
-  - alias
+---
+table: debtor_alias_table
+rows: debtor[i].alias
+columns:
+  - First Name: row_item.first_name
+  - Last Name: row_item.last_name
+  - Business: row_item.business
 ---
 question: |
   Basic Identity and Contact Information
@@ -99,19 +114,18 @@ fields:
   - State: debtor[i].address.state
     default: "Florida"
   - Zip Code: debtor[i].address.zip
-    default: "33593"
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
   - County: debtor[i].address.unit
     default: "Douglas County"
     code: county_list
   - Has separate mailing address: debtor[i].has_other_mailing_address
     datatype: yesno
     default: True
-  - Mail Number: debtor[i].mailing_number
-    datatype: number
-    default: 1111
-    show if: debtor[i].has_other_mailing_address
-  - Mail Street: debtor[i].mailing_street
-    default: 35th Ave NE
+  - Mail Address/PO Box: debtor[i].mailing_street
+    default: 11111 35th Ave NE
     show if: debtor[i].has_other_mailing_address
   - Mail City: debtor[i].mailing_city
     default: Tampa
@@ -121,26 +135,26 @@ fields:
     show if: debtor[i].has_other_mailing_address
   - Mail Zip: debtor[i].mailing_zip
     datatype: number
-    default: 99999
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: debtor[i].has_other_mailing_address
-  - note: |
-      <strong>Tax ID</strong><br>
-      [FILE ssn, 350px]
   - ID Type: debtor[i].tax_id.tax_id_type
     input type: radio
     choices:
       - Social Security Number: 1
       - Individual Taxpayer Identification Number: 2
     default: 1
-  - Tax ID (last 4 digits): debtor[i].tax_id.tax_id
-    datatype: integer
-    max: 9999
-    default: 9999
-  - note: <strong>Employer ID Number, if any</strong>
-  - EIN: debtor[i].tax_id.first_ein
-    required: False
-  - EIN: debtor[i].tax_id.second_ein
-    required: False
+  - Tax ID: debtor[i].tax_id.tax_id
+    default: 932-45-9999
+    show if:
+      variable: debtor[i].tax_id.tax_id_type
+      is: 2
+  - SSN: debtor[i].tax_id.tax_id
+    default: 324-34-9999
+    show if:
+      variable: debtor[i].tax_id.tax_id_type
+      is: 1
 
 post: |
   % if len(debtor) > 1:
@@ -157,7 +171,7 @@ section: identify
 ---
 question: |
   What is your reason for specifying a district you haven't been living in?
-fields: 
+fields:
   - Reason: debtor[i].district_info.other_district_reason
     input type: area
 section: identify
@@ -172,13 +186,13 @@ section: identify
 question: |
   Add an alias for ${ debtor[i].name.first } ${ debtor[i].name.last } used   in the last 8 years.
 subquestion: |
-  Include married or maiden names and any assumed, trade names and doing     business as names.
+  Include married or maiden names and any assumed, trade names and doing business as names, as well as your name with and without your middle initial and with and without your middle name.
 fields:
-  - First Name: debtor[i].alias[j].name.first
+  - First Name: debtor[i].alias[j].first_name
     required: False
-  - Middle Name: debtor[i].alias[j].name.middle
+  - Middle Name: debtor[i].alias[j].middle_name
     required: False
-  - Last Name: debtor[i].alias[j].name.last
+  - Last Name: debtor[i].alias[j].last_name
     required: False
   - Business: debtor[i].alias[j].business
     required: False
@@ -187,6 +201,10 @@ section: identify
 question: |
   Does ${ debtor[i].name.first } ${ debtor[i].name.last } have any           other names they've used in the last 8 years?
 yesno: debtor[i].alias.there_is_another
+under: |
+  <br><br><br>
+  <strong>Current Aliases</strong>
+  ${ debtor_alias_table }
 section: identify
 ---
 question: |
@@ -209,7 +227,7 @@ review:
       % if len(debtor) > 0:
       **Debtors**
       ${ debtor_table }
-        
+
       ${ debtor.add_action() }
       % endif
 ---
@@ -257,11 +275,45 @@ fields:
       - I request that my fee be waived: 3
 under: |
   Note:
-  
+
+  Your current overall income is estimated to be: ${ currency(overallIncome) }
+
+  150% of poverty level based on ${ int(monthly_income.median_dependents) } dependents is: ${ currency(povertyAmt) }
+
+  % if overallIncome < povertyAmt:
+  You may qualify for a fee waiver!
+  % else:
+  Sorry, you do not qualify for the fee waiver.
+  % endif
+
   If you choose to pay the entire fee please check with the clerk's office in your local court for more details about how you may pay.
-  
+
   Be aware, you may only request that your fee be waived if you are filing for Chapter 7. By law, a judge may, but is not required to, waive your fee, and may do so only if your income is less than 15% of the official poverty line that applies to your family size and you are unable to pay the fee in installments.
 section: case_det
+---
+code: |
+  overallIncome = sum((debt.income.net_rental_business + debt.income.family_support + debt.income.interest_and_dividends + debt.income.unemployment + debt.income.social_security + debt.income.other_govt_assist + debt.income.pension + debt.income.other_monthly_amount) + (debt.income.income_amount + debt.income.overtime_pay) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount) for debt in debtor)
+  #povertyAmt = 0
+  if monthly_income.median_dependents == 0.0:
+    povertyAmt = 14580 * 1.5
+  if monthly_income.median_dependents == 1.0:
+    povertyAmt = 19720 * 1.5
+  if monthly_income.median_dependents == 2.0:
+    povertyAmt = 24860 * 1.5
+  if monthly_income.median_dependents == 3.0:
+    povertyAmt = 30000 * 1.5
+  if monthly_income.median_dependents == 4.0:
+    povertyAmt = 35140 * 1.5
+  if monthly_income.median_dependents == 5.0:
+    povertyAmt = 40280 * 1.5
+  if monthly_income.median_dependents == 6.0:
+    povertyAmt = 45420 * 1.5
+  if monthly_income.median_dependents == 7.0:
+    povertyAmt = 50560 * 1.5
+  if monthly_income.median_dependents > 7.0:
+    countAbove = monthly_income.median_dependents - 7
+    povertyAmt = (50560 + (countAbove*5140))*1.5
+
 ---
 question: |
   Have you filed for bankruptcy within the last 8 years?
@@ -334,7 +386,7 @@ question: |
   Case Summary
 subquestion: |
   Case Type: Chapter 7
-  
+
   % if case.payment_method == '1':
     Payment Method: Pay entire fee
   % elif case.payment_method == '2':
@@ -342,27 +394,27 @@ subquestion: |
   % elif case.payment_method == '3':
     Payment Method: Request to have fee waived
   % endif
-  
+
   % if case.has_previous_bankruptcy:
     Previous Bankruptcy Case: Yes
     ${ previous_bankruptcy_table }
   % else:
     Pervious Bankruptcy Case: No
   % endif
-  
+
   % if case.has_pending_bankruptcy:
     Pending Bankruptcy Case: Yes
     ${ pending_bankruptcy_table }
   % else:
     Pending Bankruptcy Case: No
   % endif
-  
+
   % if case.rents_residence:
     Rents Residence: Yes
   % else:
     Rents Residence: No
   % endif
-  
+
   % if case.eviction_judgement:
     Eviction Judgement: Yes
   % else:
@@ -456,16 +508,17 @@ question: |
 fields:
   - Name: business.business[i].name
     default: Acme
-  - Number: business.business[i].number
-    default: 55555
-  - Street: business.business[i].street
-    default: 35th pl
+  - Address/PO Box: business.business[i].street
+    default: 11111 35th pl
   - City: business.business[i].city
     default: Tampa
   - State: business.business[i].state
     default: Florida
   - Zip: business.business[i].zip
-    default: 335548
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
   - Type: business.business[i].type
     input type: radio
     choices:
@@ -475,6 +528,11 @@ fields:
       - Commodity Broker: 4
       - None of the above: 5
     default: 1
+  - note: <strong>Employer ID Number, if any</strong>
+  - EIN: debtor[i].tax_id.first_ein
+    required: False
+  - EIN: debtor[i].tax_id.second_ein
+    required: False
 section: sole_prop
 ---
 question: |
@@ -545,15 +603,17 @@ fields:
     default: Radioactive Waste
   - Why is immediate attention required?: hazardous_property.property[i].immediate_attention_reason
     required: false
-  - Address: hazardous_property.property[i].number
-  - Street: hazardous_property.property[i].street
-    default: 35th pl
+  - Address/PO Box: hazardous_property.property[i].street
+    default: 1111 35th pl
   - City: hazardous_property.property[i].city
     default: Tampa
   - State: hazardous_property.property[i].state
     default: Florida
   - Zip: hazardous_property.property[i].zip
-    default: 335548
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
 section: haz_prop
 ---
 question: |
@@ -613,12 +673,15 @@ question: |
   Have ${ debtor[i].name } recieved any credit counseling?
 subquestion: |
   The law requires that you receive a briefing about credit counseling before you file for bankruptcy.
-field: debtor[i].counseling.counseling_type
-choices:
-   - I received a briefing from an approved credit counseling agency within the 180 days before I filed this bankruptcy petition, and I received a certificate of completion.: 1
-   - I received a briefing from an approved credit counseling agency within the 180 days before I filed this bankruptcy petition, but I do not have a certificate of completion.: 2
-   - I certify that I asked for credit counseling services from an approved agency, but was unable to obtain those services during the 7 days after I made my request, and exigent circumstances merit a 30-day temporary waiver of the requirement: 3
-   - I am not required to receive a briefing about credit counseling.: 4
+fields:
+
+ - Have recieved a credit briefing?: debtor[i].counseling.counseling_type
+   choices:
+     - I received a briefing from an approved credit counseling agency within the 180 days before I filed this bankruptcy petition, and I received a certificate of completion.: 1
+     - I received a briefing from an approved credit counseling agency within the 180 days before I filed this bankruptcy petition, but I do not have a certificate of completion.: 2
+ - What date did you take the class?: debtor[i].counseling.counseling_date
+   datatype: date
+   required: False
 default: 1
 section: credit_counsel
 ---
@@ -694,9 +757,11 @@ question: Form 101 output
 event: print_101
 continue button field: print_101
 attachment:
-  pdf template file: b_101.pdf
-  code: main
-  variable name: attach_101
+  - name: Form 101
+    filename: b_101.pdf
+    pdf template file: b_101.pdf
+    code: main
+    variable name: attach_101
 ---
 code: |
   debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
@@ -732,34 +797,34 @@ code: |
   main['isCh12-3'] = False
   main['isCh13'] = False
   main['isCh13-3'] = False
-  
+
   i = 1
   for debt in debtor:
     main['debtor_first_name'+str(i)] = debt.name.first
     main['debtor_middle_name'+str(i)] = debt.name.middle
     main['debtor_last_name'+str(i)] = debt.name.last
     main['debtor_suffix'+str(i)] = debt.name.suffix
-    
+
     y = 1
     for alias in debt.alias:
-    
-      main['debtor_first_othername'+str(y)+'-'+str(i)] = alias.name.first
-      main['debtor_middle_othername'+str(y)+'-'+str(i)] = alias.name.middle
-      main['debtor_last_othername'+str(y)+'-'+str(i)] = alias.name.last
+
+      main['debtor_first_othername'+str(y)+'-'+str(i)] = alias.first_name
+      main['debtor_middle_othername'+str(y)+'-'+str(i)] = alias.middle_name
+      main['debtor_last_othername'+str(y)+'-'+str(i)] = alias.last_name
       main['debtor_business_name'+str(y)+'-'+str(i)] = alias.business
       y += 1
 
     if debt.tax_id.tax_id_type == '1':
-      main['debtor_ssn'+str(i)] = debt.tax_id.tax_id
+      main['debtor_ssn'+str(i)] = debt.tax_id.tax_id[-4:]
     else:
-      main['debtor_tax_id'+str(i)] = debt.tax_id.tax_id
-    
+      main['debtor_tax_id'+str(i)] = debt.tax_id.tax_id[-4:]
+
     main['debtor_street'+str(i)] = debt.address.address
     main['debtor_city'+str(i)] = debt.address.city
     main['debtor_state'+str(i)] = debt.address.state
     main['debtor_zip'+str(i)] = debt.address.zip
     main['debtor_county'+str(i)] = debt.address.unit
-    main['debtor_mail_street'+str(i)] = str(debt.mailing_number) + " " + debt.mailing_street
+    main['debtor_mail_street'+str(i)] = debt.mailing_street
     main['debtor_mail_city'+str(i)] = debt.mailing_city
     main['debtor_mail_state'+str(i)] = debt.mailing_state
     main['debtor_mail_zip'+str(i)] = debt.mailing_zip
@@ -769,15 +834,15 @@ code: |
     main['debtor_ein'+str(i)+'-2'] = debt.tax_id.second_ein
     if debt.district_info.is_current_district == False:
       main['districtExplain'+str(i)+'-1'] = debt.district_info.other_district_reason
-    
+
     i += 1
 
   main['payEntireFee'] = True if case.payment_method == '1' else False
   main['payInstallments'] = True if case.payment_method == '2' else False
   main['payWaived'] = True if case.payment_method == '3' else False
   main['test'] = 'test'
-  
-  
+
+
   if case.has_previous_bankruptcy == True:
     main['hasPrevBankruptcy_true'] = True
     i = 1
@@ -788,10 +853,10 @@ code: |
       i += 1
   else:
     main['hasPrevBankruptcy_false'] = 1
-  
-  
 
-  
+
+
+
   if case.has_pending_bankruptcy == True:
     main['hasPendingBankruptcy_true'] = True
     i = 1
@@ -806,7 +871,7 @@ code: |
     main['hasPendingBankruptcy_false'] = 1
 
 
-  
+
 
   if case.rents_residence == True:
     main['doesRent_true'] = True
@@ -816,13 +881,13 @@ code: |
       main['hasEviction_false'] = 1
   else:
     main['doesRent_false'] = 1
-  
+
   if business.has_business == True:
     main['hasBusiness_true'] = True
     i = 1
     for bus in business.business:
       main['businessName'+str(i)] = bus.name
-      main['businessStreet'+str(i)] = str(bus.number) + " " + bus.street
+      main['businessStreet'+str(i)] = bus.street
       main['businessCity'+str(i)] = bus.city
       main['businessState'+str(i)] = bus.state
       main['businessZip'+str(i)] = bus.zip
@@ -836,7 +901,7 @@ code: |
     main['hasBusiness_false'] = 1
 
 
-    
+
   main['notChapter11'] = True
   if hazardous_property.has_property == True:
     main['hazardousProp_true'] = 1
@@ -845,11 +910,11 @@ code: |
   if hazardous_property.has_property:
     main['hazardDesc1'] = hazardous_property.property[0].hazard
     main['hazardWhy1'] = hazardous_property.property[0].immediate_attention_reason
-    main['hazardAddress'] = str(hazardous_property.property[0].number) + " " + hazardous_property.property[0].street
+    main['hazardAddress'] = hazardous_property.property[0].street
     main['hazardCity'] = hazardous_property.property[0].city
     main['hazardState'] = hazardous_property.property[0].state
     main['hazardZip'] = hazardous_property.property[0].zip
-  
+
   i = 1
   for debt in debtor:
     main['recievedBriefing'+str(i)] = True if debt.counseling.counseling_type == '1' else False
@@ -860,7 +925,7 @@ code: |
     main['disability'+str(i)] = True if debt.counseling.not_required_reason == '2' else False
     main['activeDuty'+str(i)] = True if debt.counseling.not_required_reason == '3' else False
     i += 1
-  
+
   if reporting.reporting_type == '1':
     main['consumer_debts_true'] = True
     main['business_debts_false'] = 1
@@ -872,13 +937,13 @@ code: |
     main['business_debts_false'] = 1
     main['other_business_debts_type'] = reporting.other_debt_description
   main['is_filing_ch7'] = True
-  
+
   if reporting.funds_for_creditors == True:
     main['unsecuredFunds_true'] = True
   else:
     main['unsecuredFunds_false'] = 1
 
-  
+  reporting.creditor_estimate = len(prop.creditors)+ len(prop.priority_claims)+len(prop.nonpriority_claims)
   main["creditors_1_49"] = True if 1 <= reporting.creditor_estimate <= 49 else False
   main["creditors_1000_5000"] = True if 1000 <= reporting.creditor_estimate <= 5000 else False
   main["creditors_25000_50000"] = True if 25000 <= reporting.creditor_estimate <= 50000 else False
@@ -889,6 +954,9 @@ code: |
   main["creditor_10000_25000"] = True if 10000 <= reporting.creditor_estimate <= 25000 else False
   main["creditors_more"] = True if reporting.creditor_estimate > 100000 else False
   main["creditors_200_999"] = True if 200 <= reporting.creditor_estimate <= 999 else False
+
+  reporting.asset_estimate = sum(interest.current_owned_value for interest in prop.interests) + sum(vehicle.current_owned_value for vehicle in prop.ab_vehicles) + sum(vehicle.current_owned_value for vehicle in prop.ab_other_vehicles) + prop.household_goods_value + prop.electronics_value + prop.collectibles_value + prop.hobby_equipment_value + prop.firearms_value + prop.clothes_value + prop.jewlery_value + prop.animal_value + prop.other_household_items_value + prop.financial_assets.cash_value + sum(deposit.amount for deposit in prop.financial_assets.deposits) + sum(bond.amount for bond in prop.financial_assets.bonds_and_stocks) + sum(ntStock.value for ntStock in prop.financial_assets.non_traded_stock) + sum(cBond.amount for cBond in prop.financial_assets.corporate_bonds) + sum(retAct.amount for retAct in prop.financial_assets.retirement_accounts) + sum(prepay.amount for prepay in prop.financial_assets.prepayments) + sum(annu.amount for annu in prop.financial_assets.annuities) + sum(edu.amount for edu in prop.financial_assets.edu_accounts) + prop.financial_assets.future_property_interest_value + prop.financial_assets.ip_interest_value + prop.financial_assets.intangible_interest_value + prop.owed_property.tax_refund_federal + prop.owed_property.tax_refund_state + prop.owed_property.tax_refund_local + prop.owed_property.family_support_alimony + prop.owed_property.family_support_maintenance + prop.owed_property.family_support_support + prop.owed_property.family_support_divorce + prop.owed_property.family_support_settlement + prop.owed_property.other_amounts_value + prop.owed_property.first_insurance_interest_amount + prop.owed_property.second_insurance_interest_amount + prop.owed_property.third_insurance_interest_amount + prop.owed_property.trust_amount + prop.owed_property.third_party_amount + prop.business_property.ar_amount + prop.business_property.equipment_amount + prop.business_property.machinery_amount + prop.business_property.inventory_amount + prop.business_property.partnershipValue1 + prop.business_property.partnershipValue2 + prop.business_property.partnershipValue3 + prop.business_property.lists_amount + prop.business_property.otherPropertyAmount1 + prop.business_property.otherPropertyAmount2 + prop.business_property.otherPropertyAmount3 + prop.business_property.otherPropertyAmount4 + prop.business_property.otherPropertyAmount5 + prop.business_property.otherPropertyAmount6 + prop.farming_property.animal_amount + prop.farming_property.crop_amount + prop.farming_property.equipment_amount + prop.farming_property.supplies_amount + prop.farming_property.commercial_amount + prop.other_prop_value + prop.other_prop_value2 + prop.other_prop_value3
+
   main["assets_0_50000"] = True if 0 <= reporting.assets_estimate <= 50000 else False
   main["assets_1000001_10m"] = True if 1000001 <= reporting.assets_estimate <= 10000000 else False
   main["assets_5m_1b"] = True if 5000000 <= reporting.assets_estimate <= 1000000000 else False
@@ -901,6 +969,9 @@ code: |
   main["assets_500k_1m"] = True if 500000 <= reporting.assets_estimate <= 1000000 else False
   main["assets_100m_500m"] = True if 100000000 <= reporting.assets_estimate <= 500000000 else False
   main["assets_more"] = True if reporting.assets_estimate > 50000000000 else False
+
+  reporting.liabilities_estimate = unsecured_claims['loansTotal'] + unsecured_claims['obligationsTotal'] + unsecured_claims['pensionsTotal'] + unsecured_claims['otherP2Total']
+
   main["liability_0_50k"] = True if 0 <= reporting.liabilities_estimate <= 50000 else False
   main["liability_1m_10m"] = True if 1000000 <= reporting.liabilities_estimate <= 10000000 else False
   main["liability_500m_1b"] = True if 500000000 <= reporting.liabilities_estimate <= 1000000000 else False
@@ -949,8 +1020,10 @@ question: |
   Voluntary Petition for Individuals Filing for Bankruptcy conclusion
 subquestion: |
   conclusion
+allow downloading: True
 attachment code: |
-  [ab_attach, c_attach, d_attach, ef_attach, g_attach, h_attach, i_attach, j_attach, attach_107, attach_108, attach_121, attach_122a, attach_101]
+  # attach_121, attach_122a temporarily removed
+  [ab_attach, c_attach, d_attach, ef_attach, g_attach, h_attach, i_attach, j_attach, form_107_temp, form_107_ext1, form_107_ext2, form_107_ext3, attach_108, attach_101]
 continue button field: conclusion_screen
 section: fin
 ---
@@ -963,9 +1036,9 @@ review:
   - Revisit: current_district
     button: |
       Bankruptcy Court District: ${ current_district }
-      
+
       Case number (if known):    ${ case_number }
-      
+
       % if amended_filing:
         Amended Filing: Yes
        % else:
@@ -977,7 +1050,7 @@ review:
       % if len(debtor) > 0:
       **Debtors**
       ${ debtor_table }
-        
+
       ${ debtor.add_action() }
       % endif
   - note: |

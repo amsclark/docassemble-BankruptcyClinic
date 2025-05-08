@@ -10,3 +10,16 @@
   --bs-heading-color:#000000;
   --bs-secondary-color: #595959;
 }
+
+input:invalid {
+  background-color: ivory;
+  border: none;
+  outline: 2px solid red;
+  border-radius: 5px;
+}
+select:invalid {
+  background-color: ivory;
+  border: none;
+  outline: 2px solid red;
+  border-radius: 5px;
+}

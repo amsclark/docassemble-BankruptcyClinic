@@ -31,7 +31,7 @@ fields:
   - note: |
       <br>
       ### Income Information
-      
+
       Make sure to include the value (if known) of any non-cash governmental assistance that you receive, such as food stamps (benefits under the Supplemental Nutrition Assistance Program) or housing subsidies.
   - Your income: family.you_income
     datatype: currency
@@ -75,7 +75,7 @@ question: |
   Estimate your average monthly expenses.
 subquestion: |
   Include amounts paid by any government assistance that you reported earlier.
-fields: 
+fields:
   - Average Monthly Expense: family.average_monthly_expenses
     datatype: currency
     default: 3500
@@ -126,7 +126,7 @@ question: |
   How much cash do you have?
 subquestion: |
   Examples: Money you have in your wallet, in your home, and on hand when you file this application.
-fields: 
+fields:
   - Cash on Hand: prop.cash_on_hand
     datatype: currency
     default: 2000
@@ -136,7 +136,7 @@ question: |
   Do you have bank accounts and other deposits of money?
 subquestion: |
   Examples: Checking, savings, money market, or other finacial accounts; certificates of deposit; shares in banks, credit unions, brokerage houses, and other similar institutions. If you have more than one account with the same institution, list each when asked.
-  
+
   Do not include 401(k) and IRA accounts.
 yesno: prop.has_bank_accounts
 ---
@@ -145,7 +145,7 @@ question: |
   Provide details about account.
 fields:
   - Account Type: prop.accounts[i].type
-    choices: 
+    choices:
       - Checking
       - Savings
       - Other
@@ -169,16 +169,13 @@ question: |
   Your home?
 subquestion: |
   Do you own a home outright or are you in the process of purchasing one now?
-fields: 
+fields:
   - Owns home: prop.has_home
     datatype: yesnoradio
     default: False
-  - Number: prop.mortgage_number
-    default: 1111
-    show if: prop.has_home
-  - Street: prop.mortgage_street
+  - Address/PO Box: prop.mortgage_street
     default: |
-      56 Pl
+      11111 56 Pl
     show if: prop.has_home
   - City: prop.mortgage_city
     default: |
@@ -189,8 +186,10 @@ fields:
       Florida
     show if: prop.has_home
   - Zip: prop.mortgage_zip
-    default: |
-      99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: prop.has_home
   - Current Value: prop.mortgage_current_value
     datatype: currency
@@ -206,17 +205,13 @@ question: |
   Other real estate?
 subquestion: |
   Do you own any other real estate assets?
-fields: 
+fields:
   - Has other real estate: prop.has_other_real_estate
     datatype: yesnoradio
     default: False
-  - Number: prop.other_mortgage_number
+  - Address/PO Box: prop.other_mortgage_street
     default: |
-      1111
-    show if: prop.has_other_real_estate
-  - Street: prop.other_mortgage_street
-    default: |
-      56th Pl
+      1111 56th Pl
     show if: prop.has_other_real_estate
   - City: prop.other_mortgage_city
     default: |
@@ -227,8 +222,10 @@ fields:
       Florida
     show if: prop.has_other_real_estate
   - Zip: prop.other_mortgage_zip
-    default: |
-      99999
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: prop.has_other_real_estate
   - Current Value: prop.other_mortgage_current_value
     default: 300000
@@ -373,7 +370,7 @@ fields:
     default: False
   - Whom did you pay?: additional.paid_for_services_who
     datatype: checkboxes
-    choices: 
+    choices:
       - An attorney
       - A bankruptcy petition preparer, paralegal, or typing service
       - Someone else
@@ -394,7 +391,7 @@ fields:
     default: False
   - Whom did you pay?: additional.promised_for_services_who
     datatype: checkboxes
-    choices: 
+    choices:
       - An attorney
       - A bankruptcy petition preparer, paralegal, or typing service
       - Someone else
@@ -415,7 +412,7 @@ fields:
     default: False
   - Whom was paid?: additional.behalf_for_services_who
     datatype: checkboxes
-    choices: 
+    choices:
       - An attorney
       - A bankruptcy petition preparer, paralegal, or typing service
       - Someone else
@@ -472,13 +469,12 @@ fields:
     datatype: number
     default: 111111
 ---
-event: form_103b_attach
-section: waive_fee
-question: Form 103b Attachment
-continue button field: form_103b_attach
 attachment:
-  pdf template file: form_b103b.pdf
-  code: waive
+  - name: Form 103b
+    filename: form_b103b.pdf
+    pdf template file: form_b103b.pdf
+    code: waive
+    variable name: form_103b_attach
 ---
 code: |
   debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
@@ -511,7 +507,7 @@ code: |
   waive['monthly_subtotal'] = currency(family.you_income + family.spouse_income)
   waive['monthly_govt_assist'] = currency(family.assistance_income)
   waive['monthly_net_income'] = currency((family.you_income + family.spouse_income) - family.assistance_income)
-  
+
   if family.governmental_assistance == True:
     waive['yesGovtAssist'] = True
     waive['typeGovtAssist'] = family.governmental_assistance_explain
@@ -526,7 +522,7 @@ code: |
 
   waive['typeAdditionalInfo'] = family.cannot_pay_explain
   waive['avgMonthlyExpenses'] = currency(family.average_monthly_expenses)
-  
+
   if family.has_others_with_expenses == True:
     waive['yesOutsideFamily'] = True
     waive['whoOutsideFamily'] = family.others_with_expenses_explain
@@ -538,7 +534,7 @@ code: |
     waive['amountOutsidePayers'] = currency(family.other_expense_payers_amount)
   else:
     waive['noOutsidePayers'] = True
-    
+
   if family.expense_changes == True:
     waive['yesExpenseChange'] = True
     waive['explainExpenseChange'] = family.expense_changes_explain
@@ -548,17 +544,17 @@ code: |
   waive['cashOnHand'] = currency(prop.cash_on_hand)
 
   if prop.has_home == True:
-    waive['homeAddress'] = str(prop.mortgage_number) + " " + prop.mortgage_street
+    waive['homeAddress'] = prop.mortgage_street
     waive['homeValue'] = currency(prop.mortgage_current_value)
     waive['homeCityStateZip'] = prop.mortgage_city + ", " + prop.mortgage_state + " " + prop.mortgage_zip
     waive['homeOwed'] = currency(prop.mortgage_amount_owed)
-  
+
     if prop.has_other_real_estate == True:
-      waive['otherHomeAddress'] = str(prop.other_mortgage_number) + " " + prop.other_mortgage_street
+      waive['otherHomeAddress'] = prop.other_mortgage_street
       waive['otherHomeValue'] = currency(prop.other_mortgage_current_value)
       waive['otherHomeCityStateZip'] = prop.other_mortgage_city + ", " + prop.other_mortgage_state + " " + prop.other_mortgage_zip
       waive['otherHomeOwed'] = currency(prop.other_mortgage_amount_owed)
-  
+
   if len(prop.vehicles) > 0:
     i = 1
     for car in prop.vehicles:
@@ -569,11 +565,11 @@ code: |
       waive['carMilage'+str(i)] = car.milage
       waive['carOwed'+str(i)] = currency(car.amount_owed)
       i += 1
-  
+
   waive['otherAssetsDescription'] = prop.other_asset_description
   waive['otherAssetsValue'] = currency(prop.other_asset_value)
   waive['otherAssetsOwed'] = currency(prop.other_asset_owed)
-  
+
   if len(prop.owers) > 0:
     i = 1
     for ower in prop.owers:
@@ -585,9 +581,9 @@ code: |
       else:
         waive['owedNoPaymentSoon'] = True
       i += 1
-  
 
-    
+
+
   if additional.paid_for_services == True:
     waive['yesPaidServices'] = True
     waive['paidAmount'] = currency(additional.paid_for_services_amount)
@@ -597,7 +593,7 @@ code: |
     waive['paidWho'] = additional.paid_for_services_who_describe
   else:
     waive['noPaidServices'] = True
-  
+
   if additional.promised_for_services == True:
     waive['yesPromised'] = True
     waive['promisedAttorney'] = True if 'An attorney' in additional.promised_for_services_who else False
@@ -634,12 +630,12 @@ code: |
       i += 1
   else:
     waive['noBankruptcy'] = True
-    
+
   if len(prop.accounts) > 0:
     if len(list(filter(lambda x: x.type == 'Checking', prop.accounts))) > 0:
       waive['checkingInstitution'] = list(filter(lambda x: x.type == 'Checking', prop.accounts))[0].institution
       waive['checkingAmount'] = currency(list(filter(lambda x: x.type == 'Checking', prop.accounts))[0].amount)
-    if len(list(filter(lambda x: x.type == 'Savings', prop.accounts))) > 0: 
+    if len(list(filter(lambda x: x.type == 'Savings', prop.accounts))) > 0:
       waive['savingsInstitution'] = list(filter(lambda x: x.type == 'Savings', prop.accounts))[0].institution
       waive['savingsAmount'] = currency(list(filter(lambda x: x.type == 'Savings', prop.accounts))[0].amount)
     if len(list(filter(lambda x: x.type == 'Other', prop.accounts))) > 0:

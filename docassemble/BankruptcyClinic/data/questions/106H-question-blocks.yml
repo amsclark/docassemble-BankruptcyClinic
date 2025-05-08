@@ -30,16 +30,17 @@ fields:
   - note: Codebtor Address Information
   - Name: debtors.codebtors[i].name
     default: Janna
-  - Number: debtors.codebtors[i].number
-    default: 11111
-  - Street: debtors.codebtors[i].street
-    default: 36th ave ne
+  - Address/PO Box: debtors.codebtors[i].street
+    default: 1111 36th ave ne
   - City: debtors.codebtors[i].city
     default: Seattle
   - State: debtors.codebtors[i].state
     default: Washington
   - Zip: debtors.codebtors[i].zip
-    default: 98166
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
   - note: The creditor to whom you owe the debt
   - Schedule form: debtors.codebtors[i].schedule
     choices:
@@ -62,27 +63,33 @@ fields:
   - Did your spouse live with you at the time?: debtors.had_spouse
     datatype: yesnoradio
     default: True
+    required: False
     show if: debtors.community_property
   - What state or territory did you live in?: debtors.spouse_state
     default: Washington
     show if: debtors.had_spouse
+    required: False
   - note: Fill in the name and current address of that person
     show if: debtors.had_spouse
   - Name: debtors.spouse_name
     default: Brenda Livingston
     show if: debtors.had_spouse
-  - Number: debtors.spouse_number
-    default: 1111
+    required: False
+  - Address/PO Box: debtors.spouse_street
+    default: 1111 35th Ave NE
     show if: debtors.had_spouse
-  - Street: debtors.spouse_street
-    default: 35th Ave NE
-    show if: debtors.had_spouse
+    required: False
   - City: debtors.spouse_city
     default: Seattle
     show if: debtors.had_spouse
+    required: False
   - Zip: debtors.spouse_zip
-    default: 98058
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    default: 33593
     show if: debtors.had_spouse
+    required: False
 ---
 event: schedule_h
 section: schedule_h
@@ -106,12 +113,11 @@ review:
       % else:
         Lived in community property state: No
       % endif
-      
+
       % if debtors.had_spouce:
         Had spouse: Yes
         Spouse Name: ${ debtors.spouse_name }
         State: ${ debtors.spouse_state }
-        Number: ${ debtors.spouse_number }
         Street: ${ debtors.spouse_street }
         City: ${ debtors.spouse_city }
         Zip: ${ debtors.spouse_zip }
@@ -119,14 +125,12 @@ review:
         Had spouse: No
       % endif
 ---
-event: schedule_h_attach
-section: schedule_h
-question: Schedule h Attachment
-continue button field: schedule_h_attach
 attachment:
-  pdf template file: form_b106h.pdf
-  variable name: h_attach
-  code: codebtors
+  - name: Form 106H
+    filename: form_b106h.pdf
+    pdf template file: form_b106h.pdf
+    variable name: h_attach
+    code: codebtors
 ---
 code: |
   debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
@@ -150,15 +154,15 @@ code: |
   codebtors['hasSpouce'] = True if debtors.had_spouse == True else False
   codebtors['primaryState'] = debtors.spouse_state if debtors.had_spouse == True else None
   codebtors['spousename'] = debtors.spouse_name if debtors.had_spouse == True else None
-  codebtors['spouseAddress'] = str(debtors.spouse_number) + " " + debtors.spouse_street if debtors.had_spouse == True else None
+  codebtors['spouseAddress'] = debtors.spouse_street if debtors.had_spouse == True else None
   codebtors['spouseCity'] = debtors.spouse_city if debtors.had_spouse == True else None
   codebtors['spouseState'] = debtors.spouse_state if debtors.had_spouse == True else None
   codebtors['spouseZip'] = debtors.spouse_zip if debtors.had_spouse == True else None
-  
+
   i=1
   for codebtor in debtors.codebtors:
     codebtors['name'+str(i)] = codebtor.name
-    codebtors['address'+str(i)] = str(codebtor.number) + " " + codebtor.street
+    codebtors['address'+str(i)] = codebtor.street
     codebtors['city'+str(i)] = codebtor.city
     codebtors['state'+str(i)] = codebtor.state
     codebtors['zip'+str(i)] = codebtor.zip

@@ -1,0 +1,161 @@
+modules:
+  - .objects
+  - .courts_list
+  - .county_list
+---
+metadata:
+  title: 106I test
+  short title: Petition for Chapter 7 Bankruptcy
+---
+include:
+  - 106I-question-blocks.yml
+---
+objects:
+  - debtor: |
+      DAList.using(
+        object_type=Debtor,
+        minimum_number=1,
+        complete_attribute='complete')
+  - debtor[i].income: |
+      DAObject.using(
+        complete_attribute='complete')
+  - debtors: |
+      DAObject.using(
+        complete_attribute='complete')
+  - financial_affairs: |
+      DAObject.using(
+        complete_attribute='complete')
+---
+mandatory: True
+code: |
+  amended_filing = False
+  case_number = "123456"
+  chapter = "Chapter 7"
+  current_district = "District of Nebraska"
+  financial_affairs.marital_status = True
+  debtor[0].address.address = "9999 333th St"
+  debtor[0].address.city = "Tampa"
+  debtor[0].address.city_only = False
+  debtor[0].address.geolocated = False
+  debtor[0].address.state = "Florida"
+  debtor[0].address.unit = "Doublas County"
+  debtor[0].address.zip = "33593"
+  debtor[0].alias = []
+  debtor[0].mailing_city = "Tampa"
+  debtor[0].mailing_state = "Florida"
+  debtor[0].mailing_street = "11111 35th Ave NE"
+  debtor[0].mailing_zip = 99999
+  debtor[0].name.first = "Dan"
+  debtor[0].name.middle = ""
+  debtor[0].name.last = "Fields"
+  debtor[0].tax_id.first_ein = ""
+  debtor[0].tax_id.second_ein = ""
+  debtor[0].tax_id.tax_id = 9999
+  debtor[0].tax_id.tax_id_type = "1"
+  debtor[0].income.other_regular_contributions_amount = 100
+  debtor[0].income.expect_year_delta = True
+  debtor[0].income.year_delta_explain = "Explanation"
+  debtor[0].complete = True
+  debtor[1].address.address = "9999 333th St"
+  debtor[1].address.city = "Tampa"
+  debtor[1].address.city_only = False
+  debtor[1].address.geolocated = False
+  debtor[1].address.state = "Florida"
+  debtor[1].address.unit = "Doublas County"
+  debtor[1].address.zip = "33593"
+  debtor[1].alias = []
+  debtor[1].mailing_city = "Tampa"
+  debtor[1].mailing_state = "Florida"
+  debtor[1].mailing_street = "11111 35th Ave NE"
+  debtor[1].mailing_zip = 99999
+  debtor[1].name.first = "Dan"
+  debtor[1].name.middle = ""
+  debtor[1].name.last = "Fields"
+  debtor[1].tax_id.first_ein = ""
+  debtor[1].tax_id.second_ein = ""
+  debtor[1].tax_id.tax_id = 9999
+  debtor[1].tax_id.tax_id_type = "1"
+  debtor[1].income.other_regular_contributions_amount = 100
+  debtor[1].income.expect_year_delta = True
+  debtor[1].income.year_delta_explain = "Explanation"
+  debtor[1].complete = True
+  debtor.there_is_another = False
+
+  debtors.community_property = False
+  debtors.had_spouse = False
+
+  financial_affairs.lived_elsewhere = False
+---
+mandatory: True
+code: |
+  #106I - Income
+  debtor[0].income.employment
+  debtor[0].income.income_amount_1
+  debtor[0].income.overtime_pay_1
+  debtor[0].income.tax_deduction
+  debtor[0].income.mandatory_contributions
+  debtor[0].income.voluntary_contributions
+  debtor[0].income.fund_loans
+  debtor[0].income.insurance
+  debtor[0].income.domestic_support
+  debtor[0].income.union_dues
+  debtor[0].income.other_deduction
+  debtor[0].income.net_rental_business
+  debtor[0].income.interest_and_dividends
+  debtor[0].income.family_support
+  debtor[0].income.unemployment
+  debtor[0].income.social_security
+  debtor[0].income.other_govt_assist
+  debtor[0].income.pension
+  debtor[0].income.other_monthly_income
+  if len(debtor) > 1 and financial_affairs.marital_status:
+    debtor[1].income.employment
+    if debtor[1].income.employment == 'Employed':
+      debtor[1].income.income_amount_1
+      debtor[1].income.overtime_pay_1
+      debtor[1].income.tax_deduction
+      debtor[1].income.mandatory_contributions
+      debtor[1].income.voluntary_contributions
+      debtor[1].income.fund_loans
+      debtor[1].income.insurance
+      debtor[1].income.domestic_support
+      debtor[1].income.union_dues
+      debtor[1].income.other_deduction
+      debtor[1].income.net_rental_business
+      debtor[1].income.interest_and_dividends
+      debtor[1].income.family_support
+      debtor[1].income.unemployment
+      debtor[1].income.social_security
+      debtor[1].income.other_govt_assist
+      debtor[1].income.pension
+      debtor[1].income.other_monthly_income
+    else:
+      debtor[1].income.income_amount_1 = 0
+      debtor[1].income.overtime_pay_1 = 0
+      debtor[1].income.tax_deduction = 0
+      debtor[1].income.mandatory_contributions = 0
+      debtor[1].income.voluntary_contributions = 0
+      debtor[1].income.fund_loans = 0
+      debtor[1].income.insurance = 0
+      debtor[1].income.domestic_support = 0
+      debtor[1].income.union_dues = 0
+      debtor[1].income.other_deduction = 0
+      debtor[1].income.net_rental_business = 0
+      debtor[1].income.interest_and_dividends = 0
+      debtor[1].income.family_support = 0
+      debtor[1].income.unemployment = 0
+      debtor[1].income.social_security = 0
+      debtor[1].income.other_govt_assist = 0
+      debtor[1].income.pension = 0
+      debtor[1].income.other_monthly_income = 0
+
+---
+mandatory: True
+question: |
+  Voluntary Petition for Individuals Filing for Bankruptcy conclusion
+subquestion: |
+  conclusion
+allow downloading: True
+attachment code: |
+  [i_attach]
+---
