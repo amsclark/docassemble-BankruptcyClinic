@@ -1,6 +1,6 @@
 import os
 import sys
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 from fnmatch import fnmatchcase
 from distutils.util import convert_path
 
@@ -43,19 +43,18 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
                 out.setdefault(package, []).append(prefix+name)
     return out
 
-setup(name='docassemble.BankruptcyClinic2',
-      version='0.0.3',
+setup(name='docassemble.BankruptcyClinic',
+      version='0.0.5',
       description=('A docassemble extension.'),
-      long_description='# docassemble.BankruptcyClinic2\n\nA docassemble extension.\n\n## Author\n\nAlex Clark, alex@metatheria.solutions\n\n',
+      long_description='# docassemble.BankruptcyClinic\n\nA docassemble extension.\n\n## Author\n\nSystem Administrator, admin@admin.com\n\n',
       long_description_content_type='text/markdown',
       author='Alex Clark',
-      author_email='alex@metatheria.solutions',
+      author_email='alex@clarkmanagementconsulting.com',
       license='The MIT License (MIT)',
       url='https://docassemble.org',
-      packages=find_packages(),
-      namespace_packages=['docassemble'],
+      packages=find_namespace_packages(),
       install_requires=[],
       zip_safe=False,
-      package_data=find_package_data(where='docassemble/BankruptcyClinic2/', package='docassemble.BankruptcyClinic2'),
+      package_data=find_package_data(where='docassemble/BankruptcyClinic/', package='docassemble.BankruptcyClinic'),
      )
 
