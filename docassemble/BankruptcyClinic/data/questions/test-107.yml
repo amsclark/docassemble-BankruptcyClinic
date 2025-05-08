@@ -1,3 +1,4 @@
+# Infinite loop: x.lived_elsewhere already looked for, where stack is set()
 modules:
   - .objects
   - .courts_list
@@ -255,7 +256,9 @@ mandatory: true
 code: |
   #107
   financial_affairs.debtor_count = len(debtor)
-  financial_affairs.marital_status
+  financial_affairs.marital_status = False
+  financial_affairs.lived_elsewhere = False # Set a default value
+  financial_affairs.has_second_address = False # Set a default value
 
   financial_affairs.lived_with_spouse
   financial_affairs.employed

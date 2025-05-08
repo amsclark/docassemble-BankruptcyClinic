@@ -1,3 +1,7 @@
+# Interview has an error. 
+# There was a reference to a variable 'prop.contracts_and_leases.there_are_any' that could not be 
+# looked up in the question file (for language 'en') or in any of the files incorporated by 
+# reference into the question file.
 modules:
   - .objects
   - .courts_list
@@ -211,6 +215,8 @@ code: |
   prop.priority_claims[0].zip = 99999
   prop.priority_claims[0].complete = True
   prop.priority_claims.there_is_another = False
+
+  prop.contracts_and_leases.there_are_any = False
 
   debtors.codebtors[0].name = "Terry"
   debtors.codebtors[0].street = "1111 3rd Ave"

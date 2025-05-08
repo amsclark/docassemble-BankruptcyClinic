@@ -140,10 +140,9 @@ fields:
     show if: financial_affairs.has_second_address
     required: False
   - note: Dates you lived there
-    show if: financial_affairs.lived_elsewhere
-    hide if:
-      variable: financial_affairs.has_second_address
-      is: False
+    show if:
+      code: |
+        financial_affairs.lived_elsewhere and financial_affairs.has_second_address
   - From: financial_affairs.address_from_2
     datatype: date
     default: 01/01/23
@@ -256,10 +255,9 @@ fields:
     show if: financial_affairs.has_second_address
     required: False
   - note: Dates you lived there
-    show if: financial_affairs.lived_elsewhere
-    hide if:
-      variable: financial_affairs.has_second_address
-      is: False
+    show if:
+      code: |
+        financial_affairs.lived_elsewhere and financial_affairs.has_second_address
   - From: financial_affairs.address_from_3
     datatype: date
     default: 01/01/23
@@ -372,10 +370,9 @@ fields:
     show if: financial_affairs.has_second_address
     required: False
   - note: Dates you lived there
-    show if: financial_affairs.lived_elsewhere
-    hide if:
-      variable: financial_affairs.has_second_address
-      is: False
+    show if:
+      code: |
+        financial_affairs.lived_elsewhere and financial_affairs.has_second_address
   - From: financial_affairs.address_from_4
     datatype: date
     default: 01/01/23
@@ -488,10 +485,9 @@ fields:
     show if: financial_affairs.has_second_address
     required: False
   - note: Dates you lived there
-    show if: financial_affairs.lived_elsewhere
-    hide if:
-      variable: financial_affairs.has_second_address
-      is: False
+    show if:
+      code: |
+        financial_affairs.lived_elsewhere and financial_affairs.has_second_address
   - From: financial_affairs.address_from_5
     datatype: date
     default: 01/01/23
@@ -604,10 +600,9 @@ fields:
     show if: financial_affairs.has_second_address
     required: False
   - note: Dates you lived there
-    show if: financial_affairs.has_second_address
-    hide if:
-      variable: financial_affairs.has_second_address
-      is: False
+    show if:
+      code: |
+        financial_affairs.has_second_address and financial_affairs.has_second_address
   - From: financial_affairs.address_from_6
     datatype: date
     default: 01/01/23
