@@ -33,6 +33,11 @@ question: |
 fields:
   - Case number (if known): case_number
     required: false
+validation code: | 
+  if case_number: 
+    pattern = r"^\d:\d{2}-(bk|ap|mp|br|cg|lq|tr)-\d{5}$"
+    if not re.match(pattern, case_number.lower()):
+      validation_error("That doesn't look like a valid South Dakota or Nebraska bankruptcy case number. Please enter it in the format D:YY-bk-NNNNN (e.g., '8:23-bk-12345').")
 ---
 event: district_final
 section: district
