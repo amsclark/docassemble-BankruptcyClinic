@@ -1,3 +1,4 @@
+#test
 modules:
   - .objects
   - .courts_list
