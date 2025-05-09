@@ -1432,16 +1432,24 @@ right: |
   % endfor
 script: |
   <script>
-    checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
-      "prop.interests[i].is_claiming_exemption",
-      "prop.interests[i].claiming_sub_100",
-      "prop.interests[i].current_owned_value",
-      "prop.interests[i].exemption_value",
-      "prop.interests[i].exemption_laws",
-      "prop.interests[i].exemption_value_2",
-      "prop.interests[i].exemption_laws_2");
+    // Safely check for exemptions data
+    try {
+      checkQuestionExemptions(
+        ${ json.dumps(prop.exemptions) },
+        "prop.interests[i].is_claiming_exemption",
+        "prop.interests[i].claiming_sub_100",
+        "prop.interests[i].current_owned_value",
+        "prop.interests[i].exemption_value",
+        "prop.interests[i].exemption_laws",
+        "prop.interests[i].exemption_value_2",
+        "prop.interests[i].exemption_laws_2");
+    } catch(e) {
+      console.log("Error in exemption check:", e);
+    }
   </script>
+code: |
+  # Set complete attribute to true to prevent looping
+  prop.interests[i].complete = True
 fields:
   - Street: prop.interests[i].street
     default: "1111 SE Hamilton Ave"
