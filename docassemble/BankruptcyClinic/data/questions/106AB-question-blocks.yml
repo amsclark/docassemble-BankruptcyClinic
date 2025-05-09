@@ -36,1383 +36,1383 @@ under: |
 ---
 reconsider: True
 code: |
-
-  exemptions = []
-  def tbl_data():
-    # Laws
-    homestead_law = 'Homestead (Neb. Rev. Stat. §§ 40-101 - 40-118)'
-    homestead_proceeds_law = 'Homestead, proceeds of sale (Neb. Rev. Stat. § 40-116)'
-    motor_vehicle_law = 'Motor vehicle (Neb. Rev. Stat. § 25-1556(1)(e))'
-    household_goods_law = 'Household goods (Neb. Rev. Stat. § 25-1556(1)(c))'
-    wildcard_law = 'Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))'
-    clothing_law = 'Clothing (Neb. Rev. Stat. § 25-1556(1)(b))'
-    posessions_law = 'Immediate personal possessions (Neb. Rev. Stat. § 25-1556(1)(a))'
-    health_aids_law = 'Health Aids (Neb. Rev. Stat. § 25-1556(1)(f))'
-    health_savings_law = 'Health Savings (Neb. Rev. Stat. § 8-1,131(2)(b))'
-    tools_law = 'Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))'
-    retirement_law = 'Retirement accounts (Neb. Rev. Stat. § 25-1563.01)'
-    wages_law = 'Wages (Neb. Rev. Stat. § 25-1558)'
-    public_benefits_law = 'Public Benefits (Neb. Rev. Stat. § 68-148)'
-    earned_income_law = 'Earned Income Tax Credit (Neb Rev Stat 25-1553)'
-    life_insurance_law = 'Life insurance proceeds (Neb. Rev. Stat. § 44-371)'
-    secured_settlement_law = 'Structured settlement (Neb. Rev. Stat. § 25-1563.02)'
-    workers_comp_law = 'Workers Compensation (Neb. Rev. Stat. § 48-149)'
-    unemployment_law = 'Unemployment (Neb. Rev. Stat. § 48-647)'
-    college_savings_law = 'College Savings Plan (Neb. Rev. Stat. § 85-1809)'
-    student_loan_law = 'Student Loan (20 U.S.C. § 1095a(d))'
-    social_security_law = 'Social Security (42 U.S.C. § 407)'
-    va_law = 'VA Benefits (38 U.S.C. § 5301(a))'
-    unknown_law = 'Unknown law'
-
-    # Limits
-    # Limits of value 0 are unlimited
-    homestead_limit = 120000
-    homestead_proceeds_limit = 60000
-    motor_vehicle_limit = 5000
-    household_goods_limit = 3000
-    wildcard_limit = 5000
-    clothing_limit = '∞'
-    posessions_limit = '∞'
-    health_aids_limit = '∞'
-    health_savings_limit = 25000
-    tools_limit = 5000
-    retirement_limit = '∞'
-    wages_limit = '∞'
-    public_benefits_limit = '∞'
-    earned_income_limit = '∞'
-    life_insurance_limit = 100000
-    secured_settlement_limit = '∞'
-    workers_comp_limit = '∞'
-    unemployment_limit = '∞'
-    college_savings_limit = '∞'
-    student_loan_limit = '∞'
-    social_security_limit = '∞'
-    va_limit = '∞'
-    unknown_limit = '∞'
-
-    #Exemption totals
-    homestead_amount = 0
-    homestead_proceeds_amount = 0
-    motor_vehicle_amount = 0
-    household_goods_amount = 0
-    wildcard_exemption_amount = 0
-    clothing_amount = 0
-    possessions_amount = 0
-    health_aids_amount = 0
-    health_savings_amount = 0
-    tools_amount = 0
-    retirement_amount = 0
-    wages_amount = 0
-    public_benefits_amount = 0
-    earned_income_amount = 0
-    life_insurance_amount = 0
-    secured_settlement_amount = 0
-    workers_comp_amount = 0
-    unemployment_amount = 0
-    college_savings_amount = 0
-    student_loan_amount = 0
-    social_security_amount = 0
-    va_amount = 0
-    unknown_amount = 0
-
-
-    for interest in prop.interests.elements:
-      temp = {}
-      temp['exemption_amount'] = interest.attr('exemption_value')
-      temp['exemption_laws'] = interest.attr('exemption_laws')
-      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-      temp['sub_100'] = interest.attr('claiming_sub_100')
-      if interest.attr('has_loan'):
-        temp['current_owned_value'] = interest.attr('current_value') - interest.attr('current_owed_amount')
-      else:
-        temp['current_owned_value'] = interest.attr('current_value')
-      temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
-
-      exemptions.append(temp)
-
-      if interest.attr('exemption_value_2'):
-        temp = {}
-        temp['exemption_amount'] = interest.attr('exemption_value_2')
-        temp['exemption_laws'] = interest.attr('exemption_laws_2')
-        temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-        temp['sub_100'] = interest.attr('claiming_sub_100')
-        if interest.attr('has_loan'):
-          temp['current_owned_value'] = interest.attr('current_value') - interest.attr('current_owed_amount')
-        else:
-          temp['current_owned_value'] = interest.attr('current_value')
-        temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
-
-        exemptions.append(temp)
-
-
-    for interest in prop.ab_vehicles.elements:
-      temp = {}
-      temp['exemption_amount'] = interest.attr('exemption_value')
-      temp['exemption_laws'] = interest.attr('exemption_laws')
-      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-      temp['sub_100'] = interest.attr('claiming_sub_100')
-      if interest.attr('has_loan'):
-        temp['current_owned_value'] = interest.attr('current_value') - interest.attr('current_owed_amount')
-      else:
-        temp['current_owned_value'] = interest.attr('current_value')
-      temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
-      exemptions.append(temp)
-
-      if interest.attr('exemption_value_2'):
-        temp = {}
-        temp['exemption_amount'] = interest.attr('exemption_value_2')
-        temp['exemption_laws'] = interest.attr('exemption_laws_2')
-        temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-        temp['sub_100'] = interest.attr('claiming_sub_100')
-        if interest.attr('has_loan'):
-          temp['current_owned_value'] = interest.attr('current_value') - interest.attr('current_owed_amount')
-        else:
-          temp['current_owned_value'] = interest.attr('current_value')
-        temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
-        exemptions.append(temp)
-
-
-    for interest in prop.ab_other_vehicles.elements:
-      temp = {}
-      temp['exemption_amount'] = interest.attr('exemption_value')
-      temp['exemption_laws'] = interest.attr('exemption_laws')
-      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-      temp['sub_100'] = interest.attr('claiming_sub_100')
-      if interest.attr('has_loan'):
-        temp['current_owned_value'] = interest.attr('current_value') - interest.attr('current_owed_amount')
-      else:
-        temp['current_owned_value'] = interest.attr('current_value')
-      temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
-      exemptions.append(temp)
-
-      if interest.attr('exemption_value_2'):
-        temp = {}
-        temp['exemption_amount'] = interest.attr('exemption_value')
-        temp['exemption_laws'] = interest.attr('exemption_laws')
-        temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-        temp['sub_100'] = interest.attr('claiming_sub_100')
-        if interest.attr('has_loan'):
-          temp['current_owned_value'] = interest.attr('current_value') - interest.attr('current_owed_amount')
-        else:
-          temp['current_owned_value'] = interest.attr('current_value')
-        temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
-        exemptions.append(temp)
-
-
-    household_goods_interest = {}
-    if prop.attr('household_goods_is_claiming_exemption'):
-      household_goods_interest['is_claiming_exemption'] = prop.attr('household_goods_is_claiming_exemption')
-      household_goods_interest['claiming_sub_100'] = prop.attr('household_goods_claiming_sub_100')
-      household_goods_interest['sub_100'] = prop.attr('household_goods_claiming_sub_100')
-      household_goods_interest['exemption_laws'] = prop.attr('household_goods_exemption_laws')
-      household_goods_interest['current_owned_value'] = prop.attr('household_goods_value')
-      household_goods_interest['exemption_amount'] = prop.attr('household_goods_exemption_value')
-      exemptions.append(household_goods_interest)
-
-      if prop.attr('household_goods_value_2'):
-        household_goods_interest['is_claiming_exemption'] = prop.attr('household_goods_is_claiming_exemption')
-        household_goods_interest['claiming_sub_100'] = prop.attr('household_goods_claiming_sub_100')
-        household_goods_interest['sub_100'] = prop.attr('household_goods_claiming_sub_100')
-        household_goods_interest['exemption_laws'] = prop.attr('household_goods_exemption_laws_2')
-        household_goods_interest['current_owned_value'] = prop.attr('household_goods_value')
-        household_goods_interest['exemption_amount'] = prop.attr('household_goods_exemption_value_2')
-        exemptions.append(household_goods_interest)
-
-    secured_household_goods_interest = {}
-    if prop.attr('secured_household_goods_is_claiming_exemption'):
-      secured_household_goods_interest['is_claiming_exemption'] = prop.attr('secured_household_goods_is_claiming_exemption')
-      secured_household_goods_interest['claiming_sub_100'] = prop.attr('secured_household_goods_claiming_sub_100')
-      secured_household_goods_interest['sub_100'] = prop.attr('secured_household_goods_claiming_sub_100')
-      secured_household_goods_interest['exemption_laws'] = prop.attr('secured_household_goods_exemption_laws')
-      secured_household_goods_interest['current_owned_value'] = prop.attr('secured_household_goods_value')
-      secured_household_goods_interest['exemption_amount'] = prop.attr('secured_household_goods_exemption_value')
-      exemptions.append(secured_household_goods_interest)
-
-      if prop.attr('secured_household_goods_exemption_value_2'):
-        secured_household_goods_interest['is_claiming_exemption'] = prop.attr('secured_household_goods_is_claiming_exemption')
-        secured_household_goods_interest['claiming_sub_100'] = prop.attr('secured_household_goods_claiming_sub_100')
-        secured_household_goods_interest['sub_100'] = prop.attr('secured_household_goods_claiming_sub_100')
-        secured_household_goods_interest['exemption_laws'] = prop.attr('secured_household_goods_exemption_laws_2')
-        secured_household_goods_interest['current_owned_value'] = prop.attr('secured_household_goods_value')
-        secured_household_goods_interest['exemption_amount'] = prop.attr('secured_household_goods_exemption_value_2')
-        exemptions.append(secured_household_goods_interest)
-
-    electronics_interest = {}
-    if prop.attr('electronics_is_claiming_exemption'):
-      electronics_interest['is_claiming_exemption'] = prop.attr('electronics_is_claiming_exemption')
-      electronics_interest['claiming_sub_100'] = prop.attr('electronics_claiming_sub_100')
-      electronics_interest['sub_100'] = prop.attr('electronics_claiming_sub_100')
-      electronics_interest['exemption_laws'] = prop.attr('electronics_exemption_laws')
-      electronics_interest['current_owned_value'] = prop.attr('electronics_value')
-      electronics_interest['exemption_amount'] = prop.attr('electronics_exemption_value')
-      exemptions.append(electronics_interest)
-
-      if prop.attr('electronics_exemption_value_2'):
-        electronics_interest['is_claiming_exemption'] = prop.attr('electronics_is_claiming_exemption')
-        electronics_interest['claiming_sub_100'] = prop.attr('electronics_claiming_sub_100')
-        electronics_interest['sub_100'] = prop.attr('electronics_claiming_sub_100')
-        electronics_interest['exemption_laws'] = prop.attr('electronics_exemption_laws_2')
-        electronics_interest['current_owned_value'] = prop.attr('electronics_value')
-        electronics_interest['exemption_amount'] = prop.attr('electronics_exemption_value_2')
-        exemptions.append(electronics_interest)
-
-    collectibles_interest = {}
-    if prop.attr('collectibles_is_claiming_exemption'):
-      collectibles_interest['is_claiming_exemption'] = prop.attr('collectibles_is_claiming_exemption')
-      collectibles_interest['claiming_sub_100'] = prop.attr('collectibles_claiming_sub_100')
-      collectibles_interest['sub_100'] = prop.attr('collectibles_claiming_sub_100')
-      collectibles_interest['exemption_laws'] = prop.attr('collectibles_exemption_laws')
-      collectibles_interest['current_owned_value'] = prop.attr('collectibles_value')
-      collectibles_interest['exemption_amount'] = prop.attr('collectibles_exemption_value')
-      exemptions.append(collectibles_interest)
-
-      if prop.attr('collectibles_exemption_value_2'):
-        collectibles_interest['is_claiming_exemption'] = prop.attr('collectibles_is_claiming_exemption')
-        collectibles_interest['claiming_sub_100'] = prop.attr('collectibles_claiming_sub_100')
-        collectibles_interest['sub_100'] = prop.attr('collectibles_claiming_sub_100')
-        collectibles_interest['exemption_laws'] = prop.attr('collectibles_exemption_laws_2')
-        collectibles_interest['current_owned_value'] = prop.attr('collectibles_value')
-        collectibles_interest['exemption_amount'] = prop.attr('collectibles_exemption_value_2')
-        exemptions.append(collectibles_interest)
-
-    hobby_interest = {}
-    if prop.attr('hobby_equipment_is_claiming_exemption'):
-      hobby_interest['is_claiming_exemption'] = prop.attr('hobby_equipment_is_claiming_exemption')
-      hobby_interest['claiming_sub_100'] = prop.attr('hobby_equipment_claiming_sub_100')
-      hobby_interest['sub_100'] = prop.attr('hobby_equipment_claiming_sub_100')
-      hobby_interest['exemption_laws'] = prop.attr('hobby_equipment_exemption_laws')
-      hobby_interest['current_owned_value'] = prop.attr('hobby_equipment_value')
-      hobby_interest['exemption_amount'] = prop.attr('hobby_equipment_exemption_value')
-      exemptions.append(hobby_interest)
-
-      if prop.attr('hobby_equipment_exemption_value_2'):
-        hobby_interest['is_claiming_exemption'] = prop.attr('hobby_equipment_is_claiming_exemption')
-        hobby_interest['claiming_sub_100'] = prop.attr('hobby_equipment_claiming_sub_100')
-        hobby_interest['sub_100'] = prop.attr('hobby_equipment_claiming_sub_100')
-        hobby_interest['exemption_laws'] = prop.attr('hobby_equipment_exemption_laws_2')
-        hobby_interest['current_owned_value'] = prop.attr('hobby_equipment_value')
-        hobby_interest['exemption_amount'] = prop.attr('hobby_equipment_exemption_value_2')
-        exemptions.append(hobby_interest)
-
-
-    firearms_interest = {}
-    if prop.attr('firearms_is_claiming_exemption'):
-      firearms_interest['is_claiming_exemption'] = prop.attr('firearms_is_claiming_exemption')
-      firearms_interest['claiming_sub_100'] = prop.attr('firearms_claiming_sub_100')
-      firearms_interest['sub_100'] = prop.attr('firearms_claiming_sub_100')
-      firearms_interest['exemption_laws'] = prop.attr('firearms_exemption_laws')
-      firearms_interest['current_owned_value'] = prop.attr('firearms_value')
-      firearms_interest['exemption_amount'] = prop.attr('firearms_exemption_value')
-      exemptions.append(firearms_interest)
-
-      if prop.attr('firearms_exemption_value_2'):
-        firearms_interest['is_claiming_exemption'] = prop.attr('firearms_is_claiming_exemption')
-        firearms_interest['claiming_sub_100'] = prop.attr('firearms_claiming_sub_100')
-        firearms_interest['sub_100'] = prop.attr('firearms_claiming_sub_100')
-        firearms_interest['exemption_laws'] = prop.attr('firearms_exemption_laws_2')
-        firearms_interest['current_owned_value'] = prop.attr('firearms_value')
-        firearms_interest['exemption_amount'] = prop.attr('firearms_exemption_value_2')
-        exemptions.append(firearms_interest)
-
-    clothes_interest = {}
-    if prop.attr('clothes_is_claiming_exemption'):
-      clothes_interest['is_claiming_exemption'] = prop.attr('clothes_is_claiming_exemption')
-      clothes_interest['claiming_sub_100'] = prop.attr('clothes_claiming_sub_100')
-      clothes_interest['sub_100'] = prop.attr('clothes_claiming_sub_100')
-      clothes_interest['exemption_laws'] = prop.attr('clothes_exemption_laws')
-      clothes_interest['current_owned_value'] = prop.attr('clothes_value')
-      clothes_interest['exemption_amount'] = prop.attr('clothes_exemption_value')
-      exemptions.append(clothes_interest)
-
-      if prop.attr('clothes_exemption_value'):
-        clothes_interest['is_claiming_exemption'] = prop.attr('clothes_is_claiming_exemption')
-        clothes_interest['claiming_sub_100'] = prop.attr('clothes_claiming_sub_100')
-        clothes_interest['sub_100'] = prop.attr('clothes_claiming_sub_100')
-        clothes_interest['exemption_laws'] = prop.attr('clothes_exemption_laws_2')
-        clothes_interest['current_owned_value'] = prop.attr('clothes_value')
-        clothes_interest['exemption_amount'] = prop.attr('clothes_exemption_value_2')
-        exemptions.append(clothes_interest)
-
-    jewlery_interest = {}
-    if prop.attr('jewlery_is_claiming_exemption'):
-      jewlery_interest['is_claiming_exemption'] = prop.attr('jewlery_is_claiming_exemption')
-      jewlery_interest['claiming_sub_100'] = prop.attr('jewlery_claiming_sub_100')
-      jewlery_interest['sub_100'] = prop.attr('jewlery_claiming_sub_100')
-      jewlery_interest['exemption_laws'] = prop.attr('jewlery_exemption_laws')
-      jewlery_interest['current_owned_value'] = prop.attr('jewlery_value')
-      jewlery_interest['exemption_amount'] = prop.attr('jewlery_exemption_value')
-      exemptions.append(jewlery_interest)
-
-      if prop.attr('jewlery_exemption_value_2'):
-        jewlery_interest['is_claiming_exemption'] = prop.attr('jewlery_is_claiming_exemption')
-        jewlery_interest['claiming_sub_100'] = prop.attr('jewlery_claiming_sub_100')
-        jewlery_interest['sub_100'] = prop.attr('jewlery_claiming_sub_100')
-        jewlery_interest['exemption_laws'] = prop.attr('jewlery_exemption_laws_2')
-        jewlery_interest['current_owned_value'] = prop.attr('jewlery_value')
-        jewlery_interest['exemption_amount'] = prop.attr('jewlery_exemption_value_2')
-        exemptions.append(jewlery_interest)
-
-    animal_interest = {}
-    if prop.attr('animal_is_claiming_exemption'):
-      animal_interest['is_claiming_exemption'] = prop.attr('animal_is_claiming_exemption')
-      animal_interest['claiming_sub_100'] = prop.attr('animal_claiming_sub_100')
-      animal_interest['sub_100'] = prop.attr('animal_claiming_sub_100')
-      animal_interest['exemption_laws'] = prop.attr('animal_exemption_laws')
-      animal_interest['current_owned_value'] = prop.attr('animal_value')
-      animal_interest['exemption_amount'] = prop.attr('animal_exemption_value')
-      exemptions.append(animal_interest)
-
-      if prop.attr('animal_exemption_value'):
-        animal_interest['is_claiming_exemption'] = prop.attr('animal_is_claiming_exemption')
-        animal_interest['claiming_sub_100'] = prop.attr('animal_claiming_sub_100')
-        animal_interest['sub_100'] = prop.attr('animal_claiming_sub_100')
-        animal_interest['exemption_laws'] = prop.attr('animal_exemption_laws_2')
-        animal_interest['current_owned_value'] = prop.attr('animal_value')
-        animal_interest['exemption_amount'] = prop.attr('animal_exemption_value_2')
-        exemptions.append(animal_interest)
-
-    other_household_interest = {}
-    if prop.attr('other_household_items_is_claiming_exemption'):
-      other_household_interest['is_claiming_exemption'] = prop.attr('other_household_items_is_claiming_exemption')
-      other_household_interest['claiming_sub_100'] = prop.attr('other_household_items_claiming_sub_100')
-      other_household_interest['sub_100'] = prop.attr('other_household_items_claiming_sub_100')
-      other_household_interest['exemption_laws'] = prop.attr('other_household_items_exemption_laws')
-      other_household_interest['current_owned_value'] = prop.attr('other_household_items_value')
-      other_household_interest['exemption_amount'] = prop.attr('other_household_items_exemption_value')
-      exemptions.append(other_household_interest)
-
-      if prop.attr('other_household_items_value_2'):
-        other_household_interest['is_claiming_exemption'] = prop.attr('other_household_items_is_claiming_exemption')
-        other_household_interest['claiming_sub_100'] = prop.attr('other_household_items_claiming_sub_100')
-        other_household_interest['sub_100'] = prop.attr('other_household_items_claiming_sub_100')
-        other_household_interest['exemption_laws'] = prop.attr('other_household_items_exemption_laws_2')
-        other_household_interest['current_owned_value'] = prop.attr('other_household_items_value')
-        other_household_interest['exemption_amount'] = prop.attr('other_household_items_exemption_value_2')
-        exemptions.append(other_household_interest)
-
-    cash_interest = {}
-    if prop.financial_assets.attr('cash_is_claiming_exemption'):
-      cash_interest['is_claiming_exemption'] = prop.financial_assets.attr('cash_is_claiming_exemption')
-      cash_interest['claiming_sub_100'] = prop.financial_assets.attr('cash_sub_100')
-      cash_interest['sub_100'] = prop.financial_assets.attr('cash_sub_100')
-      cash_interest['exemption_laws'] = prop.financial_assets.attr('cash_exemption_laws')
-      cash_interest['current_owned_value'] = prop.financial_assets.attr('cash_value')
-      cash_interest['exemption_amount'] = prop.financial_assets.attr('cash_exemption_value')
-      exemptions.append(cash_interest)
-
-      if prop.financial_assets.attr('cash_exemption_value_2'):
-        cash_interest['is_claiming_exemption'] = prop.financial_assets.attr('cash_is_claiming_exemption')
-        cash_interest['claiming_sub_100'] = prop.financial_assets.attr('cash_sub_100')
-        cash_interest['sub_100'] = prop.financial_assets.attr('cash_sub_100')
-        cash_interest['exemption_laws'] = prop.financial_assets.attr('cash_exemption_laws_2')
-        cash_interest['current_owned_value'] = prop.financial_assets.attr('cash_value')
-        cash_interest['exemption_amount'] = prop.financial_assets.attr('cash_exemption_value_2')
-        exemptions.append(cash_interest)
-
-
-    for interest in prop.financial_assets.deposits.elements:
-      temp = {}
-      temp['exemption_amount'] = interest.attr('exemption_value')
-      temp['exemption_laws'] = interest.attr('exemption_laws')
-      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-      temp['sub_100'] = interest.attr('claiming_sub_100')
-      temp['current_owned_value'] = interest.attr('amount')
-      temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
-      exemptions.append(temp)
-
-      if interest.attr('exemption_value_2'):
-        temp = {}
-        temp['exemption_amount'] = interest.attr('exemption_value_2')
-        temp['exemption_laws'] = interest.attr('exemption_laws_2')
-        temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-        temp['sub_100'] = interest.attr('claiming_sub_100')
-        temp['current_owned_value'] = interest.attr('amount')
-        temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
-        exemptions.append(temp)
-
-    for interest in prop.financial_assets.bonds_and_stocks.elements:
-      temp = {}
-      temp['exemption_amount'] = interest.attr('exemption_value')
-      temp['exemption_laws'] = interest.attr('exemption_laws')
-      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-      temp['sub_100'] = interest.attr('claiming_sub_100')
-      temp['current_owned_value'] = interest.attr('amount')
-      temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
-      exemptions.append(temp)
-
-      if interest.attr('exemption_value_2'):
-        temp = {}
-        temp['exemption_amount'] = interest.attr('exemption_value_2')
-        temp['exemption_laws'] = interest.attr('exemption_laws_2')
-        temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-        temp['sub_100'] = interest.attr('claiming_sub_100')
-        temp['current_owned_value'] = interest.attr('amount')
-        temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
-        exemptions.append(temp)
-
-
-    for interest in prop.financial_assets.non_traded_stock.elements:
-      temp = {}
-      temp['exemption_amount'] = interest.attr('exemption_value')
-      temp['exemption_laws'] = interest.attr('exemption_laws')
-      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-      temp['sub_100'] = interest.attr('claiming_sub_100')
-      temp['current_owned_value'] = interest.attr('value')
-      temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
-      exemptions.append(temp)
-
-      if interest.attr('exemption_value_2'):
-        temp = {}
-        temp['exemption_amount'] = interest.attr('exemption_value_2')
-        temp['exemption_laws'] = interest.attr('exemption_laws_2')
-        temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-        temp['sub_100'] = interest.attr('claiming_sub_100')
-        temp['current_owned_value'] = interest.attr('value')
-        temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
-        exemptions.append(temp)
-
-    for interest in prop.financial_assets.corporate_bonds.elements:
-      temp = {}
-      temp['exemption_amount'] = interest.attr('exemption_value')
-      temp['exemption_laws'] = interest.attr('exemption_laws')
-      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-      temp['sub_100'] = interest.attr('claiming_sub_100')
-      temp['current_owned_value'] = interest.attr('amount')
-      temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
-      exemptions.append(temp)
-
-      if interest.attr('exemption_value_2'):
-        temp = {}
-        temp['exemption_amount'] = interest.attr('exemption_value_2')
-        temp['exemption_laws'] = interest.attr('exemption_laws_2')
-        temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-        temp['sub_100'] = interest.attr('claiming_sub_100')
-        temp['current_owned_value'] = interest.attr('amount')
-        temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
-        exemptions.append(temp)
-
-
-    for interest in prop.financial_assets.retirement_accounts.elements:
-      temp = {}
-      temp['exemption_amount'] = interest.attr('exemption_value')
-      temp['exemption_laws'] = interest.attr('exemption_laws')
-      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-      temp['sub_100'] = interest.attr('claiming_sub_100')
-      temp['current_owned_value'] = interest.attr('amount')
-      temp['is_claiming_exemption'] = interest.attr('has_claim')
-      exemptions.append(temp)
-
-      if interest.attr('exemption_value_2'):
-        temp = {}
-        temp['exemption_amount'] = interest.attr('exemption_value_2')
-        temp['exemption_laws'] = interest.attr('exemption_laws_2')
-        temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-        temp['sub_100'] = interest.attr('claiming_sub_100')
-        temp['current_owned_value'] = interest.attr('amount')
-        temp['is_claiming_exemption'] = interest.attr('has_claim')
-        exemptions.append(temp)
-
-
-    for interest in prop.financial_assets.prepayments.elements:
-      temp = {}
-      temp['exemption_amount'] = interest.attr('exemption_value')
-      temp['exemption_laws'] = interest.attr('exemption_laws')
-      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-      temp['sub_100'] = interest.attr('claiming_sub_100')
-      temp['current_owned_value'] = interest.attr('amount')
-      temp['is_claiming_exemption'] = interest.attr('has_claim')
-      exemptions.append(temp)
-
-      if interest.attr('exemption_value_2'):
-        temp = {}
-        temp['exemption_amount'] = interest.attr('exemption_value_2')
-        temp['exemption_laws'] = interest.attr('exemption_laws_2')
-        temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-        temp['sub_100'] = interest.attr('claiming_sub_100')
-        temp['current_owned_value'] = interest.attr('amount')
-        temp['is_claiming_exemption'] = interest.attr('has_claim')
-        exemptions.append(temp)
-
-
-    for interest in prop.financial_assets.annuities.elements:
-      temp = {}
-      temp['exemption_amount'] = interest.attr('exemption_value')
-      temp['exemption_laws'] = interest.attr('exemption_laws')
-      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-      temp['sub_100'] = interest.attr('claiming_sub_100')
-      temp['current_owned_value'] = interest.attr('amount')
-      temp['is_claiming_exemption'] = interest.attr('has_claim')
-      exemptions.append(temp)
-
-      if interest.attr('exemption_value_2'):
-        temp = {}
-        temp['exemption_amount'] = interest.attr('exemption_value_2')
-        temp['exemption_laws'] = interest.attr('exemption_laws_2')
-        temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-        temp['sub_100'] = interest.attr('claiming_sub_100')
-        temp['current_owned_value'] = interest.attr('amount')
-        temp['is_claiming_exemption'] = interest.attr('has_claim')
-        exemptions.append(temp)
-
-
-    for interest in prop.financial_assets.edu_accounts.elements:
-      temp = {}
-      temp['exemption_amount'] = interest.attr('exemption_value')
-      temp['exemption_laws'] = interest.attr('exemption_laws')
-      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-      temp['sub_100'] = interest.attr('claiming_sub_100')
-      temp['current_owned_value'] = interest.attr('amount')
-      temp['is_claiming_exemption'] = interest.attr('has_claim')
-      exemptions.append(temp)
-
-      if interest.attr('exemption_value_2'):
-        temp = {}
-        temp['exemption_amount'] = interest.attr('exemption_value_2')
-        temp['exemption_laws'] = interest.attr('exemption_laws_2')
-        temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
-        temp['sub_100'] = interest.attr('claiming_sub_100')
-        temp['current_owned_value'] = interest.attr('amount')
-        temp['is_claiming_exemption'] = interest.attr('has_claim')
-        exemptions.append(temp)
-
-
-    future_interest = {}
-    if prop.financial_assets.attr('future_property_interest_has_claim'):
-      future_interest['is_claiming_exemption'] = prop.financial_assets.attr('future_property_interest_has_claim')
-      future_interest['claiming_sub_100'] = prop.financial_assets.attr('future_property_interest_sub_100')
-      future_interest['sub_100'] = prop.financial_assets.attr('future_property_interest_sub_100')
-      future_interest['exemption_laws'] = prop.financial_assets.attr('future_property_interest_exemption_laws')
-      future_interest['current_owned_value'] = prop.financial_assets.attr('future_property_interest_value')
-      future_interest['exemption_amount'] = prop.financial_assets.attr('future_property_interest_exemption_value')
-      exemptions.append(future_interest)
-
-      if prop.financial_assets.attr('future_property_interest_exemption_value_2'):
-        future_interest['is_claiming_exemption'] = prop.financial_assets.attr('future_property_interest_has_claim')
-        future_interest['claiming_sub_100'] = prop.financial_assets.attr('future_property_interest_sub_100')
-        future_interest['sub_100'] = prop.financial_assets.attr('future_property_interest_sub_100')
-        future_interest['exemption_laws'] = prop.financial_assets.attr('future_property_interest_exemption_laws_2')
-        future_interest['current_owned_value'] = prop.financial_assets.attr('future_property_interest_value')
-        future_interest['exemption_amount'] = prop.financial_assets.attr('future_property_interest_exemption_value_2')
-        exemptions.append(future_interest)
-
-    ip_interest = {}
-    if prop.financial_assets.attr('ip_interest_has_claim'):
-      ip_interest['is_claiming_exemption'] = prop.financial_assets.attr('ip_interest_has_claim')
-      ip_interest['claiming_sub_100'] = prop.financial_assets.attr('ip_interest_sub_100')
-      ip_interest['sub_100'] = prop.financial_assets.attr('ip_interest_sub_100')
-      ip_interest['exemption_laws'] = prop.financial_assets.attr('ip_interest_exemption_laws')
-      ip_interest['current_owned_value'] = prop.financial_assets.attr('ip_interest_value')
-      ip_interest['exemption_amount'] = prop.financial_assets.attr('ip_interest_exemption_value')
-      exemptions.append(ip_interest)
-
-      if prop.financial_assets.attr('ip_interest_exemption_value_2'):
-        ip_interest['is_claiming_exemption'] = prop.financial_assets.attr('ip_interest_has_claim')
-        ip_interest['claiming_sub_100'] = prop.financial_assets.attr('ip_interest_sub_100')
-        ip_interest['sub_100'] = prop.financial_assets.attr('ip_interest_sub_100')
-        ip_interest['exemption_laws'] = prop.financial_assets.attr('ip_interest_exemption_laws_2')
-        ip_interest['current_owned_value'] = prop.financial_assets.attr('ip_interest_value')
-        ip_interest['exemption_amount'] = prop.financial_assets.attr('ip_interest_exemption_value_2')
-        exemptions.append(ip_interest)
-
-    intangible_interest = {}
-    if prop.financial_assets.attr('intangible_interest_has_claim'):
-      intangible_interest['is_claiming_exemption'] = prop.financial_assets.attr('intangible_interest_has_claim')
-      intangible_interest['claiming_sub_100'] = prop.financial_assets.attr('intangible_interest_sub_100')
-      intangible_interest['sub_100'] = prop.financial_assets.attr('intangible_interest_sub_100')
-      intangible_interest['exemption_laws'] = prop.financial_assets.attr('intangible_interest_exemption_laws')
-      intangible_interest['current_owned_value'] = prop.financial_assets.attr('intangible_interest_value')
-      intangible_interest['exemption_amount'] = prop.financial_assets.attr('intangible_interest_exemption_value')
-      exemptions.append(intangible_interest)
-
-      if prop.financial_assets.attr('intangible_interest_exemption_value_2'):
-        intangible_interest['is_claiming_exemption'] = prop.financial_assets.attr('intangible_interest_has_claim')
-        intangible_interest['claiming_sub_100'] = prop.financial_assets.attr('intangible_interest_sub_100')
-        intangible_interest['sub_100'] = prop.financial_assets.attr('intangible_interest_sub_100')
-        intangible_interest['exemption_laws'] = prop.financial_assets.attr('intangible_interest_exemption_laws_2')
-        intangible_interest['current_owned_value'] = prop.financial_assets.attr('intangible_interest_value')
-        intangible_interest['exemption_amount'] = prop.financial_assets.attr('intangible_interest_exemption_value_2')
-        exemptions.append(intangible_interest)
-
-    refund_interest = {}
-    if prop.owed_property.attr('tax_refund_has_claim'):
-      refund_interest['is_claiming_exemption'] = prop.owed_property.attr('tax_refund_has_claim')
-      refund_interest['claiming_sub_100'] = prop.owed_property.attr('tax_refund_sub_100')
-      refund_interest['sub_100'] = prop.owed_property.attr('tax_refund_sub_100')
-      refund_interest['exemption_laws'] = prop.owed_property.attr('tax_refund_exemption_laws')
-
-      refund_interest['current_owned_value'] = 0
-      if prop.owed_property.attr('tax_refund_federal'):
-        refund_interest['current_owned_value'] += prop.owed_property.attr('tax_refund_federal')
-      if prop.owed_property.attr('tax_refund_state'):
-        refund_interest['current_owned_value'] += prop.owed_property.attr('tax_refund_state')
-      if prop.owed_property.attr('tax_refund_local'):
-        refund_interest['current_owned_value'] += prop.owed_property.attr('tax_refund_local')
-
-      refund_interest['exemption_amount'] = prop.owed_property.attr('tax_refund_exemption_value')
-      exemptions.append(refund_interest)
-
-      if prop.owed_property.attr('tax_refund_exemption_value_2'):
-        refund_interest['is_claiming_exemption'] = prop.owed_property.attr('tax_refund_has_claim')
-        refund_interest['claiming_sub_100'] = prop.owed_property.attr('tax_refund_sub_100')
-        refund_interest['sub_100'] = prop.owed_property.attr('tax_refund_sub_100')
-        refund_interest['exemption_laws'] = prop.owed_property.attr('tax_refund_exemption_laws_2')
-
-        refund_interest['current_owned_value'] = 0
-        if prop.owed_property.attr('tax_refund_federal'):
-          refund_interest['current_owned_value'] += prop.owed_property.attr('tax_refund_federal')
-        if prop.owed_property.attr('tax_refund_state'):
-          refund_interest['current_owned_value'] += prop.owed_property.attr('tax_refund_state')
-        if prop.owed_property.attr('tax_refund_local'):
-          refund_interest['current_owned_value'] += prop.owed_property.attr('tax_refund_local')
-
-        refund_interest['exemption_amount'] = prop.owed_property.attr('tax_refund_exemption_value_2')
-        exemptions.append(refund_interest)
-
-    family_interest = {}
-    if prop.owed_property.attr('family_support_has_claim'):
-      family_interest['is_claiming_exemption'] = prop.owed_property.attr('family_support_has_claim')
-      family_interest['claiming_sub_100'] = prop.owed_property.attr('family_support_sub_100')
-      family_interest['sub_100'] = prop.owed_property.attr('family_support_sub_100')
-      family_interest['exemption_laws'] = prop.owed_property.attr('family_support_exemption_laws')
-
-      family_interest['current_owned_value'] = 0
-      if prop.owed_property.attr('family_support_alimony'):
-        family_interest['current_owned_value'] += prop.owed_property.attr('family_support_alimony')
-      if prop.owed_property.attr('family_support_maintenance'):
-        family_interest['current_owned_value'] += prop.owed_property.attr('family_support_maintenance')
-      if prop.owed_property.attr('family_support_support'):
-        family_interest['current_owned_value'] += prop.owed_property.attr('family_support_support')
-      if prop.owed_property.attr('family_support_divorce'):
-        family_interest['current_owned_value'] += prop.owed_property.attr('family_support_divorce')
-      if prop.owed_property.attr('family_support_settlement'):
-        family_interest['current_owned_value'] += prop.owed_property.attr('family_support_settlement')
-
-      family_interest['exemption_amount'] = prop.owed_property.attr('family_support_exemption_value')
-      exemptions.append(family_interest)
-
-      if prop.owed_property.attr('family_support_exemption_value_2'):
-        family_interest['is_claiming_exemption'] = prop.owed_property.attr('family_support_has_claim')
-        family_interest['claiming_sub_100'] = prop.owed_property.attr('family_support_sub_100')
-        family_interest['sub_100'] = prop.owed_property.attr('family_support_sub_100')
-        family_interest['exemption_laws'] = prop.owed_property.attr('family_support_exemption_laws_2')
-
-        family_interest['current_owned_value'] = 0
-        if prop.owed_property.attr('family_support_alimony'):
-          family_interest['current_owned_value'] += prop.owed_property.attr('family_support_alimony')
-        if prop.owed_property.attr('family_support_maintenance'):
-          family_interest['current_owned_value'] += prop.owed_property.attr('family_support_maintenance')
-        if prop.owed_property.attr('family_support_support'):
-          family_interest['current_owned_value'] += prop.owed_property.attr('family_support_support')
-        if prop.owed_property.attr('family_support_divorce'):
-          family_interest['current_owned_value'] += prop.owed_property.attr('family_support_divorce')
-        if prop.owed_property.attr('family_support_settlement'):
-          family_interest['current_owned_value'] += prop.owed_property.attr('family_support_settlement')
-
-        family_interest['exemption_amount'] = prop.owed_property.attr('family_support_exemption_value_2')
-        exemptions.append(family_interest)
-
-    other_owed_interest = {}
-    if prop.owed_property.attr('other_amounts_has_claim'):
-      other_owed_interest['is_claiming_exemption'] = prop.owed_property.attr('other_amounts_has_claim')
-      other_owed_interest['claiming_sub_100'] = prop.owed_property.attr('other_amounts_sub_100')
-      other_owed_interest['sub_100'] = prop.owed_property.attr('other_amounts_sub_100')
-      other_owed_interest['exemption_laws'] = prop.owed_property.attr('other_amounts_exemption_laws')
-      other_owed_interest['current_owned_value'] = prop.owed_property.attr('other_amounts_value')
-      other_owed_interest['exemption_amount'] = prop.owed_property.attr('other_amounts_exemption_value')
-      exemptions.append(other_owed_interest)
-
-      if prop.owed_property.attry('other_amounts_exemption_value_2'):
-        other_owed_interest['is_claiming_exemption'] = prop.owed_property.attr('other_amounts_has_claim')
-        other_owed_interest['claiming_sub_100'] = prop.owed_property.attr('other_amounts_sub_100')
-        other_owed_interest['sub_100'] = prop.owed_property.attr('other_amounts_sub_100')
-        other_owed_interest['exemption_laws'] = prop.owed_property.attr('other_amounts_exemption_laws_2')
-        other_owed_interest['current_owned_value'] = prop.owed_property.attr('other_amounts_value')
-        other_owed_interest['exemption_amount'] = prop.owed_property.attr('other_amounts_exemption_value_2')
-        exemptions.append(other_owed_interest)
-
-    insurance_interest_1 = {}
-    if prop.owed_property.attr('first_insurance_interest_has_claim'):
-      insurance_interest_1['is_claiming_exemption'] = prop.owed_property.attr('first_insurance_interest_has_claim')
-      insurance_interest_1['claiming_sub_100'] = prop.owed_property.attr('first_insurance_interest_sub_100')
-      insurance_interest_1['sub_100'] = prop.owed_property.attr('first_insurance_interest_sub_100')
-      insurance_interest_1['exemption_laws'] = prop.owed_property.attr('first_insurance_interest_exemption_laws')
-      insurance_interest_1['current_owned_value'] = prop.owed_property.attr('first_insurance_interest_amount')
-      insurance_interest_1['exemption_amount'] = prop.owed_property.attr('first_insurance_exemption_value')
-      exemptions.append(insurance_interest_1)
-
-      if prop.owed_property.attr('first_insurance_exemption_value_2'):
-        insurance_interest_1['is_claiming_exemption'] = prop.owed_property.attr('first_insurance_interest_has_claim')
-        insurance_interest_1['claiming_sub_100'] = prop.owed_property.attr('first_insurance_interest_sub_100')
-        insurance_interest_1['sub_100'] = prop.owed_property.attr('first_insurance_interest_sub_100')
-        insurance_interest_1['exemption_laws'] = prop.owed_property.attr('first_insurance_interest_exemption_laws_2')
-        insurance_interest_1['current_owned_value'] = prop.owed_property.attr('first_insurance_interest_amount')
-        insurance_interest_1['exemption_amount'] = prop.owed_property.attr('first_insurance_exemption_value_2')
-        exemptions.append(insurance_interest_1)
-
-    insurance_interest_2 = {}
-    if prop.owed_property.attr('second_insurance_interest_has_claim'):
-      insurance_interest_2['is_claiming_exemption'] = prop.owed_property.attr('second_insurance_interest_has_claim')
-      insurance_interest_2['claiming_sub_100'] = prop.owed_property.attr('second_insurance_interest_sub_100')
-      insurance_interest_2['sub_100'] = prop.owed_property.attr('second_insurance_interest_sub_100')
-      insurance_interest_2['exemption_laws'] = prop.owed_property.attr('second_insurance_interest_exemption_laws')
-      insurance_interest_2['current_owned_value'] = prop.owed_property.attr('second_insurance_interest_amount')
-      insurance_interest_2['exemption_amount'] = prop.owed_property.attr('second_insurance_exemption_value')
-      exemptions.append(insurance_interest_2)
-
-      if prop.owed_property.attr('second_insurance_exemption_value_2'):
-        insurance_interest_2['is_claiming_exemption'] = prop.owed_property.attr('second_insurance_interest_has_claim')
-        insurance_interest_2['claiming_sub_100'] = prop.owed_property.attr('second_insurance_interest_sub_100')
-        insurance_interest_2['sub_100'] = prop.owed_property.attr('second_insurance_interest_sub_100')
-        insurance_interest_2['exemption_laws'] = prop.owed_property.attr('second_insurance_interest_exemption_laws_2')
-        insurance_interest_2['current_owned_value'] = prop.owed_property.attr('second_insurance_interest_amount')
-        insurance_interest_2['exemption_amount'] = prop.owed_property.attr('second_insurance_exemption_value_2')
-        exemptions.append(insurance_interest_2)
-
-    insurance_interest_3 = {}
-    if prop.owed_property.attr('third_insurance_interest_has_claim'):
-      insurance_interest_3['is_claiming_exemption'] = prop.owed_property.attr('third_insurance_interest_has_claim')
-      insurance_interest_3['claiming_sub_100'] = prop.owed_property.attr('third_insurance_interest_sub_100')
-      insurance_interest_3['sub_100'] = prop.owed_property.attr('third_insurance_interest_sub_100')
-      insurance_interest_3['exemption_laws'] = prop.owed_property.attr('third_insurance_interest_exemption_laws')
-      insurance_interest_3['current_owned_value'] = prop.owed_property.attr('third_insurance_interest_amount')
-      insurance_interest_3['exemption_amount'] = prop.owed_property.attr('third_insurance_exemption_value')
-      exemptions.append(insurance_interest_3)
-
-      if prop.owed_property.attr('third_insurance_exemption_value_2'):
-        insurance_interest_3['is_claiming_exemption'] = prop.owed_property.attr('third_insurance_interest_has_claim')
-        insurance_interest_3['claiming_sub_100'] = prop.owed_property.attr('third_insurance_interest_sub_100')
-        insurance_interest_3['sub_100'] = prop.owed_property.attr('third_insurance_interest_sub_100')
-        insurance_interest_3['exemption_laws'] = prop.owed_property.attr('third_insurance_interest_exemption_laws_2')
-        insurance_interest_3['current_owned_value'] = prop.owed_property.attr('third_insurance_interest_amount')
-        insurance_interest_3['exemption_amount'] = prop.owed_property.attr('third_insurance_exemption_value_2')
-        exemptions.append(insurance_interest_3)
-
-
-    trust_interest = {}
-    if prop.owed_property.attr('trust_has_claim'):
-      trust_interest['is_claiming_exemption'] = prop.owed_property.attr('trust_has_claim')
-      trust_interest['claiming_sub_100'] = prop.owed_property.attr('trust_sub_100')
-      trust_interest['sub_100'] = prop.owed_property.attr('trust_sub_100')
-      trust_interest['exemption_laws'] = prop.owed_property.attr('trust_exemption_laws')
-      trust_interest['current_owned_value'] = prop.owed_property.attr('trust_amount')
-      trust_interest['exemption_amount'] = prop.owed_property.attr('trust_exemption_value')
-      exemptions.append(trust_interest)
-
-      if prop.owed_property.attr('trust_exemption_value_2'):
-        trust_interest['is_claiming_exemption'] = prop.owed_property.attr('trust_has_claim')
-        trust_interest['claiming_sub_100'] = prop.owed_property.attr('trust_sub_100')
-        trust_interest['sub_100'] = prop.owed_property.attr('trust_sub_100')
-        trust_interest['exemption_laws'] = prop.owed_property.attr('trust_exemption_laws_2')
-        trust_interest['current_owned_value'] = prop.owed_property.attr('trust_amount')
-        trust_interest['exemption_amount'] = prop.owed_property.attr('trust_exemption_value_2')
-        exemptions.append(trust_interest)
-
-    third_party_interest = {}
-    if prop.owed_property.attr('third_party_has_claim'):
-      third_party_interest['is_claiming_exemption'] = prop.owed_property.attr('third_party_has_claim')
-      third_party_interest['claiming_sub_100'] = prop.owed_property.attr('third_party_sub_100')
-      third_party_interest['sub_100'] = prop.owed_property.attr('third_party_sub_100')
-      third_party_interest['exemption_laws'] = prop.owed_property.attr('third_party_exemption_laws')
-      third_party_interest['current_owned_value'] = prop.owed_property.attr('third_party_amount')
-      third_party_interest['exemption_amount'] = prop.owed_property.attr('third_party_exemption_value')
-      exemptions.append(third_party_interest)
-
-      if prop.owed_property.attr('third_party_exemption_value_2'):
-        third_party_interest['is_claiming_exemption'] = prop.owed_property.attr('third_party_has_claim')
-        third_party_interest['claiming_sub_100'] = prop.owed_property.attr('third_party_sub_100')
-        third_party_interest['sub_100'] = prop.owed_property.attr('third_party_sub_100')
-        third_party_interest['exemption_laws'] = prop.owed_property.attr('third_party_exemption_laws_2')
-        third_party_interest['current_owned_value'] = prop.owed_property.attr('third_party_amount')
-        third_party_interest['exemption_amount'] = prop.owed_property.attr('third_party_exemption_value_2')
-        exemptions.append(third_party_interest)
-
-    contingent_interest = {}
-    if prop.owed_property.attr('contingent_claims_has_claim'):
-      contingent_interest['is_claiming_exemption'] = prop.owed_property.attr('contingent_claims_has_claim')
-      contingent_interest['claiming_sub_100'] = prop.owed_property.attr('contingent_claims_sub_100')
-      contingent_interest['sub_100'] = prop.owed_property.attr('contingent_claims_sub_100')
-      contingent_interest['exemption_laws'] = prop.owed_property.attr('contingent_claims_exemption_laws')
-      contingent_interest['current_owned_value'] = prop.owed_property.attr('contingent_claims_amount')
-      contingent_interest['exemption_amount'] = prop.owed_property.attr('contingent_claims_exemption_value')
-      exemptions.append(contingent_interest)
-
-      if prop.owed_property.attr('contingent_claims_exemption_value'):
-        contingent_interest['is_claiming_exemption'] = prop.owed_property.attr('contingent_claims_has_claim')
-        contingent_interest['claiming_sub_100'] = prop.owed_property.attr('contingent_claims_sub_100')
-        contingent_interest['sub_100'] = prop.owed_property.attr('contingent_claims_sub_100')
-        contingent_interest['exemption_laws'] = prop.owed_property.attr('contingent_claims_exemption_laws_2')
-        contingent_interest['current_owned_value'] = prop.owed_property.attr('contingent_claims_amount')
-        contingent_interest['exemption_amount'] = prop.owed_property.attr('contingent_claims_exemption_value_2')
-        exemptions.append(contingent_interest)
-
-    other_asset_interest = {}
-    if prop.owed_property.attr('other_assets_has_claim'):
-      other_asset_interest['is_claiming_exemption'] = prop.owed_property.attr('other_assets_has_claim')
-      other_asset_interest['claiming_sub_100'] = prop.owed_property.attr('other_assets_sub_100')
-      other_asset_interest['sub_100'] = prop.owed_property.attr('other_assets_sub_100')
-      other_asset_interest['exemption_laws'] = prop.owed_property.attr('other_assets_exemption_laws')
-      other_asset_interest['current_owned_value'] = prop.owed_property.attr('other_assets_amount')
-      other_asset_interest['exemption_amount'] = prop.owed_property.attr('other_assets_exemption_value')
-      exemptions.append(other_asset_interest)
-
-      if prop.owed_property.attr('other_assets_exemption_value_2'):
-        other_asset_interest['is_claiming_exemption'] = prop.owed_property.attr('other_assets_has_claim')
-        other_asset_interest['claiming_sub_100'] = prop.owed_property.attr('other_assets_sub_100')
-        other_asset_interest['sub_100'] = prop.owed_property.attr('other_assets_sub_100')
-        other_asset_interest['exemption_laws'] = prop.owed_property.attr('other_assets_exemption_laws_2')
-        other_asset_interest['current_owned_value'] = prop.owed_property.attr('other_assets_amount')
-        other_asset_interest['exemption_amount'] = prop.owed_property.attr('other_assets_exemption_value_2')
-        exemptions.append(other_asset_interest)
-
-    ar_interest = {}
-    if prop.business_property.attr('ar_has_claim'):
-      ar_interest['is_claiming_exemption'] = prop.business_property.attr('ar_has_claim')
-      ar_interest['claiming_sub_100'] = prop.business_property.attr('ar_sub_100')
-      ar_interest['sub_100'] = prop.business_property.attr('ar_sub_100')
-      ar_interest['exemption_laws'] = prop.business_property.attr('ar_exemption_laws')
-      ar_interest['current_owned_value'] = prop.business_property.attr('ar_amount')
-      ar_interest['exemption_amount'] = prop.business_property.attr('ar_exemption_value')
-      exemptions.append(ar_interest)
-
-      if prop.business_property.attr('ar_exemption_value_2'):
-        ar_interest['is_claiming_exemption'] = prop.business_property.attr('ar_has_claim')
-        ar_interest['claiming_sub_100'] = prop.business_property.attr('ar_sub_100')
-        ar_interest['sub_100'] = prop.business_property.attr('ar_sub_100')
-        ar_interest['exemption_laws'] = prop.business_property.attr('ar_exemption_laws_2')
-        ar_interest['current_owned_value'] = prop.business_property.attr('ar_amount')
-        ar_interest['exemption_amount'] = prop.business_property.attr('ar_exemption_value_2')
-        exemptions.append(ar_interest)
-
-    equipment_interest = {}
-    if prop.business_property.attr('equipment_has_claim'):
-      equipment_interest['is_claiming_exemption'] = prop.business_property.attr('equipment_has_claim')
-      equipment_interest['claiming_sub_100'] = prop.business_property.attr('equipment_sub_100')
-      equipment_interest['sub_100'] = prop.business_property.attr('equipment_sub_100')
-      equipment_interest['exemption_laws'] = prop.business_property.attr('equipment_exemption_laws')
-      equipment_interest['current_owned_value'] = prop.business_property.attr('equipment_amount')
-      equipment_interest['exemption_amount'] = prop.business_property.attr('equipment_exemption_value')
-      exemptions.append(equipment_interest)
-
-      if prop.business_property.attr('equipment_exemption_value_2'):
-        equipment_interest['is_claiming_exemption'] = prop.business_property.attr('equipment_has_claim')
-        equipment_interest['claiming_sub_100'] = prop.business_property.attr('equipment_sub_100')
-        equipment_interest['sub_100'] = prop.business_property.attr('equipment_sub_100')
-        equipment_interest['exemption_laws'] = prop.business_property.attr('equipment_exemption_laws_2')
-        equipment_interest['current_owned_value'] = prop.business_property.attr('equipment_amount')
-        equipment_interest['exemption_amount'] = prop.business_property.attr('equipment_exemption_value_2')
-        exemptions.append(equipment_interest)
-
-    machinery_interest = {}
-    if prop.business_property.attr('machinery_has_claim'):
-      machinery_interest['is_claiming_exemption'] = prop.business_property.attr('machinery_has_claim')
-      machinery_interest['claiming_sub_100'] = prop.business_property.attr('machinery_sub_100')
-      machinery_interest['sub_100'] = prop.business_property.attr('machinery_sub_100')
-      machinery_interest['exemption_laws'] = prop.business_property.attr('machinery_exemption_laws')
-      machinery_interest['current_owned_value'] = prop.business_property.attr('machinery_amount')
-      machinery_interest['exemption_amount'] = prop.business_property.attr('machinery_exemption_value')
-      exemptions.append(machinery_interest)
-
-      if prop.business_property.attr('machinery_exemption_value_2'):
-        machinery_interest['is_claiming_exemption'] = prop.business_property.attr('machinery_has_claim')
-        machinery_interest['claiming_sub_100'] = prop.business_property.attr('machinery_sub_100')
-        machinery_interest['sub_100'] = prop.business_property.attr('machinery_sub_100')
-        machinery_interest['exemption_laws'] = prop.business_property.attr('machinery_exemption_laws_2')
-        machinery_interest['current_owned_value'] = prop.business_property.attr('machinery_amount')
-        machinery_interest['exemption_amount'] = prop.business_property.attr('machinery_exemption_value_2')
-        exemptions.append(machinery_interest)
-
-    inventory_interest = {}
-    if prop.business_property.attr('inventory_has_claim'):
-      inventory_interest['is_claiming_exemption'] = prop.business_property.attr('inventory_has_claim')
-      inventory_interest['claiming_sub_100'] = prop.business_property.attr('inventory_sub_100')
-      inventory_interest['sub_100'] = prop.business_property.attr('inventory_sub_100')
-      inventory_interest['exemption_laws'] = prop.business_property.attr('inventory_exemption_laws')
-      inventory_interest['current_owned_value'] = prop.business_property.attr('inventory_amount')
-      inventory_interest['exemption_amount'] = prop.business_property.attr('inventory_exemption_value')
-      exemptions.append(inventory_interest)
-
-      if prop.business_property.attr('inventory_exemption_value_2'):
-        inventory_interest['is_claiming_exemption'] = prop.business_property.attr('inventory_has_claim')
-        inventory_interest['claiming_sub_100'] = prop.business_property.attr('inventory_sub_100')
-        inventory_interest['sub_100'] = prop.business_property.attr('inventory_sub_100')
-        inventory_interest['exemption_laws'] = prop.business_property.attr('inventory_exemption_laws_2')
-        inventory_interest['current_owned_value'] = prop.business_property.attr('inventory_amount')
-        inventory_interest['exemption_amount'] = prop.business_property.attr('inventory_exemption_value_2')
-        exemptions.append(inventory_interest)
-
-    partnership_interest = {}
-    if prop.business_property.attr('partnership_has_claim'):
-      partnership_interest['is_claiming_exemption'] = prop.business_property.attr('partnership_has_claim')
-      partnership_interest['claiming_sub_100'] = prop.business_property.attr('partnership_sub_100')
-      partnership_interest['sub_100'] = prop.business_property.attr('partnership_sub_100')
-      partnership_interest['exemption_laws'] = prop.business_property.attr('partnership_exemption_laws')
-
-      partnership_interest['current_owned_value'] = 0
-      if prop.business_property.attr('partnershipValue1'):
-        partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue1')
-      if prop.business_property.attr('partnershipValue2'):
-        partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue2')
-      if prop.business_property.attr('partnershipValue3'):
-        partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue3')
-      if prop.business_property.attr('partnershipValue4'):
-        partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue4')
-      if prop.business_property.attr('partnershipValue5'):
-        partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue5')
-
-      partnership_interest['exemption_amount'] = prop.business_property.attr('partnership_exemption_value')
-      exemptions.append(partnership_interest)
-
-      if prop.business_property.attr('partnership_exemption_value_2'):
-        partnership_interest['is_claiming_exemption'] = prop.business_property.attr('partnership_has_claim')
-        partnership_interest['claiming_sub_100'] = prop.business_property.attr('partnership_sub_100')
-        partnership_interest['sub_100'] = prop.business_property.attr('partnership_sub_100')
-        partnership_interest['exemption_laws'] = prop.business_property.attr('partnership_exemption_laws_2')
-
-        partnership_interest['current_owned_value'] = 0
-        if prop.business_property.attr('partnershipValue1'):
-          partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue1')
-        if prop.business_property.attr('partnershipValue2'):
-          partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue2')
-        if prop.business_property.attr('partnershipValue3'):
-          partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue3')
-        if prop.business_property.attr('partnershipValue4'):
-          partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue4')
-        if prop.business_property.attr('partnershipValue5'):
-          partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue5')
-
-        partnership_interest['exemption_amount'] = prop.business_property.attr('partnership_exemption_value_2')
-        exemptions.append(partnership_interest)
-
-    lists_interest = {}
-    if prop.business_property.attr('lists_has_claim'):
-      lists_interest['is_claiming_exemption'] = prop.business_property.attr('lists_has_claim')
-      lists_interest['claiming_sub_100'] = prop.business_property.attr('lists_sub_100')
-      lists_interest['sub_100'] = prop.business_property.attr('lists_sub_100')
-      lists_interest['exemption_laws'] = prop.business_property.attr('lists_exemption_laws')
-      lists_interest['current_owned_value'] = prop.business_property.attr('lists_amount')
-      lists_interest['exemption_amount'] = prop.business_property.attr('lists_exemption_value')
-      exemptions.append(lists_interest)
-
-      if prop.business_property.attr('lists_exemption_value_2'):
-        lists_interest['is_claiming_exemption'] = prop.business_property.attr('lists_has_claim')
-        lists_interest['claiming_sub_100'] = prop.business_property.attr('lists_sub_100')
-        lists_interest['sub_100'] = prop.business_property.attr('lists_sub_100')
-        lists_interest['exemption_laws'] = prop.business_property.attr('lists_exemption_laws_2')
-        lists_interest['current_owned_value'] = prop.business_property.attr('lists_amount')
-        lists_interest['exemption_amount'] = prop.business_property.attr('lists_exemption_value_2')
-        exemptions.append(lists_interest)
-
-    other_prop_interest = {}
-    if prop.business_property.attr('otherProperty_has_claim'):
-      other_prop_interest['is_claiming_exemption'] = prop.business_property.attr('otherProperty_has_claim')
-      other_prop_interest['claiming_sub_100'] = prop.business_property.attr('otherProperty_sub_100')
-      other_prop_interest['sub_100'] = prop.business_property.attr('otherProperty_sub_100')
-      other_prop_interest['exemption_laws'] = prop.business_property.attr('otherProperty_exemption_laws')
-
-      other_prop_interest['current_owned_value'] = 0
-      if prop.business_property.attr('otherPropertyAmount1'):
-        other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount1')
-      if prop.business_property.attr('otherPropertyAmount2'):
-        other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount2')
-      if prop.business_property.attr('otherPropertyAmount3'):
-        other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount3')
-      if prop.business_property.attr('otherPropertyAmount4'):
-        other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount4')
-      if prop.business_property.attr('otherPropertyAmount5'):
-        other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount5')
-      if prop.business_property.attr('otherPropertyAmount6'):
-        other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount6')
-
-      other_prop_interest['exemption_amount'] = prop.business_property.attr('exemption_value')
-      exemptions.append(other_prop_interest)
-
-      if prop.business_property.attr('exemption_value_2'):
-        other_prop_interest['is_claiming_exemption'] = prop.business_property.attr('otherProperty_has_claim')
-        other_prop_interest['claiming_sub_100'] = prop.business_property.attr('otherProperty_sub_100')
-        other_prop_interest['sub_100'] = prop.business_property.attr('otherProperty_sub_100')
-        other_prop_interest['exemption_laws'] = prop.business_property.attr('otherProperty_exemption_laws_2')
-
-        other_prop_interest['current_owned_value'] = 0
-        if prop.business_property.attr('otherPropertyAmount1'):
-          other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount1')
-        if prop.business_property.attr('otherPropertyAmount2'):
-          other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount2')
-        if prop.business_property.attr('otherPropertyAmount3'):
-          other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount3')
-        if prop.business_property.attr('otherPropertyAmount4'):
-          other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount4')
-        if prop.business_property.attr('otherPropertyAmount5'):
-          other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount5')
-        if prop.business_property.attr('otherPropertyAmount6'):
-          other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount6')
-
-        other_prop_interest['exemption_amount'] = prop.business_property.attr('exemption_value_2')
-        exemptions.append(other_prop_interest)
-
-    farm_animals_interest = {}
-    if prop.farming_property.attr('has_animal_claim'):
-      farm_animals_interest['is_claiming_exemption'] = prop.farming_property.attr('has_animal_claim')
-      farm_animals_interest['claiming_sub_100'] = prop.farming_property.attr('animal_sub_100')
-      farm_animals_interest['sub_100'] = prop.farming_property.attr('animal_sub_100')
-      farm_animals_interest['exemption_laws'] = prop.farming_property.attr('animal_exemption_laws')
-      farm_animals_interest['current_owned_value'] = prop.farming_property.attr('animal_amount')
-      farm_animals_interest['exemption_amount'] = prop.farming_property.attr('animal_exemption_value')
-      exemptions.append(farm_animals_interest)
-
-      if prop.farming_property.attr('animal_exemption_value_2'):
-        farm_animals_interest['is_claiming_exemption'] = prop.farming_property.attr('has_animal_claim')
-        farm_animals_interest['claiming_sub_100'] = prop.farming_property.attr('animal_sub_100')
-        farm_animals_interest['sub_100'] = prop.farming_property.attr('animal_sub_100')
-        farm_animals_interest['exemption_laws'] = prop.farming_property.attr('animal_exemption_laws_2')
-        farm_animals_interest['current_owned_value'] = prop.farming_property.attr('animal_amount')
-        farm_animals_interest['exemption_amount'] = prop.farming_property.attr('animal_exemption_value_2')
-        exemptions.append(farm_animals_interest)
-
-    crops_interest = {}
-    if prop.farming_property.attr('has_crops_claim'):
-      crops_interest['is_claiming_exemption'] = prop.farming_property.attr('has_crops_claim')
-      crops_interest['claiming_sub_100'] = prop.farming_property.attr('crops_sub_100')
-      crops_interest['sub_100'] = prop.farming_property.attr('crops_sub_100')
-      crops_interest['exemption_laws'] = prop.farming_property.attr('crops_exemption_laws')
-      crops_interest['current_owned_value'] = prop.farming_property.attr('crop_amount')
-      crops_interest['exemption_amount'] = prop.farming_property.attr('crops_exemption_value')
-      exemptions.append(crops_interest)
-
-      if prop.farming_property.attr('crops_exemption_value_2'):
-        crops_interest['is_claiming_exemption'] = prop.farming_property.attr('has_crops_claim')
-        crops_interest['claiming_sub_100'] = prop.farming_property.attr('crops_sub_100')
-        crops_interest['sub_100'] = prop.farming_property.attr('crops_sub_100')
-        crops_interest['exemption_laws'] = prop.farming_property.attr('crops_exemption_laws_2')
-        crops_interest['current_owned_value'] = prop.farming_property.attr('crop_amount')
-        crops_interest['exemption_amount'] = prop.farming_property.attr('crops_exemption_value_2')
-        exemptions.append(crops_interest)
-
-    farm_equip_interest = {}
-    if prop.farming_property.attr('has_equipment_claim'):
-      farm_equip_interest['is_claiming_exemption'] = prop.farming_property.attr('has_equipment_claim')
-      farm_equip_interest['claiming_sub_100'] = prop.farming_property.attr('equipment_sub_100')
-      farm_equip_interest['sub_100'] = prop.farming_property.attr('equipment_sub_100')
-      farm_equip_interest['exemption_laws'] = prop.farming_property.attr('equipment_exemption_laws')
-      farm_equip_interest['current_owned_value'] = prop.farming_property.attr('equipment_amount')
-      farm_equip_interest['exemption_amount'] = prop.farming_property.attr('equipment_exemption_value')
-      exemptions.append(farm_equip_interest)
-
-      if prop.farming_property.attr('equipment_exemption_value_2'):
-        farm_equip_interest['is_claiming_exemption'] = prop.farming_property.attr('has_equipment_claim')
-        farm_equip_interest['claiming_sub_100'] = prop.farming_property.attr('equipment_sub_100')
-        farm_equip_interest['sub_100'] = prop.farming_property.attr('equipment_sub_100')
-        farm_equip_interest['exemption_laws'] = prop.farming_property.attr('equipment_exemption_laws_2')
-        farm_equip_interest['current_owned_value'] = prop.farming_property.attr('equipment_amount')
-        farm_equip_interest['exemption_amount'] = prop.farming_property.attr('equipment_exemption_value_2')
-        exemptions.append(farm_equip_interest)
-
-    farm_supply_interest = {}
-    if prop.farming_property.attr('has_supplies_claim'):
-      farm_supply_interest['is_claiming_exemption'] = prop.farming_property.attr('has_supplies_claim')
-      farm_supply_interest['claiming_sub_100'] = prop.farming_property.attr('supplies_sub_100')
-      farm_supply_interest['sub_100'] = prop.farming_property.attr('supplies_sub_100')
-      farm_supply_interest['exemption_laws'] = prop.farming_property.attr('supplies_exemption_laws')
-      farm_supply_interest['current_owned_value'] = prop.farming_property.attr('supplies_amount')
-      farm_supply_interest['exemption_amount'] = prop.farming_property.attr('supplies_exemption_value')
-      exemptions.append(farm_supply_interest)
-
-      if prop.farming_property.attr('supplies_exemption_value_2'):
-        farm_supply_interest['is_claiming_exemption'] = prop.farming_property.attr('has_supplies_claim')
-        farm_supply_interest['claiming_sub_100'] = prop.farming_property.attr('supplies_sub_100')
-        farm_supply_interest['sub_100'] = prop.farming_property.attr('supplies_sub_100')
-        farm_supply_interest['exemption_laws'] = prop.farming_property.attr('supplies_exemption_laws_2')
-        farm_supply_interest['current_owned_value'] = prop.farming_property.attr('supplies_amount')
-        farm_supply_interest['exemption_amount'] = prop.farming_property.attr('supplies_exemption_value_2')
-        exemptions.append(farm_supply_interest)
-
-    fishing_interest = {}
-    if prop.farming_property.attr('has_fishing_claim'):
-      fishing_interest['is_claiming_exemption'] = prop.farming_property.attr('has_fishing_claim')
-      fishing_interest['claiming_sub_100'] = prop.farming_property.attr('fishing_sub_100')
-      fishing_interest['sub_100'] = prop.farming_property.attr('fishing_sub_100')
-      fishing_interest['exemption_laws'] = prop.farming_property.attr('fishing_exemption_laws')
-      fishing_interest['current_owned_value'] = prop.farming_property.attr('commercial_amount')
-      fishing_interest['exemption_amount'] = prop.farming_property.attr('fishing_exemption_value')
-      exemptions.append(fishing_interest)
-
-      if prop.farming_property.attr('fishing_exemption_value_2'):
-        fishing_interest['is_claiming_exemption'] = prop.farming_property.attr('has_fishing_claim')
-        fishing_interest['claiming_sub_100'] = prop.farming_property.attr('fishing_sub_100')
-        fishing_interest['sub_100'] = prop.farming_property.attr('fishing_sub_100')
-        fishing_interest['exemption_laws'] = prop.farming_property.attr('fishing_exemption_laws_2')
-        fishing_interest['current_owned_value'] = prop.farming_property.attr('commercial_amount')
-        fishing_interest['exemption_amount'] = prop.farming_property.attr('fishing_exemption_value_2')
-        exemptions.append(fishing_interest)
-
-    any_other_interest = {}
-    if prop.attr('other_prop_has_claim'):
-      any_other_interest['is_claiming_exemption'] = prop.attr('other_prop_has_claim')
-      any_other_interest['claiming_sub_100'] = prop.attr('other_prop_sub_100')
-      any_other_interest['sub_100'] = prop.attr('other_prop_sub_100')
-      any_other_interest['exemption_laws'] = prop.attr('other_prop_exemption_laws')
-
-      any_other_interest['current_owned_value'] = 0
-
-      if prop.attr('other_prop_value1'):
-        any_other_interest['current_owned_value'] += prop.attr('other_prop_value1')
-      if prop.attr('other_prop_value2'):
-        any_other_interest['current_owned_value'] += prop.attr('other_prop_value2')
-      if prop.attr('other_prop_value2'):
-        any_other_interest['current_owned_value'] += prop.attr('other_prop_value2')
-
-      any_other_interest['exemption_amount'] = prop.attr('other_prop_exemption_value')
-      exemptions.append(any_other_interest)
-
-      if prop.attr('other_prop_exemption_value_2'):
-        any_other_interest['is_claiming_exemption'] = prop.attr('other_prop_has_claim')
-        any_other_interest['claiming_sub_100'] = prop.attr('other_prop_sub_100')
-        any_other_interest['sub_100'] = prop.attr('other_prop_sub_100')
-        any_other_interest['exemption_laws'] = prop.attr('other_prop_exemption_laws_2')
-
-        any_other_interest['current_owned_value'] = 0
-
-        if prop.attr('other_prop_value1'):
-          any_other_interest['current_owned_value'] += prop.attr('other_prop_value1')
-        if prop.attr('other_prop_value2'):
-          any_other_interest['current_owned_value'] += prop.attr('other_prop_value2')
-        if prop.attr('other_prop_value2'):
-          any_other_interest['current_owned_value'] += prop.attr('other_prop_value2')
-
-        any_other_interest['exemption_amount'] = prop.attr('other_prop_exemption_value_2')
-        exemptions.append(any_other_interest)
-
-
-    for prop_item in exemptions:
-      if not prop_item['is_claiming_exemption']:
-        continue
-
-      exemption_amount = 0
-
-      if prop_item['claiming_sub_100'] or prop_item['sub_100']:
-        exemption_amount = prop_item['exemption_amount']
-      else:
-        exemption_amount = prop_item['current_owned_value']
-
-
-      if prop_item['exemption_laws'] == homestead_law:
-        homestead_amount += exemption_amount
-      elif prop_item['exemption_laws'] == homestead_proceeds_law:
-        homestead_proceeds_amount += exemption_amount
-      elif prop_item['exemption_laws'] == motor_vehicle_law:
-        motor_vehicle_amount += exemption_amount
-      elif prop_item['exemption_laws'] == household_goods_law:
-        household_goods_amount += exemption_amount
-      elif prop_item['exemption_laws'] == wildcard_law:
-        wildcard_exemption_amount += exemption_amount
-      elif prop_item['exemption_laws'] == clothing_law:
-        clothing_amount += exemption_amount
-      elif prop_item['exemption_laws'] == posessions_law:
-        possessions_amount += exemption_amount
-      elif prop_item['exemption_laws'] == health_aids_law:
-        health_aids_amount += exemption_amount
-      elif prop_item['exemption_laws'] == health_savings_law:
-        health_savings_amount += exemption_amount
-      elif prop_item['exemption_laws'] == tools_law:
-        tools_amount += exemption_amount
-      elif prop_item['exemption_laws'] == retirement_law:
-        retirement_amount += exemption_amount
-      elif prop_item['exemption_laws'] == wages_law:
-        wages_amount += exemption_amount
-      elif prop_item['exemption_laws'] == public_benefits_law:
-        public_benefits_amount += exemption_amount
-      elif prop_item['exemption_laws'] == earned_income_law:
-        earned_income_amount += exemption_amount
-      elif prop_item['exemption_laws'] == life_insurance_law:
-        life_insurance_amount += exemption_amount
-      elif prop_item['exemption_laws'] == secured_settlement_law:
-        secured_settlement_amount += exemption_amount
-      elif prop_item['exemption_laws'] == workers_comp_law:
-        workers_comp_amount += exemption_amount
-      elif prop_item['exemption_laws'] == unemployment_law:
-        unemployment_amount += exemption_amount
-      elif prop_item['exemption_laws'] == college_savings_law:
-        college_savings_amount += exemption_amount
-      elif prop_item['exemption_laws'] == student_loan_law:
-        student_loan_amount += exemption_amount
-      elif prop_item['exemption_laws'] == social_security_law:
-        social_security_amount += exemption_amount
-      elif prop_item['exemption_laws'] == va_law:
-        va_amount += exemption_amount
-      elif prop_item['exemption_laws'] == unknown_law:
-        unknown_amount += exemption_amount
-      else:
-        log(prop_item['exemption_laws'], 'info')
-
-    ret = [
-      {
-        "name": "Homestead",
-        "full_name": "Homestead (Neb. Rev. Stat. §§ 40-101 - 40-118)",
-        "limit": homestead_limit,
-        "law": homestead_law,
-        "amount": homestead_amount,
-      },
-      {
-        "name": "Homestead Proceeds",
-        "full_name": "Homestead, proceeds of sale (Neb. Rev. Stat. § 40-116)",
-        "limit": homestead_proceeds_limit,
-        "law": homestead_proceeds_law,
-        "amount": homestead_proceeds_amount,
-      },
-      {
-        "name": "Motor Vehicle",
-        "full_name": "Motor vehicle (Neb. Rev. Stat. § 25-1556(1)(e))",
-        "limit": motor_vehicle_limit,
-        "law": motor_vehicle_law,
-        "amount": motor_vehicle_amount,
-      },
-      {
-        "name": "Household Goods",
-        "full_name": "Household goods (Neb. Rev. Stat. § 25-1556(1)(c))",
-        "limit": household_goods_limit,
-        "law": household_goods_law,
-        "amount": household_goods_amount,
-      },
-      {
-        "name": "Wildcard",
-        "full_name": "Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))",
-        "limit": wildcard_limit,
-        "law": wildcard_law,
-        "amount": wildcard_exemption_amount,
-      },
-      {
-        "name": "Clothing",
-        "full_name": "Clothing (Neb. Rev. Stat. § 25-1556(1)(b))",
-        "limit": clothing_limit,
-        "law": clothing_law,
-        "amount": clothing_amount,
-      },
-      {
-        "name": "Possessions",
-        "full_name": "Possessions",
-        "limit": posessions_limit,
-        "law": posessions_law,
-        "amount": possessions_amount,
-      },
-      {
-        "name": "Health Aids",
-        "full_name": "Health Aids (Neb. Rev. Stat. § 25-1556(1)(f))",
-        "limit": health_aids_limit,
-        "law": health_aids_law,
-        "amount": health_aids_amount,
-      },
-      {
-        "name": "Health Savings",
-        "full_name": "Health Savings (Neb. Rev. Stat. § 8-1,131(2)(b))",
-        "limit": health_savings_limit,
-        "law": health_savings_law,
-        "amount": health_savings_amount,
-      },
-      {
-        "name": "Tools of the Trade",
-        "full_name": "Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))",
-        "limit": tools_limit,
-        "law": tools_law,
-        "amount": tools_amount,
-      },
-      {
-        "name": "Retirement Accounts",
-        "full_name": "Retirement accounts (Neb. Rev. Stat. § 25-1563.01)",
-        "limit": retirement_limit,
-        "law": retirement_law,
-        "amount": retirement_amount,
-      },
-      {
-        "name": "Wages",
-        "full_name": "Wages (Neb. Rev. Stat. § 25-1558)",
-        "limit": wages_limit,
-        "law": wages_law,
-        "amount": wages_amount,
-      },
-      {
-        "name": "Public Benefits",
-        "full_name": "Public Benefits (Neb. Rev. Stat. § 68-148)",
-        "limit": public_benefits_limit,
-        "law": public_benefits_law,
-        "amount": public_benefits_amount,
-      },
-      {
-        "name": "Earned Income",
-        "full_name": "Earned Income Tax Credit (Neb Rev Stat 25-1553)",
-        "limit": earned_income_limit,
-        "law": earned_income_law,
-        "amount": earned_income_amount,
-      },
-      {
-        "name": "Life Insurance",
-        "full_name": "Life insurance proceeds (Neb. Rev. Stat. § 44-371)",
-        "limit": life_insurance_limit,
-        "law": life_insurance_law,
-        "amount": life_insurance_amount,
-      },
-      {
-        "name": "Secured Settlement",
-        "full_name": "Secured Settlement",
-        "limit": secured_settlement_limit,
-        "law": secured_settlement_law,
-        "amount": secured_settlement_amount,
-      },
-      {
-        "name": "Workers Compensation",
-        "full_name": "Workers Compensation (Neb. Rev. Stat. § 48-149)",
-        "limit": workers_comp_limit,
-        "law": workers_comp_law,
-        "amount": workers_comp_amount,
-      },
-      {
-        "name": "Unemployment",
-        "full_name": "Unemployment (Neb. Rev. Stat. § 48-647)",
-        "limit": unemployment_limit,
-        "law": unemployment_law,
-        "amount": unemployment_amount,
-      },
-      {
-        "name": "College Savings",
-        "full_name": "College Savings Plan (Neb. Rev. Stat. § 85-1809)",
-        "limit": college_savings_limit,
-        "law": college_savings_law,
-        "amount": college_savings_amount,
-      },
-      {
-        "name": "Student Loan",
-        "full_name": "Student Loan (20 U.S.C. § 1095a(d))",
-        "limit": student_loan_limit,
-        "law": student_loan_law,
-        "amount": student_loan_amount,
-      },
-      {
-        "name": "Social Security",
-        "full_name": "Social Security (42 U.S.C. § 407)",
-        "limit": social_security_limit,
-        "law": social_security_law,
-        "amount": social_security_amount,
-      },
-      {
-        "name": "VA Benefit",
-        "full_name": "VA Benefits (38 U.S.C. § 5301(a))",
-        "limit": va_limit,
-        "law": va_law,
-        "amount": va_amount
-      },
-      {
-        "name": "Unknown",
-        "full_name": "Unknown",
-        "limit": unknown_limit,
-        "law": unknown_law,
-        "amount": unknown_amount
-      },
-    ]
-
-    prop.exemptions = {}
-
-    for item in ret:
-      prop.exemptions[item['full_name']] = item
-
-    return ret
+#
+  #exemptions = []
+  #def tbl_data():
+  #  # Laws
+  #  homestead_law = 'Homestead (Neb. Rev. Stat. §§ 40-101 - 40-118)'
+  #  homestead_proceeds_law = 'Homestead, proceeds of sale (Neb. Rev. Stat. § 40-116)'
+  #  motor_vehicle_law = 'Motor vehicle (Neb. Rev. Stat. § 25-1556(1)(e))'
+  #  household_goods_law = 'Household goods (Neb. Rev. Stat. § 25-1556(1)(c))'
+  #  wildcard_law = 'Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))'
+  #  clothing_law = 'Clothing (Neb. Rev. Stat. § 25-1556(1)(b))'
+  #  posessions_law = 'Immediate personal possessions (Neb. Rev. Stat. § 25-1556(1)(a))'
+  #  health_aids_law = 'Health Aids (Neb. Rev. Stat. § 25-1556(1)(f))'
+  #  health_savings_law = 'Health Savings (Neb. Rev. Stat. § 8-1,131(2)(b))'
+  #  tools_law = 'Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))'
+  #  retirement_law = 'Retirement accounts (Neb. Rev. Stat. § 25-1563.01)'
+  #  wages_law = 'Wages (Neb. Rev. Stat. § 25-1558)'
+  #  public_benefits_law = 'Public Benefits (Neb. Rev. Stat. § 68-148)'
+  #  earned_income_law = 'Earned Income Tax Credit (Neb Rev Stat 25-1553)'
+  #  life_insurance_law = 'Life insurance proceeds (Neb. Rev. Stat. § 44-371)'
+  #  secured_settlement_law = 'Structured settlement (Neb. Rev. Stat. § 25-1563.02)'
+  #  workers_comp_law = 'Workers Compensation (Neb. Rev. Stat. § 48-149)'
+  #  unemployment_law = 'Unemployment (Neb. Rev. Stat. § 48-647)'
+  #  college_savings_law = 'College Savings Plan (Neb. Rev. Stat. § 85-1809)'
+  #  student_loan_law = 'Student Loan (20 U.S.C. § 1095a(d))'
+  #  social_security_law = 'Social Security (42 U.S.C. § 407)'
+  #  va_law = 'VA Benefits (38 U.S.C. § 5301(a))'
+  #  unknown_law = 'Unknown law'
+#
+  #  # Limits
+  #  # Limits of value 0 are unlimited
+  #  homestead_limit = 120000
+  #  homestead_proceeds_limit = 60000
+  #  motor_vehicle_limit = 5000
+  #  household_goods_limit = 3000
+  #  wildcard_limit = 5000
+  #  clothing_limit = '∞'
+  #  posessions_limit = '∞'
+  #  health_aids_limit = '∞'
+  #  health_savings_limit = 25000
+  #  tools_limit = 5000
+  #  retirement_limit = '∞'
+  #  wages_limit = '∞'
+  #  public_benefits_limit = '∞'
+  #  earned_income_limit = '∞'
+  #  life_insurance_limit = 100000
+  #  secured_settlement_limit = '∞'
+  #  workers_comp_limit = '∞'
+  #  unemployment_limit = '∞'
+  #  college_savings_limit = '∞'
+  #  student_loan_limit = '∞'
+  #  social_security_limit = '∞'
+  #  va_limit = '∞'
+  #  unknown_limit = '∞'
+#
+  #  #Exemption totals
+  #  homestead_amount = 0
+  #  homestead_proceeds_amount = 0
+  #  motor_vehicle_amount = 0
+  #  household_goods_amount = 0
+  #  wildcard_exemption_amount = 0
+  #  clothing_amount = 0
+  #  possessions_amount = 0
+  #  health_aids_amount = 0
+  #  health_savings_amount = 0
+  #  tools_amount = 0
+  #  retirement_amount = 0
+  #  wages_amount = 0
+  #  public_benefits_amount = 0
+  #  earned_income_amount = 0
+  #  life_insurance_amount = 0
+  #  secured_settlement_amount = 0
+  #  workers_comp_amount = 0
+  #  unemployment_amount = 0
+  #  college_savings_amount = 0
+  #  student_loan_amount = 0
+  #  social_security_amount = 0
+  #  va_amount = 0
+  #  unknown_amount = 0
+#
+#
+  #  for interest in prop.interests.elements:
+  #    temp = {}
+  #    temp['exemption_amount'] = interest.attr('exemption_value')
+  #    temp['exemption_laws'] = interest.attr('exemption_laws')
+  #    temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['sub_100'] = interest.attr('claiming_sub_100')
+  #    if interest.attr('has_loan'):
+  #      temp['current_owned_value'] = interest.attr('current_value') - interest.attr('current_owed_amount')
+  #    else:
+  #      temp['current_owned_value'] = interest.attr('current_value')
+  #    temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
+#
+  #    exemptions.append(temp)
+#
+  #    if interest.attr('exemption_value_2'):
+  #      temp = {}
+  #      temp['exemption_amount'] = interest.attr('exemption_value_2')
+  #      temp['exemption_laws'] = interest.attr('exemption_laws_2')
+  #      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['sub_100'] = interest.attr('claiming_sub_100')
+  #      if interest.attr('has_loan'):
+  #        temp['current_owned_value'] = interest.attr('current_value') - interest.attr('current_owed_amount')
+  #      else:
+  #        temp['current_owned_value'] = interest.attr('current_value')
+  #      temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
+#
+  #      exemptions.append(temp)
+#
+#
+  #  for interest in prop.ab_vehicles.elements:
+  #    temp = {}
+  #    temp['exemption_amount'] = interest.attr('exemption_value')
+  #    temp['exemption_laws'] = interest.attr('exemption_laws')
+  #    temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['sub_100'] = interest.attr('claiming_sub_100')
+  #    if interest.attr('has_loan'):
+  #      temp['current_owned_value'] = interest.attr('current_value') - interest.attr('current_owed_amount')
+  #    else:
+  #      temp['current_owned_value'] = interest.attr('current_value')
+  #    temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
+  #    exemptions.append(temp)
+#
+  #    if interest.attr('exemption_value_2'):
+  #      temp = {}
+  #      temp['exemption_amount'] = interest.attr('exemption_value_2')
+  #      temp['exemption_laws'] = interest.attr('exemption_laws_2')
+  #      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['sub_100'] = interest.attr('claiming_sub_100')
+  #      if interest.attr('has_loan'):
+  #        temp['current_owned_value'] = interest.attr('current_value') - interest.attr('current_owed_amount')
+  #      else:
+  #        temp['current_owned_value'] = interest.attr('current_value')
+  #      temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
+  #      exemptions.append(temp)
+#
+#
+  #  for interest in prop.ab_other_vehicles.elements:
+  #    temp = {}
+  #    temp['exemption_amount'] = interest.attr('exemption_value')
+  #    temp['exemption_laws'] = interest.attr('exemption_laws')
+  #    temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['sub_100'] = interest.attr('claiming_sub_100')
+  #    if interest.attr('has_loan'):
+  #      temp['current_owned_value'] = interest.attr('current_value') - interest.attr('current_owed_amount')
+  #    else:
+  #      temp['current_owned_value'] = interest.attr('current_value')
+  #    temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
+  #    exemptions.append(temp)
+#
+  #    if interest.attr('exemption_value_2'):
+  #      temp = {}
+  #      temp['exemption_amount'] = interest.attr('exemption_value')
+  #      temp['exemption_laws'] = interest.attr('exemption_laws')
+  #      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['sub_100'] = interest.attr('claiming_sub_100')
+  #      if interest.attr('has_loan'):
+  #        temp['current_owned_value'] = interest.attr('current_value') - interest.attr('current_owed_amount')
+  #      else:
+  #        temp['current_owned_value'] = interest.attr('current_value')
+  #      temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
+  #      exemptions.append(temp)
+#
+#
+  #  household_goods_interest = {}
+  #  if prop.attr('household_goods_is_claiming_exemption'):
+  #    household_goods_interest['is_claiming_exemption'] = prop.attr('household_goods_is_claiming_exemption')
+  #    household_goods_interest['claiming_sub_100'] = prop.attr('household_goods_claiming_sub_100')
+  #    household_goods_interest['sub_100'] = prop.attr('household_goods_claiming_sub_100')
+  #    household_goods_interest['exemption_laws'] = prop.attr('household_goods_exemption_laws')
+  #    household_goods_interest['current_owned_value'] = prop.attr('household_goods_value')
+  #    household_goods_interest['exemption_amount'] = prop.attr('household_goods_exemption_value')
+  #    exemptions.append(household_goods_interest)
+#
+  #    if prop.attr('household_goods_value_2'):
+  #      household_goods_interest['is_claiming_exemption'] = prop.attr('household_goods_is_claiming_exemption')
+  #      household_goods_interest['claiming_sub_100'] = prop.attr('household_goods_claiming_sub_100')
+  #      household_goods_interest['sub_100'] = prop.attr('household_goods_claiming_sub_100')
+  #      household_goods_interest['exemption_laws'] = prop.attr('household_goods_exemption_laws_2')
+  #      household_goods_interest['current_owned_value'] = prop.attr('household_goods_value')
+  #      household_goods_interest['exemption_amount'] = prop.attr('household_goods_exemption_value_2')
+  #      exemptions.append(household_goods_interest)
+#
+  #  secured_household_goods_interest = {}
+  #  if prop.attr('secured_household_goods_is_claiming_exemption'):
+  #    secured_household_goods_interest['is_claiming_exemption'] = prop.attr('secured_household_goods_is_claiming_exemption')
+  #    secured_household_goods_interest['claiming_sub_100'] = prop.attr('secured_household_goods_claiming_sub_100')
+  #    secured_household_goods_interest['sub_100'] = prop.attr('secured_household_goods_claiming_sub_100')
+  #    secured_household_goods_interest['exemption_laws'] = prop.attr('secured_household_goods_exemption_laws')
+  #    secured_household_goods_interest['current_owned_value'] = prop.attr('secured_household_goods_value')
+  #    secured_household_goods_interest['exemption_amount'] = prop.attr('secured_household_goods_exemption_value')
+  #    exemptions.append(secured_household_goods_interest)
+#
+  #    if prop.attr('secured_household_goods_exemption_value_2'):
+  #      secured_household_goods_interest['is_claiming_exemption'] = prop.attr('secured_household_goods_is_claiming_exemption')
+  #      secured_household_goods_interest['claiming_sub_100'] = prop.attr('secured_household_goods_claiming_sub_100')
+  #      secured_household_goods_interest['sub_100'] = prop.attr('secured_household_goods_claiming_sub_100')
+  #      secured_household_goods_interest['exemption_laws'] = prop.attr('secured_household_goods_exemption_laws_2')
+  #      secured_household_goods_interest['current_owned_value'] = prop.attr('secured_household_goods_value')
+  #      secured_household_goods_interest['exemption_amount'] = prop.attr('secured_household_goods_exemption_value_2')
+  #      exemptions.append(secured_household_goods_interest)
+#
+  #  electronics_interest = {}
+  #  if prop.attr('electronics_is_claiming_exemption'):
+  #    electronics_interest['is_claiming_exemption'] = prop.attr('electronics_is_claiming_exemption')
+  #    electronics_interest['claiming_sub_100'] = prop.attr('electronics_claiming_sub_100')
+  #    electronics_interest['sub_100'] = prop.attr('electronics_claiming_sub_100')
+  #    electronics_interest['exemption_laws'] = prop.attr('electronics_exemption_laws')
+  #    electronics_interest['current_owned_value'] = prop.attr('electronics_value')
+  #    electronics_interest['exemption_amount'] = prop.attr('electronics_exemption_value')
+  #    exemptions.append(electronics_interest)
+#
+  #    if prop.attr('electronics_exemption_value_2'):
+  #      electronics_interest['is_claiming_exemption'] = prop.attr('electronics_is_claiming_exemption')
+  #      electronics_interest['claiming_sub_100'] = prop.attr('electronics_claiming_sub_100')
+  #      electronics_interest['sub_100'] = prop.attr('electronics_claiming_sub_100')
+  #      electronics_interest['exemption_laws'] = prop.attr('electronics_exemption_laws_2')
+  #      electronics_interest['current_owned_value'] = prop.attr('electronics_value')
+  #      electronics_interest['exemption_amount'] = prop.attr('electronics_exemption_value_2')
+  #      exemptions.append(electronics_interest)
+#
+  #  collectibles_interest = {}
+  #  if prop.attr('collectibles_is_claiming_exemption'):
+  #    collectibles_interest['is_claiming_exemption'] = prop.attr('collectibles_is_claiming_exemption')
+  #    collectibles_interest['claiming_sub_100'] = prop.attr('collectibles_claiming_sub_100')
+  #    collectibles_interest['sub_100'] = prop.attr('collectibles_claiming_sub_100')
+  #    collectibles_interest['exemption_laws'] = prop.attr('collectibles_exemption_laws')
+  #    collectibles_interest['current_owned_value'] = prop.attr('collectibles_value')
+  #    collectibles_interest['exemption_amount'] = prop.attr('collectibles_exemption_value')
+  #    exemptions.append(collectibles_interest)
+#
+  #    if prop.attr('collectibles_exemption_value_2'):
+  #      collectibles_interest['is_claiming_exemption'] = prop.attr('collectibles_is_claiming_exemption')
+  #      collectibles_interest['claiming_sub_100'] = prop.attr('collectibles_claiming_sub_100')
+  #      collectibles_interest['sub_100'] = prop.attr('collectibles_claiming_sub_100')
+  #      collectibles_interest['exemption_laws'] = prop.attr('collectibles_exemption_laws_2')
+  #      collectibles_interest['current_owned_value'] = prop.attr('collectibles_value')
+  #      collectibles_interest['exemption_amount'] = prop.attr('collectibles_exemption_value_2')
+  #      exemptions.append(collectibles_interest)
+#
+  #  hobby_interest = {}
+  #  if prop.attr('hobby_equipment_is_claiming_exemption'):
+  #    hobby_interest['is_claiming_exemption'] = prop.attr('hobby_equipment_is_claiming_exemption')
+  #    hobby_interest['claiming_sub_100'] = prop.attr('hobby_equipment_claiming_sub_100')
+  #    hobby_interest['sub_100'] = prop.attr('hobby_equipment_claiming_sub_100')
+  #    hobby_interest['exemption_laws'] = prop.attr('hobby_equipment_exemption_laws')
+  #    hobby_interest['current_owned_value'] = prop.attr('hobby_equipment_value')
+  #    hobby_interest['exemption_amount'] = prop.attr('hobby_equipment_exemption_value')
+  #    exemptions.append(hobby_interest)
+#
+  #    if prop.attr('hobby_equipment_exemption_value_2'):
+  #      hobby_interest['is_claiming_exemption'] = prop.attr('hobby_equipment_is_claiming_exemption')
+  #      hobby_interest['claiming_sub_100'] = prop.attr('hobby_equipment_claiming_sub_100')
+  #      hobby_interest['sub_100'] = prop.attr('hobby_equipment_claiming_sub_100')
+  #      hobby_interest['exemption_laws'] = prop.attr('hobby_equipment_exemption_laws_2')
+  #      hobby_interest['current_owned_value'] = prop.attr('hobby_equipment_value')
+  #      hobby_interest['exemption_amount'] = prop.attr('hobby_equipment_exemption_value_2')
+  #      exemptions.append(hobby_interest)
+#
+#
+  #  firearms_interest = {}
+  #  if prop.attr('firearms_is_claiming_exemption'):
+  #    firearms_interest['is_claiming_exemption'] = prop.attr('firearms_is_claiming_exemption')
+  #    firearms_interest['claiming_sub_100'] = prop.attr('firearms_claiming_sub_100')
+  #    firearms_interest['sub_100'] = prop.attr('firearms_claiming_sub_100')
+  #    firearms_interest['exemption_laws'] = prop.attr('firearms_exemption_laws')
+  #    firearms_interest['current_owned_value'] = prop.attr('firearms_value')
+  #    firearms_interest['exemption_amount'] = prop.attr('firearms_exemption_value')
+  #    exemptions.append(firearms_interest)
+#
+  #    if prop.attr('firearms_exemption_value_2'):
+  #      firearms_interest['is_claiming_exemption'] = prop.attr('firearms_is_claiming_exemption')
+  #      firearms_interest['claiming_sub_100'] = prop.attr('firearms_claiming_sub_100')
+  #      firearms_interest['sub_100'] = prop.attr('firearms_claiming_sub_100')
+  #      firearms_interest['exemption_laws'] = prop.attr('firearms_exemption_laws_2')
+  #      firearms_interest['current_owned_value'] = prop.attr('firearms_value')
+  #      firearms_interest['exemption_amount'] = prop.attr('firearms_exemption_value_2')
+  #      exemptions.append(firearms_interest)
+#
+  #  clothes_interest = {}
+  #  if prop.attr('clothes_is_claiming_exemption'):
+  #    clothes_interest['is_claiming_exemption'] = prop.attr('clothes_is_claiming_exemption')
+  #    clothes_interest['claiming_sub_100'] = prop.attr('clothes_claiming_sub_100')
+  #    clothes_interest['sub_100'] = prop.attr('clothes_claiming_sub_100')
+  #    clothes_interest['exemption_laws'] = prop.attr('clothes_exemption_laws')
+  #    clothes_interest['current_owned_value'] = prop.attr('clothes_value')
+  #    clothes_interest['exemption_amount'] = prop.attr('clothes_exemption_value')
+  #    exemptions.append(clothes_interest)
+#
+  #    if prop.attr('clothes_exemption_value'):
+  #      clothes_interest['is_claiming_exemption'] = prop.attr('clothes_is_claiming_exemption')
+  #      clothes_interest['claiming_sub_100'] = prop.attr('clothes_claiming_sub_100')
+  #      clothes_interest['sub_100'] = prop.attr('clothes_claiming_sub_100')
+  #      clothes_interest['exemption_laws'] = prop.attr('clothes_exemption_laws_2')
+  #      clothes_interest['current_owned_value'] = prop.attr('clothes_value')
+  #      clothes_interest['exemption_amount'] = prop.attr('clothes_exemption_value_2')
+  #      exemptions.append(clothes_interest)
+#
+  #  jewlery_interest = {}
+  #  if prop.attr('jewlery_is_claiming_exemption'):
+  #    jewlery_interest['is_claiming_exemption'] = prop.attr('jewlery_is_claiming_exemption')
+  #    jewlery_interest['claiming_sub_100'] = prop.attr('jewlery_claiming_sub_100')
+  #    jewlery_interest['sub_100'] = prop.attr('jewlery_claiming_sub_100')
+  #    jewlery_interest['exemption_laws'] = prop.attr('jewlery_exemption_laws')
+  #    jewlery_interest['current_owned_value'] = prop.attr('jewlery_value')
+  #    jewlery_interest['exemption_amount'] = prop.attr('jewlery_exemption_value')
+  #    exemptions.append(jewlery_interest)
+#
+  #    if prop.attr('jewlery_exemption_value_2'):
+  #      jewlery_interest['is_claiming_exemption'] = prop.attr('jewlery_is_claiming_exemption')
+  #      jewlery_interest['claiming_sub_100'] = prop.attr('jewlery_claiming_sub_100')
+  #      jewlery_interest['sub_100'] = prop.attr('jewlery_claiming_sub_100')
+  #      jewlery_interest['exemption_laws'] = prop.attr('jewlery_exemption_laws_2')
+  #      jewlery_interest['current_owned_value'] = prop.attr('jewlery_value')
+  #      jewlery_interest['exemption_amount'] = prop.attr('jewlery_exemption_value_2')
+  #      exemptions.append(jewlery_interest)
+#
+  #  animal_interest = {}
+  #  if prop.attr('animal_is_claiming_exemption'):
+  #    animal_interest['is_claiming_exemption'] = prop.attr('animal_is_claiming_exemption')
+  #    animal_interest['claiming_sub_100'] = prop.attr('animal_claiming_sub_100')
+  #    animal_interest['sub_100'] = prop.attr('animal_claiming_sub_100')
+  #    animal_interest['exemption_laws'] = prop.attr('animal_exemption_laws')
+  #    animal_interest['current_owned_value'] = prop.attr('animal_value')
+  #    animal_interest['exemption_amount'] = prop.attr('animal_exemption_value')
+  #    exemptions.append(animal_interest)
+#
+  #    if prop.attr('animal_exemption_value'):
+  #      animal_interest['is_claiming_exemption'] = prop.attr('animal_is_claiming_exemption')
+  #      animal_interest['claiming_sub_100'] = prop.attr('animal_claiming_sub_100')
+  #      animal_interest['sub_100'] = prop.attr('animal_claiming_sub_100')
+  #      animal_interest['exemption_laws'] = prop.attr('animal_exemption_laws_2')
+  #      animal_interest['current_owned_value'] = prop.attr('animal_value')
+  #      animal_interest['exemption_amount'] = prop.attr('animal_exemption_value_2')
+  #      exemptions.append(animal_interest)
+#
+  #  other_household_interest = {}
+  #  if prop.attr('other_household_items_is_claiming_exemption'):
+  #    other_household_interest['is_claiming_exemption'] = prop.attr('other_household_items_is_claiming_exemption')
+  #    other_household_interest['claiming_sub_100'] = prop.attr('other_household_items_claiming_sub_100')
+  #    other_household_interest['sub_100'] = prop.attr('other_household_items_claiming_sub_100')
+  #    other_household_interest['exemption_laws'] = prop.attr('other_household_items_exemption_laws')
+  #    other_household_interest['current_owned_value'] = prop.attr('other_household_items_value')
+  #    other_household_interest['exemption_amount'] = prop.attr('other_household_items_exemption_value')
+  #    exemptions.append(other_household_interest)
+#
+  #    if prop.attr('other_household_items_value_2'):
+  #      other_household_interest['is_claiming_exemption'] = prop.attr('other_household_items_is_claiming_exemption')
+  #      other_household_interest['claiming_sub_100'] = prop.attr('other_household_items_claiming_sub_100')
+  #      other_household_interest['sub_100'] = prop.attr('other_household_items_claiming_sub_100')
+  #      other_household_interest['exemption_laws'] = prop.attr('other_household_items_exemption_laws_2')
+  #      other_household_interest['current_owned_value'] = prop.attr('other_household_items_value')
+  #      other_household_interest['exemption_amount'] = prop.attr('other_household_items_exemption_value_2')
+  #      exemptions.append(other_household_interest)
+#
+  #  cash_interest = {}
+  #  if prop.financial_assets.attr('cash_is_claiming_exemption'):
+  #    cash_interest['is_claiming_exemption'] = prop.financial_assets.attr('cash_is_claiming_exemption')
+  #    cash_interest['claiming_sub_100'] = prop.financial_assets.attr('cash_sub_100')
+  #    cash_interest['sub_100'] = prop.financial_assets.attr('cash_sub_100')
+  #    cash_interest['exemption_laws'] = prop.financial_assets.attr('cash_exemption_laws')
+  #    cash_interest['current_owned_value'] = prop.financial_assets.attr('cash_value')
+  #    cash_interest['exemption_amount'] = prop.financial_assets.attr('cash_exemption_value')
+  #    exemptions.append(cash_interest)
+#
+  #    if prop.financial_assets.attr('cash_exemption_value_2'):
+  #      cash_interest['is_claiming_exemption'] = prop.financial_assets.attr('cash_is_claiming_exemption')
+  #      cash_interest['claiming_sub_100'] = prop.financial_assets.attr('cash_sub_100')
+  #      cash_interest['sub_100'] = prop.financial_assets.attr('cash_sub_100')
+  #      cash_interest['exemption_laws'] = prop.financial_assets.attr('cash_exemption_laws_2')
+  #      cash_interest['current_owned_value'] = prop.financial_assets.attr('cash_value')
+  #      cash_interest['exemption_amount'] = prop.financial_assets.attr('cash_exemption_value_2')
+  #      exemptions.append(cash_interest)
+#
+#
+  #  for interest in prop.financial_assets.deposits.elements:
+  #    temp = {}
+  #    temp['exemption_amount'] = interest.attr('exemption_value')
+  #    temp['exemption_laws'] = interest.attr('exemption_laws')
+  #    temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['current_owned_value'] = interest.attr('amount')
+  #    temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
+  #    exemptions.append(temp)
+#
+  #    if interest.attr('exemption_value_2'):
+  #      temp = {}
+  #      temp['exemption_amount'] = interest.attr('exemption_value_2')
+  #      temp['exemption_laws'] = interest.attr('exemption_laws_2')
+  #      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['current_owned_value'] = interest.attr('amount')
+  #      temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
+  #      exemptions.append(temp)
+#
+  #  for interest in prop.financial_assets.bonds_and_stocks.elements:
+  #    temp = {}
+  #    temp['exemption_amount'] = interest.attr('exemption_value')
+  #    temp['exemption_laws'] = interest.attr('exemption_laws')
+  #    temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['current_owned_value'] = interest.attr('amount')
+  #    temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
+  #    exemptions.append(temp)
+#
+  #    if interest.attr('exemption_value_2'):
+  #      temp = {}
+  #      temp['exemption_amount'] = interest.attr('exemption_value_2')
+  #      temp['exemption_laws'] = interest.attr('exemption_laws_2')
+  #      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['current_owned_value'] = interest.attr('amount')
+  #      temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
+  #      exemptions.append(temp)
+#
+#
+  #  for interest in prop.financial_assets.non_traded_stock.elements:
+  #    temp = {}
+  #    temp['exemption_amount'] = interest.attr('exemption_value')
+  #    temp['exemption_laws'] = interest.attr('exemption_laws')
+  #    temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['current_owned_value'] = interest.attr('value')
+  #    temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
+  #    exemptions.append(temp)
+#
+  #    if interest.attr('exemption_value_2'):
+  #      temp = {}
+  #      temp['exemption_amount'] = interest.attr('exemption_value_2')
+  #      temp['exemption_laws'] = interest.attr('exemption_laws_2')
+  #      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['current_owned_value'] = interest.attr('value')
+  #      temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
+  #      exemptions.append(temp)
+#
+  #  for interest in prop.financial_assets.corporate_bonds.elements:
+  #    temp = {}
+  #    temp['exemption_amount'] = interest.attr('exemption_value')
+  #    temp['exemption_laws'] = interest.attr('exemption_laws')
+  #    temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['current_owned_value'] = interest.attr('amount')
+  #    temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
+  #    exemptions.append(temp)
+#
+  #    if interest.attr('exemption_value_2'):
+  #      temp = {}
+  #      temp['exemption_amount'] = interest.attr('exemption_value_2')
+  #      temp['exemption_laws'] = interest.attr('exemption_laws_2')
+  #      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['current_owned_value'] = interest.attr('amount')
+  #      temp['is_claiming_exemption'] = interest.attr('is_claiming_exemption')
+  #      exemptions.append(temp)
+#
+#
+  #  for interest in prop.financial_assets.retirement_accounts.elements:
+  #    temp = {}
+  #    temp['exemption_amount'] = interest.attr('exemption_value')
+  #    temp['exemption_laws'] = interest.attr('exemption_laws')
+  #    temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['current_owned_value'] = interest.attr('amount')
+  #    temp['is_claiming_exemption'] = interest.attr('has_claim')
+  #    exemptions.append(temp)
+#
+  #    if interest.attr('exemption_value_2'):
+  #      temp = {}
+  #      temp['exemption_amount'] = interest.attr('exemption_value_2')
+  #      temp['exemption_laws'] = interest.attr('exemption_laws_2')
+  #      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['current_owned_value'] = interest.attr('amount')
+  #      temp['is_claiming_exemption'] = interest.attr('has_claim')
+  #      exemptions.append(temp)
+#
+#
+  #  for interest in prop.financial_assets.prepayments.elements:
+  #    temp = {}
+  #    temp['exemption_amount'] = interest.attr('exemption_value')
+  #    temp['exemption_laws'] = interest.attr('exemption_laws')
+  #    temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['current_owned_value'] = interest.attr('amount')
+  #    temp['is_claiming_exemption'] = interest.attr('has_claim')
+  #    exemptions.append(temp)
+#
+  #    if interest.attr('exemption_value_2'):
+  #      temp = {}
+  #      temp['exemption_amount'] = interest.attr('exemption_value_2')
+  #      temp['exemption_laws'] = interest.attr('exemption_laws_2')
+  #      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['current_owned_value'] = interest.attr('amount')
+  #      temp['is_claiming_exemption'] = interest.attr('has_claim')
+  #      exemptions.append(temp)
+#
+#
+  #  for interest in prop.financial_assets.annuities.elements:
+  #    temp = {}
+  #    temp['exemption_amount'] = interest.attr('exemption_value')
+  #    temp['exemption_laws'] = interest.attr('exemption_laws')
+  #    temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['current_owned_value'] = interest.attr('amount')
+  #    temp['is_claiming_exemption'] = interest.attr('has_claim')
+  #    exemptions.append(temp)
+#
+  #    if interest.attr('exemption_value_2'):
+  #      temp = {}
+  #      temp['exemption_amount'] = interest.attr('exemption_value_2')
+  #      temp['exemption_laws'] = interest.attr('exemption_laws_2')
+  #      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['current_owned_value'] = interest.attr('amount')
+  #      temp['is_claiming_exemption'] = interest.attr('has_claim')
+  #      exemptions.append(temp)
+#
+#
+  #  for interest in prop.financial_assets.edu_accounts.elements:
+  #    temp = {}
+  #    temp['exemption_amount'] = interest.attr('exemption_value')
+  #    temp['exemption_laws'] = interest.attr('exemption_laws')
+  #    temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['sub_100'] = interest.attr('claiming_sub_100')
+  #    temp['current_owned_value'] = interest.attr('amount')
+  #    temp['is_claiming_exemption'] = interest.attr('has_claim')
+  #    exemptions.append(temp)
+#
+  #    if interest.attr('exemption_value_2'):
+  #      temp = {}
+  #      temp['exemption_amount'] = interest.attr('exemption_value_2')
+  #      temp['exemption_laws'] = interest.attr('exemption_laws_2')
+  #      temp['claiming_sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['sub_100'] = interest.attr('claiming_sub_100')
+  #      temp['current_owned_value'] = interest.attr('amount')
+  #      temp['is_claiming_exemption'] = interest.attr('has_claim')
+  #      exemptions.append(temp)
+#
+#
+  #  future_interest = {}
+  #  if prop.financial_assets.attr('future_property_interest_has_claim'):
+  #    future_interest['is_claiming_exemption'] = prop.financial_assets.attr('future_property_interest_has_claim')
+  #    future_interest['claiming_sub_100'] = prop.financial_assets.attr('future_property_interest_sub_100')
+  #    future_interest['sub_100'] = prop.financial_assets.attr('future_property_interest_sub_100')
+  #    future_interest['exemption_laws'] = prop.financial_assets.attr('future_property_interest_exemption_laws')
+  #    future_interest['current_owned_value'] = prop.financial_assets.attr('future_property_interest_value')
+  #    future_interest['exemption_amount'] = prop.financial_assets.attr('future_property_interest_exemption_value')
+  #    exemptions.append(future_interest)
+#
+  #    if prop.financial_assets.attr('future_property_interest_exemption_value_2'):
+  #      future_interest['is_claiming_exemption'] = prop.financial_assets.attr('future_property_interest_has_claim')
+  #      future_interest['claiming_sub_100'] = prop.financial_assets.attr('future_property_interest_sub_100')
+  #      future_interest['sub_100'] = prop.financial_assets.attr('future_property_interest_sub_100')
+  #      future_interest['exemption_laws'] = prop.financial_assets.attr('future_property_interest_exemption_laws_2')
+  #      future_interest['current_owned_value'] = prop.financial_assets.attr('future_property_interest_value')
+  #      future_interest['exemption_amount'] = prop.financial_assets.attr('future_property_interest_exemption_value_2')
+  #      exemptions.append(future_interest)
+#
+  #  ip_interest = {}
+  #  if prop.financial_assets.attr('ip_interest_has_claim'):
+  #    ip_interest['is_claiming_exemption'] = prop.financial_assets.attr('ip_interest_has_claim')
+  #    ip_interest['claiming_sub_100'] = prop.financial_assets.attr('ip_interest_sub_100')
+  #    ip_interest['sub_100'] = prop.financial_assets.attr('ip_interest_sub_100')
+  #    ip_interest['exemption_laws'] = prop.financial_assets.attr('ip_interest_exemption_laws')
+  #    ip_interest['current_owned_value'] = prop.financial_assets.attr('ip_interest_value')
+  #    ip_interest['exemption_amount'] = prop.financial_assets.attr('ip_interest_exemption_value')
+  #    exemptions.append(ip_interest)
+#
+  #    if prop.financial_assets.attr('ip_interest_exemption_value_2'):
+  #      ip_interest['is_claiming_exemption'] = prop.financial_assets.attr('ip_interest_has_claim')
+  #      ip_interest['claiming_sub_100'] = prop.financial_assets.attr('ip_interest_sub_100')
+  #      ip_interest['sub_100'] = prop.financial_assets.attr('ip_interest_sub_100')
+  #      ip_interest['exemption_laws'] = prop.financial_assets.attr('ip_interest_exemption_laws_2')
+  #      ip_interest['current_owned_value'] = prop.financial_assets.attr('ip_interest_value')
+  #      ip_interest['exemption_amount'] = prop.financial_assets.attr('ip_interest_exemption_value_2')
+  #      exemptions.append(ip_interest)
+#
+  #  intangible_interest = {}
+  #  if prop.financial_assets.attr('intangible_interest_has_claim'):
+  #    intangible_interest['is_claiming_exemption'] = prop.financial_assets.attr('intangible_interest_has_claim')
+  #    intangible_interest['claiming_sub_100'] = prop.financial_assets.attr('intangible_interest_sub_100')
+  #    intangible_interest['sub_100'] = prop.financial_assets.attr('intangible_interest_sub_100')
+  #    intangible_interest['exemption_laws'] = prop.financial_assets.attr('intangible_interest_exemption_laws')
+  #    intangible_interest['current_owned_value'] = prop.financial_assets.attr('intangible_interest_value')
+  #    intangible_interest['exemption_amount'] = prop.financial_assets.attr('intangible_interest_exemption_value')
+  #    exemptions.append(intangible_interest)
+#
+  #    if prop.financial_assets.attr('intangible_interest_exemption_value_2'):
+  #      intangible_interest['is_claiming_exemption'] = prop.financial_assets.attr('intangible_interest_has_claim')
+  #      intangible_interest['claiming_sub_100'] = prop.financial_assets.attr('intangible_interest_sub_100')
+  #      intangible_interest['sub_100'] = prop.financial_assets.attr('intangible_interest_sub_100')
+  #      intangible_interest['exemption_laws'] = prop.financial_assets.attr('intangible_interest_exemption_laws_2')
+  #      intangible_interest['current_owned_value'] = prop.financial_assets.attr('intangible_interest_value')
+  #      intangible_interest['exemption_amount'] = prop.financial_assets.attr('intangible_interest_exemption_value_2')
+  #      exemptions.append(intangible_interest)
+#
+  #  refund_interest = {}
+  #  if prop.owed_property.attr('tax_refund_has_claim'):
+  #    refund_interest['is_claiming_exemption'] = prop.owed_property.attr('tax_refund_has_claim')
+  #    refund_interest['claiming_sub_100'] = prop.owed_property.attr('tax_refund_sub_100')
+  #    refund_interest['sub_100'] = prop.owed_property.attr('tax_refund_sub_100')
+  #    refund_interest['exemption_laws'] = prop.owed_property.attr('tax_refund_exemption_laws')
+#
+  #    refund_interest['current_owned_value'] = 0
+  #    if prop.owed_property.attr('tax_refund_federal'):
+  #      refund_interest['current_owned_value'] += prop.owed_property.attr('tax_refund_federal')
+  #    if prop.owed_property.attr('tax_refund_state'):
+  #      refund_interest['current_owned_value'] += prop.owed_property.attr('tax_refund_state')
+  #    if prop.owed_property.attr('tax_refund_local'):
+  #      refund_interest['current_owned_value'] += prop.owed_property.attr('tax_refund_local')
+#
+  #    refund_interest['exemption_amount'] = prop.owed_property.attr('tax_refund_exemption_value')
+  #    exemptions.append(refund_interest)
+#
+  #    if prop.owed_property.attr('tax_refund_exemption_value_2'):
+  #      refund_interest['is_claiming_exemption'] = prop.owed_property.attr('tax_refund_has_claim')
+  #      refund_interest['claiming_sub_100'] = prop.owed_property.attr('tax_refund_sub_100')
+  #      refund_interest['sub_100'] = prop.owed_property.attr('tax_refund_sub_100')
+  #      refund_interest['exemption_laws'] = prop.owed_property.attr('tax_refund_exemption_laws_2')
+#
+  #      refund_interest['current_owned_value'] = 0
+  #      if prop.owed_property.attr('tax_refund_federal'):
+  #        refund_interest['current_owned_value'] += prop.owed_property.attr('tax_refund_federal')
+  #      if prop.owed_property.attr('tax_refund_state'):
+  #        refund_interest['current_owned_value'] += prop.owed_property.attr('tax_refund_state')
+  #      if prop.owed_property.attr('tax_refund_local'):
+  #        refund_interest['current_owned_value'] += prop.owed_property.attr('tax_refund_local')
+#
+  #      refund_interest['exemption_amount'] = prop.owed_property.attr('tax_refund_exemption_value_2')
+  #      exemptions.append(refund_interest)
+#
+  #  family_interest = {}
+  #  if prop.owed_property.attr('family_support_has_claim'):
+  #    family_interest['is_claiming_exemption'] = prop.owed_property.attr('family_support_has_claim')
+  #    family_interest['claiming_sub_100'] = prop.owed_property.attr('family_support_sub_100')
+  #    family_interest['sub_100'] = prop.owed_property.attr('family_support_sub_100')
+  #    family_interest['exemption_laws'] = prop.owed_property.attr('family_support_exemption_laws')
+#
+  #    family_interest['current_owned_value'] = 0
+  #    if prop.owed_property.attr('family_support_alimony'):
+  #      family_interest['current_owned_value'] += prop.owed_property.attr('family_support_alimony')
+  #    if prop.owed_property.attr('family_support_maintenance'):
+  #      family_interest['current_owned_value'] += prop.owed_property.attr('family_support_maintenance')
+  #    if prop.owed_property.attr('family_support_support'):
+  #      family_interest['current_owned_value'] += prop.owed_property.attr('family_support_support')
+  #    if prop.owed_property.attr('family_support_divorce'):
+  #      family_interest['current_owned_value'] += prop.owed_property.attr('family_support_divorce')
+  #    if prop.owed_property.attr('family_support_settlement'):
+  #      family_interest['current_owned_value'] += prop.owed_property.attr('family_support_settlement')
+#
+  #    family_interest['exemption_amount'] = prop.owed_property.attr('family_support_exemption_value')
+  #    exemptions.append(family_interest)
+#
+  #    if prop.owed_property.attr('family_support_exemption_value_2'):
+  #      family_interest['is_claiming_exemption'] = prop.owed_property.attr('family_support_has_claim')
+  #      family_interest['claiming_sub_100'] = prop.owed_property.attr('family_support_sub_100')
+  #      family_interest['sub_100'] = prop.owed_property.attr('family_support_sub_100')
+  #      family_interest['exemption_laws'] = prop.owed_property.attr('family_support_exemption_laws_2')
+#
+  #      family_interest['current_owned_value'] = 0
+  #      if prop.owed_property.attr('family_support_alimony'):
+  #        family_interest['current_owned_value'] += prop.owed_property.attr('family_support_alimony')
+  #      if prop.owed_property.attr('family_support_maintenance'):
+  #        family_interest['current_owned_value'] += prop.owed_property.attr('family_support_maintenance')
+  #      if prop.owed_property.attr('family_support_support'):
+  #        family_interest['current_owned_value'] += prop.owed_property.attr('family_support_support')
+  #      if prop.owed_property.attr('family_support_divorce'):
+  #        family_interest['current_owned_value'] += prop.owed_property.attr('family_support_divorce')
+  #      if prop.owed_property.attr('family_support_settlement'):
+  #        family_interest['current_owned_value'] += prop.owed_property.attr('family_support_settlement')
+#
+  #      family_interest['exemption_amount'] = prop.owed_property.attr('family_support_exemption_value_2')
+  #      exemptions.append(family_interest)
+#
+  #  other_owed_interest = {}
+  #  if prop.owed_property.attr('other_amounts_has_claim'):
+  #    other_owed_interest['is_claiming_exemption'] = prop.owed_property.attr('other_amounts_has_claim')
+  #    other_owed_interest['claiming_sub_100'] = prop.owed_property.attr('other_amounts_sub_100')
+  #    other_owed_interest['sub_100'] = prop.owed_property.attr('other_amounts_sub_100')
+  #    other_owed_interest['exemption_laws'] = prop.owed_property.attr('other_amounts_exemption_laws')
+  #    other_owed_interest['current_owned_value'] = prop.owed_property.attr('other_amounts_value')
+  #    other_owed_interest['exemption_amount'] = prop.owed_property.attr('other_amounts_exemption_value')
+  #    exemptions.append(other_owed_interest)
+#
+  #    if prop.owed_property.attry('other_amounts_exemption_value_2'):
+  #      other_owed_interest['is_claiming_exemption'] = prop.owed_property.attr('other_amounts_has_claim')
+  #      other_owed_interest['claiming_sub_100'] = prop.owed_property.attr('other_amounts_sub_100')
+  #      other_owed_interest['sub_100'] = prop.owed_property.attr('other_amounts_sub_100')
+  #      other_owed_interest['exemption_laws'] = prop.owed_property.attr('other_amounts_exemption_laws_2')
+  #      other_owed_interest['current_owned_value'] = prop.owed_property.attr('other_amounts_value')
+  #      other_owed_interest['exemption_amount'] = prop.owed_property.attr('other_amounts_exemption_value_2')
+  #      exemptions.append(other_owed_interest)
+#
+  #  insurance_interest_1 = {}
+  #  if prop.owed_property.attr('first_insurance_interest_has_claim'):
+  #    insurance_interest_1['is_claiming_exemption'] = prop.owed_property.attr('first_insurance_interest_has_claim')
+  #    insurance_interest_1['claiming_sub_100'] = prop.owed_property.attr('first_insurance_interest_sub_100')
+  #    insurance_interest_1['sub_100'] = prop.owed_property.attr('first_insurance_interest_sub_100')
+  #    insurance_interest_1['exemption_laws'] = prop.owed_property.attr('first_insurance_interest_exemption_laws')
+  #    insurance_interest_1['current_owned_value'] = prop.owed_property.attr('first_insurance_interest_amount')
+  #    insurance_interest_1['exemption_amount'] = prop.owed_property.attr('first_insurance_exemption_value')
+  #    exemptions.append(insurance_interest_1)
+#
+  #    if prop.owed_property.attr('first_insurance_exemption_value_2'):
+  #      insurance_interest_1['is_claiming_exemption'] = prop.owed_property.attr('first_insurance_interest_has_claim')
+  #      insurance_interest_1['claiming_sub_100'] = prop.owed_property.attr('first_insurance_interest_sub_100')
+  #      insurance_interest_1['sub_100'] = prop.owed_property.attr('first_insurance_interest_sub_100')
+  #      insurance_interest_1['exemption_laws'] = prop.owed_property.attr('first_insurance_interest_exemption_laws_2')
+  #      insurance_interest_1['current_owned_value'] = prop.owed_property.attr('first_insurance_interest_amount')
+  #      insurance_interest_1['exemption_amount'] = prop.owed_property.attr('first_insurance_exemption_value_2')
+  #      exemptions.append(insurance_interest_1)
+#
+  #  insurance_interest_2 = {}
+  #  if prop.owed_property.attr('second_insurance_interest_has_claim'):
+  #    insurance_interest_2['is_claiming_exemption'] = prop.owed_property.attr('second_insurance_interest_has_claim')
+  #    insurance_interest_2['claiming_sub_100'] = prop.owed_property.attr('second_insurance_interest_sub_100')
+  #    insurance_interest_2['sub_100'] = prop.owed_property.attr('second_insurance_interest_sub_100')
+  #    insurance_interest_2['exemption_laws'] = prop.owed_property.attr('second_insurance_interest_exemption_laws')
+  #    insurance_interest_2['current_owned_value'] = prop.owed_property.attr('second_insurance_interest_amount')
+  #    insurance_interest_2['exemption_amount'] = prop.owed_property.attr('second_insurance_exemption_value')
+  #    exemptions.append(insurance_interest_2)
+#
+  #    if prop.owed_property.attr('second_insurance_exemption_value_2'):
+  #      insurance_interest_2['is_claiming_exemption'] = prop.owed_property.attr('second_insurance_interest_has_claim')
+  #      insurance_interest_2['claiming_sub_100'] = prop.owed_property.attr('second_insurance_interest_sub_100')
+  #      insurance_interest_2['sub_100'] = prop.owed_property.attr('second_insurance_interest_sub_100')
+  #      insurance_interest_2['exemption_laws'] = prop.owed_property.attr('second_insurance_interest_exemption_laws_2')
+  #      insurance_interest_2['current_owned_value'] = prop.owed_property.attr('second_insurance_interest_amount')
+  #      insurance_interest_2['exemption_amount'] = prop.owed_property.attr('second_insurance_exemption_value_2')
+  #      exemptions.append(insurance_interest_2)
+#
+  #  insurance_interest_3 = {}
+  #  if prop.owed_property.attr('third_insurance_interest_has_claim'):
+  #    insurance_interest_3['is_claiming_exemption'] = prop.owed_property.attr('third_insurance_interest_has_claim')
+  #    insurance_interest_3['claiming_sub_100'] = prop.owed_property.attr('third_insurance_interest_sub_100')
+  #    insurance_interest_3['sub_100'] = prop.owed_property.attr('third_insurance_interest_sub_100')
+  #    insurance_interest_3['exemption_laws'] = prop.owed_property.attr('third_insurance_interest_exemption_laws')
+  #    insurance_interest_3['current_owned_value'] = prop.owed_property.attr('third_insurance_interest_amount')
+  #    insurance_interest_3['exemption_amount'] = prop.owed_property.attr('third_insurance_exemption_value')
+  #    exemptions.append(insurance_interest_3)
+#
+  #    if prop.owed_property.attr('third_insurance_exemption_value_2'):
+  #      insurance_interest_3['is_claiming_exemption'] = prop.owed_property.attr('third_insurance_interest_has_claim')
+  #      insurance_interest_3['claiming_sub_100'] = prop.owed_property.attr('third_insurance_interest_sub_100')
+  #      insurance_interest_3['sub_100'] = prop.owed_property.attr('third_insurance_interest_sub_100')
+  #      insurance_interest_3['exemption_laws'] = prop.owed_property.attr('third_insurance_interest_exemption_laws_2')
+  #      insurance_interest_3['current_owned_value'] = prop.owed_property.attr('third_insurance_interest_amount')
+  #      insurance_interest_3['exemption_amount'] = prop.owed_property.attr('third_insurance_exemption_value_2')
+  #      exemptions.append(insurance_interest_3)
+#
+#
+  #  trust_interest = {}
+  #  if prop.owed_property.attr('trust_has_claim'):
+  #    trust_interest['is_claiming_exemption'] = prop.owed_property.attr('trust_has_claim')
+  #    trust_interest['claiming_sub_100'] = prop.owed_property.attr('trust_sub_100')
+  #    trust_interest['sub_100'] = prop.owed_property.attr('trust_sub_100')
+  #    trust_interest['exemption_laws'] = prop.owed_property.attr('trust_exemption_laws')
+  #    trust_interest['current_owned_value'] = prop.owed_property.attr('trust_amount')
+  #    trust_interest['exemption_amount'] = prop.owed_property.attr('trust_exemption_value')
+  #    exemptions.append(trust_interest)
+#
+  #    if prop.owed_property.attr('trust_exemption_value_2'):
+  #      trust_interest['is_claiming_exemption'] = prop.owed_property.attr('trust_has_claim')
+  #      trust_interest['claiming_sub_100'] = prop.owed_property.attr('trust_sub_100')
+  #      trust_interest['sub_100'] = prop.owed_property.attr('trust_sub_100')
+  #      trust_interest['exemption_laws'] = prop.owed_property.attr('trust_exemption_laws_2')
+  #      trust_interest['current_owned_value'] = prop.owed_property.attr('trust_amount')
+  #      trust_interest['exemption_amount'] = prop.owed_property.attr('trust_exemption_value_2')
+  #      exemptions.append(trust_interest)
+#
+  #  third_party_interest = {}
+  #  if prop.owed_property.attr('third_party_has_claim'):
+  #    third_party_interest['is_claiming_exemption'] = prop.owed_property.attr('third_party_has_claim')
+  #    third_party_interest['claiming_sub_100'] = prop.owed_property.attr('third_party_sub_100')
+  #    third_party_interest['sub_100'] = prop.owed_property.attr('third_party_sub_100')
+  #    third_party_interest['exemption_laws'] = prop.owed_property.attr('third_party_exemption_laws')
+  #    third_party_interest['current_owned_value'] = prop.owed_property.attr('third_party_amount')
+  #    third_party_interest['exemption_amount'] = prop.owed_property.attr('third_party_exemption_value')
+  #    exemptions.append(third_party_interest)
+#
+  #    if prop.owed_property.attr('third_party_exemption_value_2'):
+  #      third_party_interest['is_claiming_exemption'] = prop.owed_property.attr('third_party_has_claim')
+  #      third_party_interest['claiming_sub_100'] = prop.owed_property.attr('third_party_sub_100')
+  #      third_party_interest['sub_100'] = prop.owed_property.attr('third_party_sub_100')
+  #      third_party_interest['exemption_laws'] = prop.owed_property.attr('third_party_exemption_laws_2')
+  #      third_party_interest['current_owned_value'] = prop.owed_property.attr('third_party_amount')
+  #      third_party_interest['exemption_amount'] = prop.owed_property.attr('third_party_exemption_value_2')
+  #      exemptions.append(third_party_interest)
+#
+  #  contingent_interest = {}
+  #  if prop.owed_property.attr('contingent_claims_has_claim'):
+  #    contingent_interest['is_claiming_exemption'] = prop.owed_property.attr('contingent_claims_has_claim')
+  #    contingent_interest['claiming_sub_100'] = prop.owed_property.attr('contingent_claims_sub_100')
+  #    contingent_interest['sub_100'] = prop.owed_property.attr('contingent_claims_sub_100')
+  #    contingent_interest['exemption_laws'] = prop.owed_property.attr('contingent_claims_exemption_laws')
+  #    contingent_interest['current_owned_value'] = prop.owed_property.attr('contingent_claims_amount')
+  #    contingent_interest['exemption_amount'] = prop.owed_property.attr('contingent_claims_exemption_value')
+  #    exemptions.append(contingent_interest)
+#
+  #    if prop.owed_property.attr('contingent_claims_exemption_value'):
+  #      contingent_interest['is_claiming_exemption'] = prop.owed_property.attr('contingent_claims_has_claim')
+  #      contingent_interest['claiming_sub_100'] = prop.owed_property.attr('contingent_claims_sub_100')
+  #      contingent_interest['sub_100'] = prop.owed_property.attr('contingent_claims_sub_100')
+  #      contingent_interest['exemption_laws'] = prop.owed_property.attr('contingent_claims_exemption_laws_2')
+  #      contingent_interest['current_owned_value'] = prop.owed_property.attr('contingent_claims_amount')
+  #      contingent_interest['exemption_amount'] = prop.owed_property.attr('contingent_claims_exemption_value_2')
+  #      exemptions.append(contingent_interest)
+#
+  #  other_asset_interest = {}
+  #  if prop.owed_property.attr('other_assets_has_claim'):
+  #    other_asset_interest['is_claiming_exemption'] = prop.owed_property.attr('other_assets_has_claim')
+  #    other_asset_interest['claiming_sub_100'] = prop.owed_property.attr('other_assets_sub_100')
+  #    other_asset_interest['sub_100'] = prop.owed_property.attr('other_assets_sub_100')
+  #    other_asset_interest['exemption_laws'] = prop.owed_property.attr('other_assets_exemption_laws')
+  #    other_asset_interest['current_owned_value'] = prop.owed_property.attr('other_assets_amount')
+  #    other_asset_interest['exemption_amount'] = prop.owed_property.attr('other_assets_exemption_value')
+  #    exemptions.append(other_asset_interest)
+#
+  #    if prop.owed_property.attr('other_assets_exemption_value_2'):
+  #      other_asset_interest['is_claiming_exemption'] = prop.owed_property.attr('other_assets_has_claim')
+  #      other_asset_interest['claiming_sub_100'] = prop.owed_property.attr('other_assets_sub_100')
+  #      other_asset_interest['sub_100'] = prop.owed_property.attr('other_assets_sub_100')
+  #      other_asset_interest['exemption_laws'] = prop.owed_property.attr('other_assets_exemption_laws_2')
+  #      other_asset_interest['current_owned_value'] = prop.owed_property.attr('other_assets_amount')
+  #      other_asset_interest['exemption_amount'] = prop.owed_property.attr('other_assets_exemption_value_2')
+  #      exemptions.append(other_asset_interest)
+#
+  #  ar_interest = {}
+  #  if prop.business_property.attr('ar_has_claim'):
+  #    ar_interest['is_claiming_exemption'] = prop.business_property.attr('ar_has_claim')
+  #    ar_interest['claiming_sub_100'] = prop.business_property.attr('ar_sub_100')
+  #    ar_interest['sub_100'] = prop.business_property.attr('ar_sub_100')
+  #    ar_interest['exemption_laws'] = prop.business_property.attr('ar_exemption_laws')
+  #    ar_interest['current_owned_value'] = prop.business_property.attr('ar_amount')
+  #    ar_interest['exemption_amount'] = prop.business_property.attr('ar_exemption_value')
+  #    exemptions.append(ar_interest)
+#
+  #    if prop.business_property.attr('ar_exemption_value_2'):
+  #      ar_interest['is_claiming_exemption'] = prop.business_property.attr('ar_has_claim')
+  #      ar_interest['claiming_sub_100'] = prop.business_property.attr('ar_sub_100')
+  #      ar_interest['sub_100'] = prop.business_property.attr('ar_sub_100')
+  #      ar_interest['exemption_laws'] = prop.business_property.attr('ar_exemption_laws_2')
+  #      ar_interest['current_owned_value'] = prop.business_property.attr('ar_amount')
+  #      ar_interest['exemption_amount'] = prop.business_property.attr('ar_exemption_value_2')
+  #      exemptions.append(ar_interest)
+#
+  #  equipment_interest = {}
+  #  if prop.business_property.attr('equipment_has_claim'):
+  #    equipment_interest['is_claiming_exemption'] = prop.business_property.attr('equipment_has_claim')
+  #    equipment_interest['claiming_sub_100'] = prop.business_property.attr('equipment_sub_100')
+  #    equipment_interest['sub_100'] = prop.business_property.attr('equipment_sub_100')
+  #    equipment_interest['exemption_laws'] = prop.business_property.attr('equipment_exemption_laws')
+  #    equipment_interest['current_owned_value'] = prop.business_property.attr('equipment_amount')
+  #    equipment_interest['exemption_amount'] = prop.business_property.attr('equipment_exemption_value')
+  #    exemptions.append(equipment_interest)
+#
+  #    if prop.business_property.attr('equipment_exemption_value_2'):
+  #      equipment_interest['is_claiming_exemption'] = prop.business_property.attr('equipment_has_claim')
+  #      equipment_interest['claiming_sub_100'] = prop.business_property.attr('equipment_sub_100')
+  #      equipment_interest['sub_100'] = prop.business_property.attr('equipment_sub_100')
+  #      equipment_interest['exemption_laws'] = prop.business_property.attr('equipment_exemption_laws_2')
+  #      equipment_interest['current_owned_value'] = prop.business_property.attr('equipment_amount')
+  #      equipment_interest['exemption_amount'] = prop.business_property.attr('equipment_exemption_value_2')
+  #      exemptions.append(equipment_interest)
+#
+  #  machinery_interest = {}
+  #  if prop.business_property.attr('machinery_has_claim'):
+  #    machinery_interest['is_claiming_exemption'] = prop.business_property.attr('machinery_has_claim')
+  #    machinery_interest['claiming_sub_100'] = prop.business_property.attr('machinery_sub_100')
+  #    machinery_interest['sub_100'] = prop.business_property.attr('machinery_sub_100')
+  #    machinery_interest['exemption_laws'] = prop.business_property.attr('machinery_exemption_laws')
+  #    machinery_interest['current_owned_value'] = prop.business_property.attr('machinery_amount')
+  #    machinery_interest['exemption_amount'] = prop.business_property.attr('machinery_exemption_value')
+  #    exemptions.append(machinery_interest)
+#
+  #    if prop.business_property.attr('machinery_exemption_value_2'):
+  #      machinery_interest['is_claiming_exemption'] = prop.business_property.attr('machinery_has_claim')
+  #      machinery_interest['claiming_sub_100'] = prop.business_property.attr('machinery_sub_100')
+  #      machinery_interest['sub_100'] = prop.business_property.attr('machinery_sub_100')
+  #      machinery_interest['exemption_laws'] = prop.business_property.attr('machinery_exemption_laws_2')
+  #      machinery_interest['current_owned_value'] = prop.business_property.attr('machinery_amount')
+  #      machinery_interest['exemption_amount'] = prop.business_property.attr('machinery_exemption_value_2')
+  #      exemptions.append(machinery_interest)
+#
+  #  inventory_interest = {}
+  #  if prop.business_property.attr('inventory_has_claim'):
+  #    inventory_interest['is_claiming_exemption'] = prop.business_property.attr('inventory_has_claim')
+  #    inventory_interest['claiming_sub_100'] = prop.business_property.attr('inventory_sub_100')
+  #    inventory_interest['sub_100'] = prop.business_property.attr('inventory_sub_100')
+  #    inventory_interest['exemption_laws'] = prop.business_property.attr('inventory_exemption_laws')
+  #    inventory_interest['current_owned_value'] = prop.business_property.attr('inventory_amount')
+  #    inventory_interest['exemption_amount'] = prop.business_property.attr('inventory_exemption_value')
+  #    exemptions.append(inventory_interest)
+#
+  #    if prop.business_property.attr('inventory_exemption_value_2'):
+  #      inventory_interest['is_claiming_exemption'] = prop.business_property.attr('inventory_has_claim')
+  #      inventory_interest['claiming_sub_100'] = prop.business_property.attr('inventory_sub_100')
+  #      inventory_interest['sub_100'] = prop.business_property.attr('inventory_sub_100')
+  #      inventory_interest['exemption_laws'] = prop.business_property.attr('inventory_exemption_laws_2')
+  #      inventory_interest['current_owned_value'] = prop.business_property.attr('inventory_amount')
+  #      inventory_interest['exemption_amount'] = prop.business_property.attr('inventory_exemption_value_2')
+  #      exemptions.append(inventory_interest)
+#
+  #  partnership_interest = {}
+  #  if prop.business_property.attr('partnership_has_claim'):
+  #    partnership_interest['is_claiming_exemption'] = prop.business_property.attr('partnership_has_claim')
+  #    partnership_interest['claiming_sub_100'] = prop.business_property.attr('partnership_sub_100')
+  #    partnership_interest['sub_100'] = prop.business_property.attr('partnership_sub_100')
+  #    partnership_interest['exemption_laws'] = prop.business_property.attr('partnership_exemption_laws')
+#
+  #    partnership_interest['current_owned_value'] = 0
+  #    if prop.business_property.attr('partnershipValue1'):
+  #      partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue1')
+  #    if prop.business_property.attr('partnershipValue2'):
+  #      partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue2')
+  #    if prop.business_property.attr('partnershipValue3'):
+  #      partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue3')
+  #    if prop.business_property.attr('partnershipValue4'):
+  #      partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue4')
+  #    if prop.business_property.attr('partnershipValue5'):
+  #      partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue5')
+#
+  #    partnership_interest['exemption_amount'] = prop.business_property.attr('partnership_exemption_value')
+  #    exemptions.append(partnership_interest)
+#
+  #    if prop.business_property.attr('partnership_exemption_value_2'):
+  #      partnership_interest['is_claiming_exemption'] = prop.business_property.attr('partnership_has_claim')
+  #      partnership_interest['claiming_sub_100'] = prop.business_property.attr('partnership_sub_100')
+  #      partnership_interest['sub_100'] = prop.business_property.attr('partnership_sub_100')
+  #      partnership_interest['exemption_laws'] = prop.business_property.attr('partnership_exemption_laws_2')
+#
+  #      partnership_interest['current_owned_value'] = 0
+  #      if prop.business_property.attr('partnershipValue1'):
+  #        partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue1')
+  #      if prop.business_property.attr('partnershipValue2'):
+  #        partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue2')
+  #      if prop.business_property.attr('partnershipValue3'):
+  #        partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue3')
+  #      if prop.business_property.attr('partnershipValue4'):
+  #        partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue4')
+  #      if prop.business_property.attr('partnershipValue5'):
+  #        partnership_interest['current_owned_value'] += prop.business_property.attr('partnershipValue5')
+#
+  #      partnership_interest['exemption_amount'] = prop.business_property.attr('partnership_exemption_value_2')
+  #      exemptions.append(partnership_interest)
+#
+  #  lists_interest = {}
+  #  if prop.business_property.attr('lists_has_claim'):
+  #    lists_interest['is_claiming_exemption'] = prop.business_property.attr('lists_has_claim')
+  #    lists_interest['claiming_sub_100'] = prop.business_property.attr('lists_sub_100')
+  #    lists_interest['sub_100'] = prop.business_property.attr('lists_sub_100')
+  #    lists_interest['exemption_laws'] = prop.business_property.attr('lists_exemption_laws')
+  #    lists_interest['current_owned_value'] = prop.business_property.attr('lists_amount')
+  #    lists_interest['exemption_amount'] = prop.business_property.attr('lists_exemption_value')
+  #    exemptions.append(lists_interest)
+#
+  #    if prop.business_property.attr('lists_exemption_value_2'):
+  #      lists_interest['is_claiming_exemption'] = prop.business_property.attr('lists_has_claim')
+  #      lists_interest['claiming_sub_100'] = prop.business_property.attr('lists_sub_100')
+  #      lists_interest['sub_100'] = prop.business_property.attr('lists_sub_100')
+  #      lists_interest['exemption_laws'] = prop.business_property.attr('lists_exemption_laws_2')
+  #      lists_interest['current_owned_value'] = prop.business_property.attr('lists_amount')
+  #      lists_interest['exemption_amount'] = prop.business_property.attr('lists_exemption_value_2')
+  #      exemptions.append(lists_interest)
+#
+  #  other_prop_interest = {}
+  #  if prop.business_property.attr('otherProperty_has_claim'):
+  #    other_prop_interest['is_claiming_exemption'] = prop.business_property.attr('otherProperty_has_claim')
+  #    other_prop_interest['claiming_sub_100'] = prop.business_property.attr('otherProperty_sub_100')
+  #    other_prop_interest['sub_100'] = prop.business_property.attr('otherProperty_sub_100')
+  #    other_prop_interest['exemption_laws'] = prop.business_property.attr('otherProperty_exemption_laws')
+#
+  #    other_prop_interest['current_owned_value'] = 0
+  #    if prop.business_property.attr('otherPropertyAmount1'):
+  #      other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount1')
+  #    if prop.business_property.attr('otherPropertyAmount2'):
+  #      other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount2')
+  #    if prop.business_property.attr('otherPropertyAmount3'):
+  #      other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount3')
+  #    if prop.business_property.attr('otherPropertyAmount4'):
+  #      other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount4')
+  #    if prop.business_property.attr('otherPropertyAmount5'):
+  #      other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount5')
+  #    if prop.business_property.attr('otherPropertyAmount6'):
+  #      other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount6')
+#
+  #    other_prop_interest['exemption_amount'] = prop.business_property.attr('exemption_value')
+  #    exemptions.append(other_prop_interest)
+#
+  #    if prop.business_property.attr('exemption_value_2'):
+  #      other_prop_interest['is_claiming_exemption'] = prop.business_property.attr('otherProperty_has_claim')
+  #      other_prop_interest['claiming_sub_100'] = prop.business_property.attr('otherProperty_sub_100')
+  #      other_prop_interest['sub_100'] = prop.business_property.attr('otherProperty_sub_100')
+  #      other_prop_interest['exemption_laws'] = prop.business_property.attr('otherProperty_exemption_laws_2')
+#
+  #      other_prop_interest['current_owned_value'] = 0
+  #      if prop.business_property.attr('otherPropertyAmount1'):
+  #        other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount1')
+  #      if prop.business_property.attr('otherPropertyAmount2'):
+  #        other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount2')
+  #      if prop.business_property.attr('otherPropertyAmount3'):
+  #        other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount3')
+  #      if prop.business_property.attr('otherPropertyAmount4'):
+  #        other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount4')
+  #      if prop.business_property.attr('otherPropertyAmount5'):
+  #        other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount5')
+  #      if prop.business_property.attr('otherPropertyAmount6'):
+  #        other_prop_interest['current_owned_value'] += prop.business_property.attr('otherPropertyAmount6')
+#
+  #      other_prop_interest['exemption_amount'] = prop.business_property.attr('exemption_value_2')
+  #      exemptions.append(other_prop_interest)
+#
+  #  farm_animals_interest = {}
+  #  if prop.farming_property.attr('has_animal_claim'):
+  #    farm_animals_interest['is_claiming_exemption'] = prop.farming_property.attr('has_animal_claim')
+  #    farm_animals_interest['claiming_sub_100'] = prop.farming_property.attr('animal_sub_100')
+  #    farm_animals_interest['sub_100'] = prop.farming_property.attr('animal_sub_100')
+  #    farm_animals_interest['exemption_laws'] = prop.farming_property.attr('animal_exemption_laws')
+  #    farm_animals_interest['current_owned_value'] = prop.farming_property.attr('animal_amount')
+  #    farm_animals_interest['exemption_amount'] = prop.farming_property.attr('animal_exemption_value')
+  #    exemptions.append(farm_animals_interest)
+#
+  #    if prop.farming_property.attr('animal_exemption_value_2'):
+  #      farm_animals_interest['is_claiming_exemption'] = prop.farming_property.attr('has_animal_claim')
+  #      farm_animals_interest['claiming_sub_100'] = prop.farming_property.attr('animal_sub_100')
+  #      farm_animals_interest['sub_100'] = prop.farming_property.attr('animal_sub_100')
+  #      farm_animals_interest['exemption_laws'] = prop.farming_property.attr('animal_exemption_laws_2')
+  #      farm_animals_interest['current_owned_value'] = prop.farming_property.attr('animal_amount')
+  #      farm_animals_interest['exemption_amount'] = prop.farming_property.attr('animal_exemption_value_2')
+  #      exemptions.append(farm_animals_interest)
+#
+  #  crops_interest = {}
+  #  if prop.farming_property.attr('has_crops_claim'):
+  #    crops_interest['is_claiming_exemption'] = prop.farming_property.attr('has_crops_claim')
+  #    crops_interest['claiming_sub_100'] = prop.farming_property.attr('crops_sub_100')
+  #    crops_interest['sub_100'] = prop.farming_property.attr('crops_sub_100')
+  #    crops_interest['exemption_laws'] = prop.farming_property.attr('crops_exemption_laws')
+  #    crops_interest['current_owned_value'] = prop.farming_property.attr('crop_amount')
+  #    crops_interest['exemption_amount'] = prop.farming_property.attr('crops_exemption_value')
+  #    exemptions.append(crops_interest)
+#
+  #    if prop.farming_property.attr('crops_exemption_value_2'):
+  #      crops_interest['is_claiming_exemption'] = prop.farming_property.attr('has_crops_claim')
+  #      crops_interest['claiming_sub_100'] = prop.farming_property.attr('crops_sub_100')
+  #      crops_interest['sub_100'] = prop.farming_property.attr('crops_sub_100')
+  #      crops_interest['exemption_laws'] = prop.farming_property.attr('crops_exemption_laws_2')
+  #      crops_interest['current_owned_value'] = prop.farming_property.attr('crop_amount')
+  #      crops_interest['exemption_amount'] = prop.farming_property.attr('crops_exemption_value_2')
+  #      exemptions.append(crops_interest)
+#
+  #  farm_equip_interest = {}
+  #  if prop.farming_property.attr('has_equipment_claim'):
+  #    farm_equip_interest['is_claiming_exemption'] = prop.farming_property.attr('has_equipment_claim')
+  #    farm_equip_interest['claiming_sub_100'] = prop.farming_property.attr('equipment_sub_100')
+  #    farm_equip_interest['sub_100'] = prop.farming_property.attr('equipment_sub_100')
+  #    farm_equip_interest['exemption_laws'] = prop.farming_property.attr('equipment_exemption_laws')
+  #    farm_equip_interest['current_owned_value'] = prop.farming_property.attr('equipment_amount')
+  #    farm_equip_interest['exemption_amount'] = prop.farming_property.attr('equipment_exemption_value')
+  #    exemptions.append(farm_equip_interest)
+#
+  #    if prop.farming_property.attr('equipment_exemption_value_2'):
+  #      farm_equip_interest['is_claiming_exemption'] = prop.farming_property.attr('has_equipment_claim')
+  #      farm_equip_interest['claiming_sub_100'] = prop.farming_property.attr('equipment_sub_100')
+  #      farm_equip_interest['sub_100'] = prop.farming_property.attr('equipment_sub_100')
+  #      farm_equip_interest['exemption_laws'] = prop.farming_property.attr('equipment_exemption_laws_2')
+  #      farm_equip_interest['current_owned_value'] = prop.farming_property.attr('equipment_amount')
+  #      farm_equip_interest['exemption_amount'] = prop.farming_property.attr('equipment_exemption_value_2')
+  #      exemptions.append(farm_equip_interest)
+#
+  #  farm_supply_interest = {}
+  #  if prop.farming_property.attr('has_supplies_claim'):
+  #    farm_supply_interest['is_claiming_exemption'] = prop.farming_property.attr('has_supplies_claim')
+  #    farm_supply_interest['claiming_sub_100'] = prop.farming_property.attr('supplies_sub_100')
+  #    farm_supply_interest['sub_100'] = prop.farming_property.attr('supplies_sub_100')
+  #    farm_supply_interest['exemption_laws'] = prop.farming_property.attr('supplies_exemption_laws')
+  #    farm_supply_interest['current_owned_value'] = prop.farming_property.attr('supplies_amount')
+  #    farm_supply_interest['exemption_amount'] = prop.farming_property.attr('supplies_exemption_value')
+  #    exemptions.append(farm_supply_interest)
+#
+  #    if prop.farming_property.attr('supplies_exemption_value_2'):
+  #      farm_supply_interest['is_claiming_exemption'] = prop.farming_property.attr('has_supplies_claim')
+  #      farm_supply_interest['claiming_sub_100'] = prop.farming_property.attr('supplies_sub_100')
+  #      farm_supply_interest['sub_100'] = prop.farming_property.attr('supplies_sub_100')
+  #      farm_supply_interest['exemption_laws'] = prop.farming_property.attr('supplies_exemption_laws_2')
+  #      farm_supply_interest['current_owned_value'] = prop.farming_property.attr('supplies_amount')
+  #      farm_supply_interest['exemption_amount'] = prop.farming_property.attr('supplies_exemption_value_2')
+  #      exemptions.append(farm_supply_interest)
+#
+  #  fishing_interest = {}
+  #  if prop.farming_property.attr('has_fishing_claim'):
+  #    fishing_interest['is_claiming_exemption'] = prop.farming_property.attr('has_fishing_claim')
+  #    fishing_interest['claiming_sub_100'] = prop.farming_property.attr('fishing_sub_100')
+  #    fishing_interest['sub_100'] = prop.farming_property.attr('fishing_sub_100')
+  #    fishing_interest['exemption_laws'] = prop.farming_property.attr('fishing_exemption_laws')
+  #    fishing_interest['current_owned_value'] = prop.farming_property.attr('commercial_amount')
+  #    fishing_interest['exemption_amount'] = prop.farming_property.attr('fishing_exemption_value')
+  #    exemptions.append(fishing_interest)
+#
+  #    if prop.farming_property.attr('fishing_exemption_value_2'):
+  #      fishing_interest['is_claiming_exemption'] = prop.farming_property.attr('has_fishing_claim')
+  #      fishing_interest['claiming_sub_100'] = prop.farming_property.attr('fishing_sub_100')
+  #      fishing_interest['sub_100'] = prop.farming_property.attr('fishing_sub_100')
+  #      fishing_interest['exemption_laws'] = prop.farming_property.attr('fishing_exemption_laws_2')
+  #      fishing_interest['current_owned_value'] = prop.farming_property.attr('commercial_amount')
+  #      fishing_interest['exemption_amount'] = prop.farming_property.attr('fishing_exemption_value_2')
+  #      exemptions.append(fishing_interest)
+#
+  #  any_other_interest = {}
+  #  if prop.attr('other_prop_has_claim'):
+  #    any_other_interest['is_claiming_exemption'] = prop.attr('other_prop_has_claim')
+  #    any_other_interest['claiming_sub_100'] = prop.attr('other_prop_sub_100')
+  #    any_other_interest['sub_100'] = prop.attr('other_prop_sub_100')
+  #    any_other_interest['exemption_laws'] = prop.attr('other_prop_exemption_laws')
+#
+  #    any_other_interest['current_owned_value'] = 0
+#
+  #    if prop.attr('other_prop_value1'):
+  #      any_other_interest['current_owned_value'] += prop.attr('other_prop_value1')
+  #    if prop.attr('other_prop_value2'):
+  #      any_other_interest['current_owned_value'] += prop.attr('other_prop_value2')
+  #    if prop.attr('other_prop_value2'):
+  #      any_other_interest['current_owned_value'] += prop.attr('other_prop_value2')
+#
+  #    any_other_interest['exemption_amount'] = prop.attr('other_prop_exemption_value')
+  #    exemptions.append(any_other_interest)
+#
+  #    if prop.attr('other_prop_exemption_value_2'):
+  #      any_other_interest['is_claiming_exemption'] = prop.attr('other_prop_has_claim')
+  #      any_other_interest['claiming_sub_100'] = prop.attr('other_prop_sub_100')
+  #      any_other_interest['sub_100'] = prop.attr('other_prop_sub_100')
+  #      any_other_interest['exemption_laws'] = prop.attr('other_prop_exemption_laws_2')
+#
+  #      any_other_interest['current_owned_value'] = 0
+#
+  #      if prop.attr('other_prop_value1'):
+  #        any_other_interest['current_owned_value'] += prop.attr('other_prop_value1')
+  #      if prop.attr('other_prop_value2'):
+  #        any_other_interest['current_owned_value'] += prop.attr('other_prop_value2')
+  #      if prop.attr('other_prop_value2'):
+  #        any_other_interest['current_owned_value'] += prop.attr('other_prop_value2')
+#
+  #      any_other_interest['exemption_amount'] = prop.attr('other_prop_exemption_value_2')
+  #      exemptions.append(any_other_interest)
+#
+#
+  #  for prop_item in exemptions:
+  #    if not prop_item['is_claiming_exemption']:
+  #      continue
+#
+  #    exemption_amount = 0
+#
+  #    if prop_item['claiming_sub_100'] or prop_item['sub_100']:
+  #      exemption_amount = prop_item['exemption_amount']
+  #    else:
+  #      exemption_amount = prop_item['current_owned_value']
+#
+#
+  #    if prop_item['exemption_laws'] == homestead_law:
+  #      homestead_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == homestead_proceeds_law:
+  #      homestead_proceeds_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == motor_vehicle_law:
+  #      motor_vehicle_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == household_goods_law:
+  #      household_goods_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == wildcard_law:
+  #      wildcard_exemption_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == clothing_law:
+  #      clothing_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == posessions_law:
+  #      possessions_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == health_aids_law:
+  #      health_aids_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == health_savings_law:
+  #      health_savings_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == tools_law:
+  #      tools_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == retirement_law:
+  #      retirement_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == wages_law:
+  #      wages_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == public_benefits_law:
+  #      public_benefits_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == earned_income_law:
+  #      earned_income_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == life_insurance_law:
+  #      life_insurance_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == secured_settlement_law:
+  #      secured_settlement_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == workers_comp_law:
+  #      workers_comp_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == unemployment_law:
+  #      unemployment_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == college_savings_law:
+  #      college_savings_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == student_loan_law:
+  #      student_loan_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == social_security_law:
+  #      social_security_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == va_law:
+  #      va_amount += exemption_amount
+  #    elif prop_item['exemption_laws'] == unknown_law:
+  #      unknown_amount += exemption_amount
+  #    else:
+  #      log(prop_item['exemption_laws'], 'info')
+#
+  #  ret = [
+  #    {
+  #      "name": "Homestead",
+  #      "full_name": "Homestead (Neb. Rev. Stat. §§ 40-101 - 40-118)",
+  #      "limit": homestead_limit,
+  #      "law": homestead_law,
+  #      "amount": homestead_amount,
+  #    },
+  #    {
+  #      "name": "Homestead Proceeds",
+  #      "full_name": "Homestead, proceeds of sale (Neb. Rev. Stat. § 40-116)",
+  #      "limit": homestead_proceeds_limit,
+  #      "law": homestead_proceeds_law,
+  #      "amount": homestead_proceeds_amount,
+  #    },
+  #    {
+  #      "name": "Motor Vehicle",
+  #      "full_name": "Motor vehicle (Neb. Rev. Stat. § 25-1556(1)(e))",
+  #      "limit": motor_vehicle_limit,
+  #      "law": motor_vehicle_law,
+  #      "amount": motor_vehicle_amount,
+  #    },
+  #    {
+  #      "name": "Household Goods",
+  #      "full_name": "Household goods (Neb. Rev. Stat. § 25-1556(1)(c))",
+  #      "limit": household_goods_limit,
+  #      "law": household_goods_law,
+  #      "amount": household_goods_amount,
+  #    },
+  #    {
+  #      "name": "Wildcard",
+  #      "full_name": "Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))",
+  #      "limit": wildcard_limit,
+  #      "law": wildcard_law,
+  #      "amount": wildcard_exemption_amount,
+  #    },
+  #    {
+  #      "name": "Clothing",
+  #      "full_name": "Clothing (Neb. Rev. Stat. § 25-1556(1)(b))",
+  #      "limit": clothing_limit,
+  #      "law": clothing_law,
+  #      "amount": clothing_amount,
+  #    },
+  #    {
+  #      "name": "Possessions",
+  #      "full_name": "Possessions",
+  #      "limit": posessions_limit,
+  #      "law": posessions_law,
+  #      "amount": possessions_amount,
+  #    },
+  #    {
+  #      "name": "Health Aids",
+  #      "full_name": "Health Aids (Neb. Rev. Stat. § 25-1556(1)(f))",
+  #      "limit": health_aids_limit,
+  #      "law": health_aids_law,
+  #      "amount": health_aids_amount,
+  #    },
+  #    {
+  #      "name": "Health Savings",
+  #      "full_name": "Health Savings (Neb. Rev. Stat. § 8-1,131(2)(b))",
+  #      "limit": health_savings_limit,
+  #      "law": health_savings_law,
+  #      "amount": health_savings_amount,
+  #    },
+  #    {
+  #      "name": "Tools of the Trade",
+  #      "full_name": "Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))",
+  #      "limit": tools_limit,
+  #      "law": tools_law,
+  #      "amount": tools_amount,
+  #    },
+  #    {
+  #      "name": "Retirement Accounts",
+  #      "full_name": "Retirement accounts (Neb. Rev. Stat. § 25-1563.01)",
+  #      "limit": retirement_limit,
+  #      "law": retirement_law,
+  #      "amount": retirement_amount,
+  #    },
+  #    {
+  #      "name": "Wages",
+  #      "full_name": "Wages (Neb. Rev. Stat. § 25-1558)",
+  #      "limit": wages_limit,
+  #      "law": wages_law,
+  #      "amount": wages_amount,
+  #    },
+  #    {
+  #      "name": "Public Benefits",
+  #      "full_name": "Public Benefits (Neb. Rev. Stat. § 68-148)",
+  #      "limit": public_benefits_limit,
+  #      "law": public_benefits_law,
+  #      "amount": public_benefits_amount,
+  #    },
+  #    {
+  #      "name": "Earned Income",
+  #      "full_name": "Earned Income Tax Credit (Neb Rev Stat 25-1553)",
+  #      "limit": earned_income_limit,
+  #      "law": earned_income_law,
+  #      "amount": earned_income_amount,
+  #    },
+  #    {
+  #      "name": "Life Insurance",
+  #      "full_name": "Life insurance proceeds (Neb. Rev. Stat. § 44-371)",
+  #      "limit": life_insurance_limit,
+  #      "law": life_insurance_law,
+  #      "amount": life_insurance_amount,
+  #    },
+  #    {
+  #      "name": "Secured Settlement",
+  #      "full_name": "Secured Settlement",
+  #      "limit": secured_settlement_limit,
+  #      "law": secured_settlement_law,
+  #      "amount": secured_settlement_amount,
+  #    },
+  #    {
+  #      "name": "Workers Compensation",
+  #      "full_name": "Workers Compensation (Neb. Rev. Stat. § 48-149)",
+  #      "limit": workers_comp_limit,
+  #      "law": workers_comp_law,
+  #      "amount": workers_comp_amount,
+  #    },
+  #    {
+  #      "name": "Unemployment",
+  #      "full_name": "Unemployment (Neb. Rev. Stat. § 48-647)",
+  #      "limit": unemployment_limit,
+  #      "law": unemployment_law,
+  #      "amount": unemployment_amount,
+  #    },
+  #    {
+  #      "name": "College Savings",
+  #      "full_name": "College Savings Plan (Neb. Rev. Stat. § 85-1809)",
+  #      "limit": college_savings_limit,
+  #      "law": college_savings_law,
+  #      "amount": college_savings_amount,
+  #    },
+  #    {
+  #      "name": "Student Loan",
+  #      "full_name": "Student Loan (20 U.S.C. § 1095a(d))",
+  #      "limit": student_loan_limit,
+  #      "law": student_loan_law,
+  #      "amount": student_loan_amount,
+  #    },
+  #    {
+  #      "name": "Social Security",
+  #      "full_name": "Social Security (42 U.S.C. § 407)",
+  #      "limit": social_security_limit,
+  #      "law": social_security_law,
+  #      "amount": social_security_amount,
+  #    },
+  #    {
+  #      "name": "VA Benefit",
+  #      "full_name": "VA Benefits (38 U.S.C. § 5301(a))",
+  #      "limit": va_limit,
+  #      "law": va_law,
+  #      "amount": va_amount
+  #    },
+  #    {
+  #      "name": "Unknown",
+  #      "full_name": "Unknown",
+  #      "limit": unknown_limit,
+  #      "law": unknown_law,
+  #      "amount": unknown_amount
+  #    },
+  #  ]
+#
+  #  prop.exemptions = {}
+#
+  #  for item in ret:
+  #    prop.exemptions[item['full_name']] = item
+#
+  #  return ret
 
 ---
 features:
@@ -1422,20 +1422,19 @@ features:
 section: schedule_ab
 question: |
   Tell the court about details about the interest in question.
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+### # Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     // Safely check for exemptions data
     try {
       checkQuestionExemptions(
-        ${ json.dumps(prop.exemptions) },
+        
         "prop.interests[i].is_claiming_exemption",
         "prop.interests[i].claiming_sub_100",
         "prop.interests[i].current_owned_value",
@@ -1447,9 +1446,9 @@ script: |
       console.log("Error in exemption check:", e);
     }
   </script>
-code: |
-  # Set complete attribute to true to prevent looping
-  prop.interests[i].complete = True
+#code: |
+#  # Set complete attribute to true to prevent looping
+#  prop.interests[i].complete = True
 fields:
   - Street: prop.interests[i].street
     default: "1111 SE Hamilton Ave"
@@ -1584,18 +1583,18 @@ question: |
   Tell the court about one of your vehicles.
 subquestion: |
   Vehicles can include cars, vans, trucks, tractors, sport utility vehicles, motorcycles.
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+
       "prop.ab_vehicles[i].is_claiming_exemption",
       "prop.ab_vehicles[i].claiming_sub_100",
       "prop.ab_vehicles[i].current_owned_value",
@@ -1715,18 +1714,18 @@ question: |
   Tell the court about one of your other vehicles
 subquestion: |
   Other vehicles can include boats, trailers, motors, personal watercraft, fishing vessels, snowmobiles, motorcycle accessories.
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.ab_other_vehicles[i].is_claiming_exemption",
       "prop.ab_other_vehicles[i].claiming_sub_100",
       "prop.ab_other_vehicles[i].current_owned_value",
@@ -1814,19 +1813,19 @@ fields:
 section: schedule_ab
 question: |
   Describe your personal and household items.
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     setTimeout(() => {
           checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.household_goods_is_claiming_exemption",
       "prop.household_goods_claiming_sub_100",
       "prop.household_goods_value",
@@ -1835,7 +1834,7 @@ script: |
       "prop.household_goods_exemption_value_2",
       "prop.household_goods_exemption_laws_2");
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.secured_household_goods_is_claiming_exemption",
       "prop.secured_household_goods_claiming_sub_100",
       "prop.secured_household_goods_value",
@@ -1844,7 +1843,7 @@ script: |
       "prop.secured_household_goods_exemption_value_2",
       "prop.secured_household_goods_exemption_laws_2");
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.electronics_is_claiming_exemption",
       "prop.electronics_claiming_sub_100",
       "prop.electronics_value",
@@ -1853,7 +1852,7 @@ script: |
       "prop.electronics_exemption_value_2",
       "prop.electronics_exemption_laws_2");
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.collectibles_is_claiming_exemption",
       "prop.collectibles_claiming_sub_100",
       "prop.collectibles_value",
@@ -1862,7 +1861,7 @@ script: |
       "prop.collectibles_exemption_value_2",
       "prop.collectibles_exemption_laws_2");
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.hobby_equipment_is_claiming_exemption",
       "prop.hobby_equipment_claiming_sub_100",
       "prop.hobby_equipment_value",
@@ -1871,7 +1870,7 @@ script: |
       "prop.hobby_equipment_exemption_value_2",
       "prop.hobby_equipment_exemption_laws_2");
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.firearms_is_claiming_exemption",
       "prop.firearms_claiming_sub_100",
       "prop.firearms_value",
@@ -1880,7 +1879,7 @@ script: |
       "prop.firearms_exemption_value_2",
       "prop.firearms_exemption_laws_2");
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.clothes_is_claiming_exemption",
       "prop.clothes_claiming_sub_100",
       "prop.clothes_value",
@@ -1889,7 +1888,7 @@ script: |
       "prop.clothes_exemption_value_2",
       "prop.clothes_exemption_laws_2");
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.jewlery_is_claiming_exemption",
       "prop.jewlery_claiming_sub_100",
       "prop.jewlery_value",
@@ -1898,7 +1897,7 @@ script: |
       "prop.jewlery_exemption_value_2",
       "prop.jewlery_exemption_laws_2");
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.animal_is_claiming_exemption",
       "prop.animal_claiming_sub_100",
       "prop.animal_value",
@@ -1907,7 +1906,7 @@ script: |
       "prop.animal_exemption_value_2",
       "prop.animal_exemption_laws_2");
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.other_household_items_is_claiming_exemption",
       "prop.other_household_items_claiming_sub_100",
       "prop.other_household_items_value",
@@ -2388,18 +2387,18 @@ question: |
   What is your cash on hand?
 subquestion: |
   Examples: Money you have in your wallet, in your home, in a safe deposit box, and on hand when you file your petition.
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.financial_assets.cash_is_claiming_exemption",
       "prop.financial_assets.cash_sub_100",
       "prop.financial_assets.cash_value",
@@ -2478,18 +2477,18 @@ under: |
 section: schedule_ab
 question: |
   Tell the court about your deposit.
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.financial_assets.deposits[i].is_claiming_exemption",
       "prop.financial_assets.deposits[i].sub_100",
       "prop.financial_assets.deposits[i].amount",
@@ -2568,18 +2567,18 @@ under: |
 section: schedule_ab
 question: |
   Tell the court about your bonds and stocks.
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.financial_assets.bonds_and_stocks[i].is_claiming_exemption",
       "prop.financial_assets.bonds_and_stocks[i].sub_100",
       "prop.financial_assets.bonds_and_stocks[i].amount",
@@ -2654,18 +2653,18 @@ under: |
 section: schedule_ab
 question: |
   Tell the court about your interests in incorporated and unincorporated businesses.
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.financial_assets.non_traded_stock[i].is_claiming_exemption",
       "prop.financial_assets.non_traded_stock[i].sub_100",
       "prop.financial_assets.non_traded_stock[i].value",
@@ -2741,18 +2740,18 @@ under: |
 section: schedule_ab
 question: |
   Tell the court about your interests in corporate bonds.
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.financial_assets.corporate_bonds[i].is_claiming_exemption",
       "prop.financial_assets.corporate_bonds[i].sub_100",
       "prop.financial_assets.corporate_bonds[i].amount",
@@ -2827,18 +2826,18 @@ under: |
 section: schedule_ab
 question: |
   Tell the court about your interests retirement or pension accounts.
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.financial_assets.retirement_accounts[i].has_claim",
       "prop.financial_assets.retirement_accounts[i].sub_100",
       "prop.financial_assets.retirement_accounts[i].amount",
@@ -2930,18 +2929,18 @@ under: |
 section: schedule_ab
 question: |
   Tell the court about your interests retirement or pension accounts.
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.financial_assets.prepayments[i].has_claim",
       "prop.financial_assets.prepayments[i].sub_100",
       "prop.financial_assets.prepayments[i].amount",
@@ -3029,18 +3028,18 @@ under: |
 section: schedule_ab
 question: |
   Tell the court about your annuity.
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.financial_assets.annuities[i].has_claim",
       "prop.financial_assets.annuities[i].sub_100",
       "prop.financial_assets.annuities[i].amount",
@@ -3116,18 +3115,18 @@ under: |
 section: schedule_ab
 question: |
   Tell the court about your education account.
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.financial_assets.edu_accounts[i].has_claim",
       "prop.financial_assets.edu_accounts[i].sub_100",
       "prop.financial_assets.edu_accounts[i].amount",
@@ -3179,18 +3178,18 @@ fields:
 section: schedule_ab
 question: |
   Do you have any trusts, equitable or future interests in property (other than anything previously listed), and rights or powers exercisable for your benefit?
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.financial_assets.future_property_interest_has_claim",
       "prop.financial_assets.future_property_interest_sub_100",
       "prop.financial_assets.future_property_interest_value",
@@ -3248,18 +3247,18 @@ question: |
   Do you have any patents, copyrights, trademarks, trade secrets, and other intellectual property?
 subquestion: |
   Examples: Internet domain names, websites, proceeds from royalties and licensing agreements.
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.financial_assets.ip_interest_has_claim",
       "prop.financial_assets.ip_interest_sub_100",
       "prop.financial_assets.ip_interest_value",
@@ -3317,18 +3316,18 @@ question: |
   Do you have any licenses, franchises, or other general intagibles?
 subquestion: |
   Examples: Building permits, exclusive licenses, cooperative association holdings, liquor licenses, professional licenses.
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.financial_assets.intangible_interest_has_claim",
       "prop.financial_assets.intangible_interest_sub_100",
       "prop.financial_assets.intangible_interest_value",
@@ -3384,18 +3383,18 @@ fields:
 section: schedule_ab
 question: |
   Money or property owed to you?
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.owed_property.tax_refund_has_claim",
       "prop.owed_property.tax_refund_sub_100",
       "prop.owed_property.tax_refund_federal",
@@ -3405,7 +3404,7 @@ script: |
       "prop.owed_property.tax_refund_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.owed_property.family_support_has_claim",
       "prop.owed_property.family_support_sub_100",
       "prop.owed_property.family_support_alimony",
@@ -3415,7 +3414,7 @@ script: |
       "prop.owed_property.family_support_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.owed_property.other_amounts_has_claim",
       "prop.owed_property.other_amounts_sub_100",
       "prop.owed_property.other_amounts_value",
@@ -3425,7 +3424,7 @@ script: |
       "prop.owed_property.other_amounts_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.owed_property.first_insurance_interest_has_claim",
       "prop.owed_property.first_insurance_interest_sub_100",
       "prop.owed_property.first_insurance_interest_amount",
@@ -3435,7 +3434,7 @@ script: |
       "prop.owed_property.first_insurance_interest_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.owed_property.second_insurance_interest_has_claim",
       "prop.owed_property.second_insurance_interest_sub_100",
       "prop.owed_property.second_insurance_interest_amount",
@@ -3445,7 +3444,7 @@ script: |
       "prop.owed_property.second_insurance_interest_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.owed_property.third_insurance_interest_has_claim",
       "prop.owed_property.third_insurance_interest_sub_100",
       "prop.owed_property.third_insurance_interest_amount",
@@ -3455,7 +3454,7 @@ script: |
       "prop.owed_property.third_insurance_interest_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.owed_property.trust_has_claim",
       "prop.owed_property.trust_sub_100",
       "prop.owed_property.trust_amount",
@@ -3465,7 +3464,7 @@ script: |
       "prop.owed_property.trust_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.owed_property.third_party_has_claim",
       "prop.owed_property.third_party_sub_100",
       "prop.owed_property.third_party_amount",
@@ -3475,7 +3474,7 @@ script: |
       "prop.owed_property.third_party_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.owed_property.contingent_claims_has_claim",
       "prop.owed_property.contingent_claims_sub_100",
       "prop.owed_property.contingent_claims_amount",
@@ -3485,7 +3484,7 @@ script: |
       "prop.owed_property.contingent_claims_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.owed_property.other_assets_has_claim",
       "prop.owed_property.other_assets_sub_100",
       "prop.owed_property.other_assets_amount",
@@ -4062,19 +4061,19 @@ fields:
 section: schedule_ab
 question: |
   Tell us about your business-related property
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.business_property.ar_has_claim",
       "prop.business_property.ar_sub_100",
       "prop.business_property.ar_amount",
@@ -4084,7 +4083,7 @@ script: |
       "prop.business_property.ar_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.business_property.equipment_has_claim",
       "prop.business_property.equipment_sub_100",
       "prop.business_property.equipment_amount",
@@ -4094,7 +4093,7 @@ script: |
       "prop.business_property.equipment_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.business_property.machinery_has_claim",
       "prop.business_property.machinery_sub_100",
       "prop.business_property.machinery_amount",
@@ -4104,7 +4103,7 @@ script: |
       "prop.business_property.machinery_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.business_property.inventory_has_claim",
       "prop.business_property.inventory_sub_100",
       "prop.business_property.inventory_amount",
@@ -4114,7 +4113,7 @@ script: |
       "prop.business_property.inventory_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.business_property.partnership_has_claim",
       "prop.business_property.partnership_sub_100",
       "prop.business_property.partnershipValue1",
@@ -4123,7 +4122,7 @@ script: |
       "prop.business_property.partnership_exemption_value_2",
       "prop.business_property.partnership_exemption_laws_2");
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.business_property.lists_has_claim",
       "prop.business_property.lists_sub_100",
       "prop.business_property.lists_amount",
@@ -4133,7 +4132,7 @@ script: |
       "prop.business_property.lists_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.business_property.otherProperty_has_claim",
       "prop.business_property.otherProperty_sub_100",
       "prop.business_property.otherPropertyAmount1",
@@ -4619,18 +4618,18 @@ fields:
 section: schedule_ab
 question: |
   Tell us about your Farm and Commecial Fishing-related property
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.farming_property.has_animal_claim",
       "prop.farming_property.animal_sub_100",
       "prop.farming_property.animal_amount",
@@ -4640,7 +4639,7 @@ script: |
       "prop.farming_property.animal_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.farming_property.has_crops_claim",
       "prop.farming_property.crops_sub_100",
       "prop.farming_property.crop_amount",
@@ -4650,7 +4649,7 @@ script: |
       "prop.farming_property.crops_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.farming_property.has_equipment_claim",
       "prop.farming_property.equipment_sub_100",
       "prop.farming_property.equipment_amount",
@@ -4660,7 +4659,7 @@ script: |
       "prop.farming_property.equipment_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.farming_property.has_supplies_claim",
       "prop.farming_property.supplies_sub_100",
       "prop.farming_property.supplies_amount",
@@ -4670,7 +4669,7 @@ script: |
       "prop.farming_property.supplies_exemption_laws_2");
 
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.farming_property.has_fishing_claim",
       "prop.farming_property.fishing_sub_100",
       "prop.farming_property.commercial_amount",
@@ -4922,18 +4921,18 @@ fields:
 section: schedule_ab
 question: |
   Describe all property that you haven't already listed
-right: |
-  Current Exemption Summary.
-
-  Name           |Limit            |Amount
-  ---------------|-----------------|-----------------
-  % for item in tbl_data():
-  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
-  % endfor
+#right: |
+#  Current Exemption Summary.
+#
+#  Name           |Limit            |Amount
+#  ---------------|-----------------|-----------------
+#  % for item in tbl_data():
+#  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
+#  % endfor
 script: |
   <script>
     checkQuestionExemptions(
-      ${ json.dumps(prop.exemptions) },
+      
       "prop.other_prop_has_claim",
       "prop.other_prop_sub_100",
       "prop.other_prop_value",
