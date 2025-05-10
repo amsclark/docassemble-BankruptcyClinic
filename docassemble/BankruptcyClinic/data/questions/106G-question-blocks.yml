@@ -149,7 +149,7 @@ code: |
   codebtors['noCommunityProperty'] = True if debtors.community_property == False else False
   codebtors['hasCommunityProperty'] = True if debtors.community_property == True else False
   codebtors['noSpouse'] = True if debtors.had_spouse == False else False
-  codebtors['hasSpouce'] = True if debtors.had_spouse == True else False
+  codebtors['hasspouse'] = True if debtors.had_spouse == True else False
   codebtors['primaryState'] = debtors.spouse_state if debtors.had_spouse == True else None
   codebtors['spousename'] = debtors.spouse_name if debtors.had_spouse == True else None
   codebtors['spouseAddress'] = debtors.spouse_street if debtors.had_spouse == True else None

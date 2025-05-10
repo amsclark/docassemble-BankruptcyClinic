@@ -17,7 +17,7 @@ fields:
   - You: family.you
     datatype: yesno
     default: True
-  - Your spouce: family.has_spouce
+  - Your spouse: family.has_spouse
     datatype: yesno
     default: True
   - Your dependents: family.has_dependents
@@ -36,7 +36,7 @@ fields:
   - Your income: family.you_income
     datatype: currency
     default: 50000
-  - Your spouces income: family.spouse_income
+  - Your spouses income: family.spouse_income
     datatype: currency
     required: False
     default: 30000
@@ -498,7 +498,7 @@ code: |
   waive['case_number_4'] = case_number
   waive['isAmended'] = amended_filing
   waive['sizeYou'] = True if family.you == True else False
-  waive['sizeSpouse'] = True if family.has_spouce == True else False
+  waive['sizeSpouse'] = True if family.has_spouse == True else False
   waive['sizeDependents'] = True if family.has_dependents == True else False
   waive['dependentCount'] = family.dependent_count if family.has_dependents == True else None
   waive['sizeTotal'] = family.total_number

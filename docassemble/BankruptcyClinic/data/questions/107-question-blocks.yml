@@ -693,7 +693,7 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - note: |
-      Within the last 8 years, did you ever live with a spouce or legal equivalent in a community property state or territory? (Community property states and territories include Arizona, California, Idaho, Louisiana, Nevada, New Mexico, Puerto Rico, Texas, Washington, and Wisconsin.
+      Within the last 8 years, did you ever live with a spouse or legal equivalent in a community property state or territory? (Community property states and territories include Arizona, California, Idaho, Louisiana, Nevada, New Mexico, Puerto Rico, Texas, Washington, and Wisconsin.
   - no label: financial_affairs.lived_with_spouse
     datatype: yesnoradio
     default: True

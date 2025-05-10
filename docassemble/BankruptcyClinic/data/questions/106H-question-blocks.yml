@@ -11,7 +11,7 @@ section: schedule_h
 question: |
   Do you have any codebtors?
 subquestion: |
-  If you are filing a joint case, do not list either spouce as a codebtor.
+  If you are filing a joint case, do not list either spouse as a codebtor.
 yesno: debtors.codebtors.there_are_any
 ---
 section: schedule_h
@@ -25,7 +25,7 @@ section: schedule_h
 question: |
   Tell us about your codebtor
 subquestion: |
-  Do not include your spouce as a codebtor if your spouce is filing with you.
+  Do not include your spouse as a codebtor if your spouse is filing with you.
 fields:
   - note: Codebtor Address Information
   - Name: debtors.codebtors[i].name
@@ -114,7 +114,7 @@ review:
         Lived in community property state: No
       % endif
 
-      % if debtors.had_spouce:
+      % if debtors.had_spouse:
         Had spouse: Yes
         Spouse Name: ${ debtors.spouse_name }
         State: ${ debtors.spouse_state }
@@ -151,7 +151,7 @@ code: |
   codebtors['noCommunityProperty'] = True if debtors.community_property == False else False
   codebtors['hasCommunityProperty'] = True if debtors.community_property == True else False
   codebtors['noSpouse'] = True if debtors.had_spouse == False else False
-  codebtors['hasSpouce'] = True if debtors.had_spouse == True else False
+  codebtors['hasspouse'] = True if debtors.had_spouse == True else False
   codebtors['primaryState'] = debtors.spouse_state if debtors.had_spouse == True else None
   codebtors['spousename'] = debtors.spouse_name if debtors.had_spouse == True else None
   codebtors['spouseAddress'] = debtors.spouse_street if debtors.had_spouse == True else None

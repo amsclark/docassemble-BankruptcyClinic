@@ -70,11 +70,11 @@ review:
 #Part 1: Identify Yourself
 
 question: |
-  Are you filing individually or with a spouce?
+  Are you filing individually or with a spouse?
 field: filing_status
 choices:
   - Filing individually
-  - Filing with spouce
+  - Filing with spouse
 ---
 
 table: debtor_table

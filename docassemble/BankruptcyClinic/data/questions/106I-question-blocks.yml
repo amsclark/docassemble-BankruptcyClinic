@@ -55,7 +55,7 @@ question: Give details about monthly income
 subquestion: |
     Estimate monthly income as of the date you file this form. If you have nothing to report for any line, write 0. Include your non-filing spouse unless you are separated.
 
-    If you or your non-filing spouce have more than one employer, combine the information for all employers for that person on the lines below.
+    If you or your non-filing spouse have more than one employer, combine the information for all employers for that person on the lines below.
 
     Please populate all your paystubs information for the previous month.
 fields:
@@ -326,7 +326,7 @@ question: Give details about monthly income
 subquestion: |
     Estimate monthly income as of the date you file this form. If you have nothing to report for any line, write 0. Include your non-filing spouse unless you are separated.
 
-    If you or your non-filing spouce have more than one employer, combine the information for all employers for that person on the lines below.
+    If you or your non-filing spouse have more than one employer, combine the information for all employers for that person on the lines below.
 
     Please populate all your paystubs information for the last full month.
 fields:
