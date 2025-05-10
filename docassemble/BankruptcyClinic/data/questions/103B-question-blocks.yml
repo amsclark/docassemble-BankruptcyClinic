@@ -156,6 +156,7 @@ fields:
     datatype: currency
 under: |
   ${ prop_accounts_table }
+list collect: True
 ---
 section: waive_fee
 question: |
@@ -291,6 +292,7 @@ fields:
   - Amount owed: prop.vehicles[i].amount_owed
     default: 14000
     datatype: currency
+list collect: True
 ---
 section: waive_fee
 question: |
@@ -345,6 +347,7 @@ fields:
       500
 under: |
   ${ prop_owers_table }
+list collect: True
 ---
 section: waive_fee
 question: |
@@ -468,6 +471,7 @@ fields:
   - Case Number: additional.bankruptcies[i].case_number
     datatype: number
     default: 111111
+list collect: True
 ---
 attachment:
   - name: Form 103b

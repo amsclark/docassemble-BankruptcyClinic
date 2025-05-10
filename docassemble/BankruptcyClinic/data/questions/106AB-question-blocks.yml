@@ -1565,6 +1565,7 @@ edit:
   - year
   - current_value
   - current_owned_value
+list collect = True
 ---
 section: schedule_ab
 question: |
@@ -1681,6 +1682,7 @@ fields:
       - Unknown law
     show if: prop.ab_vehicles[i].is_claiming_exemption
     required: False
+list collect = True
 ---
 table: prop_ab_other_vehicles_table
 rows: prop.ab_other_vehicles
@@ -1809,6 +1811,7 @@ fields:
       - Unknown law
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
     required: False
+list collect = True
 ---
 section: schedule_ab
 question: |
@@ -2540,6 +2543,7 @@ fields:
       - Unknown law
     show if: prop.financial_assets.deposits[i].is_claiming_exemption
     required: False
+list collect: True
 ---
 table: financial_bonds_table
 rows: prop.financial_assets.bonds_and_stocks
@@ -2624,6 +2628,7 @@ fields:
       - Unknown law
     show if: prop.financial_assets.bonds_and_stocks[i].is_claiming_exemption
     required: False
+list collect: True 
 ---
 table: financial_non_traded_stock_table
 rows: prop.financial_assets.non_traded_stock
@@ -2713,6 +2718,7 @@ fields:
       - Unknown law
     show if: prop.financial_assets.non_traded_stock[i].is_claiming_exemption
     required: false
+list collect: True 
 ---
 table: financial_corporate_bonds_table
 rows: prop.financial_assets.corporate_bonds
@@ -2797,6 +2803,7 @@ fields:
       - Unknown law
     show if: prop.financial_assets.corporate_bonds[i].is_claiming_exemption
     required: False
+list collect: True
 ---
 table: financial_retirement_accounts_table
 rows: prop.financial_assets.retirement_accounts
@@ -2900,6 +2907,7 @@ fields:
       - Unknown law
     show if: prop.financial_assets.retirement_accounts[i].has_claim
     required: False
+list collect: True
 ---
 table: financial_prepayments_table
 rows: prop.financial_assets.prepayments
@@ -3000,6 +3008,7 @@ fields:
       - Unknown law
     show if: prop.financial_assets.prepayments[i].has_claim
     required: False
+list collect: True
 ---
 table: financial_annuities_table
 rows: prop.financial_assets.annuities
@@ -3087,6 +3096,7 @@ fields:
       - Unknown law
     show if: prop.financial_assets.annuities[i].has_claim
     required: False
+list collect: True
 ---
 table: financial_edu_accounts_table
 rows: prop.financial_assets.edu_accounts
@@ -3174,6 +3184,7 @@ fields:
       - Unknown law
     show if: prop.financial_assets.edu_accounts[i].has_claim
     required: False
+    list collect: True
 ---
 section: schedule_ab
 question: |

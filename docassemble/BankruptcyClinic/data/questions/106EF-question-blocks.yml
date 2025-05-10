@@ -203,6 +203,7 @@ fields:
     default: 33593
     show if: prop.priority_claims[i].has_notify
     required: False
+list collect: True
 ---
 table: prop_nonpriority_claims_table
 rows: prop.nonpriority_claims
@@ -406,6 +407,7 @@ fields:
     default: 33593
     show if: prop.nonpriority_claims[i].has_notify
     required: False
+list collect: True
 ---
 event: schedule_ef
 section: schedule_ef

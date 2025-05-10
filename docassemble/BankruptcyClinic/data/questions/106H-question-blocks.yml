@@ -50,6 +50,7 @@ fields:
     default: Schedule D
   - Line: debtors.codebtors[i].schedule_line
     default: 3
+list collect: True
 ---
 section: schedule_h
 question: |
@@ -90,6 +91,7 @@ fields:
     default: 33593
     show if: debtors.had_spouse
     required: False
+list collect: True
 ---
 event: schedule_h
 section: schedule_h

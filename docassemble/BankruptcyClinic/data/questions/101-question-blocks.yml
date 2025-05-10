@@ -202,6 +202,7 @@ fields:
   - Business: debtor[i].alias[j].business
     required: False
 section: identify
+list collect: True
 ---
 question: |
   Does ${ debtor[i].name.first } ${ debtor[i].name.last } have any           other names they've used in the last 8 years?
@@ -337,6 +338,7 @@ fields:
   - Case Number: case.previous_bankruptcy[i].case_number
     default: abc1234ed
 section: case_det
+list collect: True
 ---
 question: |
   Do you have any other bankruptcy cases filed in the last 8 years?
@@ -368,6 +370,7 @@ fields:
   - Case Number: case.pending_bankruptcy[i].case_number
     default: 11222ddv2
 section: case_det
+list collect: True
 ---
 question: |
   Do you have any other pending bankruptcy cases filed in the last 8 years?
@@ -539,6 +542,7 @@ fields:
   - EIN: debtor[i].tax_id.second_ein
     required: False
 section: sole_prop
+list collect: True
 ---
 question: |
   Are you a sole proprietor of any **other** full- or part-time businesses?
@@ -620,6 +624,7 @@ fields:
     maxlength: 5
     default: 33593
 section: haz_prop
+list collect: True
 ---
 question: |
   Are there any other hazardous properties you'd like to report?

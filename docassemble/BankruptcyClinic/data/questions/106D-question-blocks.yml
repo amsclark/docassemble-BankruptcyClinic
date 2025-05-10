@@ -87,6 +87,7 @@ fields:
     maxlength: 5
     default: 33593
     required: False
+list collect: True
 ---
 mandatory: True
 code: |
@@ -235,6 +236,7 @@ fields:
     show if:
       variable: prop.creditors[i].has_codebtor
       is: True
+list collect: True 
 ---
 event: schedule_d
 section: schedule_d

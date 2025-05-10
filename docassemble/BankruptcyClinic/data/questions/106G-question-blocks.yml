@@ -80,6 +80,7 @@ fields:
     datatype: yesnoradio
     default: False
     show if: prop.contracts_and_leases[i].unexpired_lease
+list collect: True
 ---
 event: schedule_g
 section: schedule_g
