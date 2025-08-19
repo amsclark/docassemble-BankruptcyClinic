@@ -617,7 +617,7 @@ code: |
   elif case.payment_method == '3':
     waive_fee_intro
     family.you
-    family.has_spouce
+    family.has_spouse
     family.has_dependents
     family.dependent_count
     family.total_number
@@ -1816,7 +1816,7 @@ review:
         Lived in community property state: No
       % endif
 
-      % if debtors.had_spouce:
+      % if debtors.had_spouse:
         Had spouse: Yes
         Spouse Name: ${ debtors.spouse_name }
         State: ${ debtors.spouse_state }

@@ -1565,7 +1565,6 @@ edit:
   - year
   - current_value
   - current_owned_value
-list collect = True
 ---
 section: schedule_ab
 question: |
@@ -1682,7 +1681,7 @@ fields:
       - Unknown law
     show if: prop.ab_vehicles[i].is_claiming_exemption
     required: False
-list collect = True
+list collect: True
 ---
 table: prop_ab_other_vehicles_table
 rows: prop.ab_other_vehicles
@@ -1811,7 +1810,7 @@ fields:
       - Unknown law
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
     required: False
-list collect = True
+list collect: True
 ---
 section: schedule_ab
 question: |
@@ -3184,7 +3183,7 @@ fields:
       - Unknown law
     show if: prop.financial_assets.edu_accounts[i].has_claim
     required: False
-    list collect: True
+list collect: True
 ---
 section: schedule_ab
 question: |

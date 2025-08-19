@@ -27,7 +27,7 @@ question: |
 subquestion: |
   Do not include your spouse as a codebtor if your spouse is filing with you.
 fields:
-  - note: Codebtor Address Information
+  - note: Codebtor Address Information[i]
   - Name: debtors.codebtors[i].name
     default: Janna
   - Address/PO Box: debtors.codebtors[i].street

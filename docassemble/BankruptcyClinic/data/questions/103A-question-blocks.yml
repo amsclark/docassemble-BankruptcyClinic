@@ -114,6 +114,7 @@ under: |
   % endif
   ${ installment_payment_table }
   ${ payment.payments.add_action() }
+list collect: True
 ---
 attachment:
   name: Form 103a

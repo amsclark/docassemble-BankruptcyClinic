@@ -59,6 +59,7 @@ fields:
   - Schedule A/B line: prop.exempt_property.properties[i].line
     datatype: number
     default: 4
+list collect: True 
 ---
 section: schedule_c
 question: |
