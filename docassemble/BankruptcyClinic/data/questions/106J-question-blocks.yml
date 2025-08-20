@@ -1,20 +1,3 @@
----
-code: |
-  # Ensure debtor[0].expenses exists
-  if not hasattr(debtor[0], 'expenses'):
-    debtor[0].expenses = DAObject()
-  # Ensure dependents list exists
-  if not hasattr(debtor[0].expenses, 'dependents'):
-    debtor[0].expenses.dependents = DAList()
-  # Ensure other_household is set (default to False if not joint case)
-  if not hasattr(debtor[0].expenses, 'other_household'):
-    debtor[0].expenses.other_household = False
-  # Ensure joint_case is set
-  if not hasattr(debtor[0].expenses, 'joint_case'):
-    debtor[0].expenses.joint_case = False
-  # Only reference debtor[1] if it exists
-  if len(debtor) > 1 and not hasattr(debtor[1], 'complete'):
-    debtor[1].complete = False
 table: dependents_table
 rows: debtor[0].expenses.dependents
 columns:
