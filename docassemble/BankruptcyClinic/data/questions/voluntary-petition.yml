@@ -405,8 +405,8 @@ code: |
   prop.has_other_prop
 
   #106C
-  #prop.exempt_property.exemption_type
-  #prop.exempt_property.properties.gather()
+  prop.exempt_property.exemption_type
+  prop.exempt_property.properties.gather()
   prop.exempt_property.claim_homestead_exemption = False
 
   #107
@@ -422,7 +422,7 @@ code: |
     financial_affairs.debtor2_had_other_income
   financial_affairs.primarily_consumer_debts
 
-  #financial_affairs.large_debt_payments
+  financial_affairs.large_debt_payments
   financial_affairs.consumer_debt_payments.gather()
 
   financial_affairs.insider_payments.gather()
@@ -706,28 +706,28 @@ code: |
   reporting.complete = True
 
 
-  #if case.rents_residence:
-  #  if case.eviction_judgement:
-   #   attach_101a
-  #    if wish_to_stay == True:
-  #      attach_101b
-  #if case.payment_method == '2':
-   # form_103a_attach
-  #if case.payment_method == '3':
-  #  form_103b_attach
-  #schedule_ab_attach
-  #schedule_c_attach
-  #schedule_d_attach
-  #schedule_ef_attach
-  #schedule_g_attach
-  #schedule_h_attach
-  #schedule_i_attach
-  #schedule_j_attach
-  #form_107_attach
-  #form_108_attach
-  #form_121_attach
-  #form_122a_attach
-  #print_101
+  if case.rents_residence:
+    if case.eviction_judgement:
+      attach_101a
+      if wish_to_stay == True:
+        attach_101b
+  if case.payment_method == '2':
+    form_103a_attach
+  if case.payment_method == '3':
+    form_103b_attach
+  schedule_ab_attach
+  schedule_c_attach
+  schedule_d_attach
+  schedule_ef_attach
+  schedule_g_attach
+  schedule_h_attach
+  schedule_i_attach
+  schedule_j_attach
+  form_107_attach
+  form_108_attach
+  form_121_attach
+  form_122a_attach
+  print_101
   conclusion_screen
 ---
 question: |
