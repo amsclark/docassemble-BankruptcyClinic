@@ -119,7 +119,8 @@ objects:
   - debtor[i].expenses.dependents: |
       DAList.using(
         object_type=DAObject,
-        complete_attribute='complete')
+        complete_attribute='complete',
+        ask_number=True)
   - debtor[i].ssn_info: |
       DAObject.using(
         complete_attribute='complete')
