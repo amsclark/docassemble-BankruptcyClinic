@@ -66,8 +66,7 @@ fields:
       Tell the court why you are unable to pay the filing fee in installments within 120 days. If you have some additional circumstances that cause you not to be able to pay your filing fee in installments, explain them.
   - Explain: family.cannot_pay_explain
     input type: area
-    # default: |
-      NA
+    # default: NA
 ---
 #Part 2 - Tell the court about your monthly expenses
 section: waive_fee
@@ -86,8 +85,7 @@ fields:
     datatype: yesno
   - Explain: family.others_with_expenses_explain
     input type: area
-    # default: |
-      NA
+    # default:       NA
     show if: family.has_others_with_expenses
   - note: |
       <br><br>
@@ -105,8 +103,7 @@ fields:
     datatype: yesno
   - Explain: family.expense_changes_explain
     input type: area
-    # default: |
-      NA
+    # default:       NA
     show if: family.expense_changes
 ---
 # Part 3 - Tell the court about your property
@@ -175,16 +172,13 @@ fields:
     datatype: yesnoradio
     # default: False
   - Address/PO Box: prop.mortgage_street
-    # default: |
-      11111 56 Pl
+    # default:       11111 56 Pl
     show if: prop.has_home
   - City: prop.mortgage_city
-    # default: |
-      Tampa
+    # default:       Tampa
     show if: prop.has_home
   - State: prop.mortgage_state
-    # default: |
-      Florida
+    # default:       Florida
     show if: prop.has_home
   - Zip: prop.mortgage_zip
     datatype: number
@@ -211,16 +205,13 @@ fields:
     datatype: yesnoradio
     # default: False
   - Address/PO Box: prop.other_mortgage_street
-    # default: |
-      1111 56th Pl
+    # default:       1111 56th Pl
     show if: prop.has_other_real_estate
   - City: prop.other_mortgage_city
-    # default: |
-      Tampa
+    # default:       Tampa
     show if: prop.has_other_real_estate
   - State: prop.other_mortgage_state
-    # default: |
-      Florida
+    # default:       Florida
     show if: prop.has_other_real_estate
   - Zip: prop.other_mortgage_zip
     datatype: number
@@ -273,14 +264,11 @@ question: |
   Enter vehicle information
 fields:
   - Make: prop.vehicles[i].make
-    # default: |
-      Toyota
+    # default:       Toyota
   - Model: prop.vehicles[i].model
-    # default: |
-      Corolla
+    # default:       Corolla
   - Year: prop.vehicles[i].year
-    # default: |
-      2015
+    # default:       2015
   - Milage: prop.vehicles[i].milage
     datatype: number
     # default: 200000
@@ -302,8 +290,7 @@ subquestion: |
 fields:
   - Describe other assets: prop.other_asset_description
     input type: area
-    # default: |
-      Something else
+    # default:       Something else
   - Current Value: prop.other_asset_value
     datatype: currency
     # default: 1000
@@ -339,12 +326,10 @@ question: |
   Tell us about the ower.
 fields:
   - Ower Name: prop.owers[i].name
-    # default: |
-      Cindy
+    # default:       Cindy
   - How much?: prop.owers[i].amount
     datatype: currency
-    # default: |
-      500
+    # default:       500
 under: |
   ${ prop_owers_table }
 list collect: True
@@ -379,8 +364,7 @@ fields:
       - Someone else
     show if: additional.paid_for_services
   - Describe who: additional.paid_for_services_who_describe
-    # default: |
-      Family Friend
+    # default:       Family Friend
     show if: additional.paid_for_services
   - How much?: additional.paid_for_services_amount
     # default: 1000
@@ -400,8 +384,7 @@ fields:
       - Someone else
     show if: additional.promised_for_services
   - Describe who: additional.promised_for_services_who_describe
-    # default: |
-      Family Friend
+    # default:       Family Friend
     show if: additional.promised_for_services
   - How much?: additional.promised_for_services_amount
     # default: 1000
@@ -430,8 +413,7 @@ fields:
       - Someone else
     show if: additional.behalf_for_services
   - Other payer: additional.behalf_other_payer
-    # default: |
-      Someone else
+    # default:       Someone else
     show if: additional.behalf_for_services
   - How much was paid?: additional.behalf_for_services_amount
     # default: 1000

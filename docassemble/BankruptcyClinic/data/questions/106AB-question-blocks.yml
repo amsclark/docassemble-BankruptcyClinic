@@ -1487,8 +1487,7 @@ fields:
       - Debtor 1 only
       - At least one of the debtors and another
     show if: len(debtor) == 1
-    # default: |
-      Debtor 1 only
+    # default:       Debtor 1 only
   - Who has an interest in the property?: prop.interests[i].who
     input type: radio
     choices:
@@ -1497,8 +1496,7 @@ fields:
       - Debtor 1 and Debtor 2 only
       - At least one of the debtors and another
     show if: len(debtor) > 1
-    # default: |
-      Debtor 1 only
+    # default:       Debtor 1 only
   - Current property value: prop.interests[i].current_value
     # default: 200000
     datatype: currency
@@ -1620,8 +1618,7 @@ fields:
       - Debtor 1 only
       - At least one of the debtors and another
     show if: len(debtor) == 1
-    # default: |
-      Debtor 1 only
+    # default:       Debtor 1 only
   - Who has an interest in the property?: prop.ab_vehicles[i].who
     input type: radio
     choices:
@@ -1630,8 +1627,7 @@ fields:
       - Debtor 1 and Debtor 2 only
       - At least one of the debtors and another
     show if: len(debtor) > 1
-    # default: |
-      Debtor 1 only
+    # default:       Debtor 1 only
   - Current property value: prop.ab_vehicles[i].current_value
     # default: 200000
     datatype: currency
@@ -1752,8 +1748,7 @@ fields:
       - Debtor 1 only
       - At least one of the debtors and another
     show if: len(debtor) == 1
-    # default: |
-      Debtor 1 only
+    # default:       Debtor 1 only
   - Who has an interest in the property?: prop.ab_other_vehicles[i].who
     input type: radio
     choices:
@@ -1762,8 +1757,7 @@ fields:
       - Debtor 1 and Debtor 2 only
       - At least one of the debtors and another
     show if: len(debtor) > 1
-    # default: |
-      Debtor 1 only
+    # default:       Debtor 1 only
   - Current property value: prop.ab_other_vehicles[i].current_value
     # default: 200000
     datatype: currency
@@ -2862,8 +2856,7 @@ fields:
       - Retirement account
       - Keogh
       - Additional account
-    # default: |
-      401(k) or similar plan
+    # default:       401(k) or similar plan
   - Institution: prop.financial_assets.retirement_accounts[i].institution
     # default: CoolCo LLC
   - Amount: prop.financial_assets.retirement_accounts[i].amount
@@ -2969,8 +2962,7 @@ fields:
       - Water
       - Rented furniture
       - Other
-    # default: |
-      401(k) or similar plan
+    # default:       401(k) or similar plan
   - Institution: prop.financial_assets.prepayments[i].institution
     # default: Real estate pros
   - Amount: prop.financial_assets.prepayments[i].amount

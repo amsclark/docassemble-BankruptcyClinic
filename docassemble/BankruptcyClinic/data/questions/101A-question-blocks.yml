@@ -5,19 +5,15 @@ subquestion: |
   Please provide contact information for the landlord that has obtained a judgement for possession in an eviction, unlawful detainer action, or similar proceeding (called eviction judgement) against you to possess your residence.
 fields:
   - Landlords Name: landlord_name
-    # default: |
-      Jerry Lewis
+    # default: Jerry Lewis
   - note: |
       Landlord's address:
   - Address: landlord_street
-    # default: |
-      53349 56th SE
+    # default: 53349 56th SE
   - City: landlord_city
-    # default: |
-      Meris
+    # default: Meris
   - State: landlord_state
-    # default: |
-      KY
+    # default: KY
   - zip: landlord_zip
     datatype: number
     minlength: 5
