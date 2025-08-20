@@ -1,0 +1,305 @@
+# Infinite loop: x.lived_elsewhere already looked for, where stack is set()
+modules:
+  - .objects
+  - .courts_list
+  - .county_list
+---
+metadata:
+  title: 107 Test
+  short title: Petition for Chapter 7 Bankruptcy
+---
+include:
+  - 107-question-blocks.yml
+---
+objects:
+  - debtor: |
+      DAList.using(
+        object_type=Debtor,
+        minimum_number=1,
+        complete_attribute='complete')
+  - debtor[i].alias: |
+      DAList.using(
+        object_type=DebtorAlias,
+        complete_attribute='complete')
+  - financial_affairs: |
+      DAObject.using(
+        complete_attribute='complete')
+  - financial_affairs.consumer_debt_payments: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete')
+  - financial_affairs.insider_payments: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete')
+  - financial_affairs.insider_benefits: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete')
+  - financial_affairs.lawsuits: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete')
+  - financial_affairs.levies: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete')
+  - financial_affairs.gifts: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete')
+  - financial_affairs.bankruptcy_payments: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete')
+  - financial_affairs.creditor_help: |
+      DAObject.using(
+        complete_attribute='complete')
+  - financial_affairs.other_transfers: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete')
+  - financial_affairs.self_settled_trust: |
+      DAObject.using(
+        complete_attribute='complete')
+  - financial_affairs.instruments: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete')
+  - financial_affairs.deposit_box: |
+      DAObject.using(
+        complete_attribute='complete')
+  - financial_affairs.storage_unit: |
+      DAObject.using(
+        complete_attribute='complete')
+  - financial_affairs.held_property: |
+      DAObject.using(
+        complete_attribute='complete')
+  - financial_affairs.environment: |
+      DAObject.using(
+        complete_attrubute='complete')
+  - financial_affairs.businesses: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete')
+---
+code: |
+  financial_affairs.consumer_debt_payments[i].creditor_name
+  financial_affairs.consumer_debt_payments[i].creditor_street
+  financial_affairs.consumer_debt_payments[i].creditor_city
+  financial_affairs.consumer_debt_payments[i].creditor_state
+  financial_affairs.consumer_debt_payments[i].creditor_zip
+  financial_affairs.consumer_debt_payments[i].total_amount
+  financial_affairs.consumer_debt_payments[i].amount_owed
+  financial_affairs.consumer_debt_payments[i].payment_for
+  financial_affairs.consumer_debt_payments[i].complete = True
+---
+code: |
+  financial_affairs.insider_payments[i].insider_name
+  financial_affairs.insider_payments[i].street
+  financial_affairs.insider_payments[i].city
+  financial_affairs.insider_payments[i].state
+  financial_affairs.insider_payments[i].zip
+  financial_affairs.insider_payments[i].total_amount
+  financial_affairs.insider_payments[i].amount_owed
+  financial_affairs.insider_payments[i].reason
+  financial_affairs.insider_payments[i].complete = True
+---
+code: |
+  financial_affairs.insider_benefits[i].insider_name
+  financial_affairs.insider_benefits[i].street
+  financial_affairs.insider_benefits[i].city
+  financial_affairs.insider_benefits[i].state
+  financial_affairs.insider_benefits[i].zip
+  financial_affairs.insider_benefits[i].total_amount
+  financial_affairs.insider_benefits[i].amount_owed
+  financial_affairs.insider_benefits[i].reason
+  financial_affairs.insider_benefits[i].complete = True
+---
+code: |
+  financial_affairs.lawsuits[i].case_title
+  financial_affairs.lawsuits[i].case_number
+  financial_affairs.lawsuits[i].nature_of_case
+  financial_affairs.lawsuits[i].court_name
+  financial_affairs.lawsuits[i].court_street
+  financial_affairs.lawsuits[i].court_city
+  financial_affairs.lawsuits[i].court_state
+  financial_affairs.lawsuits[i].court_zip
+  financial_affairs.lawsuits[i].case_status
+  financial_affairs.lawsuits[i].payment_method = 2
+  financial_affairs.lawsuits[i].complete = True
+---
+code: |
+  financial_affairs.levies[i].creditor_name
+  financial_affairs.levies[i].creditor_street
+  financial_affairs.levies[i].creditor_city
+  financial_affairs.levies[i].creditor_state
+  financial_affairs.levies[i].creditor_zip
+  financial_affairs.levies[i].property_description
+  financial_affairs.levies[i].property_action
+  financial_affairs.levies[i].property_value
+  financial_affairs.levies[i].complete = True
+---
+code: |
+  financial_affairs.gifts[i].person_name
+  financial_affairs.gifts[i].street
+  financial_affairs.gifts[i].city
+  financial_affairs.gifts[i].state
+  financial_affairs.gifts[i].zip
+  financial_affairs.gifts[i].relationship
+  financial_affairs.gifts[i].description
+  financial_affairs.gifts[i].date_1
+  financial_affairs.gifts[i].value_1
+  financial_affairs.gifts[i].complete = True
+---
+code: |
+  financial_affairs.bankruptcy_payments[i].name
+  financial_affairs.bankruptcy_payments[i].street
+  financial_affairs.bankruptcy_payments[i].city
+  financial_affairs.bankruptcy_payments[i].state
+  financial_affairs.bankruptcy_payments[i].zip
+  financial_affairs.bankruptcy_payments[i].email_or_website
+  financial_affairs.bankruptcy_payments[i].property_description
+  financial_affairs.bankruptcy_payments[i].date_1
+  financial_affairs.bankruptcy_payments[i].value_1
+  financial_affairs.bankruptcy_payments[i].complete = True
+---
+code: |
+  financial_affairs.other_transfers[i].name
+  financial_affairs.other_transfers[i].street
+  financial_affairs.other_transfers[i].city
+  financial_affairs.other_transfers[i].state
+  financial_affairs.other_transfers[i].zip
+  financial_affairs.other_transfers[i].relationship
+  financial_affairs.other_transfers[i].property_description
+  financial_affairs.other_transfers[i].exchange_description
+  financial_affairs.other_transfers[i].date
+  financial_affairs.other_transfers[i].complete = True
+---
+code: |
+  financial_affairs.instruments[i].name
+  financial_affairs.instruments[i].street
+  financial_affairs.instruments[i].city
+  financial_affairs.instruments[i].state
+  financial_affairs.instruments[i].zip
+  financial_affairs.instruments[i].account_number
+  financial_affairs.instruments[i].account_type
+  financial_affairs.instruments[i].date
+  financial_affairs.instruments[i].last_balance
+  financial_affairs.instruments[i].complete = True
+---
+code: |
+  financial_affairs.businesses[i].name
+  financial_affairs.businesses[i].street
+  financial_affairs.businesses[i].city
+  financial_affairs.businesses[i].state
+  financial_affairs.businesses[i].zip
+  financial_affairs.businesses[i].nature
+  financial_affairs.businesses[i].accountant
+  financial_affairs.businesses[i].ein
+  financial_affairs.businesses[i].from_date
+  financial_affairs.businesses[i].to
+  financial_affairs.businesses[i].complete = True
+---
+mandatory: True
+code: |
+  amended_filing = False
+  case_number = "123456"
+  chapter = "Chapter 7"
+  current_district = "District of Nebraska"
+  debtor[0].address.address = "9999 333th St"
+  debtor[0].address.city = "Tampa"
+  debtor[0].address.city_only = False
+  debtor[0].address.geolocated = False
+  debtor[0].address.state = "Florida"
+  debtor[0].address.unit = "Doublas County"
+  debtor[0].address.zip = "33593"
+  debtor[0].alias = []
+  debtor[0].mailing_city = "Tampa"
+  debtor[0].mailing_state = "Florida"
+  debtor[0].mailing_street = "11111 35th Ave NE"
+  debtor[0].mailing_zip = 99999
+  debtor[0].name.first = "Dan"
+  debtor[0].name.middle = ""
+  debtor[0].name.last = "Fields"
+  debtor[0].tax_id.first_ein = ""
+  debtor[0].tax_id.second_ein = ""
+  debtor[0].tax_id.tax_id = 9999
+  debtor[0].tax_id.tax_id_type = "1"
+  debtor[0].complete = True
+  debtor[1].address.address = "9999 333th St"
+  debtor[1].address.city = "Tampa"
+  debtor[1].address.city_only = False
+  debtor[1].address.geolocated = False
+  debtor[1].address.state = "Florida"
+  debtor[1].address.unit = "Doublas County"
+  debtor[1].address.zip = "33593"
+  debtor[1].alias = []
+  debtor[1].mailing_city = "Tampa"
+  debtor[1].mailing_state = "Florida"
+  debtor[1].mailing_street = "11111 35th Ave NE"
+  debtor[1].mailing_zip = 99999
+  debtor[1].name.first = "Dan"
+  debtor[1].name.middle = ""
+  debtor[1].name.last = "Fields"
+  debtor[1].tax_id.first_ein = ""
+  debtor[1].tax_id.second_ein = ""
+  debtor[1].tax_id.tax_id = 9999
+  debtor[1].tax_id.tax_id_type = "1"
+  debtor[1].complete = True
+  debtor.there_is_another = False
+
+
+  debtor_name_test = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
+---
+mandatory: true
+code: |
+  #107
+  financial_affairs.debtor_count = len(debtor)
+  financial_affairs.marital_status = False
+  financial_affairs.lived_elsewhere = False # Set a default value
+  financial_affairs.has_second_address = False # Set a default value
+
+  financial_affairs.lived_with_spouse
+  financial_affairs.employed
+  if len(debtor) > 1 and financial_affairs.marital_status == False:
+    financial_affairs.debtor2_employed
+  financial_affairs.had_other_income
+  if len(debtor) > 1 and financial_affairs.marital_status == False:
+    financial_affairs.debtor2_had_other_income
+  financial_affairs.primarily_consumer_debts
+
+  #financial_affairs.large_debt_payments
+  financial_affairs.consumer_debt_payments.gather()
+
+  financial_affairs.insider_payments.gather()
+  financial_affairs.insider_benefits.gather()
+  financial_affairs.lawsuits.gather()
+  financial_affairs.levies.gather()
+  financial_affairs.has_refusal
+  financial_affairs.other_assignee
+  financial_affairs.gifts.gather()
+  financial_affairs.has_charity
+  financial_affairs.has_disaster
+  financial_affairs.bankruptcy_payments.gather()
+  financial_affairs.has_creditor_help
+  financial_affairs.other_transfers.gather()
+  financial_affairs.has_self_settled_trust
+  financial_affairs.instruments.gather()
+  financial_affairs.has_deposit_box
+  financial_affairs.has_storage_unit
+  financial_affairs.has_held_property
+  financial_affairs.environment.has_liability
+  financial_affairs.environment.has_release
+  financial_affairs.environment.has_proceeding
+  financial_affairs.business_types
+  if financial_affairs.business_types['A sole proprietor or self-employed in a trade, profession, or other activity, either full-time or part-time'] or financial_affairs.business_types['A member of a limited liability company (LLC) or limited liability partnership (LLP)'] or financial_affairs.business_types['A partner in a partnership'] or financial_affairs.business_types['An officer, director, or managing executive of a corporation'] or financial_affairs.business_types['An owner of at least 5% of the voting or equity securities of a corporation']:
+    financial_affairs.businesses.there_are_any = True
+  financial_affairs.businesses.gather()
+  financial_affairs.has_statement
+
+---
+mandatory: True
+question: test output
+attachment code: |
+  [form_107_temp, form_107_ext1, form_107_ext2, form_107_ext3]

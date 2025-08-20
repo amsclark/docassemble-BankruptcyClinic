@@ -74,10 +74,10 @@ subquestion: |
 fields:
   - First payment when filing?: payment.payment_on_petition
     datatype: yesnoradio
-    # default: False
+    default: False
   - Filing payment amount: payment.initial_payment_amount
     datatype: currency
-    # default: 100
+    default: 100
     show if: payment.payment_on_petition
 ---
 section: payment_installments
@@ -104,10 +104,10 @@ subquestion: |
 fields:
   - Amount to be paid: payment.payments[i].amount
     datatype: currency
-    # default: 150
+    default: 150
   - On or before: payment.payments[i].proposed_date
     datatype: date
-    # default: 05/03/2023
+    default: 05/03/2023
 under: |
   % if payment.payment_on_petition:
     Payment on filing: ${payment.initial_payment_amount}

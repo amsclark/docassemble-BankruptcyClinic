@@ -1,0 +1,348 @@
+# Interview has an error. 
+# There was a reference to a variable 'prop.contracts_and_leases.there_are_any' that could not be 
+# looked up in the question file (for language 'en') or in any of the files incorporated by 
+# reference into the question file.
+modules:
+  - .objects
+  - .courts_list
+  - .county_list
+---
+metadata:
+  title: 106H test
+  short title: Petition for Chapter 7 Bankruptcy
+---
+include:
+  - 106H-question-blocks.yml
+---
+objects:
+  - debtor: |
+      DAList.using(
+        object_type=Debtor,
+        minimum_number=1,
+        complete_attribute='complete')
+  - debtors: |
+      DAObject.using(
+        complete_attribute='complete')
+  - debtors.codebtors: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete')
+  - financial_affairs: |
+      DAObject.using(
+        complete_attribute='complete')
+  - prop: |
+      DAObject.using(
+        complete_attribute='complete')
+  - prop.creditors: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete')
+  - prop.priority_claims: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete')
+  - prop.nonpriority_claims: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete')
+  - prop.contracts_and_leases: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete')
+---
+mandatory: True
+code: |
+  amended_filing = False
+  case_number = "123456"
+  chapter = "Chapter 7"
+  current_district = "District of Nebraska"
+  debtor[0].address.address = "9999 333th St"
+  debtor[0].address.city = "Tampa"
+  debtor[0].address.city_only = False
+  debtor[0].address.geolocated = False
+  debtor[0].address.state = "Florida"
+  debtor[0].address.unit = "Doublas County"
+  debtor[0].address.zip = "33593"
+  debtor[0].alias = []
+  debtor[0].mailing_city = "Tampa"
+  debtor[0].mailing_state = "Florida"
+  debtor[0].mailing_street = "11111 35th Ave NE"
+  debtor[0].mailing_zip = 99999
+  debtor[0].name.first = "Dan"
+  debtor[0].name.middle = ""
+  debtor[0].name.last = "Fields"
+  debtor[0].tax_id.first_ein = ""
+  debtor[0].tax_id.second_ein = ""
+  debtor[0].tax_id.tax_id = 9999
+  debtor[0].tax_id.tax_id_type = "1"
+  debtor[0].complete = True
+  debtor.there_is_another = False
+
+  debtors.community_property = False
+  debtors.had_spouse = False
+
+  financial_affairs.lived_elsewhere = False
+
+  prop.creditors[0].has_codebtor = True
+  prop.creditors[0].account_number = 'testid342325423523'
+  prop.creditors[0].agreement = False
+  prop.creditors[0].city = "Tampa"
+  prop.creditors[0].claim_amount = 405
+  prop.creditors[0].codebtor_name = "Janna"
+  prop.creditors[0].codebtor_street = "1111 36th Ave NE"
+  prop.creditors[0].codebtor_zip = 98166
+  prop.creditors[0].codebtor_state = "Florida"
+  prop.creditors[0].codebtor_city = "Tampa"
+  prop.creditors[0].collateral_value = 300
+  prop.creditors[0].community_debt = False
+  prop.creditors[0].complete = True
+  prop.creditors[0].contingent = False
+  prop.creditors[0].disputed = False
+  prop.creditors[0].exempt = False
+  prop.creditors[0].has_codebtor = True
+  prop.creditors[0].has_other_lien_type = False
+  prop.creditors[0].incurred_date = "2023-03-02T00:00:00-05:00"
+  prop.creditors[0].lawsuit = False
+  prop.creditors[0].lien = False
+  prop.creditors[0].name = "Some creditor"
+  prop.creditors[0].other_city = "Tampa"
+  prop.creditors[0].other_city_2 = "Tampa"
+  prop.creditors[0].other_city_3 = "Tampa"
+  prop.creditors[0].other_name = "Other org"
+  prop.creditors[0].other_name_2 = "Other org"
+  prop.creditors[0].other_name_3 = "Other org"
+  prop.creditors[0].other_notify = True
+  prop.creditors[0].other_state = "Florida"
+  prop.creditors[0].other_state_2 = "Florida"
+  prop.creditors[0].other_state_3 = "Florida"
+  prop.creditors[0].other_street = "11111 33rd S"
+  prop.creditors[0].other_street_2 = "11111 33rd S"
+  prop.creditors[0].other_street_3 = "11111 33rd S"
+  prop.creditors[0].other_zip = 99999
+  prop.creditors[0].other_zip_2 = 99999
+  prop.creditors[0].other_zip_3 = 99999
+  prop.creditors[0].prop_description = "Household Goods"
+  prop.creditors[0].property_action = "Retain the property and do something else"
+  prop.creditors[0].property_action_other = "something"
+  prop.creditors[0].state = "Florida"
+  prop.creditors[0].street = "1111 45th pl"
+  prop.creditors[0].unliquidated = False
+  prop.creditors[0].unsecured_portion = 100
+  prop.creditors[0].who = "Debtor 1 only"
+  prop.creditors[0].zip = 99999
+  prop.creditors[0].complete = True
+  prop.creditors.there_is_another = False
+
+  prop.nonpriority_claims[0].has_codebtor = True
+  prop.nonpriority_claims[0].account_number = 9999
+  prop.nonpriority_claims[0].city = "tampa"
+  prop.nonpriority_claims[0].codebtor_name = "Jenna"
+  prop.nonpriority_claims[0].codebtor_street = "1111 36th Ave NE"
+  prop.nonpriority_claims[0].codebtor_state = "Florida"
+  prop.nonpriority_claims[0].codebtor_city = "Tampa"
+  prop.nonpriority_claims[0].codebtor_zip = 98166
+  prop.nonpriority_claims[0].contingent = False
+  prop.nonpriority_claims[0].date_incurred = "2023-01-01T00:00:00-05:00"
+  prop.nonpriority_claims[0].disputed = False
+  prop.nonpriority_claims[0].has_codebtor = True
+  prop.nonpriority_claims[0].has_notify = True
+  prop.nonpriority_claims[0].name = "Some creditor"
+  prop.nonpriority_claims[0].other_city = "Tampa"
+  prop.nonpriority_claims[0].other_city_2 = "Tampa"
+  prop.nonpriority_claims[0].other_city_3 = "Tampa"
+  prop.nonpriority_claims[0].other_name = "Other name"
+  prop.nonpriority_claims[0].other_name_2 = "Other name"
+  prop.nonpriority_claims[0].other_name_3 = "Other name"
+  prop.nonpriority_claims[0].other_state = "Florida"
+  prop.nonpriority_claims[0].other_state_2 = "Florida"
+  prop.nonpriority_claims[0].other_state_3 = "Florida"
+  prop.nonpriority_claims[0].other_street = "1111 23rd Ave"
+  prop.nonpriority_claims[0].other_street_2 = "1111 23rd Ave"
+  prop.nonpriority_claims[0].other_street_3 = "1111 23rd Ave"
+  prop.nonpriority_claims[0].other_type = "Other"
+  prop.nonpriority_claims[0].other_zip = 99999
+  prop.nonpriority_claims[0].other_zip_2 = 99999
+  prop.nonpriority_claims[0].other_zip_3 = 99999
+  prop.nonpriority_claims[0].state = "Florida"
+  prop.nonpriority_claims[0].street = "1111 3rd pl s"
+  prop.nonpriority_claims[0].total_claim = 400
+  prop.nonpriority_claims[0].type = "Other"
+  prop.nonpriority_claims[0].unliquified = False
+  prop.nonpriority_claims[0].who = "Debtor 1 only"
+  prop.nonpriority_claims[0].zip = 99999
+  prop.nonpriority_claims[0].complete = True
+  prop.nonpriority_claims.there_is_another = False
+
+
+  prop.priority_claims[0].has_codebtor = True
+  prop.priority_claims[0].account_number = 99999
+  prop.priority_claims[0].city = "Tampa"
+  prop.priority_claims[0].codebtor_name = "Janna"
+  prop.priority_claims[0].codebtor_street = "1111 36th Ave NE"
+  prop.priority_claims[0].codebtor_city = "Tampa"
+  prop.priority_claims[0].codebtor_state = "Florida"
+  prop.priority_claims[0].codebtor_zip = 98166
+  prop.priority_claims[0].contingent = False
+  prop.priority_claims[0].date_incurred = "2023-01-01T00:00:00-05:00"
+  prop.priority_claims[0].disputed = False
+  prop.priority_claims[0].has_codebtor = True
+  prop.priority_claims[0].has_notify = True
+  prop.priority_claims[0].name = "Some creditor"
+  prop.priority_claims[0].nonpriority_amount = 400
+  prop.priority_claims[0].other_city = "Tampa"
+  prop.priority_claims[0].other_city_2 = "Tampa"
+  prop.priority_claims[0].other_city_3 = "Tampa"
+  prop.priority_claims[0].other_name = "Other name"
+  prop.priority_claims[0].other_name_2 = "Other name"
+  prop.priority_claims[0].other_name_3 = "Ohter name"
+  prop.priority_claims[0].other_state = "Florida"
+  prop.priority_claims[0].other_state_2 = "Florida"
+  prop.priority_claims[0].other_state_3 = "Florida"
+  prop.priority_claims[0].other_street = "1111 23rd Ave"
+  prop.priority_claims[0].other_street_2 = "1111 23rd Ave"
+  prop.priority_claims[0].other_street_3 = "1111 23rd Ave"
+  prop.priority_claims[0].other_type = "Other"
+  prop.priority_claims[0].other_zip = 99999
+  prop.priority_claims[0].other_zip_2 = 99999
+  prop.priority_claims[0].other_zip_3 = 99999
+  prop.priority_claims[0].priority_amount = 100
+  prop.priority_claims[0].state = "Florida"
+  prop.priority_claims[0].street = "1111 3rd pl s"
+  prop.priority_claims[0].total_claim = 400
+  prop.priority_claims[0].type = "Other"
+  prop.priority_claims[0].unliquified = False
+  prop.priority_claims[0].who = "Debtor 1 only"
+  prop.priority_claims[0].zip = 99999
+  prop.priority_claims[0].complete = True
+  prop.priority_claims.there_is_another = False
+
+  prop.contracts_and_leases.there_are_any = False
+
+  debtors.codebtors[0].name = "Terry"
+  debtors.codebtors[0].street = "1111 3rd Ave"
+  debtors.codebtors[0].city = "Tampa"
+  debtors.codebtors[0].state = "Florida"
+  debtors.codebtors[0].zip = 99999
+  debtors.codebtors[0].schedule = "Schedule D"
+  debtors.codebtors[0].schedule_line = 3
+  debtors.codebtors.there_is_another = False
+
+
+ 
+  debtor_name_test = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
+
+  codebtors = {}
+  codebtors['debtor1_name_1'] = debtor_name
+  codebtors['debtor1_name_2'] = debtor_name
+  codebtors['debtor2_name_1'] = debtor2_name
+  codebtors['bankruptcy_district'] = current_district
+  codebtors['case_number_1'] = case_number
+  codebtors['case_number_2'] = case_number
+  codebtors['isAmended'] = amended_filing
+  codebtors['noCommunityProperty'] = True if debtors.community_property == False else False
+  codebtors['hasCommunityProperty'] = True if debtors.community_property == True else False
+  codebtors['noSpouse'] = True if debtors.had_spouse == False else False
+  codebtors['hasspouse'] = True if debtors.had_spouse == True else False
+  codebtors['primaryState'] = debtors.spouse_state if debtors.had_spouse == True else None
+  codebtors['spousename'] = debtors.spouse_name if debtors.had_spouse == True else None
+  codebtors['spouseAddress'] = debtors.spouse_street if debtors.had_spouse == True else None
+  codebtors['spouseCity'] = debtors.spouse_city if debtors.had_spouse == True else None
+  codebtors['spouseState'] = debtors.spouse_state if debtors.had_spouse == True else None
+  codebtors['spouseZip'] = debtors.spouse_zip if debtors.had_spouse == True else None  
+  
+  i=1
+  
+  c=1
+  for creditor in prop.creditors:
+    if creditor.has_codebtor == True:
+      codebtors['name'+str(i)] = creditor.codebtor_name
+      codebtors['address'+str(i)] = creditor.codebtor_street
+      codebtors['city'+str(i)] = creditor.codebtor_city
+      codebtors['state'+str(i)] = creditor.codebtor_state
+      codebtors['zip'+str(i)] = creditor.codebtor_zip
+      codebtors['isD'+str(i)] = True
+      codebtors['dLine'+str(i)] = c
+      codebtors['isEF'+str(i)] = False
+      codebtors['efLine'+str(i)] = None
+      codebtors['isG'+str(i)] = False
+      codebtors['gLine'+str(i)] = None
+      i += 1
+    c += 1
+  
+  c=1
+  for creditor in prop.priority_claims:
+    if creditor.has_codebtor == True:
+      codebtors['name'+str(i)] = creditor.codebtor_name
+      codebtors['address'+str(i)] = creditor.codebtor_street
+      codebtors['city'+str(i)] = creditor.codebtor_city
+      codebtors['state'+str(i)] = creditor.codebtor_state
+      codebtors['zip'+str(i)] = creditor.codebtor_zip
+      codebtors['isD'+str(i)] = True
+      codebtors['dLine'+str(i)] = c
+      codebtors['isEF'+str(i)] = False
+      codebtors['efLine'+str(i)] = None
+      codebtors['isG'+str(i)] = False
+      codebtors['gLine'+str(i)] = None
+      i += 1
+    c += 1
+
+  c=1
+  for creditor in prop.nonpriority_claims:
+    if creditor.has_codebtor == True:
+      codebtors['name'+str(i)] = creditor.codebtor_name
+      codebtors['address'+str(i)] = creditor.codebtor_street
+      codebtors['city'+str(i)] = creditor.codebtor_city
+      codebtors['state'+str(i)] = creditor.codebtor_state
+      codebtors['zip'+str(i)] = creditor.codebtor_zip
+      codebtors['isD'+str(i)] = True
+      codebtors['dLine'+str(i)] = c
+      codebtors['isEF'+str(i)] = False
+      codebtors['efLine'+str(i)] = None
+      codebtors['isG'+str(i)] = False
+      codebtors['gLine'+str(i)] = None
+      i += 1
+    c += 1
+  
+
+  c=1
+  for creditor in prop.contracts_and_leases:
+    if creditor.has_codebtor == True:
+      codebtors['name'+str(i)] = creditor.codebtor_name
+      codebtors['address'+str(i)] = creditor.codebtor_street
+      codebtors['city'+str(i)] = creditor.codebtor_city
+      codebtors['state'+str(i)] = creditor.codebtor_state
+      codebtors['zip'+str(i)] = creditor.codebtor_zip
+      codebtors['isD'+str(i)] = True
+      codebtors['dLine'+str(i)] = c
+      codebtors['isEF'+str(i)] = False
+      codebtors['efLine'+str(i)] = None
+      codebtors['isG'+str(i)] = False
+      codebtors['gLine'+str(i)] = None
+      i += 1
+    c += 1
+---
+mandatory: True
+code: |
+  #106H
+  debtors.community_property
+  #debtors.codebtors.gather()
+---
+code: |
+  debtors.codebtors[i].name
+  debtors.codebtors[i].street
+  debtors.codebtors[i].city
+  debtors.codebtors[i].state
+  debtors.codebtors[i].zip
+  debtors.codebtors[i].schedule
+  debtors.codebtors[i].schedule_line
+  debtors.codebtors[i].complete = True
+---
+mandatory: True
+question: |
+  Voluntary Petition for Individuals Filing for Bankruptcy conclusion
+subquestion: |
+  conclusion
+allow downloading: True
+attachment code: |
+  [h_attach]
+---

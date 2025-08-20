@@ -1,0 +1,138 @@
+modules:
+  - .objects
+  - .courts_list
+  - .county_list
+---
+metadata:
+  title: 121 test
+  short title: Petition for Chapter 7 Bankruptcy
+---
+include:
+  - 121-question-blocks.yml
+---
+objects:
+  - debtor: |
+      DAList.using(
+        object_type=Debtor,
+        minimum_number=1,
+        complete_attribute='complete')
+  - debtor[i].income: |
+      DAObject.using(
+        complete_attribute='complete')
+  - debtors: |
+      DAObject.using(
+        complete_attribute='complete')
+  - financial_affairs: |
+      DAObject.using(
+        complete_attribute='complete')
+  - debtor[i].expenses: |
+      DAObject.using(
+        complete_attribute='complete')
+  - debtor[i].expenses.dependents: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete')
+  - debtor[i].ssn_info: |
+      DAObject.using(
+        complete_attribute='complete')
+---
+mandatory: True
+code: |
+  amended_filing = False
+  case_number = "123456"
+  chapter = "Chapter 7"
+  current_district = "District of Nebraska"
+  debtor[0].address.address = "9999 333th St"
+  debtor[0].address.city = "Tampa"
+  debtor[0].address.city_only = False
+  debtor[0].address.geolocated = False
+  debtor[0].address.state = "Florida"
+  debtor[0].address.unit = "Doublas County"
+  debtor[0].address.zip = "33593"
+  debtor[0].alias = []
+  debtor[0].mailing_city = "Tampa"
+  debtor[0].mailing_state = "Florida"
+  debtor[0].mailing_street = "11111 35th Ave NE"
+  debtor[0].mailing_zip = 99999
+  debtor[0].name.first = "Dan"
+  debtor[0].name.middle = ""
+  debtor[0].name.last = "Fields"
+  debtor[0].tax_id.first_ein = ""
+  debtor[0].tax_id.second_ein = ""
+  debtor[0].tax_id.tax_id = 9999
+  debtor[0].tax_id.tax_id_type = "1"
+  debtor[0].complete = True
+  # debtor[1].address.address = "9999 333th St"
+  # debtor[1].address.city = "Tampa"
+  # debtor[1].address.city_only = False
+  # debtor[1].address.geolocated = False
+  # debtor[1].address.state = "Florida"
+  # debtor[1].address.unit = "Doublas County"
+  # debtor[1].address.zip = "33593"
+  # debtor[1].alias = []
+  # debtor[1].mailing_city = "Tampa"
+  # debtor[1].mailing_state = "Florida"
+  # debtor[1].mailing_street = "11111 35th Ave NE"
+  # debtor[1].mailing_zip = 99999
+  # debtor[1].name.first = "Dan"
+  # debtor[1].name.middle = ""
+  # debtor[1].name.last = "Fields"
+  # debtor[1].tax_id.first_ein = ""
+  # debtor[1].tax_id.second_ein = ""
+  # debtor[1].tax_id.tax_id = 9999
+  # debtor[1].tax_id.tax_id_type = "1"
+  # debtor[1].complete = True
+  debtor.there_is_another = False
+
+  debtors.community_property = False
+  debtors.had_spouse = False
+
+  financial_affairs.lived_elsewhere = False
+---
+mandatory: True
+code: |
+  #121
+  debtor[0].ssn_info.no_ssn
+---
+code: |
+  ssn = {}
+  ssn['bankruptcy_district'] = current_district
+  ssn['case_number'] = case_number
+  ssn['debtor1_first_name'] = debtor[0].name.first
+  ssn['debtor1_middle_name'] = debtor[0].name.middle
+  ssn['debtor1_last_name'] = debtor[0].name.last
+  ssn['debtor1_no_itin'] = True if debtor[0].ssn_info.no_itin == True else False
+  ssn['debtor1_no_ssn'] = True if debtor[0].ssn_info.no_ssn == True else False
+  if debtor[0].ssn_info.no_ssn == True:
+    ssn['debtor1_ssn_1'] = debtor[0].ssn_info.ssn_1
+    ssn['debtor1_ssn_2'] = debtor[0].ssn_info.ssn_2
+  if debtor[0].ssn_info.no_itin == True:
+    ssn['debtor1_itin_1'] = debtor[0].ssn_info.itin_1
+    ssn['debtor1_itin_2'] = debtor[0].ssn_info.itin_2
+  if len(debtor) > 1:
+    ssn['debtor2_first_name'] = debtor[1].name.first
+    ssn['debtor2_middle_name'] = debtor[1].name.middle
+    ssn['debtor2_last_name'] = debtor[1].name.last
+    ssn['debtor2_no_itin'] = True if debtor[1].ssn_info.no_itin == True else False
+    ssn['debtor2_no_ssn'] = True if debtor[1].ssn_info.no_ssn == True else False
+    if debtor[1].ssn_info.no_ssn == True:
+      ssn['debtor2_ssn_1'] = debtor[1].ssn_info.ssn_1
+      ssn['debtor2_ssn_2'] = debtor[1].ssn_info.ssn_1
+    if debtor[1].ssn_info.no_itin == True:
+      ssn['debtor2_itin_1'] = debtor[1].ssn_info.itin_1
+      ssn['debtor2_itin_2'] = debtor[1].ssn_info.itin_2
+---
+mandatory: True
+question: |
+  Voluntary Petition for Individuals Filing for Bankruptcy conclusion
+subquestion: |
+  conclusion
+allow downloading: True
+attachment code: |
+  [attach_121]
+---
+code: |
+  debtor[i].ssn_info.no_ssn
+  debtor[i].ssn_info.no_itin
+  debtor.ssn_info.complete = True
+---

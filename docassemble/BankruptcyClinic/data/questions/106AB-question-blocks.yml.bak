@@ -1451,18 +1451,18 @@ script: |
 #  prop.interests[i].complete = True
 fields:
   - Street: prop.interests[i].street
-    # default: "1111 SE Hamilton Ave"
+    default: "1111 SE Hamilton Ave"
   - City: prop.interests[i].city
-    # default: Tampa
+    default: Tampa
   - State: prop.interests[i].state
-    # default: Florida
+    default: Florida
   - Zip: prop.interests[i].zip
     datatype: number
     minlength: 5
     maxlength: 5
-    # default: 33593
+    default: 33593
   - County: prop.interests[i].county
-    # default: Fulston
+    default: Fulston
   - note: |
       <br><br>
       Tell the court about the value and interest in the property.
@@ -1477,9 +1477,9 @@ fields:
       - Investment property
       - Timeshare
       - Other
-    # default: Single-family home
+    default: Single-family home
   - Other property type: prop.interests[i].other_type
-    # default: other
+    default: other
     show if: prop.interests[i].type["Other"]
   - Who has an interest in the property?: prop.interests[i].who
     input type: radio
@@ -1487,7 +1487,7 @@ fields:
       - Debtor 1 only
       - At least one of the debtors and another
     show if: len(debtor) == 1
-    # default: |
+    default: |
       Debtor 1 only
   - Who has an interest in the property?: prop.interests[i].who
     input type: radio
@@ -1497,37 +1497,37 @@ fields:
       - Debtor 1 and Debtor 2 only
       - At least one of the debtors and another
     show if: len(debtor) > 1
-    # default: |
+    default: |
       Debtor 1 only
   - Current property value: prop.interests[i].current_value
-    # default: 200000
+    default: 200000
     datatype: currency
   - Do you have a mortgage/loan on the property?: prop.interests[i].has_loan
-    # default: false
+    default: false
     datatype: yesno
   - How much do you owe on the loan?: prop.interests[i].current_owed_amount
-    # default: 150000
+    default: 150000
     datatype: currency
     show if: prop.interests[i].has_loan
   - Describe the nature of your ownership interest: prop.interests[i].ownership_interest
     input type: area
-    # default: NA
+    default: NA
   - Is this community property?: prop.interests[i].is_community_property
-    # default: False
+    default: False
     datatype: yesnoradio
   - Other information about item, such as local property identification number: prop.interests[i].other_info
-    # default: Other info
+    default: Other info
   - Claiming Exemption?: prop.interests[i].is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.interests[i].claiming_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.interests[i].is_claiming_exemption
   - note: First Exemption
     show if: prop.interests[i].is_claiming_exemption
   - Value of exemption being claimed: prop.interests[i].exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.interests[i].claiming_sub_100
   - Specific laws that allow exemption: prop.interests[i].exemption_laws
@@ -1540,7 +1540,7 @@ fields:
   - note: Second Exemption
     show if: prop.interests[i].is_claiming_exemption
   - Value of exemption being claimed: prop.interests[i].exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.interests[i].claiming_sub_100
     required: False
@@ -1605,22 +1605,22 @@ script: |
   </script>
 fields:
   - Make: prop.ab_vehicles[i].make
-    # default: Toyota
+    default: Toyota
   - Model: prop.ab_vehicles[i].model
-    # default: Corolla
+    default: Corolla
   - Year: prop.ab_vehicles[i].year
     datatype: number
-    # default: 2012
+    default: 2012
   - Approximate milage: prop.ab_vehicles[i].milage
     datatype: number
-    # default: 200000
+    default: 200000
   - Who has an interest in the property?: prop.ab_vehicles[i].who
     input type: radio
     choices:
       - Debtor 1 only
       - At least one of the debtors and another
     show if: len(debtor) == 1
-    # default: |
+    default: |
       Debtor 1 only
   - Who has an interest in the property?: prop.ab_vehicles[i].who
     input type: radio
@@ -1630,35 +1630,35 @@ fields:
       - Debtor 1 and Debtor 2 only
       - At least one of the debtors and another
     show if: len(debtor) > 1
-    # default: |
+    default: |
       Debtor 1 only
   - Current property value: prop.ab_vehicles[i].current_value
-    # default: 200000
+    default: 200000
     datatype: currency
   - Do you have a mortgage/loan on the vehicle?: prop.ab_vehicles[i].has_loan
-    # default: false
+    default: false
     datatype: yesno
   - How much do you owe on the loan?: prop.ab_vehicles[i].current_owed_amount
-    # default: 150000
+    default: 150000
     datatype: currency
     show if: prop.ab_vehicles[i].has_loan
   - Is this community property?: prop.ab_vehicles[i].is_community_property
-    # default: False
+    default: False
     datatype: yesnoradio
   - Other information: prop.ab_vehicles[i].other_info
     required: false
     input type: area
   - Claiming Exemption?: prop.ab_vehicles[i].is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.ab_vehicles[i].claiming_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.ab_vehicles[i].is_claiming_exemption
   - note: First Exemption
     show if: prop.ab_vehicles[i].is_claiming_exemption
   - Value of exemption being claimed: prop.ab_vehicles[i].exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.ab_vehicles[i].claiming_sub_100
   - Specific laws that allow exemption: prop.ab_vehicles[i].exemption_laws
@@ -1670,7 +1670,7 @@ fields:
   - note: Second Exemption
     show if: prop.ab_vehicles[i].is_claiming_exemption
   - Value of exemption being claimed: prop.ab_vehicles[i].exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.ab_vehicles[i].claiming_sub_100
     required: False
@@ -1737,22 +1737,22 @@ script: |
   </script>
 fields:
   - Make: prop.ab_other_vehicles[i].make
-    # default: Toyota
+    default: Toyota
   - Model: prop.ab_other_vehicles[i].model
-    # default: Corolla
+    default: Corolla
   - Year: prop.ab_other_vehicles[i].year
     datatype: number
-    # default: 2012
+    default: 2012
   - Other info: prop.ab_other_vehicles[i].other_info
     input type: area
-    # default: na
+    default: na
   - Who has an interest in the property?: prop.ab_other_vehicles[i].who
     input type: radio
     choices:
       - Debtor 1 only
       - At least one of the debtors and another
     show if: len(debtor) == 1
-    # default: |
+    default: |
       Debtor 1 only
   - Who has an interest in the property?: prop.ab_other_vehicles[i].who
     input type: radio
@@ -1762,32 +1762,32 @@ fields:
       - Debtor 1 and Debtor 2 only
       - At least one of the debtors and another
     show if: len(debtor) > 1
-    # default: |
+    default: |
       Debtor 1 only
   - Current property value: prop.ab_other_vehicles[i].current_value
-    # default: 200000
+    default: 200000
     datatype: currency
   - Do you have a mortgage/loan on the vehicle?: prop.ab_other_vehicles[i].has_loan
-    # default: false
+    default: false
     datatype: yesno
   - How much do you owe on the loan?: prop.ab_other_vehicles[i].current_owed_amount
-    # default: 150000
+    default: 150000
     datatype: currency
     show if: prop.ab_other_vehicles[i].has_loan
   - Is this community property?: prop.ab_other_vehicles[i].is_community_property
-    # default: False
+    default: False
     datatype: yesnoradio
   - Claiming Exemption?: prop.ab_other_vehicles[i].is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.ab_other_vehicles[i].claiming_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
   - note: Exemption 1
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
   - Value of exemption being claimed: prop.ab_other_vehicles[i].exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.ab_other_vehicles[i].claiming_sub_100
   - Specific laws that allow exemption: prop.ab_other_vehicles[i].exemption_laws
@@ -1799,7 +1799,7 @@ fields:
   - note: Exemption 2
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
   - Value of exemption being claimed: prop.ab_other_vehicles[i].exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.ab_other_vehicles[i].claiming_sub_100
     required: False
@@ -1923,26 +1923,26 @@ fields:
   - note: <h3>Household Goods & Furnishings</h3>
   - Do you own any household good and furnishings?: prop.has_household_goods
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.household_goods_description
-    # default: Some goods
+    default: Some goods
     input type: area
     show if: prop.has_household_goods
   - Total owned value: prop.household_goods_value
     datatype: currency
-    # default: 3000
+    default: 3000
     show if: prop.has_household_goods
   - Claiming Exemption?: prop.household_goods_is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.household_goods_claiming_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.household_goods_is_claiming_exemption
   - note: Exemption 1
     show if: prop.household_goods_is_claiming_exemption
   - Value of exemption being claimed: prop.household_goods_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.household_goods_claiming_sub_100
   - Specific laws that allow exemption: prop.household_goods_exemption_laws
@@ -1954,7 +1954,7 @@ fields:
   - note: Exemption 2
     show if: prop.household_goods_is_claiming_exemption
   - Value of exemption being claimed: prop.household_goods_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.household_goods_claiming_sub_100
     required: False
@@ -1970,26 +1970,26 @@ fields:
 
   - Do you own any secured household goods and furnishings?: prop.has_secured_household_goods
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.secured_household_goods_description
-    # default: Some secured goods
+    default: Some secured goods
     input type: area
     show if: prop.has_secured_household_goods
   - Total owned value: prop.secured_household_goods_value
     datatype: currency
-    # default: 3000
+    default: 3000
     show if: prop.has_secured_household_goods
   - Claiming Exemption?: prop.secured_household_goods_is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.secured_household_goods_claiming_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.secured_household_goods_is_claiming_exemption
   - note: Exemption 1
     show if: prop.secured_household_goods_is_claiming_exemption
   - Value of exemption being claimed: prop.secured_household_goods_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.secured_household_goods_claiming_sub_100
   - Specific laws that allow exemption: prop.secured_household_goods_exemption_laws
@@ -2001,7 +2001,7 @@ fields:
   - note: Exemption 2
     show if: prop.secured_household_goods_is_claiming_exemption
   - Value of exemption being claimed: prop.secured_household_goods_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.secured_household_goods_claiming_sub_100
     required: False
@@ -2017,25 +2017,25 @@ fields:
 
   - Do you own any electronics?: prop.has_electronics
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.electronics_description
-    # default: Some electrons
+    default: Some electrons
     input type: area
     show if: prop.has_electronics
   - Total owned value: prop.electronics_value
     datatype: currency
-    # default: 500
+    default: 500
   - Claiming Exemption?: prop.electronics_is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.electronics_claiming_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.electronics_is_claiming_exemption
   - note: First Exemption
     show if: prop.electronics_is_claiming_exemption
   - Value of exemption being claimed: prop.electronics_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.electronics_claiming_sub_100
   - Specific laws that allow exemption: prop.electronics_exemption_laws
@@ -2048,7 +2048,7 @@ fields:
   - note: Second Exemption
     show if: prop.electronics_is_claiming_exemption
   - Value of exemption being claimed: prop.electronics_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.electronics_claiming_sub_100
     required: False
@@ -2065,25 +2065,25 @@ fields:
 
   - Do you own any collectibles?: prop.has_collectibles
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.collectibles_description
-    # default: Some collectables
+    default: Some collectables
     input type: area
     show if: prop.has_collectibles
   - Total owned value: prop.collectibles_value
     datatype: currency
-    # default: 100
+    default: 100
   - Claiming Exemption?: prop.collectibles_is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.collectibles_claiming_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.collectibles_is_claiming_exemption
   - note: First Exemption
     show if: prop.collectibles_is_claiming_exemption
   - Value of exemption being claimed: prop.collectibles_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.collectibles_claiming_sub_100
   - Specific laws that allow exemption: prop.collectibles_exemption_laws
@@ -2094,7 +2094,7 @@ fields:
   - note: Second Exemption
     show if: prop.collectibles_is_claiming_exemption
   - Value of exemption being claimed: prop.collectibles_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.collectibles_claiming_sub_100
     required: False
@@ -2109,25 +2109,25 @@ fields:
 
   - Do you own any sports and hobby equipment?: prop.has_hobby_equipment
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.hobby_equipment_description
-    # default: Some hobby equipment
+    default: Some hobby equipment
     input type: area
     show if: prop.has_hobby_equipment
   - Total owned value: prop.hobby_equipment_value
     datatype: currency
-    # default: 3000
+    default: 3000
   - Claiming Exemption?: prop.hobby_equipment_is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.hobby_equipment_claiming_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.hobby_equipment_is_claiming_exemption
   - note: First Exemption
     show if: prop.hobby_equipment_is_claiming_exemption
   - Value of exemption being claimed: prop.hobby_equipment_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.hobby_equipment_claiming_sub_100
   - Specific laws that allow exemption: prop.hobby_equipment_exemption_laws
@@ -2138,7 +2138,7 @@ fields:
   - note: Second Exemption
     show if: prop.hobby_equipment_is_claiming_exemption
   - Value of exemption being claimed: prop.hobby_equipment_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.hobby_equipment_claiming_sub_100
     required: False
@@ -2153,26 +2153,26 @@ fields:
 
   - Do you own any firearms?: prop.has_firearms
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.firearms_description
-    # default: some firearms
+    default: some firearms
     input type: area
     show if: prop.has_firearms
   - Total owned value: prop.firearms_value
     datatype: currency
-    # default: 500
+    default: 500
     show if: prop.has_firearms
   - Claiming Exemption?: prop.firearms_is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.firearms_claiming_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.firearms_is_claiming_exemption
   - note: First Exemption
     show if: prop.firearms_is_claiming_exemption
   - Value of exemption being claimed: prop.firearms_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.firearms_claiming_sub_100
   - Specific laws that allow exemption: prop.firearms_exemption_laws
@@ -2183,7 +2183,7 @@ fields:
   - note: Second Exemption
     show if: prop.firearms_is_claiming_exemption
   - Value of exemption being claimed: prop.firearms_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.firearms_claiming_sub_100
     required: False
@@ -2198,26 +2198,26 @@ fields:
 
   - Do you own any clothes?: prop.has_clothes
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.clothes_description
-    # default: some clothes
+    default: some clothes
     input type: area
     show if: prop.has_clothes
   - Total owned value: prop.clothes_value
     datatype: currency
-    # default: 200
+    default: 200
     show if: prop.has_clothes
   - Claiming Exemption?: prop.clothes_is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.clothes_claiming_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.clothes_is_claiming_exemption
   - note: First Exemption
     show if: prop.clothes_is_claiming_exemption
   - Value of exemption being claimed: prop.clothes_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.clothes_claiming_sub_100
   - Specific laws that allow exemption: prop.clothes_exemption_laws
@@ -2229,7 +2229,7 @@ fields:
   - note: Second Exemption
     show if: prop.clothes_is_claiming_exemption
   - Value of exemption being claimed: prop.clothes_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.clothes_claiming_sub_100
     required: False
@@ -2245,26 +2245,26 @@ fields:
 
   - Do you own any jewlery?: prop.has_jewlery
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.jewlery_description
-    # default: some jewlery
+    default: some jewlery
     input type: area
     show if: prop.has_jewlery
   - Total owned value: prop.jewlery_value
     datatype: currency
-    # default: 3000
+    default: 3000
     show if: prop.has_jewlery
   - Claiming Exemption?: prop.jewlery_is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.jewlery_claiming_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.jewlery_is_claiming_exemption
   - note: First Exemption
     show if: prop.jewlery_is_claiming_exemption
   - Value of exemption being claimed: prop.jewlery_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.jewlery_claiming_sub_100
   - Specific laws that allow exemption: prop.jewlery_exemption_laws
@@ -2277,7 +2277,7 @@ fields:
   - note: Second Exemption
     show if: prop.jewlery_is_claiming_exemption
   - Value of exemption being claimed: prop.jewlery_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.jewlery_claiming_sub_100
     required: False
@@ -2294,26 +2294,26 @@ fields:
 
   - Do you own any non-farm animals?: prop.has_animals
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.animal_description
-    # default: some dogs and cats
+    default: some dogs and cats
     input type: area
     show if: prop.has_animals
   - Total owned value: prop.animal_value
     datatype: currency
-    # default: 500
+    default: 500
     show if: prop.has_animals
   - Claiming Exemption?: prop.animal_is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.animal_claiming_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.animal_is_claiming_exemption
   - note: First Exemption
     show if: prop.animal_is_claiming_exemption
   - Value of exemption being claimed: prop.animal_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.animal_claiming_sub_100
   - Specific laws that allow exemption: prop.animal_exemption_laws
@@ -2324,7 +2324,7 @@ fields:
   - note: Second Exemption
     show if: prop.animal_is_claiming_exemption
   - Value of exemption being claimed: prop.animal_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.animal_claiming_sub_100
     required: False
@@ -2339,26 +2339,26 @@ fields:
 
   - Do you own any other personal and household items you did not already list, including any health aids you did not list?: prop.has_other_household_items
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.other_household_items_description
-    # default: some home stuff
+    default: some home stuff
     input type: area
     show if: prop.has_other_household_items
   - Total owned value: prop.other_household_items_value
-    # default: 100
+    default: 100
     datatype: currency
     show if: prop.has_other_household_items
   - Claiming Exemption?: prop.other_household_items_is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.other_household_items_claiming_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.other_household_items_is_claiming_exemption
   - note: First Exemption
     show if: prop.other_household_items_is_claiming_exemption
   - Value of exemption being claimed: prop.other_household_items_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.other_household_items_claiming_sub_100
   - Specific laws that allow exemption: prop.other_household_items_exemption_laws
@@ -2370,7 +2370,7 @@ fields:
   - note: Second Exemption
     show if: prop.other_household_items_is_claiming_exemption
   - Value of exemption being claimed: prop.other_household_items_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.other_household_items_claiming_sub_100
     required: False
@@ -2412,22 +2412,22 @@ script: |
 fields:
   - I have cash: prop.financial_assets.has_cash
     datatype: yesnoradio
-    # default: True
+    default: True
   - Total value: prop.financial_assets.cash_value
     datatype: currency
-    # default: 400
+    default: 400
     show if: prop.financial_assets.has_cash
   - Claiming Exemption?: prop.financial_assets.cash_is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.financial_assets.cash_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.financial_assets.cash_is_claiming_exemption
   - note: First Exemption
     show if: prop.financial_assets.cash_is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.cash_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.cash_sub_100
   - Specific laws that allow exemption: prop.financial_assets.cash_exemption_laws
@@ -2439,7 +2439,7 @@ fields:
   - note: Second Exemption
     show if: prop.financial_assets.cash_is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.cash_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.cash_sub_100
     required: False
@@ -2507,21 +2507,21 @@ fields:
       - Certificates of deposit
       - Other financial account
   - Institution Name: prop.financial_assets.deposits[i].institution
-    # default: BECU
+    default: BECU
   - Amount: prop.financial_assets.deposits[i].amount
-    # default: 1000
+    default: 1000
     datatype: currency
   - Claiming Exemption?: prop.financial_assets.deposits[i].is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.financial_assets.deposits[i].sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.financial_assets.deposits[i].is_claiming_exemption
   - note: First Exemption
     show if: prop.financial_assets.deposits[i].is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.deposits[i].exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.deposits[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.deposits[i].exemption_laws
@@ -2532,7 +2532,7 @@ fields:
   - note: Second Exemption
     show if: prop.financial_assets.deposits[i].is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.deposits[i].exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.deposits[i].sub_100
     required: False
@@ -2592,21 +2592,21 @@ script: |
   </script>
 fields:
   - Institution Name: prop.financial_assets.bonds_and_stocks[i].institution
-    # default: BECU
+    default: BECU
   - Amount: prop.financial_assets.bonds_and_stocks[i].amount
-    # default: 1000
+    default: 1000
     datatype: currency
   - Claiming Exemption?: prop.financial_assets.bonds_and_stocks[i].is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.financial_assets.bonds_and_stocks[i].sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.financial_assets.bonds_and_stocks[i].is_claiming_exemption
   - note: First Exemption
     show if: prop.financial_assets.bonds_and_stocks[i].is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.bonds_and_stocks[i].exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.bonds_and_stocks[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.bonds_and_stocks[i].exemption_laws
@@ -2617,7 +2617,7 @@ fields:
   - note: Second Exemption
     show if: prop.financial_assets.bonds_and_stocks[i].is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.bonds_and_stocks[i].exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.bonds_and_stocks[i].sub_100
     required: False
@@ -2679,24 +2679,24 @@ script: |
   </script>
 fields:
   - Name of entity: prop.financial_assets.non_traded_stock[i].entity
-    # default: CoolCo LLC
+    default: CoolCo LLC
   - percent of ownership: prop.financial_assets.non_traded_stock[i].ownership_percent
-    # default: 1
+    default: 1
     datatype: percent
   - Value: prop.financial_assets.non_traded_stock[i].value
-    # default: 1000
+    default: 1000
     datatype: currency
   - Claiming Exemption?: prop.financial_assets.non_traded_stock[i].is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.financial_assets.non_traded_stock[i].sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.financial_assets.non_traded_stock[i].is_claiming_exemption
   - note: First Exemption
     show if: prop.financial_assets.non_traded_stock[i].is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.non_traded_stock[i].exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.non_traded_stock[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.non_traded_stock[i].exemption_laws
@@ -2707,7 +2707,7 @@ fields:
   - note: Second Exemption
     show if: prop.financial_assets.non_traded_stock[i].is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.non_traded_stock[i].exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.non_traded_stock[i].sub_100
     required: false
@@ -2767,21 +2767,21 @@ script: |
   </script>
 fields:
   - Issuer: prop.financial_assets.corporate_bonds[i].issuer
-    # default: CoolCo LLC
+    default: CoolCo LLC
   - Amount: prop.financial_assets.corporate_bonds[i].amount
-    # default: 1000
+    default: 1000
     datatype: currency
   - Claiming Exemption?: prop.financial_assets.corporate_bonds[i].is_claiming_exemption
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.financial_assets.corporate_bonds[i].sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.financial_assets.corporate_bonds[i].is_claiming_exemption
   - note: First Exemption
     show if: prop.financial_assets.corporate_bonds[i].is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.corporate_bonds[i].exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.corporate_bonds[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.corporate_bonds[i].exemption_laws
@@ -2792,7 +2792,7 @@ fields:
   - note: Second Exemption
     show if: prop.financial_assets.corporate_bonds[i].is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.corporate_bonds[i].exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.corporate_bonds[i].sub_100
     required: False
@@ -2862,24 +2862,24 @@ fields:
       - Retirement account
       - Keogh
       - Additional account
-    # default: |
+    default: |
       401(k) or similar plan
   - Institution: prop.financial_assets.retirement_accounts[i].institution
-    # default: CoolCo LLC
+    default: CoolCo LLC
   - Amount: prop.financial_assets.retirement_accounts[i].amount
-    # default: 1000
+    default: 1000
     datatype: currency
   - Claiming Exemption?: prop.financial_assets.retirement_accounts[i].has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.financial_assets.retirement_accounts[i].sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.financial_assets.retirement_accounts[i].has_claim
   - note: First Exemption
     show if: prop.financial_assets.retirement_accounts[i].has_claim
   - Value of exemption being claimed: prop.financial_assets.retirement_accounts[i].exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.retirement_accounts[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.retirement_accounts[i].exemption_laws
@@ -2893,7 +2893,7 @@ fields:
   - note: Second Exemption
     show if: prop.financial_assets.retirement_accounts[i].has_claim
   - Value of exemption being claimed: prop.financial_assets.retirement_accounts[i].exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.retirement_accounts[i].sub_100
     required: False
@@ -2969,24 +2969,24 @@ fields:
       - Water
       - Rented furniture
       - Other
-    # default: |
+    default: |
       401(k) or similar plan
   - Institution: prop.financial_assets.prepayments[i].institution
-    # default: Real estate pros
+    default: Real estate pros
   - Amount: prop.financial_assets.prepayments[i].amount
-    # default: 1000
+    default: 1000
     datatype: currency
   - Claiming Exemption?: prop.financial_assets.prepayments[i].has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.financial_assets.prepayments[i].sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.financial_assets.prepayments[i].has_claim
   - note: First Exemption
     show if: prop.financial_assets.prepayments[i].has_claim
   - Value of exemption being claimed: prop.financial_assets.prepayments[i].exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.prepayments[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.prepayments[i].exemption_laws
@@ -2997,7 +2997,7 @@ fields:
   - note: Second Exemption
     show if: prop.financial_assets.prepayments[i].has_claim
   - Value of exemption being claimed: prop.financial_assets.prepayments[i].exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.prepayments[i].sub_100
     required: False
@@ -3058,21 +3058,21 @@ script: |
   </script>
 fields:
   - Issuer: prop.financial_assets.annuities[i].issuer
-    # default: Florida Lottery
+    default: Florida Lottery
   - Amount: prop.financial_assets.annuities[i].amount
-    # default: 50000
+    default: 50000
     datatype: currency
   - Claiming Exemption?: prop.financial_assets.annuities[i].has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.financial_assets.annuities[i].sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.financial_assets.annuities[i].has_claim
   - note: First Exemption
     show if: prop.financial_assets.annuities[i].has_claim
   - Value of exemption being claimed: prop.financial_assets.annuities[i].exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.annuities[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.annuities[i].exemption_laws
@@ -3084,7 +3084,7 @@ fields:
   - note: Second Exemption
     show if: prop.financial_assets.annuities[i].has_claim
   - Value of exemption being claimed: prop.financial_assets.annuities[i].exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.annuities[i].sub_100
     required: False
@@ -3146,21 +3146,21 @@ script: |
   </script>
 fields:
   - Institution: prop.financial_assets.edu_accounts[i].institution
-    # default: Fidelity
+    default: Fidelity
   - Amount: prop.financial_assets.edu_accounts[i].amount
-    # default: 30000
+    default: 30000
     datatype: currency
   - Claiming Exemption?: prop.financial_assets.edu_accounts[i].has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.financial_assets.edu_accounts[i].sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.financial_assets.edu_accounts[i].has_claim
   - note: First Exemption
     show if: prop.financial_assets.edu_accounts[i].has_claim
   - Value of exemption being claimed: prop.financial_assets.edu_accounts[i].exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.edu_accounts[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.edu_accounts[i].exemption_laws
@@ -3172,7 +3172,7 @@ fields:
   - note: Second Exemption
     show if: prop.financial_assets.edu_accounts[i].has_claim
   - Value of exemption being claimed: prop.financial_assets.edu_accounts[i].exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.edu_accounts[i].sub_100
     required: False
@@ -3210,27 +3210,27 @@ script: |
   </script>
 fields:
   - Has interests: prop.financial_assets.has_future_property_interest
-    # default: True
+    default: True
     datatype: yesnoradio
   - Describe interest: prop.financial_assets.future_property_interest_description
-    # default: NA
+    default: NA
     input type: area
     show if: prop.financial_assets.has_future_property_interest
   - Interest value: prop.financial_assets.future_property_interest_value
-    # default: 3000
+    default: 3000
     datatype: currency
     show if: prop.financial_assets.had_future_property_interest
   - Claiming Exemption?: prop.financial_assets.future_property_interest_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.financial_assets.future_property_interest_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.financial_assets.future_property_interest_has_claim
   - note: First Exemption
     show if: prop.financial_assets.future_property_interest_has_claim
   - Value of exemption being claimed: prop.financial_assets.future_property_interest_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.future_property_interest_sub_100
   - Specific laws that allow exemption: prop.financial_assets.future_property_interest_exemption_laws
@@ -3241,7 +3241,7 @@ fields:
   - note: Second Exemption
     show if: prop.financial_assets.future_property_interest_has_claim
   - Value of exemption being claimed: prop.financial_assets.future_property_interest_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.future_property_interest_sub_100
     required: False
@@ -3279,27 +3279,27 @@ script: |
   </script>
 fields:
   - Has interests: prop.financial_assets.has_ip_interest
-    # default: True
+    default: True
     datatype: yesnoradio
   - Describe IP: prop.financial_assets.ip_interest_description
-    # default: NA
+    default: NA
     input type: area
     show if: prop.financial_assets.has_ip_interest
   - IP value: prop.financial_assets.ip_interest_value
-    # default: 20000
+    default: 20000
     datatype: currency
     show if: prop.financial_assets.has_ip_interest
   - Claiming Exemption?: prop.financial_assets.ip_interest_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.financial_assets.ip_interest_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.financial_assets.ip_interest_has_claim
   - note: First Exemption
     show if: prop.financial_assets.ip_interest_has_claim
   - Value of exemption being claimed: prop.financial_assets.ip_interest_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.ip_interest_sub_100
   - Specific laws that allow exemption: prop.financial_assets.ip_interest_exemption_laws
@@ -3310,7 +3310,7 @@ fields:
   - note: Second Exemption
     show if: prop.financial_assets.ip_interest_has_claim
   - Value of exemption being claimed: prop.financial_assets.ip_interest_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.ip_interest_sub_100
     required: False
@@ -3348,27 +3348,27 @@ script: |
   </script>
 fields:
   - Has interest: prop.financial_assets.has_intangible_interest
-    # default: True
+    default: True
     datatype: yesnoradio
   - Describe interest: prop.financial_assets.intangible_interest_description
-    # default: NA
+    default: NA
     input type: area
     show if: prop.financial_assets.has_intangible_interest
   - Interest value: prop.financial_assets.intangible_interest_value
-    # default: 300
+    default: 300
     datatype: currency
     show if: prop.financial_assets.has_intangible_interest
   - Claiming Exemption?: prop.financial_assets.intangible_interest_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.financial_assets.intangible_interest_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.financial_assets.intangible_interest_has_claim
   - note: First Exemption
     show if: prop.financial_assets.intangible_interest_has_claim
   - Value of exemption being claimed: prop.financial_assets.intangible_interest_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.intangible_interest_sub_100
   - Specific laws that allow exemption: prop.financial_assets.intangible_interest_exemption_laws
@@ -3379,7 +3379,7 @@ fields:
   - note: Second Exemption
     show if: prop.financial_assets.intangible_interest_has_claim
   - Value of exemption being claimed: prop.financial_assets.intangible_interest_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.financial_assets.intangible_interest_sub_100
     required: False
@@ -3508,38 +3508,38 @@ fields:
   - note: |
       Tax refunds owed to you
   - Tax refunds owed to you: prop.owed_property.has_tax_refund
-    # default: True
+    default: True
     datatype: yesnoradio
   - Give specific information about them: prop.owed_property.tax_refund_description
-    # default: NA
+    default: NA
     input type: area
     show if: prop.owed_property.has_tax_refund
   - Federal amount: prop.owed_property.tax_refund_federal
     datatype: currency
-    # default: 300
+    default: 300
     show if: prop.owed_property.has_tax_refund
     required: False
   - State amount: prop.owed_property.tax_refund_state
     datatype: currency
-    # default: 200
+    default: 200
     show if: prop.owed_property.has_tax_refund
     required: False
   - Local amount: prop.owed_property.tax_refund_local
     datatype: currency
-    # default: 100
+    default: 100
     show if: prop.owed_property.has_tax_refund
     required: False
   - Claiming Exemption?: prop.owed_property.tax_refund_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.owed_property.tax_refund_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.owed_property.tax_refund_has_claim
   - note: First Exemption
     show if: prop.owed_property.tax_refund_has_claim
   - Value of exemption being claimed: prop.owed_property.tax_refund_exemption_value
-    # default: 0
+    default: 0
     show if: prop.owed_property.tax_refund_has_claim
     datatype: currency
   - Specific laws that allow exemption: prop.owed_property.tax_refund_exemption_laws
@@ -3551,7 +3551,7 @@ fields:
   - note: Second Exemption
     show if: prop.owed_property.tax_refund_has_claim
   - Value of exemption being claimed: prop.owed_property.tax_refund_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     required: False
     show if: prop.owed_property.tax_refund_has_claim
@@ -3568,49 +3568,49 @@ fields:
       Family support
       Examples: Past due or lump sum alimony, spousal support, child support, maintenance, divorce settlement, property settlement.
   - Family support owed to you: prop.owed_property.has_family_support
-    # default: True
+    default: True
     datatype: yesnoradio
   - Give specific information about them: prop.owed_property.family_support_description
-    # default: NA
+    default: NA
     input type: area
     show if: prop.owed_property.has_family_support
     required: False
   - Alimony amount: prop.owed_property.family_support_alimony
     datatype: currency
-    # default: 200
+    default: 200
     show if: prop.owed_property.has_family_support
     required: False
   - Maintenance amount: prop.owed_property.family_support_maintenance
     datatype: currency
-    # default: 300
+    default: 300
     show if: prop.owed_property.has_family_support
     required: False
   - Support amount: prop.owed_property.family_support_support
     datatype: currency
-    # default: 400
+    default: 400
     show if: prop.owed_property.has_family_support
     required: False
   - Divorce Settlement amount: prop.owed_property.family_support_divorce
     datatype: currency
-    # default: 1000
+    default: 1000
     show if: prop.owed_property.has_family_support
     required: False
   - Property Settlement amount: prop.owed_property.family_support_settlement
     datatype: currency
-    # default: 1500
+    default: 1500
     show if: prop.owed_property.has_family_support
     required: False
   - Claiming Exemption?: prop.owed_property.family_support_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.owed_property.family_support_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.owed_property.family_support_has_claim
   - note: First Exemption
     show if: prop.owed_property.family_support_has_claim
   - Value of exemption being claimed: prop.owed_property.family_support_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.family_support_sub_100
   - Specific laws that allow exemption: prop.owed_property.family_support_exemption_laws
@@ -3622,7 +3622,7 @@ fields:
   - note: Second Exemption
     show if: prop.owed_property.family_support_has_claim
   - Value of exemption being claimed: prop.owed_property.family_support_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.family_support_sub_100
     required: False
@@ -3640,29 +3640,29 @@ fields:
 
       Examples: Unpaid wages, disability insurance payments, disability benefits, sick pay, vacation pay, workers' compensation, Social Security benefits; unpaid loans you made to someone else.
   - Other amounts owed: prop.owed_property.has_other_amounts
-    # default: True
+    default: True
     datatype: yesnoradio
   - Describe other amounts: prop.owed_property.other_amounts_description
-    # default: NA
+    default: NA
     input type: area
     required: False
     show if: prop.owed_property.has_other_amounts
   - How much?: prop.owed_property.other_amounts_value
     datatype: currency
-    # default: 200
+    default: 200
     required: False
     show if: prop.owed_property.has_other_amounts
   - Claiming Exemption?: prop.owed_property.other_amounts_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.owed_property.other_amounts_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.owed_property.other_amounts_has_claim
   - note: First Exemption
     show if: prop.owed_property.other_amounts_has_claim
   - Value of exemption being claimed: prop.owed_property.other_amounts_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.other_amounts_sub_100
   - Specific laws that allow exemption: prop.owed_property.other_amounts_exemption_laws
@@ -3674,7 +3674,7 @@ fields:
   - note: Second Exemption
     show if: prop.owed_property.other_amounts_has_claim
   - Value of exemption being claimed: prop.owed_property.other_amounts_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.other_amounts_sub_100
     required: False
@@ -3693,33 +3693,33 @@ fields:
       Examples: Health, disability, or life insurance; health savings account (HSA); credit, homeowner's, or renter's insurance
   - Has insurance policies: prop.owed_property.has_insurance_interest
     datatype: yesnoradio
-    # default: True
+    default: True
   - note: Institution 1
     show if: prop.owed_property.has_insurance_interest
   - Institution name: prop.owed_property.first_insurance_interest_name
-    # default: Institution 1
+    default: Institution 1
     required: False
     show if: prop.owed_property.has_insurance_interest
   - Beneficiary: prop.owed_property.first_insurance_beneficiary
-    # default: Me
+    default: Me
     required: False
     show if: prop.owed_property.has_insurance_interest
   - Amount: prop.owed_property.first_insurance_interest_amount
     datatype: currency
-    # default: 400
+    default: 400
     required: False
     show if: prop.owed_property.has_insurance_interest
   - Claiming Exemption?: prop.owed_property.first_insurance_interest_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.owed_property.first_insurance_interest_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.owed_property.first_insurance_interest_has_claim
   - note: First Exemption
     show if: prop.owed_property.first_insurance_interest_has_claim
   - Value of exemption being claimed: prop.owed_property.first_insurance_interest_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.first_insurance_interest_sub_100
   - Specific laws that allow exemption: prop.owed_property.first_insurance_interest_exemption_laws
@@ -3732,7 +3732,7 @@ fields:
   - note: Second Exemption
     show if: prop.owed_property.first_insurance_interest_has_claim
   - Value of exemption being claimed: prop.owed_property.first_insurance_interest_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.first_insurance_interest_sub_100
     required: False
@@ -3749,33 +3749,33 @@ fields:
     show if: prop.owed_property.has_insurance_interest
   - Has second insurance interest: prop.owed_property.has_second_insurance_interest
     datatype: yesnoradio
-    # default: True
+    default: True
     show if: prop.owed_property.has_insurance_interest
   - Institution name: prop.owed_property.second_insurance_interest_name
-    # default: Institution 2
+    default: Institution 2
     required: False
     show if: prop.owed_property.has_second_insurance_interest
   - Beneficiary: prop.owed_property.second_insurance_beneficiary
-    # default: Me
+    default: Me
     required: False
     show if: prop.owed_property.has_second_insurance_interest
   - Amount: prop.owed_property.second_insurance_interest_amount
     datatype: currency
-    # default: 400
+    default: 400
     required: False
     show if: prop.owed_property.has_second_insurance_interest
   - Claiming Exemption?: prop.owed_property.second_insurance_interest_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.owed_property.has_second_insurance_interest
   - Are you claiming less than 100% of fair market value?: prop.owed_property.second_insurance_interest_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.owed_property.second_insurance_interest_has_claim
   - note: First Exemption
     show if: prop.owed_property.second_insurance_interest_has_claim
   - Value of exemption being claimed: prop.owed_property.second_insurance_interest_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.second_insurance_interest_sub_100
   - Specific laws that allow exemption: prop.owed_property.second_insurance_interest_exemption_laws
@@ -3788,7 +3788,7 @@ fields:
   - note: Second Exemption
     show if: prop.owed_property.second_insurance_interest_has_claim
   - Value of exemption being claimed: prop.owed_property.second_insurance_interest_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.second_insurance_interest_sub_100
     required: False
@@ -3805,33 +3805,33 @@ fields:
     show if: prop.owed_property.has_insurance_interest
   - Has third insurance interest: prop.owed_property.has_third_insurance_interest
     datatype: yesnoradio
-    # default: True
+    default: True
     show if: prop.owed_property.has_insurance_interest
   - Institution name: prop.owed_property.third_insurance_interest_name
-    # default: Institution 2
+    default: Institution 2
     required: False
     show if: prop.owed_property.has_third_insurance_interest
   - Beneficiary: prop.owed_property.third_insurance_beneficiary
-    # default: Me
+    default: Me
     required: False
     show if: prop.owed_property.has_third_insurance_interest
   - Amount: prop.owed_property.third_insurance_interest_amount
     datatype: currency
-    # default: 400
+    default: 400
     required: False
     show if: prop.owed_property.has_third_insurance_interest
   - Claiming Exemption?: prop.owed_property.third_insurance_interest_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.owed_property.has_third_insurance_interest
   - Are you claiming less than 100% of fair market value?: prop.owed_property.third_insurance_interest_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.owed_property.third_insurance_interest_has_claim
   - note: First Exemption
     show if: prop.owed_property.third_insurance_interest_has_claim
   - Value of exemption being claimed: prop.owed_property.third_insurance_interest_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.third_insurance_interest_sub_100
   - Specific laws that allow exemption: prop.owed_property.third_insurance_interest_exemption_laws
@@ -3844,7 +3844,7 @@ fields:
   - note: Second Exemption
     show if: prop.owed_property.third_insurance_interest_has_claim
   - Value of exemption being claimed: prop.owed_property.third_insurance_interest_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.third_insurance_interest_sub_100
     required: False
@@ -3864,28 +3864,28 @@ fields:
       If you are the beneficiary of a living trust, expect proceeds from a life insurance policy, or are currently entitled to receive property because someone has died.
   - Has interest: prop.owed_property.has_trust
     datatype: yesnoradio
-    # default: True
+    default: True
   - Description: prop.owed_property.trust_description
     input type: area
-    # default: NA
+    default: NA
     required: False
     show if: prop.owed_property.has_trust
   - Amount: prop.owed_property.trust_amount
     datatype: currency
-    # default: 300
+    default: 300
     required: False
     show if: prop.owed_property.has_trust
   - Claiming Exemption?: prop.owed_property.trust_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.owed_property.trust_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.owed_property.trust_has_claim
   - note: First Exemption
     show if: prop.owed_property.trust_has_claim
   - Value of exemption being claimed: prop.owed_property.trust_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.trust_sub_100
   - Specific laws that allow exemption: prop.owed_property.trust_exemption_laws
@@ -3897,7 +3897,7 @@ fields:
   - note: Second Exemption
     show if: prop.owed_property.trust_has_claim
   - Value of exemption being claimed: prop.owed_property.trust_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.trust_sub_100
     required: False
@@ -3916,28 +3916,28 @@ fields:
       Examples: Accidents, employment disputes, insurance claims, or rights to sue.
   - Has interest: prop.owed_property.has_third_party
     datatype: yesnoradio
-    # default: True
+    default: True
   - Description: prop.owed_property.third_party_description
     input type: area
-    # default: NA
+    default: NA
     required: False
     show if: prop.owed_property.has_third_party
   - Amount: prop.owed_property.third_party_amount
     datatype: currency
-    # default: 400
+    default: 400
     required: False
     show if: prop.owed_property.has_third_party
   - Claiming Exemption?: prop.owed_property.third_party_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.owed_property.third_party_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.owed_property.third_party_has_claim
   - note: First Exemption
     show if: prop.owed_property.third_party_has_claim
   - Value of exemption being claimed: prop.owed_property.third_party_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.third_party_sub_100
   - Specific laws that allow exemption: prop.owed_property.third_party_exemption_laws
@@ -3950,7 +3950,7 @@ fields:
   - note: Second Exemption
     show if: prop.owed_property.third_party_has_claim
   - Value of exemption being claimed: prop.owed_property.third_party_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.third_party_sub_100
     required: False
@@ -3968,28 +3968,28 @@ fields:
       Other contingent and unliquidated claims of every nature, including counterclaims of the debtor and rights to set off claims
   - Has interest: prop.owed_property.has_contingent_claims
     datatype: yesnoradio
-    # default: True
+    default: True
   - Description: prop.owed_property.contingent_claims_description
     input type: area
-    # default: NA
+    default: NA
     required: False
     show if: prop.owed_property.has_contingent_claims
   - Amount: prop.owed_property.contingent_claims_amount
     datatype: currency
-    # default: 600
+    default: 600
     required: False
     show if: prop.owed_property.has_contingent_claims
   - Claiming Exemption?: prop.owed_property.contingent_claims_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.owed_property.contingent_claims_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.owed_property.contingent_claims_has_claim
   - note: First Exemption
     show if: prop.owed_property.contingent_claims_has_claim
   - Value of exemption being claimed: prop.owed_property.contingent_claims_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.contingent_claims_sub_100
   - Specific laws that allow exemption: prop.owed_property.contingent_claims_exemption_laws
@@ -4000,7 +4000,7 @@ fields:
   - note: Second Exemption
     show if: prop.owed_property.contingent_claims_has_claim
   - Value of exemption being claimed: prop.owed_property.contingent_claims_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.contingent_claims_sub_100
     required: False
@@ -4017,28 +4017,28 @@ fields:
       Any financial assets you did not already list
   - Has other financial assets: prop.owed_property.has_other_assets
     datatype: yesnoradio
-    # default: True
+    default: True
   - Description: prop.owed_property.other_assets_description
     input type: area
-    # default: NA
+    default: NA
     required: False
     show if: prop.owed_property.has_other_assets
   - Amount: prop.owed_property.other_assets_amount
     datatype: currency
-    # default: 150
+    default: 150
     required: False
     show if: prop.owed_property.has_other_assets
   - Claiming Exemption?: prop.owed_property.other_assets_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.owed_property.other_assets_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.owed_property.other_assets_has_claim
   - note: First Exemption
     show if: prop.owed_property.other_assets_has_claim
   - Value of exemption being claimed: prop.owed_property.other_assets_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.other_assets_sub_100
   - Specific laws that allow exemption: prop.owed_property.other_assets_exemption_laws
@@ -4049,7 +4049,7 @@ fields:
   - note: Second Exemption
     show if: prop.owed_property.other_assets_has_claim
   - Value of exemption being claimed: prop.owed_property.other_assets_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.owed_property.other_assets_sub_100
     required: False
@@ -4066,7 +4066,7 @@ question: |
 fields:
   - Do you own or have any legal or equitable interest in any business related property?: prop.business_property.has_property
     datatype: yesnoradio
-    # default: True
+    default: True
 ---
 section: schedule_ab
 question: |
@@ -4157,28 +4157,28 @@ fields:
       Accounts receiveable or commissions you already earned.
   - Has property: prop.business_property.has_ar
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.business_property.ar_description
     input type: area
-    # default: NA
+    default: NA
     required: False
     show if: prop.business_property.has_ar
   - Amount: prop.business_property.ar_amount
     datatype: currency
-    # default: 300
+    default: 300
     required: False
     show if: prop.business_property.has_ar
   - Claiming Exemption?: prop.business_property.ar_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.business_property.ar_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.business_property.ar_has_claim
   - note: First Exemption
     show if: prop.business_property.ar_has_claim
   - Value of exemption being claimed: prop.business_property.ar_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.business_property.ar_sub_100
   - Specific laws that allow exemption: prop.business_property.ar_exemption_laws
@@ -4190,7 +4190,7 @@ fields:
   - note: Second Exemption
     show if: prop.business_property.ar_has_claim
   - Value of exemption being claimed: prop.business_property.ar_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.business_property.ar_sub_100
     required: False
@@ -4209,28 +4209,28 @@ fields:
       Examples: Business-related computers, software, modems, printers, copiers, fax machines, rugs, telephones, desks, chairs, electronic devices
   - Has property: prop.business_property.has_equipment
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.business_property.equipment_description
     input type: area
-    # default: NA
+    default: NA
     required: False
     show if: prop.business_property.has_equipment
   - Amount: prop.business_property.equipment_amount
     datatype: currency
-    # default: 400
+    default: 400
     required: False
     show if: prop.business_property.has_equipment
   - Claiming Exemption?: prop.business_property.equipment_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.business_property.equipment_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.business_property.equipment_has_claim
   - note: First Exemption
     show if: prop.business_property.equipment_has_claim
   - Value of exemption being claimed: prop.business_property.equipment_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.business_property.equipment_sub_100
   - Specific laws that allow exemption: prop.business_property.equipment_exemption_laws
@@ -4242,7 +4242,7 @@ fields:
   - note: Second Exemption
     show if: prop.business_property.equipment_has_claim
   - Value of exemption being claimed: prop.business_property.equipment_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.business_property.equipment_sub_100
     required: False
@@ -4260,28 +4260,28 @@ fields:
       Machinery, fixtures, equipment, supplies you use in business, and tools of your trade.
   - Has property: prop.business_property.has_machinery
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.business_property.machinery_description
     input type: area
-    # default: NA
+    default: NA
     required: False
     show if: prop.business_property.has_machinery
   - Amount: prop.business_property.machinery_amount
     datatype: currency
-    # default: 100
+    default: 100
     required: False
     show if: prop.business_property.has_machinery
   - Claiming Exemption?: prop.business_property.machinery_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.business_property.machinery_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.business_property.machinery_has_claim
   - note: First Exemption
     show if: prop.business_property.machinery_has_claim
   - Value of exemption being claimed: prop.business_property.machinery_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.business_property.machinery_sub_100
   - Specific laws that allow exemption: prop.business_property.machinery_exemption_laws
@@ -4293,7 +4293,7 @@ fields:
   - note: Second Exemption
     show if: prop.business_property.machinery_has_claim
   - Value of exemption being claimed: prop.business_property.machinery_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.business_property.machinery_sub_100
     required: False
@@ -4310,28 +4310,28 @@ fields:
       Inventory
   - Has property: prop.business_property.has_inventory
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.business_property.inventory_description
     input type: area
-    # default: NA
+    default: NA
     required: False
     show if: prop.business_property.has_inventory
   - Amount: prop.business_property.inventory_amount
     datatype: currency
-    # default: 500
+    default: 500
     required: False
     show if: prop.business_property.has_inventory
   - Claiming Exemption?: prop.business_property.inventory_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.business_property.inventory_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.business_property.inventory_has_claim
   - note: First Exemption
     show if: prop.business_property.inventory_has_claim
   - Value of exemption being claimed: prop.business_property.inventory_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.business_property.inventory_sub_100
   - Specific laws that allow exemption: prop.business_property.inventory_exemption_laws
@@ -4343,7 +4343,7 @@ fields:
   - note: Second Exemption
     show if: prop.business_property.inventory_has_claim
   - Value of exemption being claimed: prop.business_property.inventory_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.business_property.inventory_sub_100
     required: False
@@ -4360,89 +4360,89 @@ fields:
       Interests in partnerships or joint ventures
   - Has property: prop.business_property.has_partnerships
     datatype: yesnoradio
-    # default: True
+    default: True
   - Partnership 1: prop.business_property.partnershipDescription1
-    # default: partner 1
+    default: partner 1
     required: False
     show if: prop.business_property.has_partnerships
   - Ownership %: prop.business_property.partnershipOwnership1
     datatype: percent
-    # default: 10
+    default: 10
     required: False
     show if: prop.business_property.has_partnerships
   - Amount: prop.business_property.partnershipValue1
     datatype: currency
-    # default: 1000
+    default: 1000
     required: False
     show if: prop.business_property.has_partnerships
   - Partnership 2: prop.business_property.partnershipDescription2
-    # default: partner 2
+    default: partner 2
     required: False
     show if: prop.business_property.has_partnerships
   - Ownership %: prop.business_property.partnershipOwnership2
     datatype: percent
-    # default: 10
+    default: 10
     required: False
     show if: prop.business_property.has_partnerships
   - Amount: prop.business_property.partnershipValue2
     datatype: currency
-    # default: 1000
+    default: 1000
     required: False
     show if: prop.business_property.has_partnerships
   - Partnership 3: prop.business_property.partnershipDescription3
-    # default: partner 3
+    default: partner 3
     required: False
     show if: prop.business_property.has_partnerships
   - Ownership %: prop.business_property.partnershipOwnership3
     datatype: percent
-    # default: 10
+    default: 10
     required: False
     show if: prop.business_property.has_partnerships
   - Amount: prop.business_property.partnershipValue3
     datatype: currency
-    # default: 1000
+    default: 1000
     required: False
     show if: prop.business_property.has_partnerships
   - Partnership 4: prop.business_property.partnershipDescription4
-    # default: partner 4
+    default: partner 4
     required: False
     show if: prop.business_property.has_partnerships
   - Ownership %: prop.business_property.partnershipOwnership4
     datatype: percent
-    # default: 10
+    default: 10
     required: False
     show if: prop.business_property.has_partnerships
   - Amount: prop.business_property.partnershipValue4
     datatype: currency
-    # default: 1000
+    default: 1000
     required: False
     show if: prop.business_property.has_partnerships
   - Partnership 5: prop.business_property.partnershipDescription5
-    # default: partner 5
+    default: partner 5
     required: False
     show if: prop.business_property.has_partnerships
   - Ownership %: prop.business_property.partnershipOwnership5
     datatype: percent
-    # default: 10
+    default: 10
     required: False
     show if: prop.business_property.has_partnerships
   - Amount: prop.business_property.partnershipValue5
     datatype: currency
-    # default: 1000
+    default: 1000
     required: False
     show if: prop.business_property.has_partnerships
   - Claiming Exemption?: prop.business_property.partnership_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.business_property.has_partnerships
   - Are you claiming less than 100% of fair market value?: prop.business_property.partnership_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.business_property.partnership_has_claim
   - note: First Exemption
     show if: prop.business_property.partnership_has_claim
   - Value of exemption being claimed: prop.business_property.partnership_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.business_property.partnership_sub_100
   - Specific laws that allow exemption: prop.business_property.partnership_exemption_laws
@@ -4454,7 +4454,7 @@ fields:
   - note: Second Exemption
     show if: prop.business_property.partnership_has_claim
   - Value of exemption being claimed: prop.business_property.partnership_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.business_property.partnership_sub_100
     required: False
@@ -4471,33 +4471,33 @@ fields:
       Customer lists, mailing lists, or other compilations
   - Has property: prop.business_property.has_lists
     datatype: yesnoradio
-    # default: True
+    default: True
   - Do your lists include personally identifiable information?: prop.business_property.has_identity_lists
     datatype: yesnoradio
-    # default: True
+    default: True
     required: False
     show if: prop.business_property.has_lists
   - Describe: prop.business_property.lists_description
     input type: area
-    # default: NA
+    default: NA
     required: False
     show if: prop.business_property.has_lists
   - Amount: prop.business_property.lists_amount
     datatype: currency
-    # default: 800
+    default: 800
     required: False
     show if: prop.business_property.has_lists
   - Claiming Exemption?: prop.business_property.lists_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.business_property.lists_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.business_property.lists_has_claim
   - note: First Exemption
     show if: prop.business_property.lists_has_claim
   - Value of exemption being claimed: prop.business_property.lists_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.business_property.lists_sub_100
   - Specific laws that allow exemption: prop.business_property.lists_exemption_laws
@@ -4509,7 +4509,7 @@ fields:
   - note: Second Exemption
     show if: prop.business_property.lists_has_claim
   - Value of exemption being claimed: prop.business_property.lists_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.business_property.lists_sub_100
     required: False
@@ -4526,73 +4526,73 @@ fields:
       Any business-related property you did not already list
   - Has property: prop.business_property.has_other
     datatype: yesnoradio
-    # default: True
+    default: True
   - Other Property 1: prop.business_property.otherPropertyDescription1
-    # default: NA
+    default: NA
     required: False
     show if: prop.business_property.has_other
   - Amount: prop.business_property.otherPropertyAmount1
     datatype: currency
-    # default: 200
+    default: 200
     required: false
     show if: prop.business_property.has_other
   - Other Property 2: prop.business_property.otherPropertyDescription2
-    # default: NA
+    default: NA
     required: False
     show if: prop.business_property.has_other
   - Amount: prop.business_property.otherPropertyAmount2
     datatype: currency
-    # default: 200
+    default: 200
     required: false
     show if: prop.business_property.has_other
   - Other Property 3: prop.business_property.otherPropertyDescription3
-    # default: NA
+    default: NA
     required: False
     show if: prop.business_property.has_other
   - Amount: prop.business_property.otherPropertyAmount3
     datatype: currency
-    # default: 200
+    default: 200
     required: false
     show if: prop.business_property.has_other
   - Other Property 4: prop.business_property.otherPropertyDescription4
-    # default: NA
+    default: NA
     required: False
     show if: prop.business_property.has_other
   - Amount: prop.business_property.otherPropertyAmount4
     datatype: currency
-    # default: 200
+    default: 200
     required: false
     show if: prop.business_property.has_other
   - Other Property 5: prop.business_property.otherPropertyDescription5
-    # default: NA
+    default: NA
     required: False
     show if: prop.business_property.has_other
   - Amount: prop.business_property.otherPropertyAmount5
     datatype: currency
-    # default: 200
+    default: 200
     required: false
     show if: prop.business_property.has_other
   - Other Property 6: prop.business_property.otherPropertyDescription6
-    # default: NA
+    default: NA
     required: False
     show if: prop.business_property.has_other
   - Amount: prop.business_property.otherPropertyAmount6
     datatype: currency
-    # default: 200
+    default: 200
     required: false
     show if: prop.business_property.has_other
   - Claiming Exemption?: prop.business_property.otherProperty_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.business_property.has_other
   - Are you claiming less than 100% of fair market value?: prop.business_property.otherProperty_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.business_property.otherProperty_has_claim
   - note: First Exemption
     show if: prop.business_property.otherProperty_has_claim
   - Value of exemption being claimed: prop.business_property.otherProperty_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.business_property.otherProperty_sub_100
   - Specific laws that allow exemption: prop.business_property.otherProperty_exemption_laws
@@ -4604,7 +4604,7 @@ fields:
   - note: Second Exemption
     show if: prop.business_property.otherProperty_has_claim
   - Value of exemption being claimed: prop.business_property.otherProperty_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     required: False
     show if: prop.business_property.otherProperty_sub_100
@@ -4623,7 +4623,7 @@ question: |
 fields:
   - Do you own or have any legal or equitable interest in any business related property?: prop.farming_property.has_property
     datatype: yesnoradio
-    # default: True
+    default: True
 ---
 section: schedule_ab
 question: |
@@ -4694,28 +4694,28 @@ fields:
       Farm animals
   - Has property: prop.farming_property.has_animals
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.farming_property.animal_description
     input type: area
-    # default: NA
+    default: NA
     required: False
     show if: prop.farming_property.has_animals
   - Amount: prop.farming_property.animal_amount
     datatype: currency
-    # default: 800
+    default: 800
     required: False
     show if: prop.farming_property.has_animals
   - Claiming Exemption?: prop.farming_property.has_animal_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.farming_property.animal_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.farming_property.has_animal_claim
   - note: First Exemption
     show if: prop.farming_property.has_animal_claim
   - Value of exemption being claimed: prop.farming_property.animal_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.farming_property.animal_sub_100
   - Specific laws that allow exemption: prop.farming_property.animal_exemption_laws
@@ -4726,7 +4726,7 @@ fields:
   - note: Second Exemption
     show if: prop.farming_property.has_animal_claim
   - Value of exemption being claimed: prop.farming_property.animal_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.farming_property.animal_sub_100
     required: False
@@ -4741,29 +4741,29 @@ fields:
       Crops --- either growing or harvested
   - Has property: prop.farming_property.has_crops
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.farming_property.crop_description
     input type: area
-    # default: NA
+    default: NA
     required: False
     show if: prop.farming_property.has_crops
   - Amount: prop.farming_property.crop_amount
     datatype: currency
-    # default: 440
+    default: 440
     required: False
     show if: prop.farming_property.has_crops
     #farm crops exemptions
   - Claiming Exemption?: prop.farming_property.has_crops_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.farming_property.crops_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.farming_property.has_crops_claim
   - note: First Exemption
     show if: prop.farming_property.has_crops_claim
   - Value of exemption being claimed: prop.farming_property.crops_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.farming_property.crops_sub_100
   - Specific laws that allow exemption: prop.farming_property.crops_exemption_laws
@@ -4774,7 +4774,7 @@ fields:
   - note: Second Exemption
     show if: prop.farming_property.has_crops_claim
   - Value of exemption being claimed: prop.farming_property.crops_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.farming_property.crops_sub_100
     required: False
@@ -4789,28 +4789,28 @@ fields:
       Farm and fishing equipment, implements, machinery, fixtures, and tools of trade
   - Has property: prop.farming_property.has_equipment
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.farming_property.equipment_description
     input type: area
-    # default: NA
+    default: NA
     required: False
     show if: prop.farming_property.has_equipment
   - Amount: prop.farming_property.equipment_amount
     datatype: currency
-    # default: 5000
+    default: 5000
     required: False
     show if: prop.farming_property.has_equipment
   - Claiming Exemption?: prop.farming_property.has_equipment_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.farming_property.equipment_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.farming_property.has_equipment_claim
   - note: First Exemption
     show if: prop.farming_property.has_equipment_claim
   - Value of exemption being claimed: prop.farming_property.equipment_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.farming_property.equipment_sub_100
   - Specific laws that allow exemption: prop.farming_property.equipment_exemption_laws
@@ -4821,7 +4821,7 @@ fields:
   - note: Second Exemption
     show if: prop.farming_property.has_equipment_claim
   - Value of exemption being claimed: prop.farming_property.equipment_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.farming_property.equipment_sub_100
     required: False
@@ -4836,28 +4836,28 @@ fields:
       Farm and fishing supplies, chemicals, and feed
   - Has property: prop.farming_property.has_supplies
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.farming_property.supplies_description
     input type: area
-    # default: NA
+    default: NA
     required: False
     show if: prop.farming_property.has_supplies
   - Amount: prop.farming_property.supplies_amount
     datatype: currency
-    # default: 400
+    default: 400
     required: False
     show if: prop.farming_property.has_supplies
   - Claiming Exemption?: prop.farming_property.has_supplies_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.farming_property.supplies_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.farming_property.has_supplies_claim
   - note: First Exemption
     show if: prop.farming_property.has_supplies_claim
   - Value of exemption being claimed: prop.farming_property.supplies_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.farming_property.supplies_sub_100
   - Specific laws that allow exemption: prop.farming_property.supplies_exemption_laws
@@ -4868,7 +4868,7 @@ fields:
   - note: Second Exemption
     show if: prop.farming_property.has_supplies_claim
   - Value of exemption being claimed: prop.farming_property.supplies_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.farming_property.supplies_sub_100
     required: False
@@ -4883,29 +4883,29 @@ fields:
       Any farm - and commercial fishing-related property you did not already list
   - Has property: prop.farming_property.has_commercial
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.farming_property.commercial_description
     input type: area
-    # default: NA
+    default: NA
     required: False
     show if: prop.farming_property.has_commercial
   - Amount: prop.farming_property.commercial_amount
     datatype: currency
-    # default: 300
+    default: 300
     required: False
     show if: prop.farming_property.has_commercial
     #farm fishing exemptions
   - Claiming Exemption?: prop.farming_property.has_fishing_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.farming_property.fishing_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.farming_property.has_fishing_claim
   - note: First Exemption
     show if: prop.farming_property.has_fishing_claim
   - Value of exemption being claimed: prop.farming_property.fishing_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.farming_property.fishing_sub_100
   - Specific laws that allow exemption: prop.farming_property.fishing_exemption_laws
@@ -4916,7 +4916,7 @@ fields:
   - note: Second Exemption
     show if: prop.farming_property.has_fishing_claim
   - Value of exemption being claimed: prop.farming_property.fishing_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.farming_property.fishing_sub_100
     required: False
@@ -4958,46 +4958,46 @@ fields:
       Examples: Season tickets, country club membership
   - Has property: prop.has_other_prop
     datatype: yesnoradio
-    # default: True
+    default: True
   - Describe: prop.other_prop_description
     input type: area
     required: False
-    # default: NA
+    default: NA
     show if: prop.has_other_prop
   - Property value: prop.other_prop_value
     datatype: currency
-    # default: 300
+    default: 300
     required: False
     show if: prop.has_other_prop
   - Has second unlisted property?: prop.has_second_other_prop
     datatype: yesnoradio
-    # default: True
+    default: True
     show if: prop.has_other_prop
   - Property value: prop.other_prop_value2
     datatype: currency
-    # default: 300
+    default: 300
     required: False
     show if: prop.has_second_other_prop
   - Has third unlisted property?: prop.has_third_other_prop
     datatype: yesnoradio
-    # default: True
+    default: True
     show if: prop.has_other_prop
   - Property value: prop.other_prop_value3
     datatype: currency
-    # default: 300
+    default: 300
     required: False
     show if: prop.has_third_other_prop
   - Claiming Exemption?: prop.other_prop_has_claim
-    # default: False
+    default: False
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.other_prop_sub_100
-    # default: False
+    default: False
     datatype: yesnoradio
     show if: prop.other_prop_has_claim
   - note: First Exemption
     show if: prop.other_prop_has_claim
   - Value of exemption being claimed: prop.other_prop_exemption_value
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.other_prop_sub_100
   - Specific laws that allow exemption: prop.other_prop_exemption_laws
@@ -5008,7 +5008,7 @@ fields:
   - note: Second Exemption
     show if: prop.other_prop_has_claim
   - Value of exemption being claimed: prop.other_prop_exemption_value_2
-    # default: 0
+    default: 0
     datatype: currency
     show if: prop.other_prop_sub_100
     required: False

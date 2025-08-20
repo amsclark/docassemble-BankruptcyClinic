@@ -9,7 +9,7 @@ fields:
       - There is no presumption of abuse.
       - The calculation to determine if a presumption of abuse applies will be made under Chapter 7 Means Test Calculation.
       - The Means Test does not apply now because of qualified military service but it could apply later.
-    # default: There is no presumption of abuse.
+    default: There is no presumption of abuse.
 ---
 section: form_122a
 question: |
@@ -17,13 +17,13 @@ question: |
 fields:
   - Are your debts primarily non-consumer?: monthly_income.non_consumer_debts
     datatype: yesnoradio
-    # default: False
+    default: False
   - Are you a disabled veteran?: monthly_income.disabled_veteran
     datatype: yesnoradio
-    # default: False
+    default: False
   - Are you in the Reservists or National Guard?: monthly_income.reservists
     datatype: yesnoradio
-    # default: False
+    default: False
 
 ---
 section: form_122a
@@ -35,7 +35,7 @@ fields:
       - Not married
       - Married and your spouse is filing with you.
       - Married and your spouse is NOT filing with you.
-    # default: Married and your spouse is NOT filing with you.
+    default: Married and your spouse is NOT filing with you.
   - You and your spouse are: monthly_income.separated_status
     choices:
       - Living in the same household and not legally separated.
@@ -45,7 +45,7 @@ fields:
       is: Married and your spouse is NOT filing with you.
   - How many dependents?: monthly_income.dependents
     datatype: number
-    # default: 2
+    default: 2
 ---
 section: form_122a
 question: |
@@ -56,58 +56,58 @@ fields:
   - note: Income calculation Debtor 1
   - Your gross wages, salary tips, bonuses, overtime, and comissions: monthly_income.gross_wages1
     datatype: currency
-    # default: 2500
+    default: 2500
   - Alimony and maintenance payments: monthly_income.alimony1
     datatype: currency
-    # default: 300
+    default: 300
   - All amounts from any source which are regularly paid for household expenses of you or your dependents, including child support.: monthly_income.other_income1
     datatype: currency
-    # default: 200
+    default: 200
   - note: |
       Net income from operating a business, profession, or farm.
   - Gross receipts (before all deductions): monthly_income.business_gross_receipts1
     datatype: currency
-    # default: 0
+    default: 0
   - Ordinary and necessary operating expenses: monthly_income.business_operating_expenses1
     datatype: currency
-    # default: 0
+    default: 0
   - note: |
       Net income from rental and other real property
   - Gross receipts (before all deductions): monthly_income.rental_gross_receipts1
     datatype: currency
-    # default: 0
+    default: 0
   - Ordinary and necessary operating expenses: monthly_income.rental_operating_expenses1
     datatype: currency
-    # default: 0
+    default: 0
   - note: <br>
   - Interest, dividends, and royalties: monthly_income.interest1
     datatype: currency
-    # default: 0
+    default: 0
   - Unemployment compensation: monthly_income.unemployment1
     datatype: currency
-    # default: 0
+    default: 0
   - Your Social Security Act compensation: monthly_income.social1
     datatype: currency
-    # default: 0
+    default: 0
   - Spouse Social Security Act compensation: monthly_income.spouse_social1
     datatype: currency
-    # default: 0
+    default: 0
   - note: |
       Pension or retirement. Do not include any amount received that was a benefit under the Social Security Act. Also, except as stated in the next sentence, do not include any compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with disability, combat-related injury or disability, or death of a member of the uniformed services. If you recieved any retired pay paid under chapter 61 of title 10, then include that pay only to the extent that it does not exceed the amount of retired pay to which you would otherwise be entitled if retired under any provision of title 10 other than chapter 61 of that title.
   - Pension or retirement: monthly_income.pension1
     datatype: currency
-    # default: 400
+    default: 400
   - note: |
       Income from all other sources not listed. Specify the source and amount. Do not include any benefits received under the Social Security Act; payments received as a victim of a war crime, a crime against humanity, or international or domestic terrorism; or compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with a disability, combat-related injury or disability, or death of a member of the uniformed servies.
   - Source 1: monthly_income.source1_1
-    # default: first source
+    default: first source
   - Amount: monthly_income.source1_amount_1
     datatype: currency
-    # default: 100
+    default: 100
   - Source 2: monthly_income.source2_1
-    # default: second source
+    default: second source
   - Amount: monthly_income.source2_amount_1
-    # default: 100
+    default: 100
 ---
 section: form_122a
 question: |
@@ -118,58 +118,58 @@ fields:
   - note: Income calculation Debtor 2
   - Your gross wages, salary tips, bonuses, overtime, and comissions: monthly_income.gross_wages2
     datatype: currency
-    # default: 2500
+    default: 2500
   - Alimony and maintenance payments: monthly_income.alimony2
     datatype: currency
-    # default: 300
+    default: 300
   - All amounts from any source which are regularly paid for household expenses of you or your dependents, including child support.: monthly_income.other_income2
     datatype: currency
-    # default: 200
+    default: 200
   - note: |
       Net income from operating a business, profession, or farm.
   - Gross receipts (before all deductions): monthly_income.business_gross_receipts2
     datatype: currency
-    # default: 0
+    default: 0
   - Ordinary and necessary operating expenses: monthly_income.business_operating_expenses2
     datatype: currency
-    # default: 0
+    default: 0
   - note: |
       Net income from rental and other real property
   - Gross receipts (before all deductions): monthly_income.rental_gross_receipts2
     datatype: currency
-    # default: 0
+    default: 0
   - Ordinary and necessary operating expenses: monthly_income.rental_operating_expenses2
     datatype: currency
-    # default: 0
+    default: 0
   - note: <br>
   - Interest, dividends, and royalties: monthly_income.interest2
     datatype: currency
-    # default: 0
+    default: 0
   - Unemployment compensation: monthly_income.unemployment2
     datatype: currency
-    # default: 0
+    default: 0
   - Your Social Security Act compensation: monthly_income.social2
     datatype: currency
-    # default: 0
+    default: 0
   - Spouse Social Security Act compensation: monthly_income.spouse_social2
     datatype: currency
-    # default: 0
+    default: 0
   - note: |
       Pension or retirement. Do not include any amount received that was a benefit under the Social Security Act. Also, except as stated in the next sentence, do not include any compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with disability, combat-related injury or disability, or death of a member of the uniformed services. If you recieved any retired pay paid under chapter 61 of title 10, then include that pay only to the extent that it does not exceed the amount of retired pay to which you would otherwise be entitled if retired under any provision of title 10 other than chapter 61 of that title.
   - Pension or retirement: monthly_income.pension2
     datatype: currency
-    # default: 400
+    default: 400
   - note: |
       Income from all other sources not listed. Specify the source and amount. Do not include any benefits received under the Social Security Act; payments received as a victim of a war crime, a crime against humanity, or international or domestic terrorism; or compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with a disability, combat-related injury or disability, or death of a member of the uniformed servies.
   - Source 1: monthly_income.source1_2
-    # default: first source
+    default: first source
   - Amount: monthly_income.source1_amount_2
     datatype: currency
-    # default: 100
+    default: 100
   - Source 2: monthly_income.source2_2
-    # default: second source
+    default: second source
   - Amount: monthly_income.source2_amount_2
-    # default: 100
+    default: 100
 ---
 event: review_122
 question: |
@@ -248,13 +248,13 @@ question: |
   Calculate the median family income that applies to you.
 fields:
   - State in which you live: monthly_income.median_state
-    # default: Florida
+    default: Florida
   - Number of people in your household: monthly_income.median_dependents
     datatype: number
-    # default: 2
+    default: 2
   - Median family income for your state and size of household: monthly_income.median_income
     datatype: currency
-    # default: 40000
+    default: 40000
 ---
 event: form_122a
 section: form_122a

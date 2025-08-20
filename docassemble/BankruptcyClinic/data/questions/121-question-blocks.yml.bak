@@ -12,31 +12,31 @@ fields:
       Tell the court about all your Social Security or Federal Individual Taxpayer Identification Numbers
   - Debtor has a SSN: debtor[i].ssn_info.no_ssn
     datatype: yesnoradio
-    # default: True
+    default: True
   - Debtor SSN 1: debtor[i].ssn_info.ssn_1
     required: False
-    # default: 999 55 9999
+    default: 999 55 9999
     show if:
       variable: debtor[i].ssn_info.no_ssn
       is: True
   - Debtor SSN 2: debtor[i].ssn_info.ssn_2
     required: False
-    # default: 999 55 9998
+    default: 999 55 9998
     show if:
       variable: debtor[i].ssn_info.no_ssn
       is: True
   - Debtor has a ITIN: debtor[i].ssn_info.no_itin
     datatype: yesnoradio
-    # default: False
+    default: False
   - Debtor ITIN 1: debtor[i].ssn_info.itin_1
     required: False
-    # default: 555 55 5555
+    default: 555 55 5555
     show if:
       variable: debtor[i].ssn_info.no_itin
       is: True
   - Debtor ITIN 2: debtor[i].ssn_info.itin_2
     required: False
-    # default: 555 55 5554
+    default: 555 55 5554
     show if:
       variable: debtor[0].ssn_info.no_itin
       is: True

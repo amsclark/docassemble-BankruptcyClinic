@@ -19,7 +19,7 @@ subquestion: |
   Please specify the district you plan on submitting your bankruptcy case to.
 fields:
   - Bankruptcy Court District: current_district
-    # default: District of Nebraska
+    default: District of Nebraska
     code: courts_list
 ---
 section: district
@@ -104,59 +104,59 @@ subquestion: |
 fields:
   - note: <strong>Basic Debtor Info</strong>
   - First Name: debtor[i].name.first
-    # default: "Dan"
+    default: "Dan"
   - Middle Name: debtor[i].name.middle
     required: False
   - Last Name: debtor[i].name.last
-    # default: "Fields"
+    default: "Fields"
   - Suffix: debtor[i].name.suffix
     required: False
   - note: <strong>Address</strong>
   - Address: debtor[i].address.address
-    # default: "9999 333th St"
+    default: "9999 333th St"
   - City: debtor[i].address.city
-    # default: "Tampa"
+    default: "Tampa"
   - State: debtor[i].address.state
-    # default: "Florida"
+    default: "Florida"
   - Zip Code: debtor[i].address.zip
     datatype: number
     minlength: 5
     maxlength: 5
-    # default: 33593
+    default: 33593
   - County: debtor[i].address.unit
-    # default: "Douglas County"
+    default: "Douglas County"
     code: county_list
   - Has separate mailing address: debtor[i].has_other_mailing_address
     datatype: yesno
-    # default: True
+    default: True
   - Mail Address/PO Box: debtor[i].mailing_street
-    # default: 11111 35th Ave NE
+    default: 11111 35th Ave NE
     show if: debtor[i].has_other_mailing_address
   - Mail City: debtor[i].mailing_city
-    # default: Tampa
+    default: Tampa
     show if: debtor[i].has_other_mailing_address
   - Mail State: debtor[i].mailing_state
-    # default: Florida
+    default: Florida
     show if: debtor[i].has_other_mailing_address
   - Mail Zip: debtor[i].mailing_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    # default: 33593
+    default: 33593
     show if: debtor[i].has_other_mailing_address
   - ID Type: debtor[i].tax_id.tax_id_type
     input type: radio
     choices:
       - Social Security Number: 1
       - Individual Taxpayer Identification Number: 2
-    # default: 1
+    default: 1
   - Tax ID: debtor[i].tax_id.tax_id
-    # default: 932-45-9999
+    default: 932-45-9999
     show if:
       variable: debtor[i].tax_id.tax_id_type
       is: 2
   - SSN: debtor[i].tax_id.tax_id
-    # default: 324-34-9999
+    default: 324-34-9999
     show if:
       variable: debtor[i].tax_id.tax_id_type
       is: 1
@@ -274,7 +274,7 @@ question: |
 fields:
   - Payment Method: case.payment_method
     input type: radio
-    # default: 1
+    default: 1
     choices:
       - I will pay the entire fee when I file my petition: 1
       - I need to pay the fee in installments: 2
@@ -330,13 +330,13 @@ question: |
   Please provide the details of your previous bankruptcy in the previous 8 years.
 fields:
   - District: case.previous_bankruptcy[i].district
-    # default: District of Nebraska
+    default: District of Nebraska
     code: courts_list
   - When: case.previous_bankruptcy[i].when
-    # default: 11/3/2018
+    default: 11/3/2018
     datatype: date
   - Case Number: case.previous_bankruptcy[i].case_number
-    # default: abc1234ed
+    default: abc1234ed
 section: case_det
 list collect: True
 ---
@@ -358,17 +358,17 @@ question: |
   Please provide the details of your pending bankruptcy in the previous 8 years.
 fields:
   - Debtor: case.pending_bankruptcy[i].debtor
-    # default: Dan Fields
+    default: Dan Fields
   - Relationship: case.pending_bankruptcy[i].relationship
-    # default: Self
+    default: Self
   - District: case.pending_bankruptcy[i].district
-    # default: District of Nebraska
+    default: District of Nebraska
     code: courts_list
   - When: case.pending_bankruptcy[i].when
-    # default: 11/03/20
+    default: 11/03/20
     datatype: date
   - Case Number: case.pending_bankruptcy[i].case_number
-    # default: 11222ddv2
+    default: 11222ddv2
 section: case_det
 list collect: True
 ---
@@ -515,18 +515,18 @@ question: |
   Please fill in the name and location of your business.
 fields:
   - Name: business.business[i].name
-    # default: Acme
+    default: Acme
   - Address/PO Box: business.business[i].street
-    # default: 11111 35th pl
+    default: 11111 35th pl
   - City: business.business[i].city
-    # default: Tampa
+    default: Tampa
   - State: business.business[i].state
-    # default: Florida
+    default: Florida
   - Zip: business.business[i].zip
     datatype: number
     minlength: 5
     maxlength: 5
-    # default: 33593
+    default: 33593
   - Type: business.business[i].type
     input type: radio
     choices:
@@ -535,7 +535,7 @@ fields:
       - Stockbroker: 3
       - Commodity Broker: 4
       - None of the above: 5
-    # default: 1
+    default: 1
   - note: <strong>Employer ID Number, if any</strong>
   - EIN: debtor[i].tax_id.first_ein
     required: False
@@ -609,20 +609,20 @@ question: |
   Please fill in the name and location of your business.
 fields:
   - Hazard: hazardous_property.property[i].hazard
-    # default: Radioactive Waste
+    default: Radioactive Waste
   - Why is immediate attention required?: hazardous_property.property[i].immediate_attention_reason
     required: false
   - Address/PO Box: hazardous_property.property[i].street
-    # default: 1111 35th pl
+    default: 1111 35th pl
   - City: hazardous_property.property[i].city
-    # default: Tampa
+    default: Tampa
   - State: hazardous_property.property[i].state
-    # default: Florida
+    default: Florida
   - Zip: hazardous_property.property[i].zip
     datatype: number
     minlength: 5
     maxlength: 5
-    # default: 33593
+    default: 33593
 section: haz_prop
 list collect: True
 ---
@@ -692,7 +692,7 @@ fields:
  - What date did you take the class?: debtor[i].counseling.counseling_date
    datatype: date
    required: False
-# default: 1
+default: 1
 section: credit_counsel
 ---
 question: |
@@ -732,7 +732,7 @@ fields:
       - Primarily business debts: 2
       - Other: 3
   - Other type: reporting.other_debt_description
-    # default: other type
+    default: other type
     required: false
     show if:
       variable: reporting.reporting_type
