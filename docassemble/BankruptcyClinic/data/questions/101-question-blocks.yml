@@ -166,12 +166,12 @@ fields:
       variable: debtor[i].tax_id.tax_id_type
       is: 1
 
-right: |
-  % if all(hasattr(d, 'name') and hasattr(d.name, 'first') and hasattr(d.name, 'last') for d in debtor):
-  <br><br><br>
-  <strong>Current Debtors</strong>
-  ${ debtor_table }
-  % endif
+#right: |
+#  % if all(hasattr(d, 'name') and hasattr(d.name, 'first') and hasattr(d.name, 'last') for d in debtor):
+#  <br><br><br>
+#  <strong>Current Debtors</strong>
+#  ${ debtor_table }
+#  % endif
 section: identify
 ---
 question: |
@@ -212,21 +212,21 @@ list collect: True
 question: |
   Does ${ debtor[i].name.first } ${ debtor[i].name.last } have any           other names they've used in the last 8 years?
 yesno: debtor[i].alias.there_is_another
-under: |
-  <br><br><br>
-  <strong>Current Aliases</strong>
-  ${ debtor_alias_table }
+#under: |
+#  <br><br><br>
+#  <strong>Current Aliases</strong>
+#  ${ debtor_alias_table }
 section: identify
 ---
 question: |
   Are there more debtors to add?
 yesno: debtor.there_is_another
-right: |
-  % if all(hasattr(d, 'name') and hasattr(d.name, 'first') and hasattr(d.name, 'last') for d in debtor):
-  <br><br><br>
-  <strong>Current Debtors</strong>
-  ${ debtor_table }
-  % endif
+#right: |
+#  % if all(hasattr(d, 'name') and hasattr(d.name, 'first') and hasattr(d.name, 'last') for d in debtor):
+#  <br><br><br>
+#  <strong>Current Debtors</strong>
+#  ${ debtor_table }
+#  % endif
 section: identify
 ---
 event: identify
