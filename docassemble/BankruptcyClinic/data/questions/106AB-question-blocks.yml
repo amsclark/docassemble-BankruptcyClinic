@@ -1434,14 +1434,14 @@ script: |
     // Safely check for exemptions data
     try {
       checkQuestionExemptions(
-        
         "prop.interests[i].is_claiming_exemption",
         "prop.interests[i].claiming_sub_100",
         "prop.interests[i].current_owned_value",
         "prop.interests[i].exemption_value",
         "prop.interests[i].exemption_laws",
         "prop.interests[i].exemption_value_2",
-        "prop.interests[i].exemption_laws_2");
+        "prop.interests[i].exemption_laws_2",
+        "prop.interests[i].state");
     } catch(e) {
       console.log("Error in exemption check:", e);
     }
@@ -1592,14 +1592,14 @@ subquestion: |
 script: |
   <script>
     checkQuestionExemptions(
-
       "prop.ab_vehicles[i].is_claiming_exemption",
       "prop.ab_vehicles[i].claiming_sub_100",
       "prop.ab_vehicles[i].current_owned_value",
       "prop.ab_vehicles[i].exemption_value",
       "prop.ab_vehicles[i].exemption_laws",
       "prop.ab_vehicles[i].exemption_value_2",
-      "prop.ab_vehicles[i].exemption_laws_2");
+      "prop.ab_vehicles[i].exemption_laws_2",
+      "prop.ab_vehicles[i].state");
   </script>
 fields:
   - Make: prop.ab_vehicles[i].make
@@ -1722,14 +1722,14 @@ subquestion: |
 script: |
   <script>
     checkQuestionExemptions(
-      
       "prop.ab_other_vehicles[i].is_claiming_exemption",
       "prop.ab_other_vehicles[i].claiming_sub_100",
       "prop.ab_other_vehicles[i].current_owned_value",
       "prop.ab_other_vehicles[i].exemption_value",
       "prop.ab_other_vehicles[i].exemption_laws",
       "prop.ab_other_vehicles[i].exemption_value_2",
-      "prop.ab_other_vehicles[i].exemption_laws_2");
+      "prop.ab_other_vehicles[i].exemption_laws_2",
+      "prop.ab_other_vehicles[i].state");
   </script>
 fields:
   - Make: prop.ab_other_vehicles[i].make
@@ -2394,14 +2394,14 @@ subquestion: |
 script: |
   <script>
     checkQuestionExemptions(
-      
       "prop.financial_assets.cash_is_claiming_exemption",
       "prop.financial_assets.cash_sub_100",
       "prop.financial_assets.cash_value",
       "prop.financial_assets.cash_exemption_value",
       "prop.financial_assets.cash_exemption_laws",
       "prop.financial_assets.cash_exemption_value_2",
-      "prop.financial_assets.cash_exemption_laws_2");
+      "prop.financial_assets.cash_exemption_laws_2",
+      "debtor[0].address.state");
   </script>
 fields:
   - I have cash: prop.financial_assets.has_cash
