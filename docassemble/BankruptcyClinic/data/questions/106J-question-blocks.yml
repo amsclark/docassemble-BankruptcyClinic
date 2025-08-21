@@ -1,16 +1,4 @@
 ---
-code: |
-  # Only set default attributes, do not reassign DAObject/DAList
-  for i in range(len(debtor)):
-    if not hasattr(debtor[i].expenses, 'joint_case'):
-      debtor[i].expenses.joint_case = (len(debtor) > 1)
-    if not hasattr(debtor[i].expenses, 'other_household'):
-      debtor[i].expenses.other_household = False
-    if not hasattr(debtor[i].expenses, 'other_people_expenses'):
-      debtor[i].expenses.other_people_expenses = False
-    if not hasattr(debtor[i].expenses.dependents, 'there_are_any'):
-      debtor[i].expenses.dependents.there_are_any = False
----
 table: dependents_table
 rows: debtor[0].expenses.dependents
 columns:
