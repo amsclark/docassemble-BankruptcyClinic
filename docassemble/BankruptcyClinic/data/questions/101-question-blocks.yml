@@ -118,6 +118,7 @@ fields:
     # default: "Tampa"
   - State: debtor[i].address.state
     # default: "Florida"
+    # TODO: this should be a dropdown
   - Zip Code: debtor[i].address.zip
     datatype: number
     minlength: 5
@@ -125,6 +126,7 @@ fields:
     # default: 33593
   - County: debtor[i].address.unit
     # default: "Douglas County"
+    # TODO: this needs to update depending on the state selected. 
     code: county_list
   - Has separate mailing address: debtor[i].has_other_mailing_address
     datatype: yesno
@@ -137,6 +139,7 @@ fields:
     show if: debtor[i].has_other_mailing_address
   - Mail State: debtor[i].mailing_state
     # default: Florida
+    # TODO: this should be a dropdown
     show if: debtor[i].has_other_mailing_address
   - Mail Zip: debtor[i].mailing_zip
     datatype: number
@@ -152,17 +155,19 @@ fields:
     # default: 1
   - Tax ID: debtor[i].tax_id.tax_id
     # default: 932-45-9999
+    # TODO: this should have validation code
     show if:
       variable: debtor[i].tax_id.tax_id_type
       is: 2
   - SSN: debtor[i].tax_id.tax_id
+    # TODO: this should have validation code
     # default: 324-34-9999
     show if:
       variable: debtor[i].tax_id.tax_id_type
       is: 1
 
-post: |
-  % if len(debtor) > 1:
+right: |
+% if all(hasattr(d, 'name') and hasattr(d.name, 'first') and hasattr(d.name, 'last') for d in debtor):
   <br><br><br>
   <strong>Current Debtors</strong>
   ${ debtor_table }
@@ -216,10 +221,12 @@ section: identify
 question: |
   Are there more debtors to add?
 yesno: debtor.there_is_another
-under: |
+right: |
+% if all(hasattr(d, 'name') and hasattr(d.name, 'first') and hasattr(d.name, 'last') for d in debtor):
   <br><br><br>
   <strong>Current Debtors</strong>
   ${ debtor_table }
+% endif
 section: identify
 ---
 event: identify

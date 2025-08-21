@@ -337,7 +337,8 @@ code: |
   amended_filing
   if amended_filing == True:
     case_number
-  district_final
+  # next line is for an unnecessary confirmation screen. Do they want this?
+  district_final 
   filing_status
   if filing_status == "Filing individually":
     debtor.target_number = 1
