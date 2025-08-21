@@ -347,8 +347,9 @@ code: |
     debtor.target_number = 2
     debtor[0].expenses.joint_case = True
   debtor.gather()
-  debtor[0].expenses.other_household
-  debtor[0].expenses.dependents.gather()
+  # don't do this. causes an infinite loop
+  # debtor[0].expenses.other_household
+  # debtor[0].expenses.dependents.gather()
   debtor_final
 
 
