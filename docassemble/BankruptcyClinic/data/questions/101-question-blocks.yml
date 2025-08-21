@@ -167,7 +167,7 @@ fields:
       is: 1
 
 right: |
-% if all(hasattr(d, 'name') and hasattr(d.name, 'first') and hasattr(d.name, 'last') for d in debtor):
+  % if all(hasattr(d, 'name') and hasattr(d.name, 'first') and hasattr(d.name, 'last') for d in debtor):
   <br><br><br>
   <strong>Current Debtors</strong>
   ${ debtor_table }
@@ -222,11 +222,11 @@ question: |
   Are there more debtors to add?
 yesno: debtor.there_is_another
 right: |
-% if all(hasattr(d, 'name') and hasattr(d.name, 'first') and hasattr(d.name, 'last') for d in debtor):
+  % if all(hasattr(d, 'name') and hasattr(d.name, 'first') and hasattr(d.name, 'last') for d in debtor):
   <br><br><br>
   <strong>Current Debtors</strong>
   ${ debtor_table }
-% endif
+  % endif
 section: identify
 ---
 event: identify
