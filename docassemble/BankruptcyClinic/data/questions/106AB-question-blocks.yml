@@ -3211,7 +3211,7 @@ fields:
   - Interest value: prop.financial_assets.future_property_interest_value
     # default: 3000
     datatype: currency
-    show if: prop.financial_assets.had_future_property_interest
+    show if: prop.financial_assets.has_future_property_interest
   - Claiming Exemption?: prop.financial_assets.future_property_interest_has_claim
     # default: False
     datatype: yesnoradio
