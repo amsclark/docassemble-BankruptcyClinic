@@ -1,8 +1,47 @@
+
+// Nebraska exemptions (example, fill in as needed)
+const nebraskaExemptions = {
+  homestead: { law: 'Homestead (Neb. Rev. Stat. § 40-101)', limit: 60000, amount: 0 },
+  // ... add other NE exemptions here ...
+};
+
+// South Dakota exemptions
+const southDakotaExemptions = {
+  homestead: { law: 'Homestead (SDCL 43-31-1 – 43-31-6)', limit: 120000, amount: 0 },
+  homestead_proceeds: { law: 'Homestead, proceeds of sale (SDCL 43-31-4)', limit: 60000, amount: 0 },
+  household_goods: { law: 'Furniture and bedding (SDCL 43-45-5(5))', limit: 200, amount: 0 },
+  wildcard: { law: 'Wildcard (SDCL 43-5-4)', limit: 2000, amount: 0 }, // adjust for head of household
+  personal_property: { law: 'Bible, books, family pictures, burial plots, all wearing apparel, church pew, food & fuel to last one year, and clothing (SDCL 43-45-2)', limit: 0, amount: 0 },
+  health_aids: { law: 'Health Aids (SDCL 43-45-2)', limit: 0, amount: 0 },
+  retirement: { law: 'retirement (SDCL 43-45-26)', limit: 1000000, amount: 0 },
+  wages: { law: 'Wages (SDCL 15-20-12)', limit: 0, amount: 0 },
+  life_insurance: { law: 'Life insurance proceeds (SDCL 58-12-4. 43-45-6)', limit: 10000, amount: 0 },
+  workers_comp: { law: 'Workers Compensation (SDCL 62-4-42)', limit: 0, amount: 0 },
+  unemployment: { law: 'Unemployment (SDCL 61-6-28)', limit: 0, amount: 0 },
+  student_loan: { law: 'Student Loan (20 U.S.C. § 1095a(d))', limit: 0, amount: 0 },
+  social_security: { law: 'Social Security (42 U.S.C. § 407)', limit: 0, amount: 0 },
+  va: { law: 'VA Benefits (38 U.S.C. § 5301(a))', limit: 0, amount: 0 },
+  // ... add other SD exemptions here ...
+};
+
+// Helper to select the correct exemption set
+function getCurrentExemptions(userState) {
+  if (userState && userState.toLowerCase().includes('south dakota')) {
+    return southDakotaExemptions;
+  }
+  // Default to Nebraska
+  return nebraskaExemptions;
+}
+
+// Main function, now expects userState as an extra argument
 function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claiming_sub_100,
     current_owned_value, exemption_value, exemption_laws, exemption_value_2,
-    exemption_laws_2) {
+    exemption_laws_2, userState) {
+    if (userState) {
+      currentExemptions = getCurrentExemptions(userState);
+    }
 
-    function runExemptionCheck() {
+  function runExemptionCheck() {
       console.log("running exemption check");
       var isClaimingExemption = isClaimingExemptionElement.checked;
       var isCustomExemption = isCustomExemptionElement.checked;
@@ -24,8 +63,8 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
       // If not claiming exemptions skip check
       if (!isClaimingExemption) {return;}
 
-      if (!isCustomExemption && law1Element.value) {
-        if (currentValue > currentExemptions[law1].limit) {
+      if (!isCustomExemption && law1Element.value && currentExemptions[law1]) {
+        if (parseFloat(currentValue) > currentExemptions[law1].limit && currentExemptions[law1].limit !== 0) {
           console.log('ERROR OVER LIMIT');
           flash(currentValue + " is over " + law1 + " limit.", "danger");
           law1Element.setCustomValidity("Invalid");
@@ -33,14 +72,14 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
         }
       }
 
-      if ((value1 + currentExemptions[law1].amount) > currentExemptions[law1].limit) {
+      if (currentExemptions[law1] && currentExemptions[law1].limit !== 0 && (parseFloat(value1) + currentExemptions[law1].amount) > currentExemptions[law1].limit) {
         console.log('ERROR VALUE 1 TOO HIGH');
         flash(value1 + " would exceed limit of " + law1 + ".", "danger");
         value1Element.setCustomValidity("Invalid");
         law1Element.setCustomValidity("Invalid");
       }
 
-      if ((value2 + currentExemptions[law2].amount) > currentExemptions[law2].limit) {
+      if (currentExemptions[law2] && currentExemptions[law2].limit !== 0 && (parseFloat(value2) + currentExemptions[law2].amount) > currentExemptions[law2].limit) {
         console.log('ERROR VALUE 2 TOO HIGH');
         flash(value2 + " would exceed limit of " + law2 + ".", "danger");
         value2Element.setCustomValidity("Invalid");
