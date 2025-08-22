@@ -71,6 +71,7 @@ fields:
     # default: NA
 ---
 #Part 2 - Tell the court about your monthly expenses
+id: f103b_monthly_expenses
 section: waive_fee
 question: |
   Estimate your average monthly expenses.
@@ -120,6 +121,7 @@ edit:
   - institution
   - amount
 ---
+id: f103b_cash_amount
 section: waive_fee
 question: |
   How much cash do you have?
@@ -130,6 +132,7 @@ fields:
     datatype: currency
     # default: 2000
 ---
+id: f103b_bank_accounts_exist
 section: waive_fee
 question: |
   Do you have bank accounts and other deposits of money?
@@ -139,6 +142,7 @@ subquestion: |
   Do not include 401(k) and IRA accounts.
 yesno: prop.has_bank_accounts
 ---
+id: f103b_bank_account_details
 section: waive_fee
 question: |
   Provide details about account.
@@ -157,6 +161,7 @@ under: |
   ${ prop_accounts_table }
 list collect: True
 ---
+id: f103b_bank_accounts_add_another
 section: waive_fee
 question: |
   Do you have any other bank accounts or deposits of money?
@@ -164,6 +169,7 @@ yesno: prop.accounts.there_is_another
 under: |
   ${ prop_accounts_table }
 ---
+id: f103b_home_ownership
 section: waive_fee
 question: |
   Your home?
@@ -197,6 +203,7 @@ fields:
     # default: 90000
     show if: prop.has_home
 ---
+id: f103b_other_real_estate
 section: waive_fee
 question: |
   Other real estate?
@@ -247,6 +254,7 @@ edit:
   - current_value
   - amount_owed
 ---
+id: f103b_vehicles_any_exist
 section: waive_fee
 question: |
   Vehicles?
@@ -254,6 +262,7 @@ subquestion: |
   Do you own any vehicles? Examples: Cars, vans, trucks, sports utility vehicles, motorcycles, tractors, boats.
 yesno: prop.vehicles.there_are_any
 ---
+id: f103b_vehicles_add_another
 section: waive_fee
 question: |
   Do you own any more vehicles?
@@ -284,6 +293,7 @@ fields:
     datatype: currency
 list collect: True
 ---
+id: f103b_other_assets
 section: waive_fee
 question: |
   Other assets
@@ -309,6 +319,7 @@ edit:
   - name
   - amount
 ---
+id: f103b_money_owed_to_you_any_exist
 section: waive_fee
 question: |
   Money or property due you?

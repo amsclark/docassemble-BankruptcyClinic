@@ -3281,6 +3281,7 @@ fields:
     show if: prop.financial_assets.future_property_interest_has_claim
     required: False
 ---
+id: intellectual_property
 section: schedule_ab
 question: |
   Do you have any patents, copyrights, trademarks, trade secrets, and other intellectual property?
