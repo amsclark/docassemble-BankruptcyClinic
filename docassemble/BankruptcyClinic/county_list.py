@@ -1,4 +1,4 @@
-def county_list(input_state: str) -> str:
+def county_list(input_state: str) -> list:
 	if input_state == "Nebraska":
 		return [
 			"Adams County", 
@@ -95,7 +95,7 @@ def county_list(input_state: str) -> str:
 			"Wheeler County", 
 			"York County", 
 		]
-	else if input_state == "South Dakota":
+	elif input_state == "South Dakota":
 		return [
 			"Beadle County",
 		"Bennett County",
@@ -161,4 +161,6 @@ def county_list(input_state: str) -> str:
 		"Walworth County",
 		"Yankton County",
 		"Ziebach County",
-			]
+	]
+	else:
+		return []
