@@ -1,4 +1,5 @@
-states_list = [
-    "Nebraska",
-    "South Dakota"
-]
+def states_list():
+    return [
+        "Nebraska",
+        "South Dakota"
+    ]
