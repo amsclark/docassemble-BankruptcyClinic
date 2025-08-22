@@ -137,8 +137,13 @@ fields:
   - County: debtor[i].address.county
     # default: "Douglas County"
     input type: dropdown
-    code: county_list(debtor[i].address.state)
+    choices: 
+      - N/A
+    #js enable if: val('debtor[i].address.state')
     datatype: str
+  - field: hidden_county
+    input type: hidden
+    default: ""
   - Has separate mailing address: debtor[i].has_other_mailing_address
     datatype: yesno
     # default: True
@@ -176,6 +181,53 @@ fields:
     show if:
       variable: debtor[i].tax_id.tax_id_type
       is: 1
+  - note: |
+      <script>
+        // Handle dynamic county population based on state selection
+        $(document).on('daPageLoad', function() {
+          // Define county data
+          var countyData = {
+            'Nebraska': ${ county_list('Nebraska') | safe },
+            'South Dakota': ${ county_list('South Dakota') | safe }
+          };
+          
+          // Find the state and county dropdowns for this debtor
+          var stateDropdown = $('select[name*="debtor[' + ${ i } + '].address.state"]').first();
+          var countyDropdown = $('select[name*="debtor[' + ${ i } + '].address.county"]').first();
+          
+          if (stateDropdown.length && countyDropdown.length) {
+            // Function to update county options based on state
+            function updateCountyOptions(selectedState) {
+              // Clear current options
+              countyDropdown.empty();
+              
+              // Get counties for the selected state
+              var counties = countyData[selectedState] || [];
+              
+              if (counties.length > 0) {
+                // Add county options
+                counties.forEach(function(county) {
+                  countyDropdown.append($('<option></option>').attr('value', county).text(county));
+                });
+              } else {
+                // Add N/A if no counties available
+                countyDropdown.append($('<option></option>').attr('value', 'N/A').text('N/A'));
+              }
+            }
+            
+            // Update counties when state changes
+            stateDropdown.on('change', function() {
+              updateCountyOptions($(this).val());
+            });
+            
+            // Initialize counties if state is already selected
+            var currentState = stateDropdown.val();
+            if (currentState && currentState !== '') {
+              updateCountyOptions(currentState);
+            }
+          }
+        });
+      </script>
 
 #right: |
 #  % if all(hasattr(d, 'name') and hasattr(d.name, 'first') and hasattr(d.name, 'last') for d in debtor):
