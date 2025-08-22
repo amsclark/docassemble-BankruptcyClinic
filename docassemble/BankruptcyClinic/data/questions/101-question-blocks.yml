@@ -836,23 +836,20 @@ code: |
     else:
       main['debtor_tax_id'+str(i)] = debt.tax_id.tax_id[-4:]
 
-    main['debtor_street'+str(i)] = debt.address.address
-    main['debtor_city'+str(i)] = debt.address.city
-    main['debtor_state'+str(i)] = debt.address.state
-    main['debtor_zip'+str(i)] = debt.address.zip
-  main['debtor_county'+str(i)] = debt.address.county
-    main['debtor_mail_street'+str(i)] = debt.mailing_street
-    main['debtor_mail_city'+str(i)] = debt.mailing_city
-    main['debtor_mail_state'+str(i)] = debt.mailing_state
-    main['debtor_mail_zip'+str(i)] = debt.mailing_zip
-    main['yesLivedInDistrict'+str(i)] = True if debt.district_info.is_current_district == True else False
-    main['noLivedInDistrict'+str(i)] = True if debt.district_info.is_current_district == False else False
-    main['debtor_ein'+str(i)+'-1'] = debt.tax_id.first_ein
-    main['debtor_ein'+str(i)+'-2'] = debt.tax_id.second_ein
-    if debt.district_info.is_current_district == False:
-      main['districtExplain'+str(i)+'-1'] = debt.district_info.other_district_reason
 
-    i += 1
+  main['debtor_county'+str(i)] = debt.address.county
+  main['debtor_mail_street'+str(i)] = debt.mailing_street
+  main['debtor_mail_city'+str(i)] = debt.mailing_city
+  main['debtor_mail_state'+str(i)] = debt.mailing_state
+  main['debtor_mail_zip'+str(i)] = debt.mailing_zip
+  main['yesLivedInDistrict'+str(i)] = True if debt.district_info.is_current_district == True else False
+  main['noLivedInDistrict'+str(i)] = True if debt.district_info.is_current_district == False else False
+  main['debtor_ein'+str(i)+'-1'] = debt.tax_id.first_ein
+  main['debtor_ein'+str(i)+'-2'] = debt.tax_id.second_ein
+  if debt.district_info.is_current_district == False:
+    main['districtExplain'+str(i)+'-1'] = debt.district_info.other_district_reason
+
+  i += 1
 
   main['payEntireFee'] = True if case.payment_method == '1' else False
   main['payInstallments'] = True if case.payment_method == '2' else False
