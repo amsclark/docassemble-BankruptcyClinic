@@ -126,9 +126,7 @@ fields:
     # default: "Tampa"
   - State: debtor[i].address.state
     # default: "Florida"
-    dropdown:
-      - Nebraska
-      - South Dakota
+    choices: get_bk_states_list()
   - Zip Code: debtor[i].address.zip
     datatype: number
     minlength: 5

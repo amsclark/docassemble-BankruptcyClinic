@@ -1,6 +1,7 @@
 modules:
   - .courts_list
   - .county_list
+  - .get_bk_states_list
 ---
 include:
   - mandatory-initial-code.yml
