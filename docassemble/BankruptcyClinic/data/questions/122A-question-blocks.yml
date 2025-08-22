@@ -1,3 +1,4 @@
+id: means_test_presumption_of_abuse
 section: form_122a
 question: |
   Presumption of abuse & Means Test
@@ -11,6 +12,7 @@ fields:
       - The Means Test does not apply now because of qualified military service but it could apply later.
     # default: There is no presumption of abuse.
 ---
+id: means_test_exemptions
 section: form_122a
 question: |
   Identify any exemptions from Presumption of Abuse.
@@ -26,6 +28,7 @@ fields:
     # default: False
 
 ---
+id: household_and_dependents_info
 section: form_122a
 question: |
   Tell the court about your household and dependents so we can calulate median income.
@@ -47,6 +50,7 @@ fields:
     datatype: number
     # default: 2
 ---
+id: debtor1_current_monthly_income
 section: form_122a
 question: |
   Calculate your current monthly income
@@ -109,6 +113,7 @@ fields:
   - Amount: monthly_income.source2_amount_1
     # default: 100
 ---
+id: debtor2_current_monthly_income
 section: form_122a
 question: |
   Calculate Debtor 2 current monthly income
@@ -256,6 +261,7 @@ fields:
     datatype: currency
     # default: 40000
 ---
+id: monthly_income_review
 event: form_122a
 section: form_122a
 question: |

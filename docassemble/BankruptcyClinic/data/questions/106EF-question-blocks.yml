@@ -11,11 +11,13 @@ edit:
   - total_claim
   - incurred_date
 ---
+id: priority_unsecured_claims_any_exist
 section: schedule_ef
 question: |
   Do you owe any taxes or owe anyone child support?
 yesno: prop.priority_claims.there_are_any
 ---
+id: priority_unsecured_claims_add_another
 section: schedule_ef
 question: |
   Are there any more creditors that are owed taxes or child support?
@@ -23,6 +25,7 @@ yesno: prop.priority_claims.there_is_another
 under: |
   ${ prop_priority_claims_table }
 ---
+id: priority_unsecured_claim_details
 section: schedule_ef
 question: |
   Tell the court about an unsecured claim
@@ -218,11 +221,13 @@ edit:
   - total_claim
   - incurred_date
 ---
+id: nonpriority_unsecured_claims_any_exist
 section: schedule_ef
 question: |
   Do any creditors have nonpriority unsecured claims against you?
 yesno: prop.nonpriority_claims.there_are_any
 ---
+id: nonpriority_unsecured_claims_add_another
 section: schedule_ef
 question: |
   Are there any more creditors that have nonpriority unsecured claims?
@@ -230,6 +235,7 @@ yesno: prop.nonpriority_claims.there_is_another
 under: |
   ${ prop_nonpriority_claims_table }
 ---
+id: nonpriority_unsecured_claim_details
 section: schedule_ef
 question: |
   Tell the court about a nonpriority unsecured claim
@@ -409,6 +415,7 @@ fields:
     required: False
 list collect: True
 ---
+id: schedule_ef_review
 event: schedule_ef
 section: schedule_ef
 question: |

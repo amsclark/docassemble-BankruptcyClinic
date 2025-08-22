@@ -10,6 +10,7 @@ edit:
   - age
   - same_residence
 ---
+id: household_description
 section: schedule_j
 question: Describe your household
 fields:
@@ -24,10 +25,12 @@ fields:
     datatype: yesnoradio
     # default: True
 ---
+id: dependents_add_another
 section: schedule_j
 question: Are there any more dependents?
 yesno: debtor[0].expenses.dependents.there_is_another
 ---
+id: dependent_details
 section: schedule_j
 question: Tell us about your dependent
 fields:
@@ -40,6 +43,7 @@ fields:
     datatype: yesnoradio
     # default: True
 ---
+id: monthly_expenses_details
 section: schedule_j
 question: Estimate your ongoing monthly expenses
 subquestion: |
@@ -264,6 +268,7 @@ fields:
     required: False
     show if: debtor[0].expenses.has_other_expenses
 ---
+id: expense_changes_expected
 section: schedule_j
 question: |
   Do you expect an increase or decrease in your expenses within the year after you file this form?
@@ -277,6 +282,7 @@ fields:
     # default: Some expense to explain
     required: False
 ---
+id: schedule_j_review
 event: schedule_j
 section: schedule_j
 question: |

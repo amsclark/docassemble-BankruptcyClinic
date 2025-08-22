@@ -7,6 +7,7 @@ edit:
   - name
   - state
 ---
+id: codebtors_any_exist
 section: schedule_h
 question: |
   Do you have any codebtors?
@@ -14,6 +15,7 @@ subquestion: |
   If you are filing a joint case, do not list either spouse as a codebtor.
 yesno: debtors.codebtors.there_are_any
 ---
+id: codebtors_add_another
 section: schedule_h
 question: |
   Are there any more codebtors?
@@ -21,6 +23,7 @@ yesno: debtors.codebtors.there_is_another
 under: |
   ${ codebtors_table }
 ---
+id: codebtor_details
 section: schedule_h
 question: |
   Tell us about your codebtor
@@ -52,6 +55,7 @@ fields:
     # default: 3
 list collect: True
 ---
+id: community_property_spouse_info
 section: schedule_h
 question: |
   Within the last 8 years, have you lived in a community property state or territory?
@@ -93,6 +97,7 @@ fields:
     required: False
 list collect: True
 ---
+id: schedule_h_review
 event: schedule_h
 section: schedule_h
 question: |

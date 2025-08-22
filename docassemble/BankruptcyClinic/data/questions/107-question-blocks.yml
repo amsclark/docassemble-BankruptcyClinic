@@ -1,3 +1,4 @@
+id: marital_status_and_residence_history
 section: form_107
 question: |
   Give details about your marital status and where you lived before
@@ -1042,20 +1043,24 @@ edit:
   - amount_owed
   - payment_for
 ---
+id: consumer_debts_classification
 question: |
   Are either Debtor 1's or Debtor 2's debts primarily consumer debts?
 yesno: financial_affairs.primarily_consumer_debts
 ---
+id: consumer_creditor_payments
 question: |
   Did either Debtor 1 or Debtor 2 pay a consumer creditor a total of $600 or a non-consumer creditor a total of $7,575 in the last 90 days?
 yesno: financial_affairs.consumer_debt_payments.there_are_any
 ---
+id: consumer_debt_additional_creditors
 question: |
   Any other creditors you would like to add?
 yesno: financial_affairs.consumer_debt_payments.there_is_another
 under: |
   ${ consumer_debts_table }
 ---
+id: consumer_debt_payment_details
 question: |
   Tell the court about a consumer creditor you paid a total of $600 or more to OR about non-consumer creditors you paid over $7,575 to in the last 90 day.
 fields:
@@ -1115,18 +1120,21 @@ edit:
   - total_amount
   - amount_owed
 ---
+id: insider_payments_additional
 question: |
   Any other insider payments to add?
 yesno: financial_affairs.insider_payments.there_is_another
 under: |
   ${ insider_payments_table }
 ---
+id: insider_payments_to_debt
 question: |
   Did either debtor 1 or debtor 2 make any payment on debt you owed anyone who was an insider?
 subquestion: |
   Insiders include your relatives; any general partners; relatives of any general partners; partnerships of which you are a general partner; corporations of which you are an officer, director, person in control, or owner of 20% or more of their voting securities; and any managing agent, including one for a business you operate as a sole propietor. Include payments for domestic support obligations, such as child support and alimony.
 yesno: financial_affairs.insider_payments.there_are_any
 ---
+id: insider_payment_details
 question: |
   Tell the court about the payment to an insider.
 fields:
@@ -1173,12 +1181,14 @@ edit:
   - total_amount
   - amount_owed
 ---
+id: insider_benefit_payments_additional
 question: |
   Any other payments that benefited insiders to add?
 yesno: financial_affairs.insider_benefits.there_is_another
 under: |
   ${ insider_benefits_table }
 ---
+id: insider_benefit_payments
 question: |
   Insider Benefit
 subquestion: |
@@ -1187,6 +1197,7 @@ subquestion: |
   Include payments on debts guaranteed to cosigned by an insider.
 yesno: financial_affairs.insider_benefits.there_are_any
 ---
+id: insider_benefit_payment_details
 question: |
   Tell the court about the payment or transfer of any property on account of a debt that benefited an insider
 fields:
@@ -1236,6 +1247,7 @@ edit:
   - court_name
   - case_status
 ---
+id: lawsuits_court_actions
 question: |
   Lawsuits
 subquestion: |
@@ -1244,12 +1256,14 @@ subquestion: |
   Including personal injury cases, small claims actions, divorces, collection suits, paternity actions, support or custody modifications, and contract disputes.
 yesno: financial_affairs.lawsuits.there_are_any
 ---
+id: lawsuits_additional
 question: |
   Are there any more lawsuits filed against you to report?
 yesno: financial_affairs.lawsuits.there_is_another
 under: |
   ${ lawsuit_table }
 ---
+id: lawsuit_details
 question: |
   Tell the court about the lawsuit filed against you.
 fields:
@@ -1294,18 +1308,21 @@ edit:
   - property_value
   - property_action
 ---
+id: repossessed_property_seizure
 question: |
   Repossesed Property
 subquestion: |
   Within 1 year before you filed for bankruptcy, was any of your property repossessed, foreclosed, garnished, attached, seized, or levied?
 yesno: financial_affairs.levies.there_are_any
 ---
+id: repossessed_property_additional
 question: |
   Are there any more properties that have been repossessed, foreclosed, garnished, attached, seized, or levied in the last year?
 yesno: financial_affairs.levies.there_is_another
 under: |
   ${ levies_table }
 ---
+id: repossessed_property_details
 question: |
   Tell the court about a repossessed, foreclosed, garnished, attached, seized, or levied property in the last year.
 fields:
@@ -1409,12 +1426,14 @@ edit:
   - relationship
   - value_1
 ---
+id: gifts_to_others
 question: |
   Gifts to other people
 subquestion: |
   Within 2 years before you filed for bankruptcy, did you give any gifts with a total value of more than $600 per person?
 yesno: financial_affairs.gifts.there_are_any
 ---
+id: gifts_additional
 question: |
   Did you make any other gifts over $600 within 2 years before you filed for bankruptcy?
 yesno: financial_affairs.gifts.there_is_another
@@ -1455,6 +1474,7 @@ fields:
     datatype: currency
     required: False
 ---
+id: charitable_contributions
 question: |
   Charitable Contributions Made
 subquestion: |
@@ -1978,6 +1998,7 @@ fields:
     # default: 2000
     show if: financial_affairs.has_held_property
 ---
+id: environmental_law_liability
 question: |
   Environmental Law Liability
 subquestion: |
@@ -2047,6 +2068,7 @@ fields:
     # default: 01/01/23
     show if: financial_affairs.environment.has_liability
 ---
+id: hazardous_material_release
 question: |
   Hazardous Material
 subquestion: |
@@ -2106,6 +2128,7 @@ fields:
     # default: 01/01/23
     show if: financial_affairs.environment.has_release
 ---
+id: environmental_judicial_proceeding
 question: |
   Environmental Judicial Proceeding
 subquestion: |
@@ -2155,6 +2178,7 @@ fields:
     # default: Pending
     show if: financial_affairs.environment.has_proceeding
 ---
+id: business_connections
 question: |
   Business Connections
 subquestion: |
@@ -2180,16 +2204,19 @@ edit:
   - from
   - to
 ---
+id: business_existence
 question: |
   Do you have any businesses or have any connections to any business?
 yesno: financial_affairs.businesses.there_are_any
 ---
+id: business_additional
 question: |
   Do you have any more businesses to tell the court about?
 yesno: financial_affairs.businesses.there_is_another
 under: |
   ${ businesses_table }
 ---
+id: business_details
 question: |
   Tell the court about the business.
 fields:
@@ -2227,6 +2254,7 @@ fields:
     datatype: date
     # default: 01/01/23
 ---
+id: financial_statements
 question: |
   Financial Statements
 subquestion: |

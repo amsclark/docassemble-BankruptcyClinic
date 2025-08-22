@@ -39,11 +39,13 @@ edit:
   - other_city
   - other_state
 ---
+id: secured_creditors_any_exist
 section: schedule_d
 question: |
   Do any creditors have claims secured by your property?
 yesno: prop.creditors.there_are_any
 ---
+id: secured_creditors_add_another
 section: schedule_d
 question: |
   Are there any other secured claims you'd like to list?
@@ -51,6 +53,7 @@ yesno: prop.creditors.there_is_another
 under: |
   ${ prop_creditors_table }
 ---
+id: secured_debt_notify_others_any_exist
 section: schedule_d
 question: |
   Are there any others to be notifed for this debt such as collection agencies or other creditors?
@@ -58,6 +61,7 @@ subquestion: |
   Only specify others to be notified about your bankruptcy for your most recent debt.
 yesno: prop.creditors[i].notify.there_are_any
 ---
+id: secured_debt_notify_others_add_another
 section: schedule_d
 question: |
   Are there any more parties to be notifed?
@@ -65,6 +69,7 @@ yesno: prop.creditors[i].notify.there_is_another
 under: |
   ${ prop_creditors_notify_table }
 ---
+id: secured_debt_notify_others_details
 section: schedule_d
 question: |
   Tell the court about other parties to be notifed about this debt.
@@ -105,6 +110,7 @@ content: |
   % endif
 target: unsecured_claim_text
 ---
+id: secured_claim_details
 section: schedule_d
 question: |
   Tell the court about your secured claim.
@@ -238,6 +244,7 @@ fields:
       is: True
 list collect: True 
 ---
+id: schedule_d_review
 event: schedule_d
 section: schedule_d
 question: |

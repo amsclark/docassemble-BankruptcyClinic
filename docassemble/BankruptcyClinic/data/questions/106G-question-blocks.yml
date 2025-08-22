@@ -7,11 +7,13 @@ edit:
   - name
   - description
 ---
+id: executory_contracts_leases_any_exist
 section: schedule_g
 question: |
   Do you have any executory contracts or unexpired leases?
 yesno: prop.contracts_and_leases.there_are_any
 ---
+id: executory_contracts_leases_add_another
 section: schedule_g
 question: |
   Do you have any more executory contracts or unexpired leases?
@@ -19,6 +21,7 @@ yesno: prop.contracts_and_leases.there_is_another
 under: |
   ${ prop_contracts_and_leases_table }
 ---
+id: executory_contract_lease_details
 section: schedule_g
 question: |
   Tell the court about the executory contract or unexpired lease
@@ -82,6 +85,7 @@ fields:
     show if: prop.contracts_and_leases[i].unexpired_lease
 list collect: True
 ---
+id: schedule_g_review
 event: schedule_g
 section: schedule_g
 question: |

@@ -1,3 +1,4 @@
+id: debtor1_employment_info
 section: schedule_i
 question: |
   Fill in your employment information.
@@ -50,6 +51,7 @@ fields:
       variable: debtor[0].income.employment
       is: Employed
 ---
+id: debtor1_monthly_income_details
 section: schedule_i
 question: Give details about monthly income
 subquestion: |
@@ -115,6 +117,7 @@ fields:
     # default: 0
     required: False
 ---
+id: debtor1_payroll_deductions
 section: schedule_i
 question: List total payroll deductions in the previous month
 fields:
@@ -147,6 +150,7 @@ fields:
     # default: 300
     required: false
 ---
+id: debtor1_other_deductions
 section: schedule_i
 question: Do you have any deductions to claim?
 fields:
@@ -226,6 +230,7 @@ fields:
     show if: debtor[0].income.other_deduction
     required: false
 ---
+id: debtor1_other_income_sources
 section: schedule_i
 question: List all other income regularly received
 fields:
@@ -268,6 +273,7 @@ fields:
     # default: 0
     show if: debtor[0].income.other_monthly_income
 ---
+id: debtor2_employment_info
 section: schedule_i
 question: |
   Fill in employment information for other debtor.
@@ -321,6 +327,7 @@ fields:
       variable: debtor[1].income.employment
       is: Employed
 ---
+id: debtor2_monthly_income_details
 section: schedule_i
 question: Give details about monthly income
 subquestion: |
@@ -386,6 +393,7 @@ fields:
     # default: 0
     required: False
 ---
+id: debtor2_payroll_deductions
 section: schedule_i
 question: List all payroll deduction
 fields:
@@ -411,6 +419,7 @@ fields:
     datatype: currency
     # default: 300
 ---
+id: debtor2_other_deductions
 section: schedule_i
 question: Please specify any deductions.
 fields:
@@ -465,6 +474,7 @@ fields:
     # default: 0
     show if: debtor[1].income.other_deduction
 ---
+id: debtor2_other_income_sources
 section: schedule_i
 question: List all other income regularly received
 fields:
@@ -500,6 +510,7 @@ fields:
     # default: 0
     show if: debtor[1].income.other_monthly_income
 ---
+id: other_contributions_income_changes
 section: schedule_i
 question: |
   State all other regular contributions to the expenses that you list in Schedule J.
@@ -525,6 +536,7 @@ fields:
     # default: Explanation
     required: False
 ---
+id: schedule_i_review
 event: schedule_i
 section: schedule_i
 question: |
