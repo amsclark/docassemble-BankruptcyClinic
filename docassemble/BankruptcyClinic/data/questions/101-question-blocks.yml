@@ -126,7 +126,7 @@ fields:
     # default: "Tampa"
   - State: debtor[i].address.state
     # default: "Florida"
-    code: states_list
+    choices: states_list()
   - Zip Code: debtor[i].address.zip
     datatype: number
     minlength: 5
@@ -135,7 +135,7 @@ fields:
   - County: debtor[i].address.county
     # default: "Douglas County"
     # TODO: this needs to update depending on the state selected. 
-    code: county_list
+    choices: county_list()
   - Has separate mailing address: debtor[i].has_other_mailing_address
     datatype: yesno
     # default: True
