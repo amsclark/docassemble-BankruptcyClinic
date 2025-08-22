@@ -1,5 +1,74 @@
 Feature: I am preparing a bankruptcy petition
 
+Scenario: The interview loads
+  Given I start the interview at "voluntary-petition.yml"
+
+### Minimalist scenario: as much as possible skipped
+Scenario: Minimalist single filer
+  Given I start the interview at "voluntary-petition.yml"
+  And I get to the question id "debtor_final" with this data:
+    | var | value |
+    | introduction_screen | True |
+    | current_district | District of Nebraska |
+    | amended_filing | False |
+    | district_final | True |
+    | filing_status | Filing individually |
+    | debtor.target_number | 1 |
+    | debtor[0].name.first | Alex |
+    | debtor[0].name.last | Smith |
+    | debtor[0].address.state | Nebraska |
+    | debtor[0].address.county | Douglas County |
+    | debtor[0].has_other_mailing_address | False |
+    | debtor[0].tax_id.tax_id_type | 1 |
+    | debtor[0].tax_id.tax_id | 123-45-6789 |
+    | debtor[0].alias.there_are_any | False |
+    | debtor[0].district_info.is_current_district | True |
+    | debtor.there_is_another | False |
+  # Skip all optional sections, answer No/False to all booleans, and provide no extra items in lists.
+
+### Maximalist scenario: all sections filled, nothing skipped
+Scenario: Maximalist single or joint filer
+  # Filer chooses to file with spouse
+  Given I start the interview at "voluntary-petition.yml"
+  And I get to the question id "debtor_final" with this data:
+    | var | value |
+    | introduction_screen | True |
+    | current_district | District of Nebraska |
+    | amended_filing | True |
+    | case_number | 8:25-bk-12345 |
+    | district_final | True |
+    | filing_status | Filing with spouse |
+    | debtor.target_number | 2 |
+    | debtor[0].name.first | Alex |
+    | debtor[0].name.last | Smith |
+    | debtor[0].address.state | Nebraska |
+    | debtor[0].address.county | Douglas County |
+    | debtor[0].has_other_mailing_address | True |
+    | debtor[0].mailing_state | Nebraska |
+    | debtor[0].tax_id.tax_id_type | 1 |
+    | debtor[0].tax_id.tax_id | 123-45-6789 |
+    | debtor[0].alias.there_are_any | True |
+    | debtor[0].alias[0].first_name | A. |
+    | debtor[0].alias[0].last_name | S. |
+    | debtor[0].district_info.is_current_district | False |
+    | debtor[0].district_info.other_district_reason | Moved recently |
+    | debtor[1].name.first | Jamie |
+    | debtor[1].name.last | Smith |
+    | debtor[1].address.state | Nebraska |
+    | debtor[1].address.county | Douglas County |
+    | debtor[1].has_other_mailing_address | True |
+    | debtor[1].mailing_state | Nebraska |
+    | debtor[1].tax_id.tax_id_type | 2 |
+    | debtor[1].tax_id.tax_id | 987-65-4321 |
+    | debtor[1].alias.there_are_any | True |
+    | debtor[1].alias[0].first_name | J. |
+    | debtor[1].alias[0].last_name | S. |
+    | debtor[1].district_info.is_current_district | True |
+    | debtor.there_is_another | False |
+  # Add property, business, hazardous property, all payment and reporting options, etc.
+  # Continue with all sections, setting all booleans to True and providing at least one item for each list.
+
+
 # Recommended tests for voluntary-petition.yml execution flow:
 #
 # 1. Amended filing branch:
@@ -59,8 +128,5 @@ Feature: I am preparing a bankruptcy petition
 # 16. Edge cases:
 #    - Test with minimal data (single filer, no property, no business, no prior bankruptcy)
 #    - Test with maximal data (joint filing, all sections filled, multiple items in each list)
-
-Scenario: The interview loads
-  Given I start the interview at "voluntary-petition.yml"
 
 
