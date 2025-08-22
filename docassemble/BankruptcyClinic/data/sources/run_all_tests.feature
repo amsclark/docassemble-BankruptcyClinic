@@ -105,7 +105,7 @@ Scenario: Minimal single filer
     | debtor[0].address.address | hhh |  |
     | debtor[0].address.city | kkk |  |
     | debtor[0].address.state | NE |  |
-    | debtor[0].address.unit | Thomas County |  |
+    | debtor[0].address.county | Thomas County |  |
     | debtor[0].address.zip | 11111 |  |
     | debtor[0].alias.revisit | True |  |
     | debtor[0].alias.there_are_any | False |  |

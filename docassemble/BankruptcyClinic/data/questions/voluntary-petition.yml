@@ -746,7 +746,7 @@ code: |
   debtor[i].address.city
   debtor[i].address.state
   debtor[i].address.zip
-  debtor[i].address.unit #use for county
+  debtor[i].address.county #use for county
   debtor[i].alias.gather()
   debtor[i].district_info.is_current_district
   if not debtor[i].district_info.is_current_district:

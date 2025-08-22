@@ -124,7 +124,7 @@ fields:
     minlength: 5
     maxlength: 5
     # default: 33593
-  - County: debtor[i].address.unit
+  - County: debtor[i].address.county
     # default: "Douglas County"
     # TODO: this needs to update depending on the state selected. 
     code: county_list
@@ -840,7 +840,7 @@ code: |
     main['debtor_city'+str(i)] = debt.address.city
     main['debtor_state'+str(i)] = debt.address.state
     main['debtor_zip'+str(i)] = debt.address.zip
-    main['debtor_county'+str(i)] = debt.address.unit
+  main['debtor_county'+str(i)] = debt.address.county
     main['debtor_mail_street'+str(i)] = debt.mailing_street
     main['debtor_mail_city'+str(i)] = debt.mailing_city
     main['debtor_mail_state'+str(i)] = debt.mailing_state
