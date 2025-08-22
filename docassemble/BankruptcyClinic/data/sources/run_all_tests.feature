@@ -2,7 +2,7 @@
 
 Scenario: Minimal single filer
   Given I start the interview at "voluntary-petition.yml"
-  And the user gets to "none" with this data:
+  And the user gets to "filing_status" with this data:
     | var | value | trigger |
     | introduction_screen | True |  |
     | chapter | Chapter 7 |  |
