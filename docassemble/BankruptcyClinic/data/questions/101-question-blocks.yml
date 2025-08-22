@@ -185,57 +185,59 @@ fields:
       <script>
         // Handle dynamic county population based on state selection
         $(document).on('daPageLoad', function() {
-          // Define county data
-          var countyData = {
-            'Nebraska': [
-              % for county in county_list('Nebraska'):
-              "${ county }",
-              % endfor
-            ].filter(function(item) { return item !== ""; }),
-            'South Dakota': [
-              % for county in county_list('South Dakota'):
-              "${ county }",
-              % endfor
-            ].filter(function(item) { return item !== ""; })
-          };
-          
-          // Find the state and county dropdowns for this debtor
-          var stateDropdown = $('select[name*="debtor[' + ${ i } + '].address.state"]').first();
-          var countyDropdown = $('select[name*="debtor[' + ${ i } + '].address.county"]').first();
-          
-          if (stateDropdown.length && countyDropdown.length) {
-            // Function to update county options based on state
-            function updateCountyOptions(selectedState) {
-              // Clear current options
-              countyDropdown.empty();
-              
-              // Get counties for the selected state
-              var counties = countyData[selectedState] || [];
-              
-              if (counties.length > 0) {
-                // Add county options
-                counties.forEach(function(county) {
-                  countyDropdown.append($('<option></option>').attr('value', county).text(county));
-                });
-              } else {
-                // Add N/A if no counties available
-                countyDropdown.append($('<option></option>').attr('value', 'N/A').text('N/A'));
+          var questionPage = document.getElementsByTagName("H1")[0].innerHTML;
+          if (questionPage.includes("Tell the court about")) {
+            var stateDropdown = document.getElementById(btoa("debtor[${ i }].address.state").replace(/=/g,""));
+            var countyDropdown = document.getElementById(btoa("debtor[${ i }].address.county").replace(/=/g,""));
+            var hiddenCountyField = document.getElementById(btoa("hidden_county").replace(/=/g,""));
+            
+            if (stateDropdown && countyDropdown) {
+              // Trigger change event if state is already selected
+              if (stateDropdown.value !== "") {
+                stateDropdown.dispatchEvent(new Event('change'));
               }
-            }
-            
-            // Update counties when state changes
-            stateDropdown.on('change', function() {
-              updateCountyOptions($(this).val());
-            });
-            
-            // Initialize counties if state is already selected
-            var currentState = stateDropdown.val();
-            if (currentState && currentState !== '') {
-              updateCountyOptions(currentState);
+              
+              // Fetch and display the county
+              var xhr = get_interview_variables();
+              xhr.done(function(response) {
+                var state, county;
+                if (response.variables['debtor[${ i }].address.state'] && response.variables['debtor[${ i }].address.state'].length > 0) {
+                  state = response.variables['debtor[${ i }].address.state'];
+                }
+                if (response.variables['debtor[${ i }].address.county'] && response.variables['debtor[${ i }].address.county'].length > 0) {
+                  county = response.variables['debtor[${ i }].address.county'];
+                }
+                
+                // Update the state dropdown and trigger the 'change' event
+                if (state && state.length > 0) {
+                  stateDropdown.value = state;
+                  stateDropdown.dispatchEvent(new Event('change'));
+                }
+                
+                // Use a mutation observer to watch for county dropdown population
+                const observer = new MutationObserver(function(mutations) {
+                  mutations.forEach(function(mutation) {
+                    // Check if "N/A" is no longer the only option
+                    const naOption = countyDropdown.querySelector('option[value="N/A"]');
+                    if (!naOption || countyDropdown.options.length > 1) {
+                      observer.disconnect(); // Stop observing
+                      if (county) {
+                        countyDropdown.value = county; // Set the county value
+                      }
+                    }
+                  });
+                });
+                
+                // Observe changes to the county dropdown
+                observer.observe(countyDropdown, { childList: true, subtree: true });
+              });
             }
           }
         });
       </script>
+
+check in: update_counties
+continue button field: debtor_basic_info
 
 #right: |
 #  % if all(hasattr(d, 'name') and hasattr(d.name, 'first') and hasattr(d.name, 'last') for d in debtor):
@@ -244,6 +246,22 @@ fields:
 #  ${ debtor_table }
 #  % endif
 section: identify
+---
+event: update_counties
+code: |
+  if action_argument('_changed') == 'debtor[i].address.state':
+    selected_state = action_argument('debtor[i].address.state')
+    background_response(
+      {
+        'debtor[i].address.county':
+          {
+            'choices': \
+              county_list(selected_state) \
+              or \
+              ['N/A']
+          }
+      }, 'fields')
+  background_response()
 ---
 id: lived_in_district
 question: |
