@@ -7,6 +7,7 @@ edit:
   - proposed_date
   - amount
 ---
+id: installment_payment_intro
 event: installment_payment_intro
 section: payment_installments
 question: |
@@ -17,6 +18,7 @@ subquestion: |
   You must propose to pay the entire fee no later than 120 days after you file this bankruptcy case. If the court approves your application, the court will set your final payment timetable.
 continue button field: installment_payment_intro
 ---
+id: installment_payment_summary_end
 event: installment_payment_end
 section: payment_installments
 question: |
@@ -31,6 +33,7 @@ under: |
   ${ payment.payments.add_action() }
 continue button field: installment_payment_end
 ---
+id: installment_payment_review
 event: payment_installments
 section: payment_installments
 question: |
@@ -53,6 +56,7 @@ under: |
   ${ payment.payments.add_action() }
 continue button field: installment_payment_end
 ---
+id: bankruptcy_chapter_selection
 section: payment_installments
 question: |
   Bankruptcy Code
@@ -66,6 +70,7 @@ choices:
    - Chapter 12: 3
    - Chapter 13: 4
 ---
+id: payment_method_details
 section: payment_installments
 question: |
   Tell us about how you'd like to make your payments.
@@ -80,6 +85,7 @@ fields:
     # default: 100
     show if: payment.payment_on_petition
 ---
+id: payment_dates_add_another
 section: payment_installments
 question: |
   Are there any more payment dates you'd like to add in the next 120 days?
@@ -91,11 +97,13 @@ under: |
   ${ payment.payments.add_action() }
 yesno: payment.payments.there_is_another
 ---
+id: payment_dates_any_exist
 section: payment_installments
 question: |
   Do you have any payment dates you'd like to add in the next 120 days?
 yesno: payment.payments.there_are_any
 ---
+id: payment_details_individual
 section: payment_installments
 question: |
   Fill in payment details.

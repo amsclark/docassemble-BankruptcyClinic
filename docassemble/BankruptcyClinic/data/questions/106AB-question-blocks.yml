@@ -1,3 +1,4 @@
+id: schedule_ab_property_intro
 event: property_intro
 section: schedule_ab
 question: |
@@ -22,11 +23,13 @@ edit:
   - current_value
   - current_owned_value
 ---
+id: real_property_interests_any_exist
 section: schedule_ab
 question: |
   Do you own or have any legal or equitable interest in any residence, building, land, or similar property?
 yesno: prop.interests.there_are_any
 ---
+id: real_property_interests_add_another
 section: schedule_ab
 question: |
   Do you have more interests to add?
@@ -1419,6 +1422,7 @@ features:
   javascript: exemptions.js
   css: bootstrap-theme.css
 ---
+id: real_property_interest_details
 section: schedule_ab
 question: |
   Tell the court about details about the interest in question.
@@ -1564,11 +1568,13 @@ edit:
   - current_value
   - current_owned_value
 ---
+id: vehicles_any_exist
 section: schedule_ab
 question: |
   Do you own, lease, or have legal or equitable interest in any vehicles, whether they are registered or not?
 yesno: prop.ab_vehicles.there_are_any
 ---
+id: vehicles_add_another
 section: schedule_ab
 question: |
   Do you have legal or equitable interest in any other vehicles?
@@ -1576,6 +1582,7 @@ yesno: prop.ab_vehicles.there_is_another
 under: |
   ${ prop_ab_vehicles_table }
 ---
+id: vehicle_details
 section: schedule_ab
 question: |
   Tell the court about one of your vehicles.
@@ -1692,6 +1699,7 @@ edit:
   - current_value
   - current_owned_value
 ---
+id: other_vehicles_any_exist
 section: schedule_ab
 question: |
   Do you own, lease, or have legal or equitable interest in any other vehicle types not listed, whether they are registered or not?
@@ -1699,6 +1707,7 @@ subquestion: |
   Other vehicles can include boats, trailers, motors, personal watercraft, fishing vessels, snowmobiles, motorcycle accessories.
 yesno: prop.ab_other_vehicles.there_are_any
 ---
+id: other_vehicles_add_another
 section: schedule_ab
 question: |
   Do you have legal or equitable interest in any other vehicles?
@@ -1706,6 +1715,7 @@ yesno: prop.ab_other_vehicles.there_is_another
 under: |
   ${ prop_ab_other_vehicles_table }
 ---
+id: other_vehicle_details
 section: schedule_ab
 question: |
   Tell the court about one of your other vehicles
@@ -1806,6 +1816,7 @@ fields:
     required: False
 list collect: True
 ---
+id: personal_household_items
 section: schedule_ab
 question: |
   Describe your personal and household items.
@@ -2378,6 +2389,7 @@ fields:
 
 
 ---
+id: cash_on_hand
 section: schedule_ab
 question: |
   What is your cash on hand?
@@ -2456,6 +2468,7 @@ edit:
   - institution
   - amount
 ---
+id: deposits_any_exist
 section: schedule_ab
 question: |
   Do you have any deposits of money?
@@ -2463,6 +2476,7 @@ subquestion: |
   Examples: Checking, savings, or other financial accounts; certificates of deposit; shares in credit unions, brokerage houses, and other similar institutions.
 yesno: prop.financial_assets.deposits.there_are_any
 ---
+id: deposits_add_another
 section: schedule_ab
 question: |
   Do you have any more deposits of money to report?
@@ -2470,6 +2484,7 @@ yesno: prop.financial_assets.deposits.there_is_another
 under: |
   ${ financial_deposits_table }
 ---
+id: deposit_details
 section: schedule_ab
 question: |
   Tell the court about your deposit.
@@ -2547,6 +2562,7 @@ edit:
   - institution
   - amount
 ---
+id: bonds_stocks_any_exist
 section: schedule_ab
 question: |
   Do you have any bonds, mutual funds, or publicly traded stocks?
@@ -2554,6 +2570,7 @@ subquestion: |
   Examples: Bond funds, investment accounts with brokerage firms, money market accounts.
 yesno: prop.financial_assets.bonds_and_stocks.there_are_any
 ---
+id: bonds_stocks_add_another
 section: schedule_ab
 question: |
   Do you have any more bonds, mutual funds, or publicly traded stocks?
@@ -2561,6 +2578,7 @@ yesno: prop.financial_assets.bonds_and_stocks.there_is_another
 under: |
   ${ financial_bonds_table }
 ---
+id: bonds_stocks_details
 section: schedule_ab
 question: |
   Tell the court about your bonds and stocks.
@@ -2634,6 +2652,7 @@ edit:
   - ownership_percent
   - value
 ---
+id: non_traded_stock_any_exist
 section: schedule_ab
 question: |
   Do you have any non-publicly traded stock?
@@ -2641,6 +2660,7 @@ subquestion: |
   Examples: interests in incorporated and unincorporated businesses, including an interest in an LLC, partnership, and joint venture.
 yesno: prop.financial_assets.non_traded_stock.there_are_any
 ---
+id: non_traded_stock_add_another
 section: schedule_ab
 question: |
   Do you have any more non-publicly traded stock?
@@ -2648,6 +2668,7 @@ yesno: prop.financial_assets.non_traded_stock.there_is_another
 under: |
   ${ financial_non_traded_stock_table }
 ---
+id: non_traded_stock_details
 section: schedule_ab
 question: |
   Tell the court about your interests in incorporated and unincorporated businesses.
@@ -2722,6 +2743,7 @@ edit:
   - issuer
   - amount
 ---
+id: corporate_bonds_any_exist
 section: schedule_ab
 question: |
   Do you have any government and corporate bonds and other negotiable and non-negotiable instruments?
@@ -2729,6 +2751,7 @@ subquestion: |
   Negotiable instruments include personal checks, cashiers' checks, promissory notes
 yesno: prop.financial_assets.corporate_bonds.there_are_any
 ---
+id: corporate_bonds_add_another
 section: schedule_ab
 question: |
   Do you have any more government and corporate bonds?
@@ -2736,6 +2759,7 @@ yesno: prop.financial_assets.corporate_bonds.there_is_another
 under: |
   ${ financial_corporate_bonds_table }
 ---
+id: corporate_bonds_details
 section: schedule_ab
 question: |
   Tell the court about your interests in corporate bonds.
@@ -2809,6 +2833,7 @@ edit:
   - institution
   - amount
 ---
+id: retirement_accounts_any_exist
 section: schedule_ab
 question: |
   Do you have any retirement or pension accounts?
@@ -2816,6 +2841,7 @@ subquestion: |
   Examples: Interests in IRA, ERISA, Keogh, 401(k), 403(b), thrift savings accounts, or other pension or profit sharing plans.
 yesno: prop.financial_assets.retirement_accounts.there_are_any
 ---
+id: retirement_accounts_add_another
 section: schedule_ab
 question: |
   Do you have any more retirement or pension accounts?
@@ -2823,6 +2849,7 @@ yesno: prop.financial_assets.retirement_accounts.there_is_another
 under: |
   ${ financial_retirement_accounts_table }
 ---
+id: retirement_accounts_details
 section: schedule_ab
 question: |
   Tell the court about your interests retirement or pension accounts.
@@ -2912,6 +2939,7 @@ edit:
   - institution
   - amount
 ---
+id: prepayments_any_exist
 section: schedule_ab
 question: |
   Do you have any security deposits or prepayments?
@@ -2919,6 +2947,7 @@ subquestion: |
   Your share of all unused deposits you have made so that you may continue service or use from a company. Examples: Agreements with landlords, prepaid rent, public utilities (electric, gas, water), telecommunications companies, or others.
 yesno: prop.financial_assets.prepayments.there_are_any
 ---
+id: prepayments_add_another
 section: schedule_ab
 question: |
   Do you have any more security deposits or prepayments?
@@ -2926,9 +2955,10 @@ yesno: prop.financial_assets.prepayments.there_is_another
 under: |
   ${ financial_prepayments_table }
 ---
+id: prepayments_details
 section: schedule_ab
 question: |
-  Tell the court about your interests retirement or pension accounts.
+  Tell the court about your security deposits or prepayments.
 #right: |
 #  Current Exemption Summary.
 #
@@ -3011,6 +3041,7 @@ edit:
   - issuer
   - amount
 ---
+id: annuities_any_exist
 section: schedule_ab
 question: |
   Annuities?
@@ -3018,6 +3049,7 @@ subquestion: |
   A contract for a periodic payment of money to you, either for life or for a number of years.
 yesno: prop.financial_assets.annuities.there_are_any
 ---
+id: annuities_add_another
 section: schedule_ab
 question: |
   Do you have any more annuities?
@@ -3025,6 +3057,7 @@ yesno: prop.financial_assets.annuities.there_is_another
 under: |
   ${ financial_annuities_table }
 ---
+id: annuity_details
 section: schedule_ab
 question: |
   Tell the court about your annuity.
@@ -3099,6 +3132,7 @@ edit:
   - institution
   - amount
 ---
+id: education_accounts_any_exist
 section: schedule_ab
 question: |
   Interests in an education IRA, in an account in a qualifed ABLE program, or under a qualified state tuition program.
@@ -3106,6 +3140,7 @@ subquestion: |
   26 U.S.C. §§ 530(b)(1), 529A(b), and 529(b)(1).
 yesno: prop.financial_assets.edu_accounts.there_are_any
 ---
+id: education_accounts_add_another
 section: schedule_ab
 question: |
   Do you have any more education accounts?
@@ -3113,6 +3148,7 @@ yesno: prop.financial_assets.edu_accounts.there_is_another
 under: |
   ${ financial_edu_accounts_table }
 ---
+id: education_account_details
 section: schedule_ab
 question: |
   Tell the court about your education account.
@@ -3177,6 +3213,7 @@ fields:
     required: False
 list collect: True
 ---
+id: trusts_future_interests
 section: schedule_ab
 question: |
   Do you have any trusts, equitable or future interests in property (other than anything previously listed), and rights or powers exercisable for your benefit?

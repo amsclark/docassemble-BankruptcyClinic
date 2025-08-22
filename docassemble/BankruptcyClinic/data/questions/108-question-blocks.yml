@@ -9,11 +9,13 @@ edit:
   - property_description
   - property_action
 ---
+id: secured_claims_any_exist
 section: form_108
 question: |
   Do you have any creditors with secured claims?
 yesno: secured_claims.there_are_any
 ---
+id: secured_claims_add_another
 section: form_108
 question: |
   Are there any more creditors with secured claims?
@@ -21,6 +23,7 @@ yesno: secured_claims.there_is_another
 under: |
   ${ secured_claims_table }
 ---
+id: secured_claims_creditor_property_details
 section: form_108
 question: |
   Identify the creditor and the property that is collateral
@@ -57,11 +60,13 @@ edit:
   - description
   - lease_assumed
 ---
+id: personal_leases_any_exist
 section: form_108
 question: |
   Do you have any unexpired personal property leases?
 yesno: personal_leases.there_are_any
 ---
+id: personal_leases_add_another
 section: form_108
 question: |
   Are there any more unexpired personal property leases?
@@ -69,6 +74,7 @@ yesno: personal_leases.there_is_another
 under: |
   ${ personal_leases_table }
 ---
+id: personal_lease_details
 section: form_108
 question: |
   Tell the court about an unexpired personal property leases
@@ -81,6 +87,7 @@ fields:
     datatype: yesnoradio
     # default: False
 ---
+id: form_108_review_statement_of_intention
 event: form_108
 section: form_108
 question: |

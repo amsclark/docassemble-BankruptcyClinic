@@ -1,3 +1,4 @@
+id: introduction_screen
 question: |
   Voluntary Petition for Individuals Filing for Bankruptcy
 subquestion: |
@@ -12,6 +13,7 @@ subquestion: |
 continue button field: introduction_screen
 ---
 #Part 0: Location and Case
+id: district_which
 section: district
 question: |
   What district are you filing your bankruptcy case in?
@@ -22,11 +24,13 @@ fields:
     # default: District of Nebraska
     code: courts_list
 ---
+id: district_amended
 section: district
 question: |
   Are you updating a bankruptcy filing that has already been submitted to the court?
 yesno: amended_filing
 ---
+id: district_case_number
 section: district
 question: |
   Please provide the case number for your previously submitted bankruptcy claim.
@@ -39,6 +43,7 @@ validation code: |
     if not re.match(pattern, case_number.lower()):
       validation_error("That doesn't look like a valid South Dakota or Nebraska bankruptcy case number. Please enter it in the format D:YY-bk-NNNNN (e.g., '8:23-bk-12345').")
 ---
+id: district_final
 event: district_final
 section: district
 question: |
@@ -53,6 +58,7 @@ subquestion: |
   % endif
 continue button field: district_final
 ---
+id: district_review
 event: district
 section: district
 question: |
@@ -69,6 +75,7 @@ review:
 ---
 #Part 1: Identify Yourself
 
+id: filing_status
 question: |
   Are you filing individually or with a spouse?
 field: filing_status
@@ -97,6 +104,7 @@ columns:
   - Last Name: row_item.last_name
   - Business: row_item.business
 ---
+id: debtor_basic_info
 question: |
   Basic Identity and Contact Information
 subquestion: |
@@ -174,11 +182,13 @@ fields:
 #  % endif
 section: identify
 ---
+id: lived_in_district
 question: |
   Has ${ debtor[i].name.first } ${ debtor[i].name.last } lived in the specified district for over 180 days?
 yesno: debtor[i].district_info.is_current_district
 section: identify
 ---
+id: other_district_reason
 question: |
   What is your reason for specifying a district you haven't been living in?
 fields:
@@ -186,6 +196,7 @@ fields:
     input type: area
 section: identify
 ---
+id: debtor_alias_any
 question: |
   Does ${ debtor[i].name.first } ${ debtor[i].name.last } have any           other names they've used in the last 8 years?
 subquestion: |
@@ -193,6 +204,7 @@ subquestion: |
 yesno: debtor[i].alias.there_are_any
 section: identify
 ---
+id: debtor_add_alias
 question: |
   Add an alias for ${ debtor[i].name.first } ${ debtor[i].name.last } used   in the last 8 years.
 subquestion: |
@@ -209,6 +221,7 @@ fields:
 section: identify
 list collect: True
 ---
+id: debtor_alias_another
 question: |
   Does ${ debtor[i].name.first } ${ debtor[i].name.last } have any           other names they've used in the last 8 years?
 yesno: debtor[i].alias.there_is_another
@@ -218,6 +231,7 @@ yesno: debtor[i].alias.there_is_another
 #  ${ debtor_alias_table }
 section: identify
 ---
+id: debtor_another
 question: |
   Are there more debtors to add?
 yesno: debtor.there_is_another
@@ -229,6 +243,7 @@ yesno: debtor.there_is_another
 #  % endif
 section: identify
 ---
+id: identify_review
 event: identify
 section: identify
 question: |
@@ -244,6 +259,7 @@ review:
       ${ debtor.add_action() }
       % endif
 ---
+id: debtor_final
 event: debtor_final
 question: |
   Debtor Summary
@@ -276,6 +292,7 @@ edit:
   - when
   - case_number
 ---
+id: payment_method
 question: |
   How are you planning on paying the fee?
 fields:
@@ -304,6 +321,7 @@ under: |
   Be aware, you may only request that your fee be waived if you are filing for Chapter 7. By law, a judge may, but is not required to, waive your fee, and may do so only if your income is less than 15% of the official poverty line that applies to your family size and you are unable to pay the fee in installments.
 section: case_det
 ---
+id: poverty_calc
 code: |
   overallIncome = sum((debt.income.net_rental_business + debt.income.family_support + debt.income.interest_and_dividends + debt.income.unemployment + debt.income.social_security + debt.income.other_govt_assist + debt.income.pension + debt.income.other_monthly_amount) + (debt.income.income_amount + debt.income.overtime_pay) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount) for debt in debtor)
   #povertyAmt = 0
@@ -328,11 +346,13 @@ code: |
     povertyAmt = (50560 + (countAbove*5140))*1.5
 
 ---
+id: previous_bankruptcy
 question: |
   Have you filed for bankruptcy within the last 8 years?
 yesno: case.has_previous_bankruptcy
 section: case_det
 ---
+id: previous_bankruptcy_details
 question: |
   Please provide the details of your previous bankruptcy in the previous 8 years.
 fields:
@@ -347,6 +367,7 @@ fields:
 section: case_det
 list collect: True
 ---
+id: previous_bankruptcy_another
 question: |
   Do you have any other bankruptcy cases filed in the last 8 years?
 under: |
@@ -354,6 +375,7 @@ under: |
 yesno: case.previous_bankruptcy.there_is_another
 section: case_det
 ---
+id: pending_bankruptcy
 question: |
   Pending bankruptcies?
 subquestion: |
@@ -361,6 +383,7 @@ subquestion: |
 yesno: case.has_pending_bankruptcy
 section: case_det
 ---
+id: pending_bankruptcy_details
 question: |
   Please provide the details of your pending bankruptcy in the previous 8 years.
 fields:
@@ -379,6 +402,7 @@ fields:
 section: case_det
 list collect: True
 ---
+id: pending_bankruptcy_another
 question: |
   Do you have any other pending bankruptcy cases filed in the last 8 years?
 under: |
@@ -386,16 +410,19 @@ under: |
 yesno: case.pending_bankruptcy.there_is_another
 section: case_det
 ---
+id: rents_residence
 question: |
   Do you rent your residence?
 yesno: case.rents_residence
 section: case_det
 ---
+id: eviction_judgement
 question: |
   Has your landlord obtained an eviction judgement against you?
 yesno: case.eviction_judgement
 section: case_det
 ---
+id: case_final
 event: case_final
 question: |
   Case Summary
@@ -438,6 +465,7 @@ subquestion: |
 continue button field: case_final
 section: case_det
 ---
+id: case_review
 event: case_det
 section: case_det
 question: |
@@ -511,6 +539,7 @@ edit:
   - state
   - type_name
 ---
+id: has_business
 question: |
   Are you a sole proprietor of any full- or part-time business?
 subquestion: |
@@ -518,6 +547,7 @@ subquestion: |
 yesno: business.has_business
 section: sole_prop
 ---
+id: business_details
 question: |
   Please fill in the name and location of your business.
 fields:
@@ -551,6 +581,7 @@ fields:
 section: sole_prop
 list collect: True
 ---
+id: business_another
 question: |
   Are you a sole proprietor of any **other** full- or part-time businesses?
 yesno: business.business.there_is_another
@@ -559,6 +590,7 @@ under: |
   ${ business_table }
 section: sole_prop
 ---
+id: business_final
 event: business_final
 question: |
   Business Section Summary
@@ -572,6 +604,7 @@ subquestion: |
 continue button field: business_final
 section: sole_prop
 ---
+id: business_review
 event: sole_prop
 section: sole_prop
 question: |
@@ -605,6 +638,7 @@ edit:
   - immediate_attention_reason
   - number
 ---
+id: hazardous_property
 question: |
   Hazardous property?
 subquestion: |
@@ -612,6 +646,7 @@ subquestion: |
 yesno: hazardous_property.has_property
 section: haz_prop
 ---
+id: hazardous_property_details
 question: |
   Please fill in the name and location of your business.
 fields:
@@ -633,6 +668,7 @@ fields:
 section: haz_prop
 list collect: True
 ---
+id: hazardous_property_another
 question: |
   Are there any other hazardous properties you'd like to report?
 yesno: hazardous_property.property.there_is_another
@@ -642,6 +678,7 @@ under: |
   ${ hazardous_property.property.add_action() }
 section: haz_prop
 ---
+id: hazard_final
 event: hazard_final
 question: |
   Hazardous Property Summary
@@ -656,6 +693,7 @@ subquestion: |
 continue button field: hazard_final
 section: haz_prop
 ---
+id: haz_prop_review
 event: haz_prop
 section: haz_prop
 question: |
@@ -686,6 +724,7 @@ edit:
   - counseling.counseling_type
   - counseling.not_required_reason
 ---
+id: counseling
 question: |
   Have ${ debtor[i].name } recieved any credit counseling?
 subquestion: |
@@ -702,6 +741,7 @@ fields:
 # default: 1
 section: credit_counsel
 ---
+id: counseling_not_required
 question: |
   Reason credit breifing is not required?
 field: debtor[i].counseling.not_required_reason
@@ -711,6 +751,7 @@ choices:
   - Active duty: 3
 section: credit_counsel
 ---
+id: counseling_final
 event: counseling_final
 question: |
   Credit Counseling Summary
@@ -720,6 +761,7 @@ subquestion: |
 continue button field: counseling_final
 section: credit_counsel
 ---
+id: credit_counsel_review
 event: credit_counsel
 section: credit_counsel
 question: |
@@ -729,6 +771,7 @@ review:
       ${ counseling_table }
 ---
 #Part 6: Answer These Questions for Reporting Purposes
+id: reporting_type
 question: |
   What kind of debts do you have?
 fields:
@@ -746,12 +789,14 @@ fields:
       is: '3'
 section: report
 ---
+id: custom_debt_type
 question: |
   State the type of debts you owe that are not consumer or business related.
 fields:
   - Debt Type: reporting.custom_type
 section: report
 ---
+id: funds_for_creditors
 question: |
   Chapter 7 unsecured creditors
 subquestion: |
@@ -759,6 +804,7 @@ subquestion: |
 yesno: reporting.funds_for_creditors
 section: report
 ---
+id: report_estimates
 question: |
   Report Estimated Amounts
 fields:
@@ -770,6 +816,7 @@ fields:
     datatype: currency
 section: report
 ---
+id: print_101
 question: Form 101 output
 event: print_101
 continue button field: print_101
@@ -780,6 +827,7 @@ attachment:
     code: main
     variable name: attach_101
 ---
+id: print_101_code
 code: |
   debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
   if len(debtor) > 1:
@@ -999,6 +1047,7 @@ code: |
   main["liability_100m_500m"] = True if 100000000 <= reporting.liabilities_estimate <= 500000000 else False,
   main["liability_more"] = True if reporting.liabilities_estimate > 50000000000 else False
 ---
+id: report_review
 event: report
 section: report
 question: |
@@ -1030,6 +1079,7 @@ review:
     button: |
       **Estimated liability amount:** ${ reporting.liabilities_estimate }
 ---
+id: conclusion
 question: |
   Voluntary Petition for Individuals Filing for Bankruptcy conclusion
 subquestion: |
@@ -1041,6 +1091,7 @@ attachment code: |
 continue button field: conclusion_screen
 section: fin
 ---
+id: review_answers
 event: review_answers
 question: |
   Revisit questions

@@ -6,7 +6,7 @@ Scenario: The interview loads
 ### Minimalist scenario: as much as possible skipped
 Scenario: Minimalist single filer
   Given I start the interview at "voluntary-petition.yml"
-  And I set the variable "filing_status" to "Filing individually" with this data:
+  And I get to the question id "filing_status" to "Filing individually" with this data:
     | var | value |
     | introduction_screen | True |
     | current_district | District of Nebraska |

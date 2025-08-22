@@ -1,4 +1,5 @@
 #Part 0 - Intro
+id: f103b_q1_waive_fee_intro
 section: waive_fee
 event: waive_fee_intro
 question: |
@@ -8,6 +9,7 @@ subquestion: |
 continue button field: waive_fee_intro
 ---
 #Part 1 - Tell the court about your family and your family's income
+id: f103b_q2_family_income
 section: waive_fee
 question: |
   Tell the court about your family and income
