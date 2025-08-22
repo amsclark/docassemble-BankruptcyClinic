@@ -117,8 +117,8 @@ fields:
   - City: debtor[i].address.city
     # default: "Tampa"
   - State: debtor[i].address.state
-  # default: "Florida"
-  code: states_list
+    # default: "Florida"
+    code: states_list
   - Zip Code: debtor[i].address.zip
     datatype: number
     minlength: 5
