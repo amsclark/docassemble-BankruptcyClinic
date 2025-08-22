@@ -327,6 +327,7 @@ subquestion: |
   Examples: Tax refunds, past due or lump sum alimony, spousal support, child support, maintenance, divorce or property settlements, Social Security benefits, workers' compensation, personal injury recovery.
 yesno: prop.owers.there_are_any
 ---
+id: f103b_money_owed_to_you_add_another
 section: waive_fee
 question: |
   Do you have any other property due?
@@ -334,6 +335,7 @@ yesno: prop.owers.there_is_another
 under: |
   ${ prop_owers_table }
 ---
+id: f103b_money_owed_to_you_details
 section: waive_fee
 question: |
   Tell us about the ower.
@@ -347,6 +349,7 @@ under: |
   ${ prop_owers_table }
 list collect: True
 ---
+id: f103b_likely_payment_received
 section: waive_fee
 question: |
   Receiving payment?
@@ -359,6 +362,7 @@ fields:
     input type: area
 ---
 #Part 4: Answer these additional questions
+id: f103b_paid_for_services
 section: waive_fee
 question: |
   Who's paid for filing services?
@@ -444,16 +448,19 @@ edit:
   - when
   - case_number
 ---
+id: f103b_previous_bankruptcies_any_exist
 question: |
   Have you filied for bankruptcy in the last 8 years?
 yesno: additional.bankruptcies.there_are_any
 ---
+id: f103b_previous_bankruptcies_add_another
 question: |
   Do you have any other bankruptcies in the last 8 years to report?
 yesno: additional.bankruptcies.there_is_another
 under: |
   ${ add_bankruptcy_table }
 ---
+id: f103b_previous_bankruptcy_details
 question: |
   Tell the court about your previous bankruptcy case.
 fields:

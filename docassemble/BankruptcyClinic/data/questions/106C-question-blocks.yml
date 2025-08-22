@@ -13,6 +13,7 @@ edit:
   - laws
   - line
 ---
+id: exemption_type_selection
 section: schedule_c
 question: |
   Which set of exemptions are you claiming?
@@ -23,11 +24,13 @@ fields:
     - You are claiming federal exemptions.
     # default: You are claiming federal exemptions.
 ---
+id: exempt_property_any_exist
 section: schedule_c
 question: |
   Do you have any property to claim as exempt?
 yesno: prop.exempt_property.properties.there_are_any
 ---
+id: exempt_property_add_another
 section: schedule_c
 question: |
   Do you have any more property to claim as exempt?
@@ -35,6 +38,7 @@ yesno: prop.exempt_property.properties.there_is_another
 under: |
   ${ prop_exempt_table }
 ---
+id: exempt_property_details
 section: schedule_c
 question: |
   Tell us more about the property and claim for excemption
@@ -61,6 +65,7 @@ fields:
     # default: 4
 list collect: True 
 ---
+id: homestead_exemption
 section: schedule_c
 question: |
   Are you claiming a homestead exemption of more than $189,050?
@@ -76,6 +81,7 @@ fields:
     # default: False
     show if: prop.exempt_property.claim_homestead_exemption
 ---
+id: schedule_c_review
 event: schedule_c
 section: schedule_c
 question: |
