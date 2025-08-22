@@ -187,8 +187,16 @@ fields:
         $(document).on('daPageLoad', function() {
           // Define county data
           var countyData = {
-            'Nebraska': ${ county_list('Nebraska') | safe },
-            'South Dakota': ${ county_list('South Dakota') | safe }
+            'Nebraska': [
+              % for county in county_list('Nebraska'):
+              "${ county }",
+              % endfor
+            ].filter(function(item) { return item !== ""; }),
+            'South Dakota': [
+              % for county in county_list('South Dakota'):
+              "${ county }",
+              % endfor
+            ].filter(function(item) { return item !== ""; })
           };
           
           // Find the state and county dropdowns for this debtor
