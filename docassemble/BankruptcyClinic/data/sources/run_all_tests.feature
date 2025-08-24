@@ -8,28 +8,29 @@ Scenario: Minimalist single filer
   Given I start the interview at "voluntary-petition.yml"
   And I get to the question id "exemption_type_selection" with this data:
     | var | value | trigger |
+    | introduction_screen | True |  |
+    | current_district | District of Nebraska |  |
     | amended_filing | False |  |
     | chapter | Chapter 7 |  |
     | courts_list[0] | District of Nebraska |  |
     | courts_list[1] | District of South Dakota |  |
-    | current_district | District of Nebraska |  |
-    | debtor[0].address.address | 123 fake st |  |
-    | debtor[0].address.city | omaha |  |
-    | debtor[0].address.county | Douglas County |  |
-    | debtor[0].address.state | South Dakota |  |
-    | debtor[0].address.zip | 68022 |  |
-    | debtor[0].alias.revisit | True |  |
-    | debtor[0].alias.there_are_any | False |  |
-    | debtor[0].complete | True |  |
-    | debtor[0].district_info.is_current_district | True |  |
-    | debtor[0].expenses.joint_case | False |  |
-    | debtor[0].has_other_mailing_address | False |  |
-    | debtor[0].name.first | Alex |  |
-    | debtor[0].name.last | Clark |  |
-    | debtor[0].name.middle |  |  |
-    | debtor[0].name.suffix |  |  |
-    | debtor[0].tax_id.tax_id | 555-55-5555 |  |
-    | debtor[0].tax_id.tax_id_type | 1 |  |
+    | debtor[i].address.address | 123 fake st | debtor[0].address.address |
+    | debtor[i].address.city | omaha | debtor[0].address.city |
+    | debtor[i].address.county | Douglas County | debtor[0].address.county |
+    | debtor[i].address.state | South Dakota | debtor[0].address.state |
+    | debtor[i].address.zip | 68022 | debtor[0].address.zip |
+    | debtor[i].alias.revisit | True | debtor[0].alias.revisit |
+    | debtor[i].alias.there_are_any | False | debtor[0].alias.there_are_any |
+    | debtor[i].complete | True | debtor[0].complete |
+    | debtor[i].district_info.is_current_district | True | debtor[0].district_info.is_current_district |
+    | debtor[i].expenses.joint_case | False | debtor[0].expenses.joint_case |
+    | debtor[i].has_other_mailing_address | False | debtor[0].has_other_mailing_address |
+    | debtor[i].name.first | Alex | debtor[0].name.first |
+    | debtor[i].name.last | Clark | debtor[0].name.last |
+    | debtor[i].name.middle |  | debtor[0].name.middle |
+    | debtor[i].name.suffix |  | debtor[0].name.suffix |
+    | debtor[i].tax_id.tax_id | 555-55-5555 | debtor[0].tax_id.tax_id |
+    | debtor[i].tax_id.tax_id_type | 1 | debtor[0].tax_id.tax_id_type |
     | debtor.revisit | True |  |
     | debtor.target_number | 1 |  |
     | debtor.there_are_any | True |  |
