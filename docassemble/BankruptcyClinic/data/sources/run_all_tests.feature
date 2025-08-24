@@ -37,85 +37,85 @@ Scenario: Minimalist single filer
     | debtor_basic_info | True |
     | debtor_final | True |
     | district_final | True |
-    | filing_status | Filing individually |  |
-    | hidden_county |  |  |
-    | introduction_screen | True |  |
-    | prop.ab_other_vehicles.revisit | True |  |
-    | prop.ab_other_vehicles.there_are_any | False |  |
-    | prop.ab_vehicles.revisit | True |  |
-    | prop.ab_vehicles.there_are_any | False |  |
-    | prop.animal_is_claiming_exemption | False |  |
-    | prop.business_property.has_property | False |  |
-    | prop.clothes_is_claiming_exemption | False |  |
-    | prop.collectibles_is_claiming_exemption | False |  |
-    | prop.collectibles_value | 0 |  |
-    | prop.electronics_is_claiming_exemption | False |  |
-    | prop.electronics_value | 0 |  |
-    | prop.farming_property.has_property | False |  |
-    | prop.financial_assets.annuities.revisit | True |  |
-    | prop.financial_assets.annuities.there_are_any | False |  |
-    | prop.financial_assets.bonds_and_stocks.revisit | True |  |
-    | prop.financial_assets.bonds_and_stocks.there_are_any | False |  |
-    | prop.financial_assets.cash_is_claiming_exemption | False |  |
-    | prop.financial_assets.corporate_bonds.revisit | True |  |
-    | prop.financial_assets.corporate_bonds.there_are_any | False |  |
-    | prop.financial_assets.deposits.revisit | True |  |
-    | prop.financial_assets.deposits.there_are_any | False |  |
-    | prop.financial_assets.edu_accounts.revisit | True |  |
-    | prop.financial_assets.edu_accounts.there_are_any | False |  |
-    | prop.financial_assets.future_property_interest_has_claim | False |  |
-    | prop.financial_assets.has_cash | False |  |
-    | prop.financial_assets.has_future_property_interest | False |  |
-    | prop.financial_assets.has_intangible_interest | False |  |
-    | prop.financial_assets.has_ip_interest | False |  |
-    | prop.financial_assets.intangible_interest_has_claim | False |  |
-    | prop.financial_assets.ip_interest_has_claim | False |  |
-    | prop.financial_assets.non_traded_stock.revisit | True |  |
-    | prop.financial_assets.non_traded_stock.there_are_any | False |  |
-    | prop.financial_assets.prepayments.revisit | True |  |
-    | prop.financial_assets.prepayments.there_are_any | False |  |
-    | prop.financial_assets.retirement_accounts.revisit | True |  |
-    | prop.financial_assets.retirement_accounts.there_are_any | False |  |
-    | prop.firearms_is_claiming_exemption | False |  |
-    | prop.has_animals | False |  |
-    | prop.has_clothes | False |  |
-    | prop.has_collectibles | False |  |
-    | prop.has_electronics | False |  |
-    | prop.has_firearms | False |  |
-    | prop.has_hobby_equipment | False |  |
-    | prop.has_household_goods | False |  |
-    | prop.has_jewlery | False |  |
-    | prop.has_other_household_items | False |  |
-    | prop.has_other_prop | False |  |
-    | prop.has_secured_household_goods | False |  |
-    | prop.hobby_equipment_is_claiming_exemption | False |  |
-    | prop.hobby_equipment_value | 0 |  |
-    | prop.household_goods_is_claiming_exemption | False |  |
-    | prop.interests.revisit | True |  |
-    | prop.interests.there_are_any | False |  |
-    | prop.jewlery_is_claiming_exemption | False |  |
-    | prop.other_household_items_is_claiming_exemption | False |  |
-    | prop.other_prop_has_claim | False |  |
-    | prop.owed_property.contingent_claims_has_claim | False |  |
-    | prop.owed_property.family_support_has_claim | False |  |
-    | prop.owed_property.first_insurance_interest_has_claim | False |  |
-    | prop.owed_property.has_contingent_claims | False |  |
-    | prop.owed_property.has_family_support | False |  |
-    | prop.owed_property.has_insurance_interest | False |  |
-    | prop.owed_property.has_other_amounts | False |  |
-    | prop.owed_property.has_other_assets | False |  |
-    | prop.owed_property.has_tax_refund | False |  |
-    | prop.owed_property.has_third_party | False |  |
-    | prop.owed_property.has_trust | False |  |
-    | prop.owed_property.other_amounts_has_claim | False |  |
-    | prop.owed_property.other_assets_has_claim | False |  |
-    | prop.owed_property.tax_refund_has_claim | False |  |
-    | prop.owed_property.third_party_has_claim | False |  |
-    | prop.owed_property.trust_has_claim | False |  |
-    | prop.secured_household_goods_is_claiming_exemption | False |  |
-    | property_intro | True |  |
-    | selected_state | South Dakota |  |
-    | unsecured_claim | 0 |  |
+    | filing_status | Filing individually |
+    | hidden_county |  |
+    | introduction_screen | True |
+    | prop.ab_other_vehicles.revisit | True |
+    | prop.ab_other_vehicles.there_are_any | False |
+    | prop.ab_vehicles.revisit | True |
+    | prop.ab_vehicles.there_are_any | False |
+    | prop.animal_is_claiming_exemption | False |
+    | prop.business_property.has_property | False |
+    | prop.clothes_is_claiming_exemption | False |
+    | prop.collectibles_is_claiming_exemption | False |
+    | prop.collectibles_value | 0 |
+    | prop.electronics_is_claiming_exemption | False |
+    | prop.electronics_value | 0 |
+    | prop.farming_property.has_property | False |
+    | prop.financial_assets.annuities.revisit | True |
+    | prop.financial_assets.annuities.there_are_any | False |
+    | prop.financial_assets.bonds_and_stocks.revisit | True |
+    | prop.financial_assets.bonds_and_stocks.there_are_any | False |
+    | prop.financial_assets.cash_is_claiming_exemption | False |
+    | prop.financial_assets.corporate_bonds.revisit | True |
+    | prop.financial_assets.corporate_bonds.there_are_any | False |
+    | prop.financial_assets.deposits.revisit | True |
+    | prop.financial_assets.deposits.there_are_any | False |
+    | prop.financial_assets.edu_accounts.revisit | True |
+    | prop.financial_assets.edu_accounts.there_are_any | False |
+    | prop.financial_assets.future_property_interest_has_claim | False |
+    | prop.financial_assets.has_cash | False |
+    | prop.financial_assets.has_future_property_interest | False |
+    | prop.financial_assets.has_intangible_interest | False |
+    | prop.financial_assets.has_ip_interest | False |
+    | prop.financial_assets.intangible_interest_has_claim | False |
+    | prop.financial_assets.ip_interest_has_claim | False |
+    | prop.financial_assets.non_traded_stock.revisit | True |
+    | prop.financial_assets.non_traded_stock.there_are_any | False |
+    | prop.financial_assets.prepayments.revisit | True |
+    | prop.financial_assets.prepayments.there_are_any | False |
+    | prop.financial_assets.retirement_accounts.revisit | True |
+    | prop.financial_assets.retirement_accounts.there_are_any | False |
+    | prop.firearms_is_claiming_exemption | False |
+    | prop.has_animals | False |
+    | prop.has_clothes | False |
+    | prop.has_collectibles | False |
+    | prop.has_electronics | False |
+    | prop.has_firearms | False |
+    | prop.has_hobby_equipment | False |
+    | prop.has_household_goods | False |
+    | prop.has_jewlery | False |
+    | prop.has_other_household_items | False |
+    | prop.has_other_prop | False |
+    | prop.has_secured_household_goods | False |
+    | prop.hobby_equipment_is_claiming_exemption | False |
+    | prop.hobby_equipment_value | 0 |
+    | prop.household_goods_is_claiming_exemption | False |
+    | prop.interests.revisit | True |
+    | prop.interests.there_are_any | False |
+    | prop.jewlery_is_claiming_exemption | False |
+    | prop.other_household_items_is_claiming_exemption | False |
+    | prop.other_prop_has_claim | False |
+    | prop.owed_property.contingent_claims_has_claim | False |
+    | prop.owed_property.family_support_has_claim | False |
+    | prop.owed_property.first_insurance_interest_has_claim | False |
+    | prop.owed_property.has_contingent_claims | False |
+    | prop.owed_property.has_family_support | False |
+    | prop.owed_property.has_insurance_interest | False |
+    | prop.owed_property.has_other_amounts | False |
+    | prop.owed_property.has_other_assets | False |
+    | prop.owed_property.has_tax_refund | False |
+    | prop.owed_property.has_third_party | False |
+    | prop.owed_property.has_trust | False |
+    | prop.owed_property.other_amounts_has_claim | False |
+    | prop.owed_property.other_assets_has_claim | False |
+    | prop.owed_property.tax_refund_has_claim | False |
+    | prop.owed_property.third_party_has_claim | False |
+    | prop.owed_property.trust_has_claim | False |
+    | prop.secured_household_goods_is_claiming_exemption | False |
+    | property_intro | True |
+    | selected_state | South Dakota |
+    | unsecured_claim | 0 |
 
 #### Maximalist scenario: all sections filled, nothing skipped
 #Scenario: Maximalist single or joint filer
