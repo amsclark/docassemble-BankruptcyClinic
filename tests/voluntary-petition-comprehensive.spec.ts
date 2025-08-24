@@ -191,49 +191,70 @@ async function navigateToQuestion(page: any, questionId: string, data: Record<st
 async function fillBasicInfoForm(page: any, data: Record<string, any>, debtorIndex: number) {
   const prefix = `debtor[${debtorIndex}]`;
   console.log(`📝 Filling basic info for ${prefix}`);
+  console.log('Available data keys:', Object.keys(data));
   
-  // Name fields
-  if (data[`${prefix}.name.first`]) {
-    await page.fill('#ZGVidG9yW2ldLm5hbWUuZmlyc3Q', data[`${prefix}.name.first`]);
+  // Wait for form to be ready
+  await page.waitForSelector('input, select', { timeout: 10000 });
+  
+  // Name fields - check both possible data structures
+  const firstName = data[`${prefix}.name.first`] || data['debtor.name.first'];
+  const lastName = data[`${prefix}.name.last`] || data['debtor.name.last'];
+  
+  console.log(`Attempting to fill first name: ${firstName}`);
+  console.log(`Attempting to fill last name: ${lastName}`);
+  
+  if (firstName) {
+    console.log('Looking for first name field...');
+    const firstNameField = await page.locator('#ZGVidG9yW2ldLm5hbWUuZmlyc3Q').first();
+    if (await firstNameField.isVisible()) {
+      console.log('First name field found, filling...');
+      await firstNameField.fill(firstName);
+      console.log(`✅ Filled first name: ${firstName}`);
+    } else {
+      console.log('❌ First name field not found');
+    }
   }
-  if (data[`${prefix}.name.last`]) {
-    await page.fill('#ZGVidG9yW2ldLm5hbWUubGFzdA', data[`${prefix}.name.last`]);
+  
+  if (lastName) {
+    console.log('Looking for last name field...');
+    const lastNameField = await page.locator('#ZGVidG9yW2ldLm5hbWUubGFzdA').first();
+    if (await lastNameField.isVisible()) {
+      console.log('Last name field found, filling...');
+      await lastNameField.fill(lastName);
+      console.log(`✅ Filled last name: ${lastName}`);
+    } else {
+      console.log('❌ Last name field not found');
+    }
   }
   
   // Address fields
-  if (data[`${prefix}.address.address`]) {
-    await page.fill('#ZGVidG9yW2ldLmFkZHJlc3MuYWRkcmVzcw', data[`${prefix}.address.address`]);
+  const address = data[`${prefix}.address.address`] || data['debtor.address.address'];
+  const city = data[`${prefix}.address.city`] || data['debtor.address.city'];
+  const state = data[`${prefix}.address.state`] || data['debtor.address.state'];
+  const county = data[`${prefix}.address.county`] || data['debtor.address.county'];
+  
+  if (address) {
+    console.log(`Filling address: ${address}`);
+    await page.fill('#ZGVidG9yW2ldLmFkZHJlc3MuYWRkcmVzcw', address);
   }
-  if (data[`${prefix}.address.city`]) {
-    await page.fill('#ZGVidG9yW2ldLmFkZHJlc3MuY2l0eQ', data[`${prefix}.address.city`]);
+  if (city) {
+    console.log(`Filling city: ${city}`);
+    await page.fill('#ZGVidG9yW2ldLmFkZHJlc3MuY2l0eQ', city);
   }
-  if (data[`${prefix}.address.state`]) {
-    await page.selectOption('#ZGVidG9yW2ldLmFkZHJlc3Muc3RhdGU', data[`${prefix}.address.state`]);
+  if (state) {
+    console.log(`Selecting state: ${state}`);
+    await page.selectOption('#ZGVidG9yW2ldLmFkZHJlc3Muc3RhdGU', state);
     // Wait for county to populate
     await page.waitForTimeout(2000);
   }
-  if (data[`${prefix}.address.county`]) {
-    await page.selectOption('#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5', data[`${prefix}.address.county`]);
-  }
-  if (data[`${prefix}.address.zip`]) {
-    await page.fill('#ZGVidG9yW2ldLmFkZHJlc3Muemlw', data[`${prefix}.address.zip`]);
+  if (county) {
+    console.log(`Selecting county: ${county}`);
+    await page.selectOption('#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5', county);
   }
   
-  // Tax ID fields
-  if (data[`${prefix}.tax_id.tax_id_type`]) {
-    const taxIdType = data[`${prefix}.tax_id.tax_id_type`];
-    const radioId = taxIdType === '1' ? 'ZGVidG9yW2ldLnRheF9pZC50YXhfaWRfdHlwZQ_0' : 'ZGVidG9yW2ldLnRheF9pZC50YXhfaWRfdHlwZQ_1';
-    await page.click(`label[for="${radioId}"]`);
-  }
-  
-  // Mailing address checkbox
-  if (data[`${prefix}.has_other_mailing_address`] === false) {
-    // Leave unchecked
-  } else if (data[`${prefix}.has_other_mailing_address`] === true) {
-    await page.check('#ZGVidG9yW2ldLmhhc19vdGhlcl9tYWlsaW5nX2FkZHJlc3M');
-  }
-  
-  console.log(`✅ Completed basic info for ${prefix}`);
+  // Wait for form processing
+  await page.waitForTimeout(1000);
+  console.log('✅ Completed filling basic info form');
 }
 
 // Test 1: Basic interview loads
