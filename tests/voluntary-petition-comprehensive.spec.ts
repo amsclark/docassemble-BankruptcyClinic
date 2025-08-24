@@ -279,6 +279,7 @@ async function fillBasicInfoForm(page: any, data: Record<string, any>, debtorInd
   const city = data[`${prefix}.address.city`] || data['debtor.address.city'];
   const state = data[`${prefix}.address.state`] || data['debtor.address.state'];
   const county = data[`${prefix}.address.county`] || data['debtor.address.county'];
+  const zip = data[`${prefix}.address.zip`] || data['debtor.address.zip'];
   
   if (address) {
     console.log(`Filling address: ${address}`);
@@ -291,17 +292,241 @@ async function fillBasicInfoForm(page: any, data: Record<string, any>, debtorInd
   if (state) {
     console.log(`Selecting state: ${state}`);
     await page.selectOption('#ZGVidG9yW2ldLmFkZHJlc3Muc3RhdGU', state);
-    // Wait for county to populate
-    await page.waitForTimeout(2000);
+    // Explicitly trigger change event to ensure Docassemble reacts
+    await page.evaluate((sel: string) => {
+      const el = document.querySelector(sel) as HTMLSelectElement | null;
+      if (el) el.dispatchEvent(new Event('change', { bubbles: true }));
+    }, '#ZGVidG9yW2ldLmFkZHJlc3Muc3RhdGU');
+    // Wait for county to populate: options length > 1 and not just N/A
+    const countySelectSelector = '#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5';
+    try {
+      await page.waitForFunction((sel: string) => {
+        const el = document.querySelector(sel) as HTMLSelectElement | null;
+        if (!el) return false;
+        const opts = Array.from(el.options);
+        return opts.length > 1 || (opts.length === 1 && opts[0].value !== 'N/A');
+      }, countySelectSelector, { timeout: 20000 });
+    } catch (e) {
+      console.log('⚠️ County dropdown did not populate within timeout; proceeding without county selection.');
+    }
   }
   if (county) {
     console.log(`Selecting county: ${county}`);
-    await page.selectOption('#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5', county);
+    // Ensure desired county option is present
+    const countySelect = page.locator('#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5');
+    const found = await page.waitForFunction((sel: string, expected: string) => {
+      const el = document.querySelector(sel) as HTMLSelectElement | null;
+      if (!el) return false;
+      return Array.from(el.options).some(o => o.textContent?.trim() === expected || o.value === expected);
+    }, '#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5', county, { timeout: 10000 }).then(() => true).catch(() => false);
+    if (found) {
+      await countySelect.selectOption({ label: county }).catch(async () => {
+        await countySelect.selectOption(county);
+      });
+    } else {
+      console.log(`⚠️ Desired county "${county}" not found in dropdown; leaving county as-is.`);
+    }
+  }
+  if (zip) {
+    console.log(`Filling zip: ${zip}`);
+    await page.fill('#ZGVidG9yW2ldLmFkZHJlc3Muemlw', String(zip));
+  }
+
+  // ID Type and SSN/ITIN handling (often required)
+  try {
+    // Determine desired ID type; default to SSN if unspecified
+    const idType = data[`${prefix}.tax_id.tax_id_type`] || data['debtor.tax_id.tax_id_type'] || '1';
+    // Docassemble uses labelauty which hides the input; click the label[for] instead
+    const idTypeName = 'ZGVidG9yW2ldLnRheF9pZC50YXhfaWRfdHlwZQ';
+    const desiredRadio = page.locator(`input[name="${idTypeName}"][value="${idType}"]`).first();
+    if (await desiredRadio.count()) {
+      const radioId = await desiredRadio.getAttribute('id');
+      if (radioId) {
+        await page.click(`label[for="${radioId}"]`);
+      } else {
+        await desiredRadio.click({ force: true });
+      }
+    }
+
+    if (idType === '1') {
+      // Social Security Number value
+      const ssnVal = data[`${prefix}.tax_id.tax_id`] || data['debtor.tax_id.tax_id'] || '123-45-6789';
+      const ssnInput = page.getByLabel('SSN');
+      if (await ssnInput.count()) {
+        await ssnInput.fill(ssnVal);
+      }
+    } else if (idType === '2') {
+      // ITIN
+      const itinVal = data[`${prefix}.tax_id.tax_id`] || data['debtor.tax_id.tax_id'] || '987-65-4321';
+      const itinInput = page.getByLabel('Tax ID');
+      if (await itinInput.count()) {
+        await itinInput.fill(itinVal);
+      }
+    }
+  } catch (e) {
+    console.log('ID Type/Tax ID fill skipped or not present:', e);
   }
   
   // Wait for form processing
   await page.waitForTimeout(1000);
   console.log('✅ Completed filling basic info form');
+}
+
+// Continue past basic identity/debtor summary into Schedule 106AB (Property) intro
+async function continueToPropertyIntro(page: any) {
+  let steps = 0;
+  const maxSteps = 20;
+  while (steps < maxSteps) {
+    const h1 = (await page.locator('h1#daMainQuestion').textContent()) || '';
+    if (h1.includes('Please tell the court about your property.')) {
+      // We're at property intro
+      return;
+    }
+
+    // Handle known pages after Basic Identity
+    if (h1.includes('Basic Identity and Contact Information')) {
+      // We already filled it in navigateToQuestion; just submit to proceed
+      const submit = page.locator('button[type="submit"]');
+      if (await submit.count()) {
+        await submit.first().click();
+        await page.waitForLoadState('networkidle');
+        steps++;
+        continue;
+      }
+    }
+    if (h1.includes('Has') && h1.includes('lived in the specified district')) {
+      // Lived in district question -> Yes
+      await page.getByRole('radio', { name: 'Yes' }).first().check();
+    } else if (h1.includes('Does') && h1.includes('have any') && h1.toLowerCase().includes('other names')) {
+      // Alias any -> No
+      await page.getByRole('radio', { name: 'No' }).first().check();
+    } else if (h1.includes('Do you have any') && h1.toLowerCase().includes('other names they\'ve used')) {
+      await page.getByRole('radio', { name: 'No' }).first().check();
+    } else if (h1.includes('Are there more debtors to add?')) {
+      // Additional debtor -> No
+      await page.getByRole('radio', { name: 'No' }).first().check();
+    } else {
+      // For review/summary or any other page, just continue
+    }
+
+    // Click continue and loop
+    const btn = page.locator('button[type="submit"]');
+    if (await btn.count()) {
+      await btn.first().click();
+      await page.waitForLoadState('networkidle');
+    } else {
+      throw new Error(`No submit button on page with heading: ${h1}`);
+    }
+    steps++;
+  }
+  const finalH1 = await page.locator('h1#daMainQuestion').textContent();
+  throw new Error(`Expected to reach property intro within ${maxSteps} steps, last seen: ${finalH1}`);
+}
+
+// Answer a Yes/No page and continue
+async function answerYesNoAndContinue(page: any, yes: boolean) {
+  const choiceName = yes ? 'Yes' : 'No';
+  await page.getByRole('radio', { name: choiceName }).first().check();
+  await page.click('button[type="submit"]');
+  await page.waitForLoadState('networkidle');
+}
+
+// Fill a single real property interest on the details page using accessible labels
+async function fillRealPropertyInterest(page: any, item: {
+  street: string;
+  city: string;
+  state: string;
+  zip?: string | number;
+  county?: string;
+  type: 'Single-family home' | 'Duplex or Multi-unit building' | 'Condominium or cooperative' | 'Manufactured or mobile home' | 'Land' | 'Investment property' | 'Timeshare' | 'Other';
+  who?: 'Debtor 1 only' | 'Debtor 2 only' | 'Debtor 1 and Debtor 2 only' | 'At least one of the debtors and another';
+  current_value: string | number;
+  has_loan?: boolean;
+  current_owed_amount?: string | number;
+  ownership_interest?: string;
+  is_community_property?: boolean;
+  is_claiming_exemption?: boolean;
+  claiming_sub_100?: boolean;
+  exemption_value?: string | number;
+  exemption_laws?: string;
+}) {
+  // Verify we are on the details page
+  const h1 = (await page.locator('h1#daMainQuestion').textContent()) || '';
+  if (!h1.includes('Tell the court about details about the interest in question.')) {
+    throw new Error(`Not on real property details page. Found: ${h1}`);
+  }
+
+  await page.getByLabel('Street').fill(item.street);
+  await page.getByLabel('City').fill(item.city);
+  await page.getByLabel('State').selectOption({ label: item.state });
+  if (item.zip !== undefined) {
+    await page.getByLabel('Zip').fill(String(item.zip));
+  }
+  if (item.county) {
+    await page.getByLabel('County').fill(item.county);
+  }
+
+  // Property type checkbox within its group
+  const propTypeGroup = page.getByRole('group', { name: 'What is the property' });
+  if (await propTypeGroup.count()) {
+    await propTypeGroup.getByLabel(item.type).check();
+  } else {
+    await page.getByLabel(item.type).check();
+  }
+
+  // Who has an interest (if present)
+  const whoGroup = page.getByRole('group', { name: 'Who has an interest in the property?' });
+  if ((await whoGroup.count()) && item.who) {
+    await whoGroup.getByRole('radio', { name: item.who }).check();
+  }
+
+  await page.getByLabel('Current property value').fill(String(item.current_value));
+
+  // Mortgage/loan (scope to question group)
+  const loanGroup = page.getByRole('group', { name: 'Do you have a mortgage/loan on the property?' });
+  const hasLoan = !!item.has_loan;
+  if (await loanGroup.count()) {
+    await loanGroup.getByRole('radio', { name: hasLoan ? 'Yes' : 'No' }).check();
+  } else {
+    await page.getByRole('radio', { name: hasLoan ? 'Yes' : 'No' }).first().check();
+  }
+  if (hasLoan && item.current_owed_amount !== undefined) {
+    await page.getByLabel('How much do you owe on the loan?').fill(String(item.current_owed_amount));
+  }
+
+  // Ownership interest (optional)
+  if (item.ownership_interest && (await page.getByLabel('Describe the nature of your ownership interest', { exact: false }).count())) {
+    await page.getByLabel('Describe the nature of your ownership interest', { exact: false }).fill(item.ownership_interest);
+  }
+
+  // Community property (optional)
+  const communityGroup = page.getByRole('group', { name: 'Is this community property?' });
+  if ((await communityGroup.count()) && typeof item.is_community_property === 'boolean') {
+    await communityGroup.getByRole('radio', { name: item.is_community_property ? 'Yes' : 'No' }).check();
+  }
+
+  // Exemptions (optional)
+  const claimGroup = page.getByRole('group', { name: 'Claiming Exemption?' });
+  const claimEx = !!item.is_claiming_exemption;
+  if (await claimGroup.count()) {
+    await claimGroup.getByRole('radio', { name: claimEx ? 'Yes' : 'No' }).check();
+    if (claimEx) {
+      const sub100Group = page.getByRole('group', { name: 'Are you claiming less than 100% of fair market value?' });
+      const sub100 = !!item.claiming_sub_100;
+      if (await sub100Group.count()) {
+        await sub100Group.getByRole('radio', { name: sub100 ? 'Yes' : 'No' }).check();
+      }
+      if (sub100 && item.exemption_value !== undefined) {
+        await page.getByLabel('Value of exemption being claimed').fill(String(item.exemption_value));
+      }
+      if (item.exemption_laws) {
+        await page.getByLabel('Specific laws that allow exemption').selectOption({ label: item.exemption_laws });
+      }
+    }
+  }
+
+  await page.click('button[type="submit"]');
+  await page.waitForLoadState('networkidle');
 }
 
 // Test 1: Basic interview loads
