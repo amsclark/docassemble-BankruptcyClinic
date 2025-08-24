@@ -1402,18 +1402,41 @@ async function fillRealPropertyInterest(page: any, item: {
     if (missing && missing.length) console.log('Pre-submit required/validation diagnostics:', missing);
   } catch {}
   await debugDump('before submit');
-  // Avoid racing with navigation during debug; click with Promise.race guard
-  await Promise.race([
-    page.click('button[type="submit"]'),
-    page.waitForLoadState('networkidle')
-  ]).catch(() => {});
-  // If still on details page due to any hidden validation, try one more submit after slight wait
-  const stillHere = (((await page.locator('h1#daMainQuestion').textContent()) || '').includes('Tell the court about details about the interest in question.'));
-  if (stillHere) {
+  // Submit and robustly wait for navigation away from details page
+  const detailsHeading = 'Tell the court about details about the interest in question.';
+  const nextHeading = 'Do you have more interests to add?';
+  const streetSel = `[id="${streetId}"]`;
+  const trySubmit = async () => {
+    // Click submit
+    try { await page.click('button[type="submit"]'); } catch {}
+    // Wait for either next heading, heading text change, or street field to detach
+    const navigated = await Promise.race<Promise<boolean>[]>([
+      page.getByRole('heading', { name: nextHeading }).first().waitFor({ state: 'visible', timeout: 5000 }).then(() => true).catch(() => false),
+      (async () => {
+        try {
+          await page.locator(streetSel).waitFor({ state: 'detached', timeout: 5000 });
+          return true;
+        } catch {
+          return false;
+        }
+      })(),
+      (async () => {
+        try {
+          await page.waitForTimeout(300);
+          const h = (await page.locator('h1#daMainQuestion').textContent()) || '';
+          return !h.includes(detailsHeading);
+        } catch { return false; }
+      })()
+    ] as any);
+    return navigated === true;
+  };
+  let moved = await trySubmit();
+  if (!moved) {
+    // If still on details page due to any hidden validation, run a quick autofix + retry
     const errors = await page.locator('.is-invalid, .invalid-feedback, .text-danger').allTextContents();
     if (errors.length) console.log('Validation hints on details page:', errors);
     await debugDump('after submit, still here');
-    // Attempt to auto-fill any invalid fields
+    // Attempt to auto-fill any invalid or required-but-empty fields
     try {
       const invalidControls = page.locator('input.is-invalid, select.is-invalid, textarea.is-invalid');
       const cnt = await invalidControls.count();
@@ -1423,81 +1446,21 @@ async function fillRealPropertyInterest(page: any, item: {
         const tag = (await ctrl.evaluate((el: Element) => el.tagName.toLowerCase()).catch(() => '')) as string;
         if (tag === 'input') {
           const type = await ctrl.getAttribute('type');
-          if (type === 'number') {
-            await ctrl.fill('0').catch(() => {});
-          } else {
-            await ctrl.fill('N/A').catch(() => {});
-          }
+          await ctrl.fill(type === 'number' ? '0' : 'N/A').catch(() => {});
         } else if (tag === 'select') {
-          // Pick first meaningful option
           const options = await ctrl.locator('option').allTextContents();
           const firstReal = (options as string[]).find((o: string) => o.trim() && !/^select\.\.\./i.test(o.trim()));
-          if (firstReal) {
-            await ctrl.selectOption({ label: firstReal }).catch(async () => { await ctrl.selectOption(firstReal); });
-          }
+          if (firstReal) await ctrl.selectOption({ label: firstReal }).catch(async () => { await ctrl.selectOption(firstReal); });
         } else if (tag === 'textarea') {
           await ctrl.fill('N/A').catch(() => {});
         }
       }
     } catch {}
-    // Also use the visible error messages to drive fixes: click/select associated inputs
+    // Global quick pass for required fields
     try {
       await page.evaluate(() => {
-        const isVisible = (el: HTMLElement) => {
-          const style = window.getComputedStyle(el);
-          if (style.visibility === 'hidden' || style.display === 'none') return false;
-          const rect = el.getBoundingClientRect();
-          return rect.width > 0 && rect.height > 0;
-        };
-        const msgs = Array.from(document.querySelectorAll('.invalid-feedback, .text-danger')) as HTMLElement[];
-        for (const m of msgs) {
-          if (!isVisible(m)) continue;
-          const txt = (m.textContent || '').trim().toLowerCase();
-          // Find nearest container to search for controls
-          let container: HTMLElement | null = m;
-          for (let d = 0; d < 4 && container; d++) container = container.parentElement as HTMLElement | null;
-          container = container || (m.parentElement as HTMLElement | null);
-          const scope = container || document.body;
-          if (txt.includes('select one')) {
-            // Choose 'False' radio within scope if available, else first
-            const radios = Array.from(scope.querySelectorAll('input[type="radio"]')) as HTMLInputElement[];
-            if (radios.length) {
-              const target = radios.find(r => r.value === 'False') || radios[0];
-              target.checked = true;
-              target.dispatchEvent(new Event('change', { bubbles: true }));
-              target.dispatchEvent(new Event('input', { bubbles: true }));
-              // @ts-ignore
-              if ((window as any).jQuery) (window as any).jQuery(target).trigger('change');
-            }
-          } else if (txt.includes('fill this in')) {
-            // Fill nearest empty input/select/textarea
-            const ctrl = (scope.querySelector('input, textarea, select') as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null);
-            if (ctrl) {
-              const tag = ctrl.tagName.toLowerCase();
-              if (tag === 'input') {
-                const t = (ctrl as HTMLInputElement).type;
-                (ctrl as HTMLInputElement).value = t === 'number' ? '0' : 'N/A';
-                ctrl.dispatchEvent(new Event('input', { bubbles: true }));
-                ctrl.dispatchEvent(new Event('change', { bubbles: true }));
-              } else if (tag === 'textarea') {
-                (ctrl as HTMLTextAreaElement).value = 'N/A';
-                ctrl.dispatchEvent(new Event('input', { bubbles: true }));
-                ctrl.dispatchEvent(new Event('change', { bubbles: true }));
-              } else if (tag === 'select') {
-                const opts = Array.from((ctrl as HTMLSelectElement).options);
-                const real = opts.find(o => (o.textContent || '').trim() && !/^select\.\.\./i.test((o.textContent || '').trim()));
-                if (real) {
-                  (ctrl as HTMLSelectElement).value = real.value;
-                  ctrl.dispatchEvent(new Event('change', { bubbles: true }));
-                }
-              }
-            }
-          }
-        }
-        // Additionally, auto-fill any empty required fields globally as a safety net
         const requireds = Array.from(document.querySelectorAll('input[required], textarea[required], select[required]')) as (HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement)[];
         for (const el of requireds) {
-          // Skip hidden/disabled
           const style = window.getComputedStyle(el as HTMLElement);
           if (style.display === 'none' || style.visibility === 'hidden') continue;
           if ((el as any).disabled) continue;
@@ -1527,71 +1490,11 @@ async function fillRealPropertyInterest(page: any, item: {
             }
           }
         }
-        // And make sure any remaining base64 _field_* radios get a default
-        const padB64 = (s: string) => {
-          const m = s.length % 4;
-          if (m === 2) return s + '==';
-          if (m === 3) return s + '=';
-          if (m === 1) return s + '===';
-          return s;
-        };
-        const allRadios = Array.from(document.querySelectorAll('input[type="radio"]')) as HTMLInputElement[];
-        const grouped: Record<string, HTMLInputElement[]> = {};
-        for (const r of allRadios) {
-          const nm = r.getAttribute('name');
-          if (!nm) continue;
-          if (!grouped[nm]) grouped[nm] = [];
-          grouped[nm].push(r);
-        }
-        for (const [nm, group] of Object.entries(grouped)) {
-          if (group.some(r => r.checked)) continue;
-          try {
-            const decoded = atob(padB64(nm));
-            if (decoded && decoded.startsWith('_field_')) {
-              const prefer = group.find(r => r.value === 'False') || group[0];
-              if (prefer) {
-                prefer.checked = true;
-                prefer.dispatchEvent(new Event('change', { bubbles: true }));
-                prefer.dispatchEvent(new Event('input', { bubbles: true }));
-                // @ts-ignore
-                if ((window as any).jQuery) (window as any).jQuery(prefer).trigger('change');
-              }
-            }
-          } catch {}
-        }
       });
     } catch {}
-    // Final defensive pass: ensure every radio group (including generated/hidden) has a selection
-    try {
-      await page.evaluate(() => {
-        const radios = Array.from(document.querySelectorAll('input[type="radio"]')) as HTMLInputElement[];
-        const byName: Record<string, HTMLInputElement[]> = {};
-        for (const r of radios) {
-          const nm = r.getAttribute('name');
-          if (!nm) continue;
-          if (!byName[nm]) byName[nm] = [];
-          byName[nm].push(r);
-        }
-        for (const [nm, group] of Object.entries(byName)) {
-          if (!group.some(r => r.checked)) {
-            const prefer = group.find(r => r.value === 'False') || group[0];
-            if (prefer) {
-              prefer.checked = true;
-              prefer.dispatchEvent(new Event('change', { bubbles: true }));
-              prefer.dispatchEvent(new Event('input', { bubbles: true }));
-              // @ts-ignore
-              if ((window as any).jQuery) (window as any).jQuery(prefer).trigger('change');
-            }
-          }
-        }
-      });
-    } catch {}
-    await page.waitForTimeout(200);
-    await Promise.race([
-      page.click('button[type="submit"]'),
-      page.waitForLoadState('networkidle')
-    ]).catch(() => {});
+    moved = await trySubmit();
   }
+  // Final guard: if we still didn't move, log and proceed (let outer test assert the next page)
 }
 
 // Test 1: Basic interview loads
