@@ -1,0 +1,52 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e6]: Petition for Chapter 7 Bankruptcy
+      - button "Information for the developer" [ref=e8] [cursor=pointer]:
+        - img [ref=e9] [cursor=pointer]
+      - list [ref=e12]:
+        - listitem [ref=e13]:
+          - button "Menu" [ref=e14] [cursor=pointer]
+  - generic [ref=e16]:
+    - navigation [ref=e17]:
+      - generic [ref=e18]:
+        - generic [ref=e19]: Introduction
+        - generic [ref=e20]: District & Case
+        - generic [ref=e21]: Indentify Debtor(s)
+        - generic [ref=e22]: Property
+        - generic [ref=e23]: Exemptions
+        - generic [ref=e24]: Secured Creditors
+        - generic [ref=e25]: Unsecured Creditors
+        - generic [ref=e26]: Contracts and Leases
+        - generic [ref=e27]: Codebtors
+        - generic [ref=e28]: Your Income
+        - generic [ref=e29]: Expenses
+        - generic [ref=e30]: Statment of Intention
+        - generic [ref=e31]: Monthly Income
+        - generic [ref=e32]: Statement of Financial Affairs
+        - generic [ref=e33]: Case Details
+        - generic [ref=e34]: Sole Proprietorship(s)
+        - generic [ref=e35]: Hazardous Property
+        - generic [ref=e36]: Credit Counseling
+        - generic [ref=e37]: Reporting
+        - generic [ref=e38]: Other
+        - generic [ref=e39]: Finish Up
+    - main "Petition for Chapter 7 Bankruptcy" [ref=e40]:
+      - form "Voluntary Petition for Individuals Filing for Bankruptcy" [ref=e41]:
+        - heading "Voluntary Petition for Individuals Filing for Bankruptcy" [level=1] [ref=e43]
+        - generic [ref=e44]:
+          - paragraph [ref=e45]: This interview is designed to help you fill out the required forms for Chapter 7 Bankruptcy. These questions are not intended to provide, and should not be understood to provide, legal advice. They are not designed to fully explain, or to be relied upon in interpreting, the law.
+          - heading "Read These Important Warnings" [level=3] [ref=e46]
+          - list [ref=e47]:
+            - listitem [ref=e48]:
+              - paragraph [ref=e49]: Only an attorney can give you legal advice about what can happen as a result of filing for bankruptcy and what your options are. Although the law allows you to represent yourself in bankruptcy court, you should understand that many people find it difficult to represent themselves successfully.
+            - listitem [ref=e50]:
+              - paragraph [ref=e51]: Bankruptcy fraud is a serious crime; you could be fined and imprisoned if you commit fraud in your bankruptcy case. Making a false statement, concealing property, or obtaining money or property by fraud in connection with a bankruptcy case can result in fines up to $250,000, or imprisonment for up to 20 years, or both. 18 U.S.C. §§ 152, 1341, 1519, and 3571.
+          - paragraph [ref=e52]: Click continue to start filling out the Voluntary Petition for Individuals Filing for Bankruptcy.
+        - group "Press one of the following buttons:" [ref=e53]:
+          - generic [ref=e54]: "Press one of the following buttons:"
+          - button "Continue" [ref=e55] [cursor=pointer]
+```
