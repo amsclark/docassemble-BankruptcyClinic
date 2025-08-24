@@ -118,12 +118,19 @@ async function navigateToQuestion(page: any, questionId: string, data: Record<st
       const radioCount = await page.locator('input[type="radio"]').count();
       if (radioCount > 0) {
         if (data.filing_status === 'Filing individually') {
-          const individualRadio = page.locator('input[type="radio"]').first();
-          const radioId = await individualRadio.getAttribute('id');
-          if (radioId) {
-            await page.click(`label[for="${radioId}"]`);
+          // Prefer role-based selection to avoid labelauty detachment
+          const roleRadio = page.getByRole('radio', { name: 'Filing individually' }).first();
+          if (await roleRadio.count()) {
+            await roleRadio.check();
           } else {
-            await individualRadio.click({ force: true });
+            const individualRadio = page.locator('input[type="radio"]').first();
+            const radioId = await individualRadio.getAttribute('id');
+            if (radioId) {
+              await page.waitForTimeout(100);
+              await page.click(`label[for="${radioId}"]`);
+            } else {
+              await individualRadio.click({ force: true });
+            }
           }
         } else if (data.filing_status === 'Filing with spouse') {
           const spouseRadio = page.locator('input[type="radio"]').nth(1);
@@ -297,6 +304,16 @@ async function fillBasicInfoForm(page: any, data: Record<string, any>, debtorInd
       const el = document.querySelector(sel) as HTMLSelectElement | null;
       if (el) el.dispatchEvent(new Event('change', { bubbles: true }));
     }, '#ZGVidG9yW2ldLmFkZHJlc3Muc3RhdGU');
+    // Try jQuery change trigger as well (Docassemble binds with jQuery)
+    try {
+      await page.evaluate((sel: string) => {
+        // @ts-ignore
+        if ((window as any).jQuery) {
+          // @ts-ignore
+          (window as any).jQuery(sel).trigger('change');
+        }
+      }, '#ZGVidG9yW2ldLmFkZHJlc3Muc3RhdGU');
+    } catch {}
     // Wait for county to populate: options length > 1 and not just N/A
     const countySelectSelector = '#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5';
     try {
@@ -311,6 +328,7 @@ async function fillBasicInfoForm(page: any, data: Record<string, any>, debtorInd
       console.log('⚠️ County dropdown did not populate within timeout; proceeding without county selection.');
     }
   }
+  // Attempt to select county. If a desired county is provided use it; otherwise pick the first real option.
   if (county) {
     console.log(`Selecting county: ${county}`);
     const countySelect = page.locator('#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5');
@@ -338,7 +356,13 @@ async function fillBasicInfoForm(page: any, data: Record<string, any>, debtorInd
         }, { sel: '#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5', target: county });
       }
     } else {
-      console.log(`⚠️ Desired county "${county}" not found in dropdown; leaving county as-is.`);
+      console.log(`⚠️ Desired county "${county}" not found in dropdown; selecting first available real option if any.`);
+      const firstReal = options.find(o => o.trim() !== 'Select...' && o.trim() !== 'N/A');
+      if (firstReal) {
+        await countySelect.selectOption({ label: firstReal }).catch(async () => {
+          await countySelect.selectOption(firstReal);
+        });
+      }
     }
   }
   // Has separate mailing address? Default to No if not provided
@@ -410,6 +434,24 @@ async function fillBasicInfoForm(page: any, data: Record<string, any>, debtorInd
 async function continueToPropertyIntro(page: any) {
   let steps = 0;
   const maxSteps = 20;
+  // Helper to click a Yes/No by underlying radio value using label[for]
+  const clickRadioByValue = async (value: 'True' | 'False') => {
+    const input = page.locator(`input[type="radio"][value="${value}"]`).first();
+    const count = await input.count();
+    if (!count) return false;
+    const rid = await input.getAttribute('id');
+    if (rid) {
+      await page.click(`label[for="${rid}"]`);
+      return true;
+    } else {
+      try {
+        await input.click({ force: true });
+        return true;
+      } catch {
+        return false;
+      }
+    }
+  };
   while (steps < maxSteps) {
     const h1 = (await page.locator('h1#daMainQuestion').textContent()) || '';
     if (h1.includes('Please tell the court about your property.')) {
@@ -424,21 +466,39 @@ async function continueToPropertyIntro(page: any) {
       if (await submit.count()) {
         await submit.first().click();
         await page.waitForLoadState('networkidle');
+        // If still on the same page with a county validation error, pick first real county
+        const stillHere = ((await page.locator('h1#daMainQuestion').textContent()) || '').includes('Basic Identity and Contact Information');
+        if (stillHere) {
+          const countyError = await page.getByText('You need to select one.').count();
+          if (countyError > 0) {
+            const countySelect = page.locator('#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5');
+            if (await countySelect.count()) {
+              const options: string[] = await countySelect.locator('option').allTextContents();
+              const firstReal = options.find(o => o.trim() !== 'Select...' && o.trim() !== 'N/A');
+              if (firstReal) {
+                await countySelect.selectOption({ label: firstReal }).catch(async () => {
+                  await countySelect.selectOption(firstReal);
+                });
+                await submit.first().click();
+                await page.waitForLoadState('networkidle');
+              }
+            }
+          }
+        }
         steps++;
         continue;
       }
     }
     if (h1.includes('Has') && h1.includes('lived in the specified district')) {
       // Lived in district question -> Yes
-      await page.getByRole('radio', { name: 'Yes' }).first().check();
-    } else if (h1.includes('Does') && h1.includes('have any') && h1.toLowerCase().includes('other names')) {
+      await clickRadioByValue('True');
+    } else if ((h1.includes('Does') && h1.includes('have any') && h1.toLowerCase().includes('other names')) ||
+               (h1.includes('Do you have any') && h1.toLowerCase().includes("other names they've used"))) {
       // Alias any -> No
-      await page.getByRole('radio', { name: 'No' }).first().check();
-    } else if (h1.includes('Do you have any') && h1.toLowerCase().includes('other names they\'ve used')) {
-      await page.getByRole('radio', { name: 'No' }).first().check();
+      await clickRadioByValue('False');
     } else if (h1.includes('Are there more debtors to add?')) {
       // Additional debtor -> No
-      await page.getByRole('radio', { name: 'No' }).first().check();
+      await clickRadioByValue('False');
     } else {
       // For review/summary or any other page, just continue
     }
@@ -492,21 +552,45 @@ async function fillRealPropertyInterest(page: any, item: {
 
   await page.getByLabel('Street').fill(item.street);
   await page.getByLabel('City').fill(item.city);
-  await page.getByLabel('State').selectOption({ label: item.state });
+  // State can be a text input or a select; handle both gracefully
+  const stateControl = page.getByLabel('State');
+  if (await stateControl.count()) {
+  const el = await stateControl.elementHandle();
+  const tag = (await el?.evaluate((node: Element) => (node as HTMLElement).tagName.toLowerCase())) as string | undefined;
+    if (tag === 'select') {
+      try {
+        await stateControl.selectOption({ label: item.state });
+      } catch {
+        await stateControl.selectOption(item.state);
+      }
+    } else {
+      await stateControl.fill(item.state);
+    }
+  }
   if (item.zip !== undefined) {
     await page.getByLabel('Zip').fill(String(item.zip));
   }
   if (item.county) {
-    await page.getByLabel('County').fill(item.county);
+    // County is typically a text input; if it becomes a select in the future, handle both
+    const countyControl = page.getByLabel('County');
+    if (await countyControl.count()) {
+      const el = await countyControl.elementHandle();
+      const tag = (await el?.evaluate((node: Element) => (node as HTMLElement).tagName.toLowerCase())) as string | undefined;
+      if (tag === 'select') {
+        try {
+          await countyControl.selectOption({ label: item.county });
+        } catch {
+          await countyControl.selectOption(item.county);
+        }
+      } else {
+        await countyControl.fill(item.county);
+      }
+    }
   }
 
-  // Property type checkbox within its group
-  const propTypeGroup = page.getByRole('group', { name: 'What is the property' });
-  if (await propTypeGroup.count()) {
-    await propTypeGroup.getByLabel(item.type).check();
-  } else {
-    await page.getByLabel(item.type).check();
-  }
+  // Property type checkbox: prefer role-based labelauty checkbox to avoid strict-mode label/input ambiguity
+  const typeCheckbox = page.getByRole('checkbox', { name: item.type }).first();
+  await typeCheckbox.check();
 
   // Who has an interest (if present)
   const whoGroup = page.getByRole('group', { name: 'Who has an interest in the property?' });
