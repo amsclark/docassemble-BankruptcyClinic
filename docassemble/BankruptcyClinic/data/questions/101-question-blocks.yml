@@ -185,53 +185,41 @@ fields:
       <script>
         // Handle dynamic county population based on state selection
         $(document).on('daPageLoad', function() {
-          var questionPage = document.getElementsByTagName("H1")[0].innerHTML;
-          if (questionPage.includes("Tell the court about")) {
-            var stateDropdown = document.getElementById(btoa("debtor[${ i }].address.state").replace(/=/g,""));
-            var countyDropdown = document.getElementById(btoa("debtor[${ i }].address.county").replace(/=/g,""));
-            var hiddenCountyField = document.getElementById(btoa("hidden_county").replace(/=/g,""));
-            
-            if (stateDropdown && countyDropdown) {
-              // Trigger change event if state is already selected
-              if (stateDropdown.value !== "") {
+          var stateDropdown = document.getElementById(btoa("debtor[${ i }].address.state").replace(/=/g,""));
+          var countyDropdown = document.getElementById(btoa("debtor[${ i }].address.county").replace(/=/g,""));
+          var hiddenCountyField = document.getElementById(btoa("hidden_county").replace(/=/g,""));
+
+          // Run on any page that has these fields (e.g., debtor-basic-info)
+          if (stateDropdown && countyDropdown) {
+            // If state already has a value on load, trigger a change to kick off server-side choices
+            if (stateDropdown.value !== "") {
+              stateDropdown.dispatchEvent(new Event('change'));
+            }
+
+            // Fetch current interview vars (state/county) and sync widgets
+            var xhr = get_interview_variables();
+            xhr.done(function(response) {
+              var state = response.variables['debtor[${ i }].address.state'];
+              var county = response.variables['debtor[${ i }].address.county'];
+
+              if (state && state.length > 0) {
+                stateDropdown.value = state;
                 stateDropdown.dispatchEvent(new Event('change'));
               }
-              
-              // Fetch and display the county
-              var xhr = get_interview_variables();
-              xhr.done(function(response) {
-                var state, county;
-                if (response.variables['debtor[${ i }].address.state'] && response.variables['debtor[${ i }].address.state'].length > 0) {
-                  state = response.variables['debtor[${ i }].address.state'];
+
+              // Watch for county options to be populated by server via background_response
+              const observer = new MutationObserver(function() {
+                const naOption = countyDropdown.querySelector('option[value="N/A"]');
+                const hasRealOptions = countyDropdown.options.length > 1 || (naOption == null);
+                if (hasRealOptions) {
+                  observer.disconnect();
+                  if (county && county.length > 0) {
+                    countyDropdown.value = county;
+                  }
                 }
-                if (response.variables['debtor[${ i }].address.county'] && response.variables['debtor[${ i }].address.county'].length > 0) {
-                  county = response.variables['debtor[${ i }].address.county'];
-                }
-                
-                // Update the state dropdown and trigger the 'change' event
-                if (state && state.length > 0) {
-                  stateDropdown.value = state;
-                  stateDropdown.dispatchEvent(new Event('change'));
-                }
-                
-                // Use a mutation observer to watch for county dropdown population
-                const observer = new MutationObserver(function(mutations) {
-                  mutations.forEach(function(mutation) {
-                    // Check if "N/A" is no longer the only option
-                    const naOption = countyDropdown.querySelector('option[value="N/A"]');
-                    if (!naOption || countyDropdown.options.length > 1) {
-                      observer.disconnect(); // Stop observing
-                      if (county) {
-                        countyDropdown.value = county; // Set the county value
-                      }
-                    }
-                  });
-                });
-                
-                // Observe changes to the county dropdown
-                observer.observe(countyDropdown, { childList: true, subtree: true });
               });
-            }
+              observer.observe(countyDropdown, { childList: true, subtree: true });
+            });
           }
         });
       </script>
@@ -249,19 +237,26 @@ section: identify
 ---
 event: update_counties
 code: |
+  # Populate counties when state changes, and also when state is already set on initial load
   if action_argument('_changed') == 'debtor[i].address.state':
     selected_state = action_argument('debtor[i].address.state')
     background_response(
       {
         'debtor[i].address.county':
           {
-            'choices': \
-              county_list(selected_state) \
-              or \
-              ['N/A']
+            'choices': county_list(selected_state) or ['N/A']
           }
       }, 'fields')
-  background_response()
+  elif defined('debtor[i].address.state') and debtor[i].address.state:
+    background_response(
+      {
+        'debtor[i].address.county':
+          {
+            'choices': county_list(debtor[i].address.state) or ['N/A']
+          }
+      }, 'fields')
+  else:
+    background_response()
 ---
 id: lived_in_district
 question: |
