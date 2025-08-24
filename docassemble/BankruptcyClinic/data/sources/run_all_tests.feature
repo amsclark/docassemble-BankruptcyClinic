@@ -20,10 +20,11 @@ Scenario: Minimalist single filer
     | debtor[0].address.state | Nebraska |
     | debtor[0].address.zip | 68022 |
     | debtor[0].address.county | Douglas County |
+    | debtor[0].has_other_mailing_address | False |
     | debtor[0].tax_id.tax_id_type | 1 |
-    | debtor[0].tax_id.tax_id | 1111111111 |
+    | debtor[0].tax_id.tax_id | 123-45-6789 |
     | debtor[0].alias.there_are_any | False |
-    | debtor[0].district_info.is_current_district| True |
+    | debtor[0].district_info.is_current_district | True |
     
 
 #### Maximalist scenario: all sections filled, nothing skipped
