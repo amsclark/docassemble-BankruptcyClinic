@@ -534,9 +534,41 @@ async function continueToPropertyIntro(page: any) {
 // Answer a Yes/No page and continue
 async function answerYesNoAndContinue(page: any, yes: boolean) {
   const choiceName = yes ? 'Yes' : 'No';
-  await page.getByRole('radio', { name: choiceName }).first().check();
-  await page.click('button[type="submit"]');
-  await page.waitForLoadState('networkidle');
+  const currentHeading = (await page.locator('h1#daMainQuestion').textContent()) || '';
+  // Prefer radio if present
+  const radios = page.getByRole('radio', { name: choiceName }).first();
+  if (await radios.count()) {
+    await radios.check();
+    await page.click('button[type="submit"]');
+  } else {
+    // Some boolean prompts are rendered as Yes/No buttons
+    const btn = page.getByRole('button', { name: choiceName }).first();
+    if (await btn.count()) {
+      await btn.click();
+    } else {
+      // Fallback: click visible button containing the text
+      const anyBtn = page.locator('button', { hasText: choiceName }).first();
+      if (await anyBtn.count()) {
+        await anyBtn.click();
+      } else {
+        // Last resort: try clicking first submit
+        const submit = page.locator('button[type="submit"]').first();
+        if (await submit.count()) await submit.click();
+      }
+    }
+  }
+  // Wait for navigation by heading change or network idle
+  await Promise.race<Promise<any>[]>([
+    page.waitForLoadState('networkidle'),
+    (async () => {
+      try {
+        await page.waitForTimeout(300);
+        const h = (await page.locator('h1#daMainQuestion').textContent()) || '';
+        if (h !== currentHeading) return true;
+      } catch {}
+      return false;
+    })()
+  ] as any);
 }
 
 // Fill a single real property interest on the details page using accessible labels
