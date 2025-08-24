@@ -567,6 +567,7 @@ async function fillRealPropertyInterest(page: any, item: {
 
   // Helpers: base64 encode and set radios/checkboxes by Docassemble input[name]
   const b64 = (s: string) => Buffer.from(s).toString('base64');
+  const trimPad = (s: string) => s.replace(/=+$/g, '');
   const setRadioByName = async (nameB64: string, value: string) => {
     const found = await page.locator(`input[type="radio"][name="${nameB64}"][value="${value}"]`).count();
     if (!found) return false;
@@ -680,6 +681,72 @@ async function fillRealPropertyInterest(page: any, item: {
     }
   };
 
+  // Helper: fill a text/select control by Docassemble variable name using base64 name/id and data-saveas fallbacks
+  const fillByVarName = async (varName: string, value: string) => {
+    const nameB64 = b64(varName);
+    const nameShort = trimPad(nameB64);
+    // Try input/textarea first
+    let control = page.locator(`input[name="${nameB64}"]`).first();
+    if (!(await control.count())) control = page.locator(`input[name="${nameShort}"]`).first();
+    if (!(await control.count())) control = page.locator(`#${nameB64}`).first();
+    if (!(await control.count())) control = page.locator(`#${nameShort}`).first();
+    if (!(await control.count())) control = page.locator(`textarea[name="${nameB64}"]`).first();
+    if (!(await control.count())) control = page.locator(`textarea[name="${nameShort}"]`).first();
+    // If still not found, try a select
+    let isSelect = false;
+    if (!(await control.count())) {
+      const selectTry = page.locator(`select[name="${nameB64}"]`).first();
+      if (await selectTry.count()) {
+        control = selectTry;
+        isSelect = true;
+      } else {
+        const selectTry2 = page.locator(`select[name="${nameShort}"]`).first();
+        if (await selectTry2.count()) {
+          control = selectTry2;
+          isSelect = true;
+        }
+      }
+    }
+    // Try data-saveas container
+    if (!(await control.count())) {
+      const container = page.locator(`[data-saveas="${trimPad(b64(varName))}"]`).first();
+      if (await container.count()) {
+        const sel = container.locator('input, textarea, select').first();
+        if (await sel.count()) {
+          control = sel;
+          const tag = (await sel.evaluate((el: Element) => el.tagName.toLowerCase()).catch(() => '')) as string;
+          isSelect = tag === 'select';
+        }
+      }
+    }
+    if (!(await control.count())) return false;
+    try {
+      if (isSelect) {
+        try {
+          await control.selectOption({ label: value });
+        } catch {
+          await control.selectOption(String(value));
+        }
+      } else {
+        await control.fill(String(value));
+      }
+      // Trigger change/input to ensure bindings fire
+      await control.evaluate((el: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) => {
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+        // @ts-ignore
+        if ((window as any).jQuery) {
+          // @ts-ignore
+          (window as any).jQuery(el).trigger('change');
+        }
+      });
+      await page.waitForTimeout(50);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   // Helper: select a radio option by scoping to the question text to avoid ambiguous Yes/No labels
   const selectRadioByQuestion = async (questionText: string, optionText: string) => {
     // Try ARIA group first
@@ -775,8 +842,9 @@ async function fillRealPropertyInterest(page: any, item: {
     return false;
   };
 
-  await page.getByLabel('Street').fill(item.street);
-  await page.getByLabel('City').fill(item.city);
+  // Street/City/State/Zip/County — use labels if available, else fall back to base64 Docassemble var names
+  try { await page.getByLabel('Street', { exact: false }).fill(item.street); } catch {}
+  try { await page.getByLabel('City', { exact: false }).fill(item.city); } catch {}
   // State can be a text input or a select; handle both gracefully
   const stateControl = page.getByLabel('State');
   if (await stateControl.count()) {
@@ -793,11 +861,11 @@ async function fillRealPropertyInterest(page: any, item: {
     }
   }
   if (item.zip !== undefined) {
-    await page.getByLabel('Zip').fill(String(item.zip));
+    try { await page.getByLabel('Zip', { exact: false }).fill(String(item.zip)); } catch {}
   }
   if (item.county) {
     // County is typically a text input; if it becomes a select in the future, handle both
-    const countyControl = page.getByLabel('County');
+    const countyControl = page.getByLabel('County', { exact: false });
     if (await countyControl.count()) {
       const el = await countyControl.elementHandle();
       const tag = (await el?.evaluate((node: Element) => (node as HTMLElement).tagName.toLowerCase())) as string | undefined;
@@ -812,6 +880,13 @@ async function fillRealPropertyInterest(page: any, item: {
       }
     }
   }
+
+  // Fallbacks by variable name if any were missed
+  await fillByVarName('prop.interests[i].street', item.street);
+  await fillByVarName('prop.interests[i].city', item.city);
+  await fillByVarName('prop.interests[i].state', item.state);
+  if (item.zip !== undefined) await fillByVarName('prop.interests[i].zip', String(item.zip));
+  if (item.county) await fillByVarName('prop.interests[i].county', item.county);
 
   // Property type checkbox: hidden input + styled label. Click the label[for] of the underlying input and verify state.
   {
