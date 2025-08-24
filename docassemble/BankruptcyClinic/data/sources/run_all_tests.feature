@@ -19,7 +19,7 @@ Scenario: Minimalist single filer
     | debtor[0].address.city | Omaha |
     | debtor[0].address.state | Nebraska |
     | debtor[0].address.zip | 68022 |
-    | debtor[0].address.county | Douglas County |
+  | debtor[0].address.county | N/A |
     | debtor[0].has_other_mailing_address | False |
     | debtor[0].tax_id.tax_id_type | 1 |
     | debtor[0].tax_id.tax_id | 123-45-6789 |
