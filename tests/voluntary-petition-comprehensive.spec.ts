@@ -688,8 +688,8 @@ async function fillRealPropertyInterest(page: any, item: {
     // Try input/textarea first
     let control = page.locator(`input[name="${nameB64}"]`).first();
     if (!(await control.count())) control = page.locator(`input[name="${nameShort}"]`).first();
-    if (!(await control.count())) control = page.locator(`#${nameB64}`).first();
-    if (!(await control.count())) control = page.locator(`#${nameShort}`).first();
+    if (!(await control.count())) control = page.locator(`[id="${nameB64}"]`).first();
+    if (!(await control.count())) control = page.locator(`[id="${nameShort}"]`).first();
     if (!(await control.count())) control = page.locator(`textarea[name="${nameB64}"]`).first();
     if (!(await control.count())) control = page.locator(`textarea[name="${nameShort}"]`).first();
     // If still not found, try a select
@@ -709,7 +709,7 @@ async function fillRealPropertyInterest(page: any, item: {
     }
     // Try data-saveas container
     if (!(await control.count())) {
-      const container = page.locator(`[data-saveas="${trimPad(b64(varName))}"]`).first();
+  const container = page.locator(`[data-saveas="${trimPad(b64(varName))}"]`).first();
       if (await container.count()) {
         const sel = container.locator('input, textarea, select').first();
         if (await sel.count()) {
@@ -843,29 +843,52 @@ async function fillRealPropertyInterest(page: any, item: {
   };
 
   // Street/City/State/Zip/County — use labels if available, else fall back to base64 Docassemble var names
-  try { await page.getByLabel('Street', { exact: false }).fill(item.street); } catch {}
-  try { await page.getByLabel('City', { exact: false }).fill(item.city); } catch {}
+  // Strongly target docassemble base64 ids for reliability
+  const streetId = b64('prop.interests[i].street');
+  const cityId = b64('prop.interests[i].city');
+  const stateId = b64('prop.interests[i].state');
+  const zipId = b64('prop.interests[i].zip');
+  const countyId = b64('prop.interests[i].county');
+  try {
+    const streetCtrl = page.locator(`[id="${streetId}"]`);
+    await streetCtrl.waitFor({ state: 'visible', timeout: 5000 });
+    await streetCtrl.fill(item.street);
+  } catch { try { await page.getByLabel('Street', { exact: false }).fill(item.street); } catch {} }
+  try {
+    const cityCtrl = page.locator(`[id="${cityId}"]`);
+    if (await cityCtrl.count()) {
+      await cityCtrl.fill(item.city);
+    } else {
+      await page.getByLabel('City', { exact: false }).fill(item.city);
+    }
+  } catch {}
   // State can be a text input or a select; handle both gracefully
-  const stateControl = page.getByLabel('State');
+  // State: prefer id, then label; handle both select and input
+  let stateControl = page.locator(`[id="${stateId}"]`);
+  if (!(await stateControl.count())) stateControl = page.getByLabel('State');
   if (await stateControl.count()) {
-  const el = await stateControl.elementHandle();
-  const tag = (await el?.evaluate((node: Element) => (node as HTMLElement).tagName.toLowerCase())) as string | undefined;
+    const el = await stateControl.elementHandle();
+    const tag = (await el?.evaluate((node: Element) => (node as HTMLElement).tagName.toLowerCase())) as string | undefined;
     if (tag === 'select') {
-      try {
-        await stateControl.selectOption({ label: item.state });
-      } catch {
-        await stateControl.selectOption(item.state);
-      }
+      try { await stateControl.selectOption({ label: item.state }); } catch { await stateControl.selectOption(item.state); }
     } else {
       await stateControl.fill(item.state);
     }
   }
   if (item.zip !== undefined) {
-    try { await page.getByLabel('Zip', { exact: false }).fill(String(item.zip)); } catch {}
+    try {
+      const zipCtrl = page.locator(`[id="${zipId}"]`);
+      if (await zipCtrl.count()) {
+        await zipCtrl.fill(String(item.zip));
+      } else {
+        await page.getByLabel('Zip', { exact: false }).fill(String(item.zip));
+      }
+    } catch {}
   }
   if (item.county) {
     // County is typically a text input; if it becomes a select in the future, handle both
-    const countyControl = page.getByLabel('County', { exact: false });
+    let countyControl = page.locator(`[id="${countyId}"]`);
+    if (!(await countyControl.count())) countyControl = page.getByLabel('County', { exact: false });
     if (await countyControl.count()) {
       const el = await countyControl.elementHandle();
       const tag = (await el?.evaluate((node: Element) => (node as HTMLElement).tagName.toLowerCase())) as string | undefined;
@@ -1229,6 +1252,51 @@ async function fillRealPropertyInterest(page: any, item: {
       }
     });
     await page.waitForTimeout(50);
+  } catch {}
+
+  // Debug before submit
+  // Re-assert critical address fields in case earlier interactions re-rendered the form and cleared them
+  try {
+    const ensureTextByVar = async (varName: string, val: string) => {
+      const nameB64 = b64(varName);
+      const sel = `[id="${nameB64}"], [id="${trimPad(nameB64)}"], input[name="${nameB64}"], input[name="${trimPad(nameB64)}"]`;
+      const ctrl = page.locator(sel).first();
+      if (await ctrl.count()) {
+        const cur = await ctrl.inputValue().catch(() => '');
+        if (!cur) {
+          await ctrl.fill(val);
+          await ctrl.evaluate((el: HTMLInputElement) => {
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+            // @ts-ignore
+            if ((window as any).jQuery) (window as any).jQuery(el).trigger('change');
+          });
+          await page.waitForTimeout(25);
+        }
+      }
+    };
+    const ensureSelectByVar = async (varName: string, val: string) => {
+      const nameB64 = b64(varName);
+      const sel = `select[id="${nameB64}"], select[id="${trimPad(nameB64)}"], select[name="${nameB64}"], select[name="${trimPad(nameB64)}"]`;
+      const ctrl = page.locator(sel).first();
+      if (await ctrl.count()) {
+        const cur = await ctrl.inputValue().catch(() => '');
+        if (!cur) {
+          try { await ctrl.selectOption({ label: val }); } catch { await ctrl.selectOption(val); }
+          await ctrl.evaluate((el: HTMLSelectElement) => {
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+            // @ts-ignore
+            if ((window as any).jQuery) (window as any).jQuery(el).trigger('change');
+          });
+          await page.waitForTimeout(25);
+        }
+      }
+    };
+    await ensureTextByVar('prop.interests[i].street', String(item.street));
+    await ensureTextByVar('prop.interests[i].city', String(item.city));
+    await ensureSelectByVar('prop.interests[i].state', String(item.state));
+    if (item.zip !== undefined) await ensureTextByVar('prop.interests[i].zip', String(item.zip));
+    if (item.county) await ensureTextByVar('prop.interests[i].county', String(item.county));
   } catch {}
 
   // Debug before submit
