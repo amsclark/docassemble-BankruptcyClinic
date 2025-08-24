@@ -4,7 +4,7 @@
 - generic [ref=e2]:
   - banner [ref=e3]:
     - generic [ref=e4]:
-      - generic [ref=e6]: Petition for Chapter 7 Bankruptcy
+      - generic [ref=e6]: Voluntary Petition for Individuals Filing for Bankruptcy
       - button "Information for the developer" [ref=e8] [cursor=pointer]:
         - img [ref=e9] [cursor=pointer]
       - list [ref=e12]:
@@ -35,18 +35,12 @@
         - generic [ref=e37]: Reporting
         - generic [ref=e38]: Other
         - generic [ref=e39]: Finish Up
-    - main "Petition for Chapter 7 Bankruptcy" [ref=e40]:
+    - main "Voluntary Petition for Individuals Filing for Bankruptcy" [ref=e40]:
       - progressbar "Interview Progress" [ref=e41]
-      - form "What district are you filing your bankruptcy case in?" [ref=e43]:
-        - heading "What district are you filing your bankruptcy case in?" [level=1] [ref=e45]
-        - paragraph [ref=e47]: Please specify the district you plan on submitting your bankruptcy case to.
-        - generic [ref=e48]:
-          - generic [ref=e49]: Bankruptcy Court District *
-          - combobox "Bankruptcy Court District *" [active] [ref=e51]:
-            - option "Select..." [selected]
-            - option "District of Nebraska"
-            - option "District of South Dakota"
-        - group "Press one of the following buttons:" [ref=e52]:
-          - generic [ref=e53]: "Press one of the following buttons:"
-          - button "Continue" [ref=e54] [cursor=pointer]
+      - form "Are you updating a bankruptcy filing that has already been submitted to the court?" [ref=e43]:
+        - heading "Are you updating a bankruptcy filing that has already been submitted to the court?" [level=1] [ref=e45]
+        - group "Press one of the following buttons:" [ref=e46]:
+          - generic [ref=e47]: "Press one of the following buttons:"
+          - button "Yes" [ref=e48] [cursor=pointer]
+          - button "No" [ref=e49] [cursor=pointer]
 ```

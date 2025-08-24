@@ -1,66 +1,24 @@
-<testsuites id="" name="" tests="6" failures="6" skipped="0" errors="0" time="16.808525999999997">
-<testsuite name="smoke.spec.ts" timestamp="2025-08-24T13:25:03.523Z" hostname="chromium" tests="2" failures="2" skipped="0" time="15.712" errors="0">
-<testcase name="docassemble interview loads" classname="smoke.spec.ts" time="2.322">
-<failure message="smoke.spec.ts:4:5 docassemble interview loads" type="FAILURE">
-<![CDATA[  [chromium] › smoke.spec.ts:4:5 › docassemble interview loads ─────────────────────────────────────
-
-    Error: expect.toContainText: Error: strict mode violation: locator('h1') resolved to 3 elements:
-        1) <h1 class="h3" id="daMainQuestion">Voluntary Petition for Individuals Filing for Ban…</h1> aka getByRole('heading', { name: 'Voluntary Petition for' })
-        2) <h1 class="h3">Telephone assistance</h1> aka getByText('Telephone assistance')
-        3) <h1 class="h3" id="dachatHeading">Live chat</h1> aka getByLabel('Help').getByText('Live chat')
-
-    Call log:
-      - Expect "toContainText" with timeout 5000ms
-      - waiting for locator('h1')
-
-
-      10 |   
-      11 |   // Verify we're on the right page
-    > 12 |   await expect(page.locator('h1')).toContainText('Voluntary Petition for Individuals Filing for Bankruptcy');
-         |                                    ^
-      13 |   
-      14 |   // Take a screenshot for reference
-      15 |   await page.screenshot({ path: 'test-results/interview-loaded.png', fullPage: true });
-        at /home/alex/docassemble-BankruptcyClinic/tests/smoke.spec.ts:12:36
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/smoke-docassemble-interview-loads-chromium/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/smoke-docassemble-interview-loads-chromium/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../test-results/smoke-docassemble-interview-loads-chromium/error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|smoke-docassemble-interview-loads-chromium/test-failed-1.png]]
-
-[[ATTACHMENT|smoke-docassemble-interview-loads-chromium/video.webm]]
-
-[[ATTACHMENT|smoke-docassemble-interview-loads-chromium/error-context.md]]
-]]>
-</system-out>
+<testsuites id="" name="" tests="2" failures="1" skipped="0" errors="0" time="26.284098">
+<testsuite name="smoke.spec.ts" timestamp="2025-08-24T13:27:23.262Z" hostname="chromium" tests="2" failures="1" skipped="0" time="39.54" errors="0">
+<testcase name="docassemble interview loads" classname="smoke.spec.ts" time="14.379">
 </testcase>
-<testcase name="can navigate to debtor basic info" classname="smoke.spec.ts" time="13.39">
+<testcase name="can navigate to debtor basic info" classname="smoke.spec.ts" time="25.161">
 <failure message="smoke.spec.ts:18:5 can navigate to debtor basic info" type="FAILURE">
 <![CDATA[  [chromium] › smoke.spec.ts:18:5 › can navigate to debtor basic info ──────────────────────────────
 
-    TimeoutError: page.selectOption: Timeout 10000ms exceeded.
+    TimeoutError: page.click: Timeout 10000ms exceeded.
     Call log:
-      - waiting for locator('select[name="current_district"]')
+      - waiting for locator('input[value="False"]')
 
 
-      26 |   
-      27 |   // Select district
-    > 28 |   await page.selectOption('select[name="current_district"]', 'District of Nebraska');
+      36 |   
+      37 |   // Amended filing - select No
+    > 38 |   await page.click('input[value="False"]');
          |              ^
-      29 |   await page.click('button[type="submit"]');
-      30 |   await page.waitForLoadState('networkidle');
-      31 |   
-        at /home/alex/docassemble-BankruptcyClinic/tests/smoke.spec.ts:28:14
+      39 |   await page.click('button[type="submit"]');
+      40 |   await page.waitForLoadState('networkidle');
+      41 |   
+        at /home/alex/docassemble-BankruptcyClinic/tests/smoke.spec.ts:38:14
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
     ../test-results/smoke-can-navigate-to-debtor-basic-info-chromium/test-failed-1.png
@@ -80,176 +38,6 @@
 [[ATTACHMENT|smoke-can-navigate-to-debtor-basic-info-chromium/video.webm]]
 
 [[ATTACHMENT|smoke-can-navigate-to-debtor-basic-info-chromium/error-context.md]]
-]]>
-</system-out>
-</testcase>
-</testsuite>
-<testsuite name="smoke.spec.ts" timestamp="2025-08-24T13:25:03.523Z" hostname="firefox" tests="2" failures="2" skipped="0" time="18.197" errors="0">
-<testcase name="docassemble interview loads" classname="smoke.spec.ts" time="4.022">
-<failure message="smoke.spec.ts:4:5 docassemble interview loads" type="FAILURE">
-<![CDATA[  [firefox] › smoke.spec.ts:4:5 › docassemble interview loads ──────────────────────────────────────
-
-    Error: expect.toContainText: Error: strict mode violation: locator('h1') resolved to 3 elements:
-        1) <h1 class="h3" id="daMainQuestion">Voluntary Petition for Individuals Filing for Ban…</h1> aka getByRole('heading', { name: 'Voluntary Petition for' })
-        2) <h1 class="h3">Telephone assistance</h1> aka getByText('Telephone assistance')
-        3) <h1 class="h3" id="dachatHeading">Live chat</h1> aka getByLabel('Help').getByText('Live chat')
-
-    Call log:
-      - Expect "toContainText" with timeout 5000ms
-      - waiting for locator('h1')
-
-
-      10 |   
-      11 |   // Verify we're on the right page
-    > 12 |   await expect(page.locator('h1')).toContainText('Voluntary Petition for Individuals Filing for Bankruptcy');
-         |                                    ^
-      13 |   
-      14 |   // Take a screenshot for reference
-      15 |   await page.screenshot({ path: 'test-results/interview-loaded.png', fullPage: true });
-        at /home/alex/docassemble-BankruptcyClinic/tests/smoke.spec.ts:12:36
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/smoke-docassemble-interview-loads-firefox/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/smoke-docassemble-interview-loads-firefox/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../test-results/smoke-docassemble-interview-loads-firefox/error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|smoke-docassemble-interview-loads-firefox/test-failed-1.png]]
-
-[[ATTACHMENT|smoke-docassemble-interview-loads-firefox/video.webm]]
-
-[[ATTACHMENT|smoke-docassemble-interview-loads-firefox/error-context.md]]
-]]>
-</system-out>
-</testcase>
-<testcase name="can navigate to debtor basic info" classname="smoke.spec.ts" time="14.175">
-<failure message="smoke.spec.ts:18:5 can navigate to debtor basic info" type="FAILURE">
-<![CDATA[  [firefox] › smoke.spec.ts:18:5 › can navigate to debtor basic info ───────────────────────────────
-
-    TimeoutError: page.selectOption: Timeout 10000ms exceeded.
-    Call log:
-      - waiting for locator('select[name="current_district"]')
-
-
-      26 |   
-      27 |   // Select district
-    > 28 |   await page.selectOption('select[name="current_district"]', 'District of Nebraska');
-         |              ^
-      29 |   await page.click('button[type="submit"]');
-      30 |   await page.waitForLoadState('networkidle');
-      31 |   
-        at /home/alex/docassemble-BankruptcyClinic/tests/smoke.spec.ts:28:14
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/smoke-can-navigate-to-debtor-basic-info-firefox/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/smoke-can-navigate-to-debtor-basic-info-firefox/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../test-results/smoke-can-navigate-to-debtor-basic-info-firefox/error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|smoke-can-navigate-to-debtor-basic-info-firefox/test-failed-1.png]]
-
-[[ATTACHMENT|smoke-can-navigate-to-debtor-basic-info-firefox/video.webm]]
-
-[[ATTACHMENT|smoke-can-navigate-to-debtor-basic-info-firefox/error-context.md]]
-]]>
-</system-out>
-</testcase>
-</testsuite>
-<testsuite name="smoke.spec.ts" timestamp="2025-08-24T13:25:03.523Z" hostname="webkit" tests="2" failures="2" skipped="0" time="19.597" errors="0">
-<testcase name="docassemble interview loads" classname="smoke.spec.ts" time="4.923">
-<failure message="smoke.spec.ts:4:5 docassemble interview loads" type="FAILURE">
-<![CDATA[  [webkit] › smoke.spec.ts:4:5 › docassemble interview loads ───────────────────────────────────────
-
-    Error: expect.toContainText: Error: strict mode violation: locator('h1') resolved to 3 elements:
-        1) <h1 class="h3" id="daMainQuestion">Voluntary Petition for Individuals Filing for Ban…</h1> aka getByRole('heading', { name: 'Voluntary Petition for' })
-        2) <h1 class="h3">Telephone assistance</h1> aka getByText('Telephone assistance')
-        3) <h1 class="h3" id="dachatHeading">Live chat</h1> aka getByLabel('Help').getByText('Live chat')
-
-    Call log:
-      - Expect "toContainText" with timeout 5000ms
-      - waiting for locator('h1')
-
-
-      10 |   
-      11 |   // Verify we're on the right page
-    > 12 |   await expect(page.locator('h1')).toContainText('Voluntary Petition for Individuals Filing for Bankruptcy');
-         |                                    ^
-      13 |   
-      14 |   // Take a screenshot for reference
-      15 |   await page.screenshot({ path: 'test-results/interview-loaded.png', fullPage: true });
-        at /home/alex/docassemble-BankruptcyClinic/tests/smoke.spec.ts:12:36
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/smoke-docassemble-interview-loads-webkit/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/smoke-docassemble-interview-loads-webkit/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../test-results/smoke-docassemble-interview-loads-webkit/error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|smoke-docassemble-interview-loads-webkit/test-failed-1.png]]
-
-[[ATTACHMENT|smoke-docassemble-interview-loads-webkit/video.webm]]
-
-[[ATTACHMENT|smoke-docassemble-interview-loads-webkit/error-context.md]]
-]]>
-</system-out>
-</testcase>
-<testcase name="can navigate to debtor basic info" classname="smoke.spec.ts" time="14.674">
-<failure message="smoke.spec.ts:18:5 can navigate to debtor basic info" type="FAILURE">
-<![CDATA[  [webkit] › smoke.spec.ts:18:5 › can navigate to debtor basic info ────────────────────────────────
-
-    TimeoutError: page.selectOption: Timeout 10000ms exceeded.
-    Call log:
-      - waiting for locator('select[name="current_district"]')
-
-
-      26 |   
-      27 |   // Select district
-    > 28 |   await page.selectOption('select[name="current_district"]', 'District of Nebraska');
-         |              ^
-      29 |   await page.click('button[type="submit"]');
-      30 |   await page.waitForLoadState('networkidle');
-      31 |   
-        at /home/alex/docassemble-BankruptcyClinic/tests/smoke.spec.ts:28:14
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/smoke-can-navigate-to-debtor-basic-info-webkit/test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/smoke-can-navigate-to-debtor-basic-info-webkit/video.webm
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: ../test-results/smoke-can-navigate-to-debtor-basic-info-webkit/error-context.md
-]]>
-</failure>
-<system-out>
-<![CDATA[
-[[ATTACHMENT|smoke-can-navigate-to-debtor-basic-info-webkit/test-failed-1.png]]
-
-[[ATTACHMENT|smoke-can-navigate-to-debtor-basic-info-webkit/video.webm]]
-
-[[ATTACHMENT|smoke-can-navigate-to-debtor-basic-info-webkit/error-context.md]]
 ]]>
 </system-out>
 </testcase>

@@ -137,7 +137,8 @@ fields:
   - County: debtor[i].address.county
     # default: "Douglas County"
     input type: dropdown
-    code: county_list(debtor[i].address.state) or ['N/A']
+    choices: 
+      - N/A
     #js enable if: val('debtor[i].address.state')
     datatype: str
   - field: hidden_county
@@ -239,22 +240,24 @@ code: |
   # Populate counties when state changes, and also when state is already set on initial load
   if action_argument('_changed') == 'debtor[i].address.state':
     selected_state = action_argument('debtor[i].address.state')
-    background_response(
-      {
-        'debtor[i].address.county':
-          {
-            'choices': county_list(selected_state) or ['N/A']
-          }
-      }, 'fields')
-  elif defined('debtor[i].address.state') and debtor[i].address.state:
-    background_response(
-      {
-        'debtor[i].address.county':
-          {
-            'choices': county_list(debtor[i].address.state) or ['N/A']
-          }
-      }, 'fields')
+    if selected_state:
+      background_response(
+        {
+          'debtor[i].address.county':
+            {
+              'choices': county_list(selected_state) or ['N/A']
+            }
+        }, 'fields')
+    else:
+      background_response(
+        {
+          'debtor[i].address.county':
+            {
+              'choices': ['N/A']
+            }
+        }, 'fields')
   else:
+    # Don't try to access debtor[i].address.state if it might cause a loop
     background_response()
 ---
 id: lived_in_district

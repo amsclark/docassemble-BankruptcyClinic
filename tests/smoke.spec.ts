@@ -8,8 +8,8 @@ test('docassemble interview loads', async ({ page }) => {
   // Wait for the page to load
   await page.waitForLoadState('networkidle');
   
-  // Verify we're on the right page
-  await expect(page.locator('h1')).toContainText('Voluntary Petition for Individuals Filing for Bankruptcy');
+  // Verify we're on the right page - use more specific selector
+  await expect(page.locator('h1#daMainQuestion')).toContainText('Voluntary Petition for Individuals Filing for Bankruptcy');
   
   // Take a screenshot for reference
   await page.screenshot({ path: 'test-results/interview-loaded.png', fullPage: true });
@@ -24,8 +24,13 @@ test('can navigate to debtor basic info', async ({ page }) => {
   await page.click('button[type="submit"]');
   await page.waitForLoadState('networkidle');
   
-  // Select district
-  await page.selectOption('select[name="current_district"]', 'District of Nebraska');
+  // Wait for district selection page and take screenshot
+  await page.waitForSelector('select', { timeout: 10000 });
+  await page.screenshot({ path: 'test-results/district-selection.png', fullPage: true });
+  
+  // Find the district dropdown - might have different name
+  const districtSelect = page.locator('select').first();
+  await districtSelect.selectOption('District of Nebraska');
   await page.click('button[type="submit"]');
   await page.waitForLoadState('networkidle');
   
@@ -44,7 +49,7 @@ test('can navigate to debtor basic info', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   
   // Should now be on debtor basic info
-  await expect(page.locator('h1')).toContainText('Basic Identity and Contact Information');
+  await expect(page.locator('h1#daMainQuestion')).toContainText('Basic Identity and Contact Information');
   
   // Take screenshot
   await page.screenshot({ path: 'test-results/debtor-basic-info.png', fullPage: true });
