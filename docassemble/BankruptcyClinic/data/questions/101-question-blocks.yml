@@ -137,8 +137,7 @@ fields:
   - County: debtor[i].address.county
     # default: "Douglas County"
     input type: dropdown
-    choices: 
-      - N/A
+  code: county_list(debtor[i].address.state) or ['N/A']
     #js enable if: val('debtor[i].address.state')
     datatype: str
   - field: hidden_county
