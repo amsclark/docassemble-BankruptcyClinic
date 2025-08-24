@@ -1,13 +1,275 @@
-<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="2.597714">
-<testsuite name="debug.spec.ts" timestamp="2025-08-24T13:47:54.879Z" hostname="chromium" tests="1" failures="0" skipped="0" time="1.748" errors="0">
-<testcase name="debug page structure" classname="debug.spec.ts" time="1.748">
+<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="3.875158">
+<testsuite name="debug-form.spec.ts" timestamp="2025-08-24T13:58:16.084Z" hostname="chromium" tests="1" failures="0" skipped="0" time="2.899" errors="0">
+<testcase name="Debug basic info form fields" classname="debug-form.spec.ts" time="2.899">
 <system-out>
-<![CDATA[=== District Page Form Elements ===
-Select 0: name="Y3VycmVudF9kaXN0cmljdA" id="Y3VycmVudF9kaXN0cmljdA"
-  Option 0: value="" text="Select..."
-  Option 1: value="District of Nebraska" text="District of Nebraska"
-  Option 2: value="District of South Dakota" text="District of South Dakota"
-=== Amended Page Radio Elements ===
+<![CDATA[🔍 Debugging basic info form fields...
+Step 0: What district are you filing your bankruptcy case in?
+Step 1: Are you updating a bankruptcy filing that has already been submitted to the court?
+Step 2: Please provide the case number for your previously submitted bankruptcy claim.
+Step 3: District Details
+Step 4: Are you filing individually or with a spouse?
+Step 5: Are you filing individually or with a spouse?
+Step 6: Basic Identity and Contact Information
+✅ Reached basic info page!
+=== FORM FIELDS ANALYSIS ===
+Field 0:
+  Tag: INPUT
+  Type: hidden
+  Name: csrf_token
+  ID: 
+  Placeholder: 
+  Label: No ID
+  Class: 
+---
+Field 1:
+  Tag: INPUT
+  Type: hidden
+  Name: _back_one
+  ID: 
+  Placeholder: 
+  Label: No ID
+  Class: 
+---
+Field 2:
+  Tag: INPUT
+  Type: text
+  Name: ZGVidG9yW2ldLm5hbWUuZmlyc3Q
+  ID: ZGVidG9yW2ldLm5hbWUuZmlyc3Q
+  Placeholder: 
+  Label: First Name
+  Class: form-control is-invalid
+---
+Field 3:
+  Tag: INPUT
+  Type: text
+  Name: ZGVidG9yW2ldLm5hbWUubWlkZGxl
+  ID: ZGVidG9yW2ldLm5hbWUubWlkZGxl
+  Placeholder: 
+  Label: Middle Name
+  Class: form-control
+---
+Field 4:
+  Tag: INPUT
+  Type: text
+  Name: ZGVidG9yW2ldLm5hbWUubGFzdA
+  ID: ZGVidG9yW2ldLm5hbWUubGFzdA
+  Placeholder: 
+  Label: Last Name
+  Class: form-control is-invalid
+---
+Field 5:
+  Tag: INPUT
+  Type: text
+  Name: ZGVidG9yW2ldLm5hbWUuc3VmZml4
+  ID: ZGVidG9yW2ldLm5hbWUuc3VmZml4
+  Placeholder: 
+  Label: Suffix
+  Class: form-control
+---
+Field 6:
+  Tag: INPUT
+  Type: text
+  Name: ZGVidG9yW2ldLmFkZHJlc3MuYWRkcmVzcw
+  ID: ZGVidG9yW2ldLmFkZHJlc3MuYWRkcmVzcw
+  Placeholder: 
+  Label: Address
+  Class: form-control is-invalid
+---
+Field 7:
+  Tag: INPUT
+  Type: text
+  Name: ZGVidG9yW2ldLmFkZHJlc3MuY2l0eQ
+  ID: ZGVidG9yW2ldLmFkZHJlc3MuY2l0eQ
+  Placeholder: 
+  Label: City
+  Class: form-control is-invalid
+---
+Field 8:
+  Tag: SELECT
+  Type: select-one
+  Name: ZGVidG9yW2ldLmFkZHJlc3Muc3RhdGU
+  ID: ZGVidG9yW2ldLmFkZHJlc3Muc3RhdGU
+  Placeholder: 
+  Label: State
+  Class: form-select dasingleselect is-invalid
+---
+Field 9:
+  Tag: INPUT
+  Type: text
+  Name: ZGVidG9yW2ldLmFkZHJlc3Muemlw
+  ID: ZGVidG9yW2ldLmFkZHJlc3Muemlw
+  Placeholder: 
+  Label: Zip Code
+  Class: form-control danumeric is-invalid
+---
+Field 10:
+  Tag: SELECT
+  Type: select-one
+  Name: ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5
+  ID: ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5
+  Placeholder: 
+  Label: County
+  Class: form-select dasingleselect is-invalid
+---
+Field 11:
+  Tag: INPUT
+  Type: hidden
+  Name: aGlkZGVuX2NvdW50eQ
+  ID: aGlkZGVuX2NvdW50eQ
+  Placeholder: 
+  Label: No label
+  Class: 
+---
+Field 12:
+  Tag: INPUT
+  Type: checkbox
+  Name: ZGVidG9yW2ldLmhhc19vdGhlcl9tYWlsaW5nX2FkZHJlc3M
+  ID: ZGVidG9yW2ldLmhhc19vdGhlcl9tYWlsaW5nX2FkZHJlc3M
+  Placeholder: 
+  Label: Has separate mailing addressHas separate mailing address
+  Class: da-to-labelauty checkbox-icon dauncheckable labelauty da-active-invisible dafullwidth
+---
+Field 13:
+  Tag: INPUT
+  Type: text
+  Name: X2ZpZWxkXzEz
+  ID: X2ZpZWxkXzEz
+  Placeholder: 
+  Label: Mail Address/PO Box
+  Class: form-control
+---
+Field 14:
+  Tag: INPUT
+  Type: text
+  Name: X2ZpZWxkXzE0
+  ID: X2ZpZWxkXzE0
+  Placeholder: 
+  Label: Mail City
+  Class: form-control
+---
+Field 15:
+  Tag: INPUT
+  Type: text
+  Name: X2ZpZWxkXzE1
+  ID: X2ZpZWxkXzE1
+  Placeholder: 
+  Label: Mail State
+  Class: form-control
+---
+Field 16:
+  Tag: INPUT
+  Type: text
+  Name: X2ZpZWxkXzE2
+  ID: X2ZpZWxkXzE2
+  Placeholder: 
+  Label: Mail Zip
+  Class: form-control danumeric
+---
+Field 17:
+  Tag: INPUT
+  Type: radio
+  Name: ZGVidG9yW2ldLnRheF9pZC50YXhfaWRfdHlwZQ
+  ID: ZGVidG9yW2ldLnRheF9pZC50YXhfaWRfdHlwZQ_0
+  Placeholder: 
+  Label: Social Security NumberSocial Security Number
+  Class: da-to-labelauty labelauty da-active-invisible dafullwidth is-invalid
+---
+Field 18:
+  Tag: INPUT
+  Type: radio
+  Name: ZGVidG9yW2ldLnRheF9pZC50YXhfaWRfdHlwZQ
+  ID: ZGVidG9yW2ldLnRheF9pZC50YXhfaWRfdHlwZQ_1
+  Placeholder: 
+  Label: Individual Taxpayer Identification NumberIndividual Taxpayer Identification Number
+  Class: da-to-labelauty labelauty da-active-invisible dafullwidth
+---
+Field 19:
+  Tag: INPUT
+  Type: text
+  Name: X2ZpZWxkXzE4
+  ID: X2ZpZWxkXzE4
+  Placeholder: 
+  Label: Tax ID
+  Class: form-control
+---
+Field 20:
+  Tag: INPUT
+  Type: text
+  Name: X2ZpZWxkXzE5
+  ID: X2ZpZWxkXzE5
+  Placeholder: 
+  Label: SSN
+  Class: form-control
+---
+Field 21:
+  Tag: INPUT
+  Type: hidden
+  Name: _checkboxes
+  ID: 
+  Placeholder: 
+  Label: No ID
+  Class: 
+---
+Field 22:
+  Tag: INPUT
+  Type: hidden
+  Name: csrf_token
+  ID: 
+  Placeholder: 
+  Label: No ID
+  Class: 
+---
+Field 23:
+  Tag: INPUT
+  Type: hidden
+  Name: _question_name
+  ID: 
+  Placeholder: 
+  Label: No ID
+  Class: 
+---
+Field 24:
+  Tag: INPUT
+  Type: hidden
+  Name: _tracker
+  ID: 
+  Placeholder: 
+  Label: No ID
+  Class: 
+---
+Field 25:
+  Tag: INPUT
+  Type: hidden
+  Name: _visible
+  ID: 
+  Placeholder: 
+  Label: No ID
+  Class: 
+---
+Field 26:
+  Tag: INPUT
+  Type: hidden
+  Name: _varnames
+  ID: 
+  Placeholder: 
+  Label: No ID
+  Class: 
+---
+Field 27:
+  Tag: INPUT
+  Type: text
+  Name: 
+  ID: daMessage
+  Placeholder: Type your message here.
+  Label: Chat message you want to send
+  Class: form-control dachatmessage
+---
+=== NAME FIELDS IDENTIFIED ===
+Name field 0: First Name (name: ZGVidG9yW2ldLm5hbWUuZmlyc3Q, id: ZGVidG9yW2ldLm5hbWUuZmlyc3Q)
+Name field 1: Middle Name (name: ZGVidG9yW2ldLm5hbWUubWlkZGxl, id: ZGVidG9yW2ldLm5hbWUubWlkZGxl)
+Name field 2: Last Name (name: ZGVidG9yW2ldLm5hbWUubGFzdA, id: ZGVidG9yW2ldLm5hbWUubGFzdA)
+Name field 3: No ID (name: _question_name, id: )
+Name field 4: No ID (name: _varnames, id: )
 ]]>
 </system-out>
 </testcase>
