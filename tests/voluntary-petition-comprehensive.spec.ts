@@ -1297,6 +1297,56 @@ async function fillRealPropertyInterest(page: any, item: {
     await ensureSelectByVar('prop.interests[i].state', String(item.state));
     if (item.zip !== undefined) await ensureTextByVar('prop.interests[i].zip', String(item.zip));
     if (item.county) await ensureTextByVar('prop.interests[i].county', String(item.county));
+
+    // Last-resort: set values programmatically by id or name (both padded and unpadded base64 variants)
+    await page.evaluate((
+      { street, city, state, zip, county, b64, trimPad }: {
+        street: string;
+        city: string;
+        state: string;
+        zip?: string | number;
+        county?: string;
+        b64: (s: string) => string;
+        trimPad: (s: string) => string;
+      }
+    ) => {
+      const setField = (varName: string, value: string) => {
+        const key = b64(varName);
+        const variants = [key, trimPad(key)];
+        const trySet = (el: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null, v: string) => {
+          if (!el) return false;
+          const tag = el.tagName.toLowerCase();
+          if (tag === 'select') {
+            const sel = el as HTMLSelectElement;
+            const opt = Array.from(sel.options).find(o => (o.textContent || '').trim() === v || o.value === v);
+            if (opt) sel.value = opt.value;
+          } else {
+            (el as HTMLInputElement).value = v;
+          }
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+          // @ts-ignore
+          if ((window as any).jQuery) {
+            // @ts-ignore
+            (window as any).jQuery(el).trigger('change');
+          }
+          return true;
+        };
+        for (const id of variants) {
+          const byId = document.getElementById(id) as any;
+          if (byId && trySet(byId, value)) return;
+        }
+        for (const nm of variants) {
+          const byName = document.querySelector(`[name="${nm}"]`) as any;
+          if (byName && trySet(byName, value)) return;
+        }
+      };
+      setField('prop.interests[i].street', String(street));
+      setField('prop.interests[i].city', String(city));
+      setField('prop.interests[i].state', String(state));
+      if (zip !== undefined) setField('prop.interests[i].zip', String(zip));
+      if (county) setField('prop.interests[i].county', String(county));
+  }, { street: item.street, city: item.city, state: item.state, zip: item.zip, county: item.county, b64, trimPad });
   } catch {}
 
   // Debug before submit
