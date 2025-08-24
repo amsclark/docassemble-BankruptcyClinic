@@ -304,7 +304,8 @@ async function fillBasicInfoForm(page: any, data: Record<string, any>, debtorInd
         const el = document.querySelector(sel) as HTMLSelectElement | null;
         if (!el) return false;
         const opts = Array.from(el.options);
-        return opts.length > 1 || (opts.length === 1 && opts[0].value !== 'N/A');
+        // populated if more than a placeholder option
+        return opts.length > 1 || (opts.length === 1 && opts[0].value !== 'N/A' && opts[0].textContent !== 'Select...');
       }, countySelectSelector, { timeout: 20000 });
     } catch (e) {
       console.log('⚠️ County dropdown did not populate within timeout; proceeding without county selection.');
@@ -312,20 +313,53 @@ async function fillBasicInfoForm(page: any, data: Record<string, any>, debtorInd
   }
   if (county) {
     console.log(`Selecting county: ${county}`);
-    // Ensure desired county option is present
     const countySelect = page.locator('#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5');
-    const found = await page.waitForFunction((sel: string, expected: string) => {
-      const el = document.querySelector(sel) as HTMLSelectElement | null;
-      if (!el) return false;
-      return Array.from(el.options).some(o => o.textContent?.trim() === expected || o.value === expected);
-    }, '#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5', county, { timeout: 10000 }).then(() => true).catch(() => false);
-    if (found) {
+    await countySelect.waitFor({ state: 'visible' });
+    // Fetch available option labels for logging and matching
+  const options: string[] = await countySelect.locator('option').allTextContents();
+    console.log('County options available:', options);
+    if (options.some(opt => opt.trim() === county)) {
       await countySelect.selectOption({ label: county }).catch(async () => {
         await countySelect.selectOption(county);
       });
+      // Verify selection took effect; if not, force via DOM and dispatch change
+      const selected = await page.inputValue('#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5');
+      if (selected !== county) {
+        await page.evaluate(({ sel, target }: { sel: string; target: string }) => {
+          const el = document.querySelector(sel) as HTMLSelectElement | null;
+          if (!el) return;
+          for (const opt of Array.from(el.options)) {
+            if (opt.textContent?.trim() === target) {
+              el.value = opt.value;
+              el.dispatchEvent(new Event('change', { bubbles: true }));
+              break;
+            }
+          }
+        }, { sel: '#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5', target: county });
+      }
     } else {
       console.log(`⚠️ Desired county "${county}" not found in dropdown; leaving county as-is.`);
     }
+  }
+  // Has separate mailing address? Default to No if not provided
+  try {
+    const hasMailingKey = `${prefix}.has_other_mailing_address`;
+    if (!(hasMailingKey in data)) {
+      const group = page.getByRole('group', { name: 'Has separate mailing address' });
+      if (await group.count()) {
+        await group.getByRole('radio', { name: 'No' }).first().check();
+      } else {
+        // Fallback to click label[for] for the 'No' radio using name attribute
+        const nameB64 = 'ZGVidG9yW2ldLmhhc19vdGhlcl9tYWlsaW5nX2FkZHJlc3M';
+        const noInput = page.locator(`input[name="${nameB64}"][value="False"]`).first();
+        if (await noInput.count()) {
+          const rid = await noInput.getAttribute('id');
+          if (rid) await page.click(`label[for="${rid}"]`);
+        }
+      }
+    }
+  } catch (e) {
+    console.log('Mailing address selection skipped:', e);
   }
   if (zip) {
     console.log(`Filling zip: ${zip}`);
@@ -641,7 +675,7 @@ test('106AB - reach property intro after debtor info', async ({ page }) => {
     current_district: 'District of Nebraska',
     amended_filing: false,
     district_final: true,
-    filing_status: 'Filing by myself',
+  filing_status: 'Filing individually',
     'debtor[0].name.first': 'Alex',
     'debtor[0].name.last': 'Property',
     'debtor[0].address.address': '100 Property Way',
@@ -665,7 +699,7 @@ test('106AB - add one real property interest, no vehicles', async ({ page }) => 
     current_district: 'District of Nebraska',
     amended_filing: false,
     district_final: true,
-    filing_status: 'Filing by myself',
+  filing_status: 'Filing individually',
     'debtor[0].name.first': 'Alex',
     'debtor[0].name.last': 'Owner',
     'debtor[0].address.address': '500 Home St',
