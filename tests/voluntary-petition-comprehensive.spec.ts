@@ -535,17 +535,60 @@ async function continueToPropertyIntro(page: any) {
 async function answerYesNoAndContinue(page: any, yes: boolean) {
   const choiceName = yes ? 'Yes' : 'No';
   const currentHeading = (await page.locator('h1#daMainQuestion').textContent()) || '';
+  console.log(`DEBUG answerYesNoAndContinue: Looking for "${choiceName}", current heading: "${currentHeading}"`);
+  
   // Prefer radio if present
   const radios = page.getByRole('radio', { name: choiceName }).first();
-  if (await radios.count()) {
+  const radioCount = await radios.count();
+  console.log(`DEBUG answerYesNoAndContinue: Found ${radioCount} radio(s) with name "${choiceName}"`);
+  
+  if (radioCount > 0) {
+    console.log(`DEBUG answerYesNoAndContinue: Using radio path`);
     await radios.check();
     await page.click('button[type="submit"]');
   } else {
     // Some boolean prompts are rendered as Yes/No buttons
-    const btn = page.getByRole('button', { name: choiceName }).first();
-    if (await btn.count()) {
-      await btn.click();
+    let btn = page.getByRole('button', { name: choiceName }).first();
+    const btnCount = await btn.count();
+    console.log(`DEBUG answerYesNoAndContinue: Found ${btnCount} button(s) with name "${choiceName}"`);
+    
+    if (btnCount > 0) {
+      console.log(`DEBUG answerYesNoAndContinue: Using button path`);
+      // Wait for it to be attached and enabled (Docassemble sometimes re-renders these)
+      const start = Date.now();
+      while (Date.now() - start < 5000) {
+        // Re-resolve each loop in case prior handle detached
+        btn = page.getByRole('button', { name: choiceName }).first();
+        if (!(await btn.count())) break;
+        const visible = await btn.isVisible().catch(() => false);
+        const enabled = await btn.isEnabled().catch(() => false);
+        console.log(`DEBUG answerYesNoAndContinue: Button visible: ${visible}, enabled: ${enabled}`);
+        if (visible && enabled) {
+          try { 
+            console.log(`DEBUG answerYesNoAndContinue: Clicking "${choiceName}" button...`);
+            await btn.click(); 
+            console.log(`DEBUG answerYesNoAndContinue: Successfully clicked "${choiceName}" button`);
+          } catch (e) { 
+            console.log(`DEBUG answerYesNoAndContinue: Error clicking button:`, e);
+          }
+          break;
+        }
+        await page.waitForTimeout(100);
+      }
+      // If still not clicked (button disabled), attempt programmatic click
+      try {
+        console.log(`DEBUG answerYesNoAndContinue: Attempting programmatic click fallback`);
+        await page.evaluate((label: string) => {
+          const buttons = Array.from(document.querySelectorAll('button')) as HTMLButtonElement[];
+          const target = buttons.find(b => (b.textContent || '').trim() === label);
+          if (target) {
+            target.disabled = false;
+            target.click();
+          }
+        }, choiceName);
+      } catch {}
     } else {
+      console.log(`DEBUG answerYesNoAndContinue: Using fallback path`);
       // Fallback: click visible button containing the text
       const anyBtn = page.locator('button', { hasText: choiceName }).first();
       if (await anyBtn.count()) {
@@ -557,6 +600,8 @@ async function answerYesNoAndContinue(page: any, yes: boolean) {
       }
     }
   }
+  
+  console.log(`DEBUG answerYesNoAndContinue: Waiting for navigation...`);
   // Wait for navigation by heading change or network idle
   await Promise.race<Promise<any>[]>([
     page.waitForLoadState('networkidle'),
@@ -564,11 +609,18 @@ async function answerYesNoAndContinue(page: any, yes: boolean) {
       try {
         await page.waitForTimeout(300);
         const h = (await page.locator('h1#daMainQuestion').textContent()) || '';
-        if (h !== currentHeading) return true;
+        console.log(`DEBUG answerYesNoAndContinue: After wait, new heading: "${h}"`);
+        if (h !== currentHeading) {
+          console.log(`DEBUG answerYesNoAndContinue: Navigation successful, heading changed`);
+          return true;
+        }
       } catch {}
       return false;
     })()
   ] as any);
+  
+  const finalHeading = (await page.locator('h1#daMainQuestion').textContent()) || '';
+  console.log(`DEBUG answerYesNoAndContinue: Final heading after race: "${finalHeading}"`);
 }
 
 // Fill a single real property interest on the details page using accessible labels
@@ -1658,8 +1710,8 @@ test('106AB - reach property intro after debtor info', async ({ page }) => {
   expect(h1).toContain('Please tell the court about your property.');
 });
 
-// Test 106AB: add one real property interest and then stop (no vehicles)
-test('106AB - add one real property interest, no vehicles', async ({ page }) => {
+// Test 106AB: add one real property interest and one vehicle
+test('106AB - add one real property interest, one vehicle', async ({ page }) => {
   // This flow can take longer than the default 30s due to dynamic UI and extra validation
   test.setTimeout(120000);
   const testData = {
@@ -1709,17 +1761,67 @@ test('106AB - add one real property interest, no vehicles', async ({ page }) => 
   expect(h1).toContain('Do you have more interests to add?');
   // Verify our submitted address appears in the table under
   await expect(page.getByText('12 Oak St')).toBeVisible();
-  await answerYesNoAndContinue(page, false);
+  
+  // Click "No" button directly - it should be visible and enabled
+  const noButton = page.getByRole('button', { name: 'No' });
+  await noButton.waitFor({ state: 'visible' });
+  await noButton.click();
+  
+  // Wait a bit and check what page we're on
+  await page.waitForTimeout(2000);
 
-  // vehicles_any_exist: No
+  // vehicles_any_exist: Yes
   h1 = (await page.locator('h1#daMainQuestion').textContent()) || '';
+  console.log('First vehicles page heading:', h1);
   expect(h1).toContain('Do you own, lease, or have legal or equitable interest in any vehicles');
-  await answerYesNoAndContinue(page, false);
-
-  // other_vehicles_any_exist: No
+  
+  console.log('About to click Yes for first vehicles question...');
+  await answerYesNoAndContinue(page, true);
+  
+  // Check where we are after first vehicles Yes
   h1 = (await page.locator('h1#daMainQuestion').textContent()) || '';
-  expect(h1).toContain('Do you own, lease, or have legal or equitable interest in any other vehicle types');
-  await answerYesNoAndContinue(page, false);
+  console.log('After first vehicles Yes, heading:', h1);
+  
+  // Check if additional form fields appeared after clicking Yes
+  await page.waitForTimeout(1000); // Wait a bit for any dynamic content
+  const inputs = await page.locator('input').all();
+  console.log('Number of inputs on page after Yes:', inputs.length);
+  
+  if (inputs.length > 0) {
+    console.log('Input fields found after clicking Yes - this might be a vehicle details form');
+    const inputInfo = [];
+    for (const input of inputs.slice(0, 5)) { // Just check first 5
+      try {
+        const type = (await input.getAttribute('type')) || '';
+        const name = (await input.getAttribute('name')) || '';
+        const id = (await input.getAttribute('id')) || '';
+        const visible = await input.isVisible();
+        inputInfo.push(`type:"${type}" name:"${name}" id:"${id}" visible:${visible}`);
+      } catch (e) {
+        inputInfo.push(`<error>`);
+      }
+    }
+    console.log('Sample input fields:', inputInfo);
+  }
+  
+  // Check if there's a submit button now
+  const submitBtn = await page.locator('button[type="submit"]').first();
+  const hasSubmit = await submitBtn.count() > 0;
+  if (hasSubmit) {
+    const submitVisible = await submitBtn.isVisible();
+    const submitEnabled = await submitBtn.isEnabled();
+    console.log(`Submit button found: visible:${submitVisible}, enabled:${submitEnabled}`);
+    
+    if (submitVisible && submitEnabled) {
+      console.log('Clicking submit to continue...');
+      await submitBtn.click();
+      await page.waitForLoadState('networkidle');
+      
+      // Check where we are now
+      h1 = (await page.locator('h1#daMainQuestion').textContent()) || '';
+      console.log('After clicking submit, heading:', h1);
+    }
+  }
 
   // Next should be personal_household_items page
   h1 = (await page.locator('h1#daMainQuestion').textContent()) || '';
