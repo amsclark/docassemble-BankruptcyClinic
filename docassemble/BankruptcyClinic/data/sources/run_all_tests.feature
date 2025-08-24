@@ -6,13 +6,25 @@ Scenario: The interview loads
 ### Minimalist scenario: as much as possible skipped
 Scenario: Minimalist single filer
   Given I start the interview at "voluntary-petition.yml"
-  And I get to the question id "filing_status" with this data:
+  And I get to the question id "debtor_final" with this data:
     | var | value |
     | introduction_screen | True |
     | current_district | District of Nebraska |
     | amended_filing | False |
     | district_final | True |
     | filing_status | Filing individually |
+    | debtor[0].name.first | Alexander |
+    | debtor[0].name.last | clark |
+    | debtor[0].address.address | 111 Fake St. |
+    | debtor[0].address.city | Omaha |
+    | debtor[0].address.state | Nebraska |
+    | debtor[0].address.zip | 68022 |
+    | debtor[0].address.county | Douglas County |
+    | debtor[0].tax_id.tax_id_type | 1 |
+    | debtor[0].tax_id.tax_id | 1111111111 |
+    | debtor[0].alias.there_are_any | False |
+    | debtor[0].district_info.is_current_district| True |
+    
 
 #### Maximalist scenario: all sections filled, nothing skipped
 #Scenario: Maximalist single or joint filer
