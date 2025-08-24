@@ -27,10 +27,9 @@ async function navigateToQuestion(page: any, questionId: string, data: Record<st
     });
     
     // Check if we've reached the target question
-    if (h1Text.toLowerCase().includes(questionId.toLowerCase()) || 
-        h1Text.includes('Basic Identity and Contact Information')) {
+    if (h1Text.toLowerCase().includes(questionId.toLowerCase())) {
       console.log(`✅ Reached target question: ${questionId}`);
-      break;
+      // Don't break here - continue to handle the specific form type
     }
     
     // Handle introduction screen
@@ -87,7 +86,26 @@ async function navigateToQuestion(page: any, questionId: string, data: Record<st
     
     // Handle case number (for amended filings)
     if (h1Text.includes('case number') && data.case_number) {
-      await page.fill('input[type="text"]', data.case_number);
+      console.log(`Filling case number: ${data.case_number}`);
+      
+      // Debug what inputs are available
+      const allInputs = await page.locator('input').count();
+      console.log(`Found ${allInputs} input elements on case number page`);
+      
+      // Look for visible text inputs
+      const visibleTextInputs = await page.locator('input[type="text"]:visible').count();
+      const visibleInputs = await page.locator('input:visible').count();
+      console.log(`Visible inputs: ${visibleInputs}, visible text inputs: ${visibleTextInputs}`);
+      
+      if (visibleTextInputs > 0) {
+        await page.fill('input[type="text"]:visible', data.case_number);
+      } else if (visibleInputs > 0) {
+        // Find the first visible input that's not chat-related
+        await page.fill('input:visible:not(#daChatMessage):not(.dachatmessage)', data.case_number);
+      } else {
+        console.log('❌ No visible input fields found for case number');
+      }
+      
       await page.click('button[type="submit"]');
       await page.waitForLoadState('networkidle');
       currentStep++;
@@ -125,6 +143,24 @@ async function navigateToQuestion(page: any, questionId: string, data: Record<st
     
     // Handle basic info form
     if (h1Text.includes('Basic Identity and Contact Information')) {
+      console.log('📝 Detected Basic Identity form, starting to fill...');
+      
+      // Take a screenshot of the current page to see what's available
+      await page.screenshot({ 
+        path: `test-results/basic-identity-form-debug.png`, 
+        fullPage: true 
+      });
+      
+      // Let's check what elements are actually on the page
+      const allInputs = await page.locator('input').count();
+      const allSelects = await page.locator('select').count();
+      const allButtons = await page.locator('button').count();
+      console.log(`Page elements: ${allInputs} inputs, ${allSelects} selects, ${allButtons} buttons`);
+      
+      // Check for our specific field IDs
+      const firstNameExists = await page.locator('#ZGVidG9yW2ldLm5hbWUuZmlyc3Q').count();
+      console.log(`First name field exists: ${firstNameExists > 0}`);
+      
       console.log('📝 Filling basic information form...');
       await fillBasicInfoForm(page, data, 0); // First debtor
       
@@ -193,8 +229,19 @@ async function fillBasicInfoForm(page: any, data: Record<string, any>, debtorInd
   console.log(`📝 Filling basic info for ${prefix}`);
   console.log('Available data keys:', Object.keys(data));
   
-  // Wait for form to be ready
-  await page.waitForSelector('input, select', { timeout: 10000 });
+  // Wait for the page to fully load
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(2000);
+  
+  // Check if any input fields exist on the page
+  const inputFields = await page.locator('input').count();
+  const selectFields = await page.locator('select').count();
+  console.log(`Found ${inputFields} input fields and ${selectFields} select fields on the page`);
+  
+  if (inputFields === 0 && selectFields === 0) {
+    console.log('❌ No form fields found on the page - may not be a form page');
+    return;
+  }
   
   // Name fields - check both possible data structures
   const firstName = data[`${prefix}.name.first`] || data['debtor.name.first'];
@@ -292,11 +339,18 @@ test('Minimalist single filer - complete basic flow', async ({ page }) => {
   
   await navigateToQuestion(page, 'debtor_final', testData);
   
+  console.log('🔍 Checking form field values after navigation...');
+  
   // Verify form was filled correctly
   const firstName = await page.inputValue('#ZGVidG9yW2ldLm5hbWUuZmlyc3Q');
   const lastName = await page.inputValue('#ZGVidG9yW2ldLm5hbWUubGFzdA');
   const state = await page.inputValue('#ZGVidG9yW2ldLmFkZHJlc3Muc3RhdGU');
   const county = await page.inputValue('#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5');
+  
+  console.log(`First name value: "${firstName}"`);
+  console.log(`Last name value: "${lastName}"`);
+  console.log(`State value: "${state}"`);
+  console.log(`County value: "${county}"`);
   
   expect(firstName).toBe('Alexander');
   expect(lastName).toBe('clark');
