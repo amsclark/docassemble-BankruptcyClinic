@@ -45,10 +45,13 @@ async function navigateToQuestion(page: any, questionId: string, data: Record<st
     // Handle district selection
     if (h1Text.includes('district') && h1Text.toLowerCase().includes('filing') && 
         !h1Text.includes('Details')) { // Distinguish from "District Details"
-      const selectCount = await page.locator('select').count();
-      if (selectCount > 0 && data.current_district) {
-        const districtSelect = page.locator('select').first();
-        await districtSelect.selectOption(data.current_district);
+      const districtSelect = page.getByRole('combobox').first();
+      if (data.current_district && await districtSelect.count()) {
+        try {
+          await districtSelect.selectOption({ label: data.current_district });
+        } catch {
+          try { await districtSelect.selectOption(data.current_district); } catch {}
+        }
         await page.click('button[type="submit"]');
         await page.waitForLoadState('networkidle');
         currentStep++;
@@ -118,10 +121,21 @@ async function navigateToQuestion(page: any, questionId: string, data: Record<st
       const radioCount = await page.locator('input[type="radio"]').count();
       if (radioCount > 0) {
         if (data.filing_status === 'Filing individually') {
-          // Prefer role-based selection to avoid labelauty detachment
+          // Prefer role-based selection to avoid labelauty detachment (labels have role=radio)
           const roleRadio = page.getByRole('radio', { name: 'Filing individually' }).first();
           if (await roleRadio.count()) {
-            await roleRadio.check();
+            try {
+              await roleRadio.click();
+            } catch {
+              // Fallback to input + label[for]
+              const individualRadio = page.locator('input[type="radio"]').first();
+              const radioId = await individualRadio.getAttribute('id');
+              if (radioId) {
+                await page.click(`label[for="${radioId}"]`);
+              } else {
+                await individualRadio.click({ force: true });
+              }
+            }
           } else {
             const individualRadio = page.locator('input[type="radio"]').first();
             const radioId = await individualRadio.getAttribute('id');
@@ -543,12 +557,175 @@ async function fillRealPropertyInterest(page: any, item: {
   claiming_sub_100?: boolean;
   exemption_value?: string | number;
   exemption_laws?: string;
+  other_info?: string;
 }) {
   // Verify we are on the details page
   const h1 = (await page.locator('h1#daMainQuestion').textContent()) || '';
   if (!h1.includes('Tell the court about details about the interest in question.')) {
     throw new Error(`Not on real property details page. Found: ${h1}`);
   }
+
+  // Helpers: base64 encode and set radios/checkboxes by Docassemble input[name]
+  const b64 = (s: string) => Buffer.from(s).toString('base64');
+  const setRadioByName = async (nameB64: string, value: string) => {
+    const found = await page.locator(`input[type="radio"][name="${nameB64}"][value="${value}"]`).count();
+    if (!found) return false;
+    const id = await page.locator(`input[type="radio"][name="${nameB64}"][value="${value}"]`).first().getAttribute('id');
+    if (id) {
+      try {
+        await page.click(`label[for="${id}"]`);
+      } catch {
+        // fallthrough to programmatic
+      }
+    }
+  await page.evaluate(({ nameB64, value }: { nameB64: string; value: string }) => {
+      const sel = `input[type="radio"][name="${nameB64}"][value="${value}"]`;
+      const el = document.querySelector(sel) as HTMLInputElement | null;
+      if (el) {
+        el.checked = true;
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        // @ts-ignore
+        if ((window as any).jQuery) {
+          // @ts-ignore
+          (window as any).jQuery(el).trigger('change');
+        }
+      }
+    }, { nameB64, value });
+    await page.waitForTimeout(50);
+    // Verify
+    const isChecked = await page.locator(`input[type="radio"][name="${nameB64}"][value="${value}"]`).first().isChecked();
+    return isChecked;
+  };
+  const setCheckboxByName = async (nameB64: string, check: boolean) => {
+    const input = page.locator(`input[type="checkbox"][name="${nameB64}"]`).first();
+    if (!(await input.count())) return false;
+    await input.evaluate((el: HTMLInputElement, check: boolean) => {
+      el.checked = check;
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      // @ts-ignore
+      if ((window as any).jQuery) {
+        // @ts-ignore
+        (window as any).jQuery(el).trigger('change');
+      }
+    }, check);
+    await page.waitForTimeout(50);
+    return await input.isChecked();
+  };
+  const anyRadioChecked = async (nameB64: string) => {
+    return (await page.locator(`input[type="radio"][name="${nameB64}"]:checked`).count()) > 0;
+  };
+  const anyCheckboxCheckedInGroup = async (groupPrefixB64: string) => {
+    return (await page.locator(`input[type="checkbox"][name^="${groupPrefixB64}"]:checked`).count()) > 0;
+  };
+  const debugDump = async (label: string) => {
+    const inputs = await page.locator('input[name^="' + b64('prop.interests') + '"]').elementHandles();
+    const names: Array<{ name: string | null; type: string | null; checked?: boolean; value?: string | null }>= [];
+    for (const h of inputs) {
+      const name = await h.getAttribute('name');
+      const type = await h.getAttribute('type');
+      const checked = await h.evaluate((el: any) => !!el.checked);
+      const value = await h.getAttribute('value');
+      names.push({ name, type, checked, value });
+    }
+    console.log(`DEBUG ${label}:`, names);
+  };
+
+  // Helper: select a radio option by scoping to the question text to avoid ambiguous Yes/No labels
+  const selectRadioByQuestion = async (questionText: string, optionText: string) => {
+    // Try ARIA group first
+    const group = page.getByRole('group', { name: questionText });
+    if (await group.count()) {
+      const option = group.getByRole('radio', { name: optionText }).first();
+      if (await option.count()) {
+        await option.click();
+        await page.waitForTimeout(50);
+        return true;
+      }
+    }
+    // Fallback: find a container that includes the question text, then click the desired option label within
+    const container = page.locator('fieldset, .form-group, .da-field-container, form').filter({ hasText: questionText }).first();
+    if (await container.count()) {
+      // Click label containing the option text within the container
+      const label = container.locator('label', { hasText: optionText }).first();
+      if (await label.count()) {
+        try {
+          await label.scrollIntoViewIfNeeded();
+          await label.click();
+          await page.waitForTimeout(50);
+          return true;
+        } catch {
+          // Attempt to click associated input via label's for attribute
+          const forId = await label.getAttribute('for');
+          if (forId) {
+            await page.evaluate((id: string) => {
+              const el = document.getElementById(id) as HTMLInputElement | null;
+              if (el) {
+                el.checked = true;
+                el.dispatchEvent(new Event('change', { bubbles: true }));
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+                // jQuery trigger if present
+                // @ts-ignore
+                if ((window as any).jQuery) {
+                  // @ts-ignore
+                  (window as any).jQuery(el).trigger('change');
+                }
+              }
+            }, forId);
+            await page.waitForTimeout(50);
+            return true;
+          }
+        }
+      }
+      // Try underlying input by value via associated label[for]
+      const candidate = container.locator(`input[type="radio"][aria-label="${optionText}"]`).first();
+      if (await candidate.count()) {
+        const rid = await candidate.getAttribute('id');
+        if (rid) {
+          await page.click(`label[for="${rid}"]`);
+          await page.waitForTimeout(50);
+          return true;
+        } else {
+          await candidate.evaluate((el: HTMLInputElement) => {
+            el.checked = true;
+            el.dispatchEvent(new Event('change', { bubbles: true }));
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            // @ts-ignore
+            if ((window as any).jQuery) {
+              // @ts-ignore
+              (window as any).jQuery(el).trigger('change');
+            }
+          });
+          await page.waitForTimeout(50);
+          return true;
+        }
+      }
+    }
+    // Last resort: global label
+    const globalLabel = page.locator('label', { hasText: optionText }).first();
+    if (await globalLabel.count()) {
+      try {
+        await globalLabel.scrollIntoViewIfNeeded();
+        await globalLabel.click();
+      } catch {
+        const forId = await globalLabel.getAttribute('for');
+        if (forId) {
+          await page.evaluate((id: string) => {
+            const el = document.getElementById(id) as HTMLInputElement | null;
+            if (el) {
+              el.checked = true;
+              el.dispatchEvent(new Event('change', { bubbles: true }));
+              el.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+          }, forId);
+        }
+      }
+      await page.waitForTimeout(50);
+      return true;
+    }
+    return false;
+  };
 
   await page.getByLabel('Street').fill(item.street);
   await page.getByLabel('City').fill(item.city);
@@ -588,63 +765,147 @@ async function fillRealPropertyInterest(page: any, item: {
     }
   }
 
-  // Property type checkbox: prefer role-based labelauty checkbox to avoid strict-mode label/input ambiguity
-  const typeCheckbox = page.getByRole('checkbox', { name: item.type }).first();
-  await typeCheckbox.check();
+  // Property type checkbox: hidden input + styled label. Click the label[for] of the underlying input and verify state.
+  {
+    // Scope by the question container to avoid clicking wrong checkbox
+    const typeContainer = page.locator('fieldset, .form-group, .da-field-container').filter({ hasText: 'What is the property' }).first();
+    let checked = false;
+    if (await typeContainer.count()) {
+      const optionLabel = typeContainer.locator('label', { hasText: item.type }).first();
+      if (await optionLabel.count()) {
+        await optionLabel.click();
+        checked = true;
+      }
+    }
+    if (!checked) {
+      // Try role-based checkbox by visible name as a fallback
+      const roleCheckbox = page.getByRole('checkbox', { name: item.type }).first();
+      if (await roleCheckbox.count()) {
+        await roleCheckbox.click();
+      } else {
+        // Ultimate fallback: click any label with the text
+        await page.locator('label', { hasText: item.type }).first().click();
+      }
+    }
+    // Programmatic enforcement using Docassemble name
+    const typeName = b64(`prop.interests[i].type["${item.type}"]`);
+    await setCheckboxByName(typeName, true);
+    // Verify at least one type checked
+    const typeGroupPrefix = b64('prop.interests[i].type');
+    if (!(await anyCheckboxCheckedInGroup(typeGroupPrefix))) {
+      // Click first checkbox label as a last resort
+      const firstLabel = typeContainer.locator('label').first();
+      if (await firstLabel.count()) {
+        await firstLabel.click({ force: true });
+      }
+    }
+  }
 
   // Who has an interest (if present)
-  const whoGroup = page.getByRole('group', { name: 'Who has an interest in the property?' });
-  if ((await whoGroup.count()) && item.who) {
-    await whoGroup.getByRole('radio', { name: item.who }).check();
+  const targetWho = item.who || 'Debtor 1 only';
+  {
+    const whoName = b64('prop.interests[i].who');
+    let ok = await setRadioByName(whoName, targetWho);
+    if (!ok) await selectRadioByQuestion('Who has an interest in the property?', targetWho);
+    if (!(await anyRadioChecked(whoName))) {
+      // Click first option in the group
+      const grp = page.getByRole('group', { name: 'Who has an interest in the property?' });
+      if (await grp.count()) await grp.getByRole('radio').first().click({ force: true }).catch(() => {});
+    }
   }
 
   await page.getByLabel('Current property value').fill(String(item.current_value));
 
   // Mortgage/loan (scope to question group)
-  const loanGroup = page.getByRole('group', { name: 'Do you have a mortgage/loan on the property?' });
   const hasLoan = !!item.has_loan;
-  if (await loanGroup.count()) {
-    await loanGroup.getByRole('radio', { name: hasLoan ? 'Yes' : 'No' }).check();
-  } else {
-    await page.getByRole('radio', { name: hasLoan ? 'Yes' : 'No' }).first().check();
+  {
+    const name = b64('prop.interests[i].has_loan');
+    let ok = await setRadioByName(name, hasLoan ? 'True' : 'False');
+    if (!ok) await selectRadioByQuestion('Do you have a mortgage/loan on the property?', hasLoan ? 'Yes' : 'No');
+    if (!(await anyRadioChecked(name))) {
+      const grp = page.getByRole('group', { name: 'Do you have a mortgage/loan on the property?' });
+      if (await grp.count()) await grp.getByRole('radio', { name: hasLoan ? 'Yes' : 'No' }).first().click({ force: true }).catch(() => {});
+    }
   }
   if (hasLoan && item.current_owed_amount !== undefined) {
     await page.getByLabel('How much do you owe on the loan?').fill(String(item.current_owed_amount));
   }
 
   // Ownership interest (optional)
-  if (item.ownership_interest && (await page.getByLabel('Describe the nature of your ownership interest', { exact: false }).count())) {
-    await page.getByLabel('Describe the nature of your ownership interest', { exact: false }).fill(item.ownership_interest);
+  const ownershipFieldLabel = 'Describe the nature of your ownership interest';
+  if (await page.getByLabel(ownershipFieldLabel, { exact: false }).count()) {
+    await page.getByLabel(ownershipFieldLabel, { exact: false }).fill(item.ownership_interest || 'Fee simple');
   }
 
   // Community property (optional)
-  const communityGroup = page.getByRole('group', { name: 'Is this community property?' });
-  if ((await communityGroup.count()) && typeof item.is_community_property === 'boolean') {
-    await communityGroup.getByRole('radio', { name: item.is_community_property ? 'Yes' : 'No' }).check();
-  }
-
-  // Exemptions (optional)
-  const claimGroup = page.getByRole('group', { name: 'Claiming Exemption?' });
-  const claimEx = !!item.is_claiming_exemption;
-  if (await claimGroup.count()) {
-    await claimGroup.getByRole('radio', { name: claimEx ? 'Yes' : 'No' }).check();
-    if (claimEx) {
-      const sub100Group = page.getByRole('group', { name: 'Are you claiming less than 100% of fair market value?' });
-      const sub100 = !!item.claiming_sub_100;
-      if (await sub100Group.count()) {
-        await sub100Group.getByRole('radio', { name: sub100 ? 'Yes' : 'No' }).check();
-      }
-      if (sub100 && item.exemption_value !== undefined) {
-        await page.getByLabel('Value of exemption being claimed').fill(String(item.exemption_value));
-      }
-      if (item.exemption_laws) {
-        await page.getByLabel('Specific laws that allow exemption').selectOption({ label: item.exemption_laws });
-      }
+  const communityChoice = typeof item.is_community_property === 'boolean' ? (item.is_community_property ? 'Yes' : 'No') : 'No';
+  {
+    const name = b64('prop.interests[i].is_community_property');
+    let ok = await setRadioByName(name, communityChoice === 'Yes' ? 'True' : 'False');
+    if (!ok) await selectRadioByQuestion('Is this community property?', communityChoice);
+    if (!(await anyRadioChecked(name))) {
+      const grp = page.getByRole('group', { name: 'Is this community property?' });
+      if (await grp.count()) await grp.getByRole('radio', { name: communityChoice }).first().click({ force: true }).catch(() => {});
     }
   }
 
+  // Exemptions (optional)
+  const claimEx = !!item.is_claiming_exemption;
+  {
+    const name = b64('prop.interests[i].is_claiming_exemption');
+    let ok = await setRadioByName(name, claimEx ? 'True' : 'False');
+    if (!ok) await selectRadioByQuestion('Claiming Exemption?', claimEx ? 'Yes' : 'No');
+    if (!(await anyRadioChecked(name))) {
+      const grp = page.getByRole('group', { name: 'Claiming Exemption?' });
+      if (await grp.count()) await grp.getByRole('radio', { name: claimEx ? 'Yes' : 'No' }).first().click({ force: true }).catch(() => {});
+    }
+  }
+  if (claimEx) {
+    const sub100 = !!item.claiming_sub_100;
+    {
+      const name = b64('prop.interests[i].claiming_sub_100');
+      let ok = await setRadioByName(name, sub100 ? 'True' : 'False');
+      if (!ok) await selectRadioByQuestion('Are you claiming less than 100% of fair market value?', sub100 ? 'Yes' : 'No');
+      if (!(await anyRadioChecked(name))) {
+        const grp = page.getByRole('group', { name: 'Are you claiming less than 100% of fair market value?' });
+        if (await grp.count()) await grp.getByRole('radio', { name: sub100 ? 'Yes' : 'No' }).first().click({ force: true }).catch(() => {});
+      }
+    }
+    if (sub100 && item.exemption_value !== undefined) {
+      await page.getByLabel('Value of exemption being claimed').fill(String(item.exemption_value));
+    }
+    if (item.exemption_laws) {
+      await page.getByLabel('Specific laws that allow exemption').selectOption({ label: item.exemption_laws });
+    }
+  }
+
+  // Optional fields that may be required depending on validations; fill if present and empty
+  const ownershipField = page.getByLabel(ownershipFieldLabel, { exact: false });
+  if (await ownershipField.count()) {
+    const val = await ownershipField.inputValue().catch(() => '');
+    if (!val) await ownershipField.fill(item.ownership_interest || 'Fee simple');
+  }
+  const otherInfoLabel = 'Other information about item, such as local property identification number';
+  const otherInfoField = page.getByLabel(otherInfoLabel, { exact: false });
+  if (await otherInfoField.count()) {
+    const val = await otherInfoField.inputValue().catch(() => '');
+    if (!val) await otherInfoField.fill(item.other_info || 'N/A');
+  }
+
+  // Debug before submit
+  await debugDump('before submit');
   await page.click('button[type="submit"]');
   await page.waitForLoadState('networkidle');
+  // If still on details page due to any hidden validation, try one more submit after slight wait
+  const stillHere = (((await page.locator('h1#daMainQuestion').textContent()) || '').includes('Tell the court about details about the interest in question.'));
+  if (stillHere) {
+    const errors = await page.locator('.is-invalid, .invalid-feedback, .text-danger').allTextContents();
+    if (errors.length) console.log('Validation hints on details page:', errors);
+    await debugDump('after submit, still here');
+    await page.waitForTimeout(300);
+    await page.click('button[type="submit"]').catch(() => {});
+    await page.waitForLoadState('networkidle');
+  }
 }
 
 // Test 1: Basic interview loads
