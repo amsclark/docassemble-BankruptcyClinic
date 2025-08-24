@@ -6,11 +6,12 @@ Scenario: The interview loads
 ### Minimalist scenario: as much as possible skipped
 Scenario: Minimalist single filer
   Given I start the interview at "voluntary-petition.yml"
-  And I get to the question id "exemption_type_selection" with this data:
+  And I get to the question id "filing_status" with this data:
     | var | value |
     | introduction_screen | True |
     | current_district | District of Nebraska |
     | amended_filing | False |
+    | district_final | True |
     | filing_status | Filing individually |
 
 #### Maximalist scenario: all sections filled, nothing skipped
