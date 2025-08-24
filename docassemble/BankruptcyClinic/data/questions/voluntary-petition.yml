@@ -365,7 +365,7 @@ code: |
   prop.has_hobby_equipment
   prop.has_firearms
   prop.has_clothes
-  prop.has_jewlery
+  prop.has_jewelry
   prop.has_animals
   prop.has_other_household_items
   prop.financial_assets.has_cash
@@ -1315,20 +1315,20 @@ review:
 
       Total Value: ${ prop.clothes_value }
     show if: prop.has_clothes
-  - Revisit: prop.has_jewlery
+  - Revisit: prop.has_jewelry
     button: |
-      % if prop.has_jewlery:
-        Owns Jewlery: Yes
+      % if prop.has_jewelry:
+        Owns jewelry: Yes
       % else:
-        Owns Jewlery: No
+        Owns jewelry: No
       % endif
-  - Revisit: prop.jewlery_description
+  - Revisit: prop.jewelry_description
     button: |
-      Jewlery Description:
-      ${ prop.jewlery_description }
+      jewelry Description:
+      ${ prop.jewelry_description }
 
-      Total Value: ${ prop.jewlery_value }
-    show if: prop.has_jewlery
+      Total Value: ${ prop.jewelry_value }
+    show if: prop.has_jewelry
   - Revisit: prop.has_animals
     button: |
       % if prop.has_animals:

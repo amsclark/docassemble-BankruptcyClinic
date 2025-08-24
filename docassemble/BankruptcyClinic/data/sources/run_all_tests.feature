@@ -84,7 +84,7 @@ Scenario: Minimalist single filer
     | prop.has_firearms | False |
     | prop.has_hobby_equipment | False |
     | prop.has_household_goods | False |
-    | prop.has_jewlery | False |
+    | prop.has_jewelry | False |
     | prop.has_other_household_items | False |
     | prop.has_other_prop | False |
     | prop.has_secured_household_goods | False |
@@ -93,7 +93,7 @@ Scenario: Minimalist single filer
     | prop.household_goods_is_claiming_exemption | False |
     | prop.interests.revisit | True |
     | prop.interests.there_are_any | False |
-    | prop.jewlery_is_claiming_exemption | False |
+    | prop.jewelry_is_claiming_exemption | False |
     | prop.other_household_items_is_claiming_exemption | False |
     | prop.other_prop_has_claim | False |
     | prop.owed_property.contingent_claims_has_claim | False |

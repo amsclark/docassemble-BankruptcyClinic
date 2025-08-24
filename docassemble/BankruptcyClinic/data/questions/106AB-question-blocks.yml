@@ -336,24 +336,24 @@ code: |
   #      clothes_interest['exemption_amount'] = prop.attr('clothes_exemption_value_2')
   #      exemptions.append(clothes_interest)
 #
-  #  jewlery_interest = {}
-  #  if prop.attr('jewlery_is_claiming_exemption'):
-  #    jewlery_interest['is_claiming_exemption'] = prop.attr('jewlery_is_claiming_exemption')
-  #    jewlery_interest['claiming_sub_100'] = prop.attr('jewlery_claiming_sub_100')
-  #    jewlery_interest['sub_100'] = prop.attr('jewlery_claiming_sub_100')
-  #    jewlery_interest['exemption_laws'] = prop.attr('jewlery_exemption_laws')
-  #    jewlery_interest['current_owned_value'] = prop.attr('jewlery_value')
-  #    jewlery_interest['exemption_amount'] = prop.attr('jewlery_exemption_value')
-  #    exemptions.append(jewlery_interest)
+  #  jewelry_interest = {}
+  #  if prop.attr('jewelry_is_claiming_exemption'):
+  #    jewelry_interest['is_claiming_exemption'] = prop.attr('jewelry_is_claiming_exemption')
+  #    jewelry_interest['claiming_sub_100'] = prop.attr('jewelry_claiming_sub_100')
+  #    jewelry_interest['sub_100'] = prop.attr('jewelry_claiming_sub_100')
+  #    jewelry_interest['exemption_laws'] = prop.attr('jewelry_exemption_laws')
+  #    jewelry_interest['current_owned_value'] = prop.attr('jewelry_value')
+  #    jewelry_interest['exemption_amount'] = prop.attr('jewelry_exemption_value')
+  #    exemptions.append(jewelry_interest)
 #
-  #    if prop.attr('jewlery_exemption_value_2'):
-  #      jewlery_interest['is_claiming_exemption'] = prop.attr('jewlery_is_claiming_exemption')
-  #      jewlery_interest['claiming_sub_100'] = prop.attr('jewlery_claiming_sub_100')
-  #      jewlery_interest['sub_100'] = prop.attr('jewlery_claiming_sub_100')
-  #      jewlery_interest['exemption_laws'] = prop.attr('jewlery_exemption_laws_2')
-  #      jewlery_interest['current_owned_value'] = prop.attr('jewlery_value')
-  #      jewlery_interest['exemption_amount'] = prop.attr('jewlery_exemption_value_2')
-  #      exemptions.append(jewlery_interest)
+  #    if prop.attr('jewelry_exemption_value_2'):
+  #      jewelry_interest['is_claiming_exemption'] = prop.attr('jewelry_is_claiming_exemption')
+  #      jewelry_interest['claiming_sub_100'] = prop.attr('jewelry_claiming_sub_100')
+  #      jewelry_interest['sub_100'] = prop.attr('jewelry_claiming_sub_100')
+  #      jewelry_interest['exemption_laws'] = prop.attr('jewelry_exemption_laws_2')
+  #      jewelry_interest['current_owned_value'] = prop.attr('jewelry_value')
+  #      jewelry_interest['exemption_amount'] = prop.attr('jewelry_exemption_value_2')
+  #      exemptions.append(jewelry_interest)
 #
   #  animal_interest = {}
   #  if prop.attr('animal_is_claiming_exemption'):
@@ -1896,13 +1896,13 @@ script: |
       "prop.clothes_exemption_laws_2");
     checkQuestionExemptions(
       
-      "prop.jewlery_is_claiming_exemption",
-      "prop.jewlery_claiming_sub_100",
-      "prop.jewlery_value",
-      "prop.jewlery_exemption_value",
-      "prop.jewlery_exemption_laws",
-      "prop.jewlery_exemption_value_2",
-      "prop.jewlery_exemption_laws_2");
+      "prop.jewelry_is_claiming_exemption",
+      "prop.jewelry_claiming_sub_100",
+      "prop.jewelry_value",
+      "prop.jewelry_exemption_value",
+      "prop.jewelry_exemption_laws",
+      "prop.jewelry_exemption_value_2",
+      "prop.jewelry_exemption_laws_2");
     checkQuestionExemptions(
       
       "prop.animal_is_claiming_exemption",
@@ -2246,53 +2246,53 @@ fields:
     show if: prop.clothes_is_claiming_exemption
     required: False
 
-  - note: <br><br><h3>Jewlery</h3>
+  - note: <br><br><h3>jewelry</h3>
 
-  - Do you own any jewlery?: prop.has_jewlery
+  - Do you own any jewelry?: prop.has_jewelry
     datatype: yesnoradio
     # default: True
-  - Describe: prop.jewlery_description
-    # default: some jewlery
+  - Describe: prop.jewelry_description
+    # default: some jewelry
     input type: area
-    show if: prop.has_jewlery
-  - Total owned value: prop.jewlery_value
+    show if: prop.has_jewelry
+  - Total owned value: prop.jewelry_value
     datatype: currency
     # default: 3000
-    show if: prop.has_jewlery
-  - Claiming Exemption?: prop.jewlery_is_claiming_exemption
+    show if: prop.has_jewelry
+  - Claiming Exemption?: prop.jewelry_is_claiming_exemption
     # default: False
     datatype: yesnoradio
-  - Are you claiming less than 100% of fair market value?: prop.jewlery_claiming_sub_100
+  - Are you claiming less than 100% of fair market value?: prop.jewelry_claiming_sub_100
     # default: False
     datatype: yesnoradio
-    show if: prop.jewlery_is_claiming_exemption
+    show if: prop.jewelry_is_claiming_exemption
   - note: First Exemption
-    show if: prop.jewlery_is_claiming_exemption
-  - Value of exemption being claimed: prop.jewlery_exemption_value
+    show if: prop.jewelry_is_claiming_exemption
+  - Value of exemption being claimed: prop.jewelry_exemption_value
     # default: 0
     datatype: currency
-    show if: prop.jewlery_claiming_sub_100
-  - Specific laws that allow exemption: prop.jewlery_exemption_laws
+    show if: prop.jewelry_claiming_sub_100
+  - Specific laws that allow exemption: prop.jewelry_exemption_laws
     choices:
       - Clothing (Neb. Rev. Stat. § 25-1556(1)(b))
       - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
       - Unknown law
       - Immediate personal possessions (Neb. Rev. Stat. § 25-1556(1)(a))
-    show if: prop.jewlery_is_claiming_exemption
+    show if: prop.jewelry_is_claiming_exemption
   - note: Second Exemption
-    show if: prop.jewlery_is_claiming_exemption
-  - Value of exemption being claimed: prop.jewlery_exemption_value_2
+    show if: prop.jewelry_is_claiming_exemption
+  - Value of exemption being claimed: prop.jewelry_exemption_value_2
     # default: 0
     datatype: currency
-    show if: prop.jewlery_claiming_sub_100
+    show if: prop.jewelry_claiming_sub_100
     required: False
-  - Specific laws that allow exemption: prop.jewlery_exemption_laws_2
+  - Specific laws that allow exemption: prop.jewelry_exemption_laws_2
     choices:
       - Clothing (Neb. Rev. Stat. § 25-1556(1)(b))
       - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
       - Unknown law
       - Immediate personal possessions (Neb. Rev. Stat. § 25-1556(1)(a))
-    show if: prop.jewlery_is_claiming_exemption
+    show if: prop.jewelry_is_claiming_exemption
     required: False
 
   - note: <br><br><h3>Animals</h3>
@@ -5439,35 +5439,35 @@ code: |
     ab['noClothes'] = True
 
   #
-  # Jewlery
+  # jewelry
   #
 
-  if prop.has_jewlery == True:
-    ab['hasJewlery'] = True
-    ab['jewleryDescription'] = prop.jewlery_description
-    ab['jewleryAmt'] = currency(prop.jewlery_value)
+  if prop.has_jewelry == True:
+    ab['hasjewelry'] = True
+    ab['jewelryDescription'] = prop.jewelry_description
+    ab['jewelryAmt'] = currency(prop.jewelry_value)
     #exemption logic
-    if prop.jewlery_is_claiming_exemption == True:
-      sc['desc'+str(sc_i)] = "Jewlery: " + prop.jewlery_description
-      sc['currOwnedVal'+str(sc_i)] = prop.jewlery_value
-      sc['isCustExempt'+str(sc_i)] = prop.jewlery_claiming_sub_100
-      sc['custExemptVal'+str(sc_i)] = prop.jewlery_exemption_value if prop.jewlery_claiming_sub_100 == True else None
-      sc['laws'+str(sc_i)] = prop.jewlery_exemption_laws
-      sc['isFairMarket'+str(sc_i)] = False if prop.jewlery_claiming_sub_100 == True else True
+    if prop.jewelry_is_claiming_exemption == True:
+      sc['desc'+str(sc_i)] = "jewelry: " + prop.jewelry_description
+      sc['currOwnedVal'+str(sc_i)] = prop.jewelry_value
+      sc['isCustExempt'+str(sc_i)] = prop.jewelry_claiming_sub_100
+      sc['custExemptVal'+str(sc_i)] = prop.jewelry_exemption_value if prop.jewelry_claiming_sub_100 == True else None
+      sc['laws'+str(sc_i)] = prop.jewelry_exemption_laws
+      sc['isFairMarket'+str(sc_i)] = False if prop.jewelry_claiming_sub_100 == True else True
       sc['line'+str(sc_i)] = "12"
       sc_i += 1
-    if prop.jewlery_is_claiming_exemption == True and prop.jewlery_exemption_value_2:
-      sc['desc'+str(sc_i)] = "Jewlery: " + prop.jewlery_description
-      sc['currOwnedVal'+str(sc_i)] = prop.jewlery_value
-      sc['isCustExempt'+str(sc_i)] = prop.jewlery_claiming_sub_100
-      sc['custExemptVal'+str(sc_i)] = prop.jewlery_exemption_value_2 if prop.jewlery_claiming_sub_100 == True else None
-      sc['laws'+str(sc_i)] = prop.jewlery_exemption_laws_2
-      sc['isFairMarket'+str(sc_i)] = False if prop.jewlery_claiming_sub_100 == True else True
+    if prop.jewelry_is_claiming_exemption == True and prop.jewelry_exemption_value_2:
+      sc['desc'+str(sc_i)] = "jewelry: " + prop.jewelry_description
+      sc['currOwnedVal'+str(sc_i)] = prop.jewelry_value
+      sc['isCustExempt'+str(sc_i)] = prop.jewelry_claiming_sub_100
+      sc['custExemptVal'+str(sc_i)] = prop.jewelry_exemption_value_2 if prop.jewelry_claiming_sub_100 == True else None
+      sc['laws'+str(sc_i)] = prop.jewelry_exemption_laws_2
+      sc['isFairMarket'+str(sc_i)] = False if prop.jewelry_claiming_sub_100 == True else True
       sc['line'+str(sc_i)] = "12"
       sc_i += 1
     ol_i += 1
   else:
-    ab['noJewlery'] = True
+    ab['nojewelry'] = True
 
   #
   # Animals
@@ -5531,7 +5531,7 @@ code: |
   else:
     ab['noOther'] = True
 
-  ab['p3TotalAmt'] = currency(prop.household_goods_value + prop.electronics_value + prop.collectibles_value + prop.hobby_equipment_value + prop.firearms_value + prop.clothes_value + prop.jewlery_value + prop.animal_value + prop.other_household_items_value)
+  ab['p3TotalAmt'] = currency(prop.household_goods_value + prop.electronics_value + prop.collectibles_value + prop.hobby_equipment_value + prop.firearms_value + prop.clothes_value + prop.jewelry_value + prop.animal_value + prop.other_household_items_value)
 
   #
   # Cash
@@ -6757,15 +6757,15 @@ code: |
   ab['p7TotalAmt'] = currency(prop.other_prop_value + prop.other_prop_value2 + prop.other_prop_value3)
   ab['p1TotalAmtFinal'] = currency(sum(interest.current_owned_value for interest in prop.interests))
   ab['p2TotalAmtFinal'] = currency(sum(vehicle.current_owned_value for vehicle in prop.ab_vehicles) + sum(vehicle.current_owned_value for vehicle in prop.ab_other_vehicles))
-  ab['p3TotalAmtFinal'] = currency(prop.household_goods_value + prop.electronics_value + prop.collectibles_value + prop.hobby_equipment_value + prop.firearms_value + prop.clothes_value + prop.jewlery_value + prop.animal_value + prop.other_household_items_value)
+  ab['p3TotalAmtFinal'] = currency(prop.household_goods_value + prop.electronics_value + prop.collectibles_value + prop.hobby_equipment_value + prop.firearms_value + prop.clothes_value + prop.jewelry_value + prop.animal_value + prop.other_household_items_value)
   ab['p4TotalAmtFinal'] = currency(prop.financial_assets.cash_value + sum(deposit.amount for deposit in prop.financial_assets.deposits) + sum(bond.amount for bond in prop.financial_assets.bonds_and_stocks) + sum(ntStock.value for ntStock in prop.financial_assets.non_traded_stock) + sum(cBond.amount for cBond in prop.financial_assets.corporate_bonds) + sum(retAct.amount for retAct in prop.financial_assets.retirement_accounts) + sum(prepay.amount for prepay in prop.financial_assets.prepayments) + sum(annu.amount for annu in prop.financial_assets.annuities) + sum(edu.amount for edu in prop.financial_assets.edu_accounts) + prop.financial_assets.future_property_interest_value + prop.financial_assets.ip_interest_value + prop.financial_assets.intangible_interest_value + prop.owed_property.tax_refund_federal + prop.owed_property.tax_refund_state + prop.owed_property.tax_refund_local + prop.owed_property.family_support_alimony + prop.owed_property.family_support_maintenance + prop.owed_property.family_support_support + prop.owed_property.family_support_divorce + prop.owed_property.family_support_settlement + prop.owed_property.other_amounts_value + prop.owed_property.first_insurance_interest_amount + prop.owed_property.second_insurance_interest_amount + prop.owed_property.third_insurance_interest_amount + prop.owed_property.trust_amount + prop.owed_property.third_party_amount)
   ab['p5TotalAmtFinal'] = currency(prop.business_property.ar_amount + prop.business_property.equipment_amount + prop.business_property.machinery_amount + prop.business_property.inventory_amount + prop.business_property.partnershipValue1 + prop.business_property.partnershipValue2 + prop.business_property.partnershipValue3 + prop.business_property.lists_amount + prop.business_property.otherPropertyAmount1 + prop.business_property.otherPropertyAmount2 + prop.business_property.otherPropertyAmount3 + prop.business_property.otherPropertyAmount4 + prop.business_property.otherPropertyAmount5 + prop.business_property.otherPropertyAmount6)
   ab['p6TotalAmtFinal'] = currency(prop.farming_property.animal_amount + prop.farming_property.crop_amount + prop.farming_property.equipment_amount + prop.farming_property.supplies_amount + prop.farming_property.commercial_amount)
   ab['p7TotalAmtFinal'] = currency(prop.other_prop_value + prop.other_prop_value2 + prop.other_prop_value3)
-  ab['totalABPropertyAmt'] = currency(sum(vehicle.current_owned_value for vehicle in prop.ab_vehicles) + sum(vehicle.current_owned_value for vehicle in prop.ab_other_vehicles) + prop.household_goods_value + prop.electronics_value + prop.collectibles_value + prop.hobby_equipment_value + prop.firearms_value + prop.clothes_value + prop.jewlery_value + prop.animal_value + prop.other_household_items_value + prop.financial_assets.cash_value + sum(deposit.amount for deposit in prop.financial_assets.deposits) + sum(bond.amount for bond in prop.financial_assets.bonds_and_stocks) + sum(ntStock.value for ntStock in prop.financial_assets.non_traded_stock) + sum(cBond.amount for cBond in prop.financial_assets.corporate_bonds) + sum(retAct.amount for retAct in prop.financial_assets.retirement_accounts) + sum(prepay.amount for prepay in prop.financial_assets.prepayments) + sum(annu.amount for annu in prop.financial_assets.annuities) + sum(edu.amount for edu in prop.financial_assets.edu_accounts) + prop.financial_assets.future_property_interest_value + prop.financial_assets.ip_interest_value + prop.financial_assets.intangible_interest_value + prop.owed_property.tax_refund_federal + prop.owed_property.tax_refund_state + prop.owed_property.tax_refund_local + prop.owed_property.family_support_alimony + prop.owed_property.family_support_maintenance + prop.owed_property.family_support_support + prop.owed_property.family_support_divorce + prop.owed_property.family_support_settlement + prop.owed_property.other_amounts_value + prop.owed_property.first_insurance_interest_amount + prop.owed_property.second_insurance_interest_amount + prop.owed_property.third_insurance_interest_amount + prop.owed_property.trust_amount + prop.owed_property.third_party_amount + prop.business_property.ar_amount + prop.business_property.equipment_amount + prop.business_property.machinery_amount + prop.business_property.inventory_amount + prop.business_property.partnershipValue1 + prop.business_property.partnershipValue2 + prop.business_property.partnershipValue3 + prop.business_property.lists_amount + prop.business_property.otherPropertyAmount1 + prop.business_property.otherPropertyAmount2 + prop.business_property.otherPropertyAmount3 + prop.business_property.otherPropertyAmount4 + prop.business_property.otherPropertyAmount5 + prop.business_property.otherPropertyAmount6 + prop.farming_property.animal_amount + prop.farming_property.crop_amount + prop.farming_property.equipment_amount + prop.farming_property.supplies_amount + prop.farming_property.commercial_amount + prop.other_prop_value + prop.other_prop_value2 + prop.other_prop_value3)
-  ab['totalPersonalProp'] = currency(sum(vehicle.current_owned_value for vehicle in prop.ab_vehicles) + sum(vehicle.current_owned_value for vehicle in prop.ab_other_vehicles) + prop.household_goods_value + prop.electronics_value + prop.collectibles_value + prop.hobby_equipment_value + prop.firearms_value + prop.clothes_value + prop.jewlery_value + prop.animal_value + prop.other_household_items_value + prop.financial_assets.cash_value + sum(deposit.amount for deposit in prop.financial_assets.deposits) + sum(bond.amount for bond in prop.financial_assets.bonds_and_stocks) + sum(ntStock.value for ntStock in prop.financial_assets.non_traded_stock) + sum(cBond.amount for cBond in prop.financial_assets.corporate_bonds) + sum(retAct.amount for retAct in prop.financial_assets.retirement_accounts) + sum(prepay.amount for prepay in prop.financial_assets.prepayments) + sum(annu.amount for annu in prop.financial_assets.annuities) + sum(edu.amount for edu in prop.financial_assets.edu_accounts) + prop.financial_assets.future_property_interest_value + prop.financial_assets.ip_interest_value + prop.financial_assets.intangible_interest_value + prop.owed_property.tax_refund_federal + prop.owed_property.tax_refund_state + prop.owed_property.tax_refund_local + prop.owed_property.family_support_alimony + prop.owed_property.family_support_maintenance + prop.owed_property.family_support_support + prop.owed_property.family_support_divorce + prop.owed_property.family_support_settlement + prop.owed_property.other_amounts_value + prop.owed_property.first_insurance_interest_amount + prop.owed_property.second_insurance_interest_amount + prop.owed_property.third_insurance_interest_amount + prop.owed_property.trust_amount + prop.owed_property.third_party_amount + prop.business_property.ar_amount + prop.business_property.equipment_amount + prop.business_property.machinery_amount + prop.business_property.inventory_amount + prop.business_property.partnershipValue1 + prop.business_property.partnershipValue2 + prop.business_property.partnershipValue3 + prop.business_property.lists_amount + prop.business_property.otherPropertyAmount1 + prop.business_property.otherPropertyAmount2 + prop.business_property.otherPropertyAmount3 + prop.business_property.otherPropertyAmount4 + prop.business_property.otherPropertyAmount5 + prop.business_property.otherPropertyAmount6 + prop.farming_property.animal_amount + prop.farming_property.crop_amount + prop.farming_property.equipment_amount + prop.farming_property.supplies_amount + prop.farming_property.commercial_amount + prop.other_prop_value + prop.other_prop_value2 + prop.other_prop_value3)
-  ab['totalPersonalPropCopy'] = currency(sum(vehicle.current_owned_value for vehicle in prop.ab_vehicles) + sum(vehicle.current_owned_value for vehicle in prop.ab_other_vehicles) + prop.household_goods_value + prop.electronics_value + prop.collectibles_value + prop.hobby_equipment_value + prop.firearms_value + prop.clothes_value + prop.jewlery_value + prop.animal_value + prop.other_household_items_value + prop.financial_assets.cash_value + sum(deposit.amount for deposit in prop.financial_assets.deposits) + sum(bond.amount for bond in prop.financial_assets.bonds_and_stocks) + sum(ntStock.value for ntStock in prop.financial_assets.non_traded_stock) + sum(cBond.amount for cBond in prop.financial_assets.corporate_bonds) + sum(retAct.amount for retAct in prop.financial_assets.retirement_accounts) + sum(prepay.amount for prepay in prop.financial_assets.prepayments) + sum(annu.amount for annu in prop.financial_assets.annuities) + sum(edu.amount for edu in prop.financial_assets.edu_accounts) + prop.financial_assets.future_property_interest_value + prop.financial_assets.ip_interest_value + prop.financial_assets.intangible_interest_value + prop.owed_property.tax_refund_federal + prop.owed_property.tax_refund_state + prop.owed_property.tax_refund_local + prop.owed_property.family_support_alimony + prop.owed_property.family_support_maintenance + prop.owed_property.family_support_support + prop.owed_property.family_support_divorce + prop.owed_property.family_support_settlement + prop.owed_property.other_amounts_value + prop.owed_property.first_insurance_interest_amount + prop.owed_property.second_insurance_interest_amount + prop.owed_property.third_insurance_interest_amount + prop.owed_property.trust_amount + prop.owed_property.third_party_amount + prop.business_property.ar_amount + prop.business_property.equipment_amount + prop.business_property.machinery_amount + prop.business_property.inventory_amount + prop.business_property.partnershipValue1 + prop.business_property.partnershipValue2 + prop.business_property.partnershipValue3 + prop.business_property.lists_amount + prop.business_property.otherPropertyAmount1 + prop.business_property.otherPropertyAmount2 + prop.business_property.otherPropertyAmount3 + prop.business_property.otherPropertyAmount4 + prop.business_property.otherPropertyAmount5 + prop.business_property.otherPropertyAmount6 + prop.farming_property.animal_amount + prop.farming_property.crop_amount + prop.farming_property.equipment_amount + prop.farming_property.supplies_amount + prop.farming_property.commercial_amount + prop.other_prop_value + prop.other_prop_value2 + prop.other_prop_value3)
-  ab['totalABPropertyAmt'] = currency(sum(interest.current_owned_value for interest in prop.interests) + sum(vehicle.current_owned_value for vehicle in prop.ab_vehicles) + sum(vehicle.current_owned_value for vehicle in prop.ab_other_vehicles) + prop.household_goods_value + prop.electronics_value + prop.collectibles_value + prop.hobby_equipment_value + prop.firearms_value + prop.clothes_value + prop.jewlery_value + prop.animal_value + prop.other_household_items_value + prop.financial_assets.cash_value + sum(deposit.amount for deposit in prop.financial_assets.deposits) + sum(bond.amount for bond in prop.financial_assets.bonds_and_stocks) + sum(ntStock.value for ntStock in prop.financial_assets.non_traded_stock) + sum(cBond.amount for cBond in prop.financial_assets.corporate_bonds) + sum(retAct.amount for retAct in prop.financial_assets.retirement_accounts) + sum(prepay.amount for prepay in prop.financial_assets.prepayments) + sum(annu.amount for annu in prop.financial_assets.annuities) + sum(edu.amount for edu in prop.financial_assets.edu_accounts) + prop.financial_assets.future_property_interest_value + prop.financial_assets.ip_interest_value + prop.financial_assets.intangible_interest_value + prop.owed_property.tax_refund_federal + prop.owed_property.tax_refund_state + prop.owed_property.tax_refund_local + prop.owed_property.family_support_alimony + prop.owed_property.family_support_maintenance + prop.owed_property.family_support_support + prop.owed_property.family_support_divorce + prop.owed_property.family_support_settlement + prop.owed_property.other_amounts_value + prop.owed_property.first_insurance_interest_amount + prop.owed_property.second_insurance_interest_amount + prop.owed_property.third_insurance_interest_amount + prop.owed_property.trust_amount + prop.owed_property.third_party_amount + prop.business_property.ar_amount + prop.business_property.equipment_amount + prop.business_property.machinery_amount + prop.business_property.inventory_amount + prop.business_property.partnershipValue1 + prop.business_property.partnershipValue2 + prop.business_property.partnershipValue3 + prop.business_property.lists_amount + prop.business_property.otherPropertyAmount1 + prop.business_property.otherPropertyAmount2 + prop.business_property.otherPropertyAmount3 + prop.business_property.otherPropertyAmount4 + prop.business_property.otherPropertyAmount5 + prop.business_property.otherPropertyAmount6 + prop.farming_property.animal_amount + prop.farming_property.crop_amount + prop.farming_property.equipment_amount + prop.farming_property.supplies_amount + prop.farming_property.commercial_amount + prop.other_prop_value + prop.other_prop_value2 + prop.other_prop_value3)
+  ab['totalABPropertyAmt'] = currency(sum(vehicle.current_owned_value for vehicle in prop.ab_vehicles) + sum(vehicle.current_owned_value for vehicle in prop.ab_other_vehicles) + prop.household_goods_value + prop.electronics_value + prop.collectibles_value + prop.hobby_equipment_value + prop.firearms_value + prop.clothes_value + prop.jewelry_value + prop.animal_value + prop.other_household_items_value + prop.financial_assets.cash_value + sum(deposit.amount for deposit in prop.financial_assets.deposits) + sum(bond.amount for bond in prop.financial_assets.bonds_and_stocks) + sum(ntStock.value for ntStock in prop.financial_assets.non_traded_stock) + sum(cBond.amount for cBond in prop.financial_assets.corporate_bonds) + sum(retAct.amount for retAct in prop.financial_assets.retirement_accounts) + sum(prepay.amount for prepay in prop.financial_assets.prepayments) + sum(annu.amount for annu in prop.financial_assets.annuities) + sum(edu.amount for edu in prop.financial_assets.edu_accounts) + prop.financial_assets.future_property_interest_value + prop.financial_assets.ip_interest_value + prop.financial_assets.intangible_interest_value + prop.owed_property.tax_refund_federal + prop.owed_property.tax_refund_state + prop.owed_property.tax_refund_local + prop.owed_property.family_support_alimony + prop.owed_property.family_support_maintenance + prop.owed_property.family_support_support + prop.owed_property.family_support_divorce + prop.owed_property.family_support_settlement + prop.owed_property.other_amounts_value + prop.owed_property.first_insurance_interest_amount + prop.owed_property.second_insurance_interest_amount + prop.owed_property.third_insurance_interest_amount + prop.owed_property.trust_amount + prop.owed_property.third_party_amount + prop.business_property.ar_amount + prop.business_property.equipment_amount + prop.business_property.machinery_amount + prop.business_property.inventory_amount + prop.business_property.partnershipValue1 + prop.business_property.partnershipValue2 + prop.business_property.partnershipValue3 + prop.business_property.lists_amount + prop.business_property.otherPropertyAmount1 + prop.business_property.otherPropertyAmount2 + prop.business_property.otherPropertyAmount3 + prop.business_property.otherPropertyAmount4 + prop.business_property.otherPropertyAmount5 + prop.business_property.otherPropertyAmount6 + prop.farming_property.animal_amount + prop.farming_property.crop_amount + prop.farming_property.equipment_amount + prop.farming_property.supplies_amount + prop.farming_property.commercial_amount + prop.other_prop_value + prop.other_prop_value2 + prop.other_prop_value3)
+  ab['totalPersonalProp'] = currency(sum(vehicle.current_owned_value for vehicle in prop.ab_vehicles) + sum(vehicle.current_owned_value for vehicle in prop.ab_other_vehicles) + prop.household_goods_value + prop.electronics_value + prop.collectibles_value + prop.hobby_equipment_value + prop.firearms_value + prop.clothes_value + prop.jewelry_value + prop.animal_value + prop.other_household_items_value + prop.financial_assets.cash_value + sum(deposit.amount for deposit in prop.financial_assets.deposits) + sum(bond.amount for bond in prop.financial_assets.bonds_and_stocks) + sum(ntStock.value for ntStock in prop.financial_assets.non_traded_stock) + sum(cBond.amount for cBond in prop.financial_assets.corporate_bonds) + sum(retAct.amount for retAct in prop.financial_assets.retirement_accounts) + sum(prepay.amount for prepay in prop.financial_assets.prepayments) + sum(annu.amount for annu in prop.financial_assets.annuities) + sum(edu.amount for edu in prop.financial_assets.edu_accounts) + prop.financial_assets.future_property_interest_value + prop.financial_assets.ip_interest_value + prop.financial_assets.intangible_interest_value + prop.owed_property.tax_refund_federal + prop.owed_property.tax_refund_state + prop.owed_property.tax_refund_local + prop.owed_property.family_support_alimony + prop.owed_property.family_support_maintenance + prop.owed_property.family_support_support + prop.owed_property.family_support_divorce + prop.owed_property.family_support_settlement + prop.owed_property.other_amounts_value + prop.owed_property.first_insurance_interest_amount + prop.owed_property.second_insurance_interest_amount + prop.owed_property.third_insurance_interest_amount + prop.owed_property.trust_amount + prop.owed_property.third_party_amount + prop.business_property.ar_amount + prop.business_property.equipment_amount + prop.business_property.machinery_amount + prop.business_property.inventory_amount + prop.business_property.partnershipValue1 + prop.business_property.partnershipValue2 + prop.business_property.partnershipValue3 + prop.business_property.lists_amount + prop.business_property.otherPropertyAmount1 + prop.business_property.otherPropertyAmount2 + prop.business_property.otherPropertyAmount3 + prop.business_property.otherPropertyAmount4 + prop.business_property.otherPropertyAmount5 + prop.business_property.otherPropertyAmount6 + prop.farming_property.animal_amount + prop.farming_property.crop_amount + prop.farming_property.equipment_amount + prop.farming_property.supplies_amount + prop.farming_property.commercial_amount + prop.other_prop_value + prop.other_prop_value2 + prop.other_prop_value3)
+  ab['totalPersonalPropCopy'] = currency(sum(vehicle.current_owned_value for vehicle in prop.ab_vehicles) + sum(vehicle.current_owned_value for vehicle in prop.ab_other_vehicles) + prop.household_goods_value + prop.electronics_value + prop.collectibles_value + prop.hobby_equipment_value + prop.firearms_value + prop.clothes_value + prop.jewelry_value + prop.animal_value + prop.other_household_items_value + prop.financial_assets.cash_value + sum(deposit.amount for deposit in prop.financial_assets.deposits) + sum(bond.amount for bond in prop.financial_assets.bonds_and_stocks) + sum(ntStock.value for ntStock in prop.financial_assets.non_traded_stock) + sum(cBond.amount for cBond in prop.financial_assets.corporate_bonds) + sum(retAct.amount for retAct in prop.financial_assets.retirement_accounts) + sum(prepay.amount for prepay in prop.financial_assets.prepayments) + sum(annu.amount for annu in prop.financial_assets.annuities) + sum(edu.amount for edu in prop.financial_assets.edu_accounts) + prop.financial_assets.future_property_interest_value + prop.financial_assets.ip_interest_value + prop.financial_assets.intangible_interest_value + prop.owed_property.tax_refund_federal + prop.owed_property.tax_refund_state + prop.owed_property.tax_refund_local + prop.owed_property.family_support_alimony + prop.owed_property.family_support_maintenance + prop.owed_property.family_support_support + prop.owed_property.family_support_divorce + prop.owed_property.family_support_settlement + prop.owed_property.other_amounts_value + prop.owed_property.first_insurance_interest_amount + prop.owed_property.second_insurance_interest_amount + prop.owed_property.third_insurance_interest_amount + prop.owed_property.trust_amount + prop.owed_property.third_party_amount + prop.business_property.ar_amount + prop.business_property.equipment_amount + prop.business_property.machinery_amount + prop.business_property.inventory_amount + prop.business_property.partnershipValue1 + prop.business_property.partnershipValue2 + prop.business_property.partnershipValue3 + prop.business_property.lists_amount + prop.business_property.otherPropertyAmount1 + prop.business_property.otherPropertyAmount2 + prop.business_property.otherPropertyAmount3 + prop.business_property.otherPropertyAmount4 + prop.business_property.otherPropertyAmount5 + prop.business_property.otherPropertyAmount6 + prop.farming_property.animal_amount + prop.farming_property.crop_amount + prop.farming_property.equipment_amount + prop.farming_property.supplies_amount + prop.farming_property.commercial_amount + prop.other_prop_value + prop.other_prop_value2 + prop.other_prop_value3)
+  ab['totalABPropertyAmt'] = currency(sum(interest.current_owned_value for interest in prop.interests) + sum(vehicle.current_owned_value for vehicle in prop.ab_vehicles) + sum(vehicle.current_owned_value for vehicle in prop.ab_other_vehicles) + prop.household_goods_value + prop.electronics_value + prop.collectibles_value + prop.hobby_equipment_value + prop.firearms_value + prop.clothes_value + prop.jewelry_value + prop.animal_value + prop.other_household_items_value + prop.financial_assets.cash_value + sum(deposit.amount for deposit in prop.financial_assets.deposits) + sum(bond.amount for bond in prop.financial_assets.bonds_and_stocks) + sum(ntStock.value for ntStock in prop.financial_assets.non_traded_stock) + sum(cBond.amount for cBond in prop.financial_assets.corporate_bonds) + sum(retAct.amount for retAct in prop.financial_assets.retirement_accounts) + sum(prepay.amount for prepay in prop.financial_assets.prepayments) + sum(annu.amount for annu in prop.financial_assets.annuities) + sum(edu.amount for edu in prop.financial_assets.edu_accounts) + prop.financial_assets.future_property_interest_value + prop.financial_assets.ip_interest_value + prop.financial_assets.intangible_interest_value + prop.owed_property.tax_refund_federal + prop.owed_property.tax_refund_state + prop.owed_property.tax_refund_local + prop.owed_property.family_support_alimony + prop.owed_property.family_support_maintenance + prop.owed_property.family_support_support + prop.owed_property.family_support_divorce + prop.owed_property.family_support_settlement + prop.owed_property.other_amounts_value + prop.owed_property.first_insurance_interest_amount + prop.owed_property.second_insurance_interest_amount + prop.owed_property.third_insurance_interest_amount + prop.owed_property.trust_amount + prop.owed_property.third_party_amount + prop.business_property.ar_amount + prop.business_property.equipment_amount + prop.business_property.machinery_amount + prop.business_property.inventory_amount + prop.business_property.partnershipValue1 + prop.business_property.partnershipValue2 + prop.business_property.partnershipValue3 + prop.business_property.lists_amount + prop.business_property.otherPropertyAmount1 + prop.business_property.otherPropertyAmount2 + prop.business_property.otherPropertyAmount3 + prop.business_property.otherPropertyAmount4 + prop.business_property.otherPropertyAmount5 + prop.business_property.otherPropertyAmount6 + prop.farming_property.animal_amount + prop.farming_property.crop_amount + prop.farming_property.equipment_amount + prop.farming_property.supplies_amount + prop.farming_property.commercial_amount + prop.other_prop_value + prop.other_prop_value2 + prop.other_prop_value3)
 ---
 attachment:
   - name: Form 106AB
@@ -6896,20 +6896,20 @@ review:
 
       Total Value: ${ prop.clothes_value }
     show if: prop.has_clothes
-  - Revisit: prop.has_jewlery
+  - Revisit: prop.has_jewelry
     button: |
-      % if prop.has_jewlery:
-        Owns Jewlery: Yes
+      % if prop.has_jewelry:
+        Owns jewelry: Yes
       % else:
-        Owns Jewlery: No
+        Owns jewelry: No
       % endif
-  - Revisit: prop.jewlery_description
+  - Revisit: prop.jewelry_description
     button: |
-      Jewlery Description:
-      ${ prop.jewlery_description }
+      jewelry Description:
+      ${ prop.jewelry_description }
 
-      Total Value: ${ prop.jewlery_value }
-    show if: prop.has_jewlery
+      Total Value: ${ prop.jewelry_value }
+    show if: prop.has_jewelry
   - Revisit: prop.has_animals
     button: |
       % if prop.has_animals:
