@@ -409,6 +409,96 @@ test('Maximalist joint filer - complete comprehensive flow', async ({ page }) =>
   console.log('✅ Maximalist joint filer test completed successfully');
 });
 
+// Test 106AB: reach property intro after debtor info
+test('106AB - reach property intro after debtor info', async ({ page }) => {
+  const testData = {
+    introduction_screen: true,
+    current_district: 'District of Nebraska',
+    amended_filing: false,
+    district_final: true,
+    filing_status: 'Filing by myself',
+    'debtor[0].name.first': 'Alex',
+    'debtor[0].name.last': 'Property',
+    'debtor[0].address.address': '100 Property Way',
+    'debtor[0].address.city': 'Omaha',
+    'debtor[0].address.state': 'Nebraska',
+    'debtor[0].address.county': 'Douglas County',
+    'debtor[0].address.zip': '68102',
+  };
+
+  await navigateToQuestion(page, 'debtor_final', testData);
+  await continueToPropertyIntro(page);
+
+  const h1 = await page.locator('h1#daMainQuestion').textContent();
+  expect(h1).toContain('Please tell the court about your property.');
+});
+
+// Test 106AB: add one real property interest and then stop (no vehicles)
+test('106AB - add one real property interest, no vehicles', async ({ page }) => {
+  const testData = {
+    introduction_screen: true,
+    current_district: 'District of Nebraska',
+    amended_filing: false,
+    district_final: true,
+    filing_status: 'Filing by myself',
+    'debtor[0].name.first': 'Alex',
+    'debtor[0].name.last': 'Owner',
+    'debtor[0].address.address': '500 Home St',
+    'debtor[0].address.city': 'Omaha',
+    'debtor[0].address.state': 'Nebraska',
+    'debtor[0].address.county': 'Douglas County',
+    'debtor[0].address.zip': '68102',
+  };
+
+  await navigateToQuestion(page, 'debtor_final', testData);
+  await continueToPropertyIntro(page);
+
+  // Continue from property intro
+  await page.click('button[type="submit"]');
+  await page.waitForLoadState('networkidle');
+
+  // real_property_interests_any_exist: Yes
+  let h1 = (await page.locator('h1#daMainQuestion').textContent()) || '';
+  expect(h1).toContain('Do you own or have any legal or equitable interest in any residence');
+  await answerYesNoAndContinue(page, true);
+
+  // Fill details
+  await fillRealPropertyInterest(page, {
+    street: '12 Oak St',
+    city: 'Omaha',
+    state: 'Nebraska',
+    zip: '68102',
+    county: 'Douglas County',
+    type: 'Single-family home',
+    who: 'Debtor 1 only',
+    current_value: '200000',
+    has_loan: false,
+    is_community_property: false,
+    is_claiming_exemption: false,
+  });
+
+  // real_property_interests_add_another: No
+  h1 = (await page.locator('h1#daMainQuestion').textContent()) || '';
+  expect(h1).toContain('Do you have more interests to add?');
+  // Verify our submitted address appears in the table under
+  await expect(page.getByText('12 Oak St')).toBeVisible();
+  await answerYesNoAndContinue(page, false);
+
+  // vehicles_any_exist: No
+  h1 = (await page.locator('h1#daMainQuestion').textContent()) || '';
+  expect(h1).toContain('Do you own, lease, or have legal or equitable interest in any vehicles');
+  await answerYesNoAndContinue(page, false);
+
+  // other_vehicles_any_exist: No
+  h1 = (await page.locator('h1#daMainQuestion').textContent()) || '';
+  expect(h1).toContain('Do you own, lease, or have legal or equitable interest in any other vehicle types');
+  await answerYesNoAndContinue(page, false);
+
+  // Next should be personal_household_items page
+  h1 = (await page.locator('h1#daMainQuestion').textContent()) || '';
+  expect(h1).toContain('Describe your personal and household items.');
+});
+
 // Test 4: Amended filing branch - TRUE
 test('Variant 1: Amended filing with case number', async ({ page }) => {
   const testData = {
