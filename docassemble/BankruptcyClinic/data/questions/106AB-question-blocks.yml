@@ -1,7 +1,3 @@
----
-modules:
-  - docassemble.BankruptcyClinic.objects
----
 id: schedule_ab_property_intro
 event: property_intro
 section: schedule_ab
@@ -1537,8 +1533,11 @@ fields:
     datatype: currency
     show if: prop.interests[i].claiming_sub_100
   - Specific laws that allow exemption: prop.interests[i].exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'real_property')
+    choices:
+      - Homestead (Neb. Rev. Stat. §§ 40-101 - 40-118)
+      - Homestead, proceeds of sale (Neb. Rev. Stat. § 40-116)
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.interests[i].is_claiming_exemption
   - note: Second Exemption
     show if: prop.interests[i].is_claiming_exemption
@@ -1548,8 +1547,11 @@ fields:
     show if: prop.interests[i].claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.interests[i].exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'real_property')
+    choices:
+      - Homestead (Neb. Rev. Stat. §§ 40-101 - 40-118)
+      - Homestead, proceeds of sale (Neb. Rev. Stat. § 40-116)
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.interests[i].is_claiming_exemption
     required: False
 ---
@@ -1663,8 +1665,10 @@ fields:
     datatype: currency
     show if: prop.ab_vehicles[i].claiming_sub_100
   - Specific laws that allow exemption: prop.ab_vehicles[i].exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'vehicle')
+    choices:
+      - Motor vehicle (Neb. Rev. Stat. § 25-1556(1)(e))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.ab_vehicles[i].is_claiming_exemption
   - note: Second Exemption
     show if: prop.ab_vehicles[i].is_claiming_exemption
@@ -1674,8 +1678,10 @@ fields:
     show if: prop.ab_vehicles[i].claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.ab_vehicles[i].exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'vehicle')
+    choices:
+      - Motor vehicle (Neb. Rev. Stat. § 25-1556(1)(e))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.ab_vehicles[i].is_claiming_exemption
     required: False
 list collect: True
@@ -1789,8 +1795,10 @@ fields:
     datatype: currency
     show if: prop.ab_other_vehicles[i].claiming_sub_100
   - Specific laws that allow exemption: prop.ab_other_vehicles[i].exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'vehicle')
+    choices:
+      - Motor vehicle (Neb. Rev. Stat. § 25-1556(1)(e))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
   - note: Exemption 2
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
@@ -1800,8 +1808,10 @@ fields:
     show if: prop.ab_other_vehicles[i].claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.ab_other_vehicles[i].exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'vehicle')
+    choices:
+      - Motor vehicle (Neb. Rev. Stat. § 25-1556(1)(e))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
     required: False
 list collect: True
@@ -1941,8 +1951,10 @@ fields:
     datatype: currency
     show if: prop.household_goods_claiming_sub_100
   - Specific laws that allow exemption: prop.household_goods_exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Household goods (Neb. Rev. Stat. § 25-1556(1)(c))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.household_goods_is_claiming_exemption
   - note: Exemption 2
     show if: prop.household_goods_is_claiming_exemption
@@ -1952,8 +1964,10 @@ fields:
     show if: prop.household_goods_claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.household_goods_exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Household goods (Neb. Rev. Stat. § 25-1556(1)(c))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.household_goods_is_claiming_exemption
     required: False
 
@@ -1984,8 +1998,10 @@ fields:
     datatype: currency
     show if: prop.secured_household_goods_claiming_sub_100
   - Specific laws that allow exemption: prop.secured_household_goods_exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Household goods (Neb. Rev. Stat. § 25-1556(1)(c))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.secured_household_goods_is_claiming_exemption
   - note: Exemption 2
     show if: prop.secured_household_goods_is_claiming_exemption
@@ -1995,8 +2011,10 @@ fields:
     show if: prop.secured_household_goods_claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.secured_household_goods_exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Household goods (Neb. Rev. Stat. § 25-1556(1)(c))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.secured_household_goods_is_claiming_exemption
     required: False
 
@@ -2026,8 +2044,11 @@ fields:
     datatype: currency
     show if: prop.electronics_claiming_sub_100
   - Specific laws that allow exemption: prop.electronics_exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
+      - Household goods (Neb. Rev. Stat. § 25-1556(1)(c))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.electronics_is_claiming_exemption
   - note: Second Exemption
     show if: prop.electronics_is_claiming_exemption
@@ -2037,8 +2058,11 @@ fields:
     show if: prop.electronics_claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.electronics_exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
+      - Household goods (Neb. Rev. Stat. § 25-1556(1)(c))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.electronics_is_claiming_exemption
     required: False
 
@@ -2068,8 +2092,9 @@ fields:
     datatype: currency
     show if: prop.collectibles_claiming_sub_100
   - Specific laws that allow exemption: prop.collectibles_exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.collectibles_is_claiming_exemption
   - note: Second Exemption
     show if: prop.collectibles_is_claiming_exemption
@@ -2079,8 +2104,9 @@ fields:
     show if: prop.collectibles_claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.collectibles_exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.collectibles_is_claiming_exemption
     required: False
 
@@ -2110,8 +2136,9 @@ fields:
     datatype: currency
     show if: prop.hobby_equipment_claiming_sub_100
   - Specific laws that allow exemption: prop.hobby_equipment_exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.hobby_equipment_is_claiming_exemption
   - note: Second Exemption
     show if: prop.hobby_equipment_is_claiming_exemption
@@ -2121,8 +2148,9 @@ fields:
     show if: prop.hobby_equipment_claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.hobby_equipment_exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.hobby_equipment_is_claiming_exemption
     required: False
 
@@ -2153,8 +2181,9 @@ fields:
     datatype: currency
     show if: prop.firearms_claiming_sub_100
   - Specific laws that allow exemption: prop.firearms_exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.firearms_is_claiming_exemption
   - note: Second Exemption
     show if: prop.firearms_is_claiming_exemption
@@ -2164,8 +2193,9 @@ fields:
     show if: prop.firearms_claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.firearms_exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.firearms_is_claiming_exemption
     required: False
 
@@ -2196,8 +2226,10 @@ fields:
     datatype: currency
     show if: prop.clothes_claiming_sub_100
   - Specific laws that allow exemption: prop.clothes_exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Clothing (Neb. Rev. Stat. § 25-1556(1)(b))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.clothes_is_claiming_exemption
   - note: Second Exemption
     show if: prop.clothes_is_claiming_exemption
@@ -2207,8 +2239,10 @@ fields:
     show if: prop.clothes_claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.clothes_exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Clothing (Neb. Rev. Stat. § 25-1556(1)(b))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.clothes_is_claiming_exemption
     required: False
 
@@ -2239,8 +2273,11 @@ fields:
     datatype: currency
     show if: prop.jewelry_claiming_sub_100
   - Specific laws that allow exemption: prop.jewelry_exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Clothing (Neb. Rev. Stat. § 25-1556(1)(b))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
+      - Immediate personal possessions (Neb. Rev. Stat. § 25-1556(1)(a))
     show if: prop.jewelry_is_claiming_exemption
   - note: Second Exemption
     show if: prop.jewelry_is_claiming_exemption
@@ -2250,8 +2287,11 @@ fields:
     show if: prop.jewelry_claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.jewelry_exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Clothing (Neb. Rev. Stat. § 25-1556(1)(b))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
+      - Immediate personal possessions (Neb. Rev. Stat. § 25-1556(1)(a))
     show if: prop.jewelry_is_claiming_exemption
     required: False
 
@@ -2282,8 +2322,9 @@ fields:
     datatype: currency
     show if: prop.animal_claiming_sub_100
   - Specific laws that allow exemption: prop.animal_exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.animal_is_claiming_exemption
   - note: Second Exemption
     show if: prop.animal_is_claiming_exemption
@@ -2293,8 +2334,9 @@ fields:
     show if: prop.animal_claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.animal_exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.animal_is_claiming_exemption
     required: False
 
@@ -2325,8 +2367,10 @@ fields:
     datatype: currency
     show if: prop.other_household_items_claiming_sub_100
   - Specific laws that allow exemption: prop.other_household_items_exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Health Aids (Neb. Rev. Stat. § 25-1556(1)(f))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.other_household_items_is_claiming_exemption
   - note: Second Exemption
     show if: prop.other_household_items_is_claiming_exemption
@@ -2336,8 +2380,10 @@ fields:
     show if: prop.other_household_items_claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.other_household_items_exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Health Aids (Neb. Rev. Stat. § 25-1556(1)(f))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.other_household_items_is_claiming_exemption
     required: False
 
@@ -2391,8 +2437,10 @@ fields:
     datatype: currency
     show if: prop.financial_assets.cash_sub_100
   - Specific laws that allow exemption: prop.financial_assets.cash_exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Public Benefits (Neb. Rev. Stat. § 68-148)
+      - Unknown law
     show if: prop.financial_assets.cash_is_claiming_exemption
   - note: Second Exemption
     show if: prop.financial_assets.cash_is_claiming_exemption
@@ -2402,8 +2450,10 @@ fields:
     show if: prop.financial_assets.cash_sub_100
     required: False
   - Specific laws that allow exemption: prop.financial_assets.cash_exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Public Benefits (Neb. Rev. Stat. § 68-148)
+      - Unknown law
     show if: prop.financial_assets.cash_is_claiming_exemption
     required: False
 ---
@@ -2484,8 +2534,9 @@ fields:
     datatype: currency
     show if: prop.financial_assets.deposits[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.deposits[i].exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.financial_assets.deposits[i].is_claiming_exemption
   - note: Second Exemption
     show if: prop.financial_assets.deposits[i].is_claiming_exemption
@@ -2495,8 +2546,9 @@ fields:
     show if: prop.financial_assets.deposits[i].sub_100
     required: False
   - Specific laws that allow exemption: prop.financial_assets.deposits[i].exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.financial_assets.deposits[i].is_claiming_exemption
     required: False
 list collect: True
@@ -2570,8 +2622,9 @@ fields:
     datatype: currency
     show if: prop.financial_assets.bonds_and_stocks[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.bonds_and_stocks[i].exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.financial_assets.bonds_and_stocks[i].is_claiming_exemption
   - note: Second Exemption
     show if: prop.financial_assets.bonds_and_stocks[i].is_claiming_exemption
@@ -2581,8 +2634,9 @@ fields:
     show if: prop.financial_assets.bonds_and_stocks[i].sub_100
     required: False
   - Specific laws that allow exemption: prop.financial_assets.bonds_and_stocks[i].exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.financial_assets.bonds_and_stocks[i].is_claiming_exemption
     required: False
 list collect: True 
@@ -2661,8 +2715,9 @@ fields:
     datatype: currency
     show if: prop.financial_assets.non_traded_stock[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.non_traded_stock[i].exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.financial_assets.non_traded_stock[i].is_claiming_exemption
   - note: Second Exemption
     show if: prop.financial_assets.non_traded_stock[i].is_claiming_exemption
@@ -2672,8 +2727,9 @@ fields:
     show if: prop.financial_assets.non_traded_stock[i].sub_100
     required: false
   - Specific laws that allow exemption: prop.financial_assets.non_traded_stock[i].exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.financial_assets.non_traded_stock[i].is_claiming_exemption
     required: false
 list collect: True 
@@ -2747,8 +2803,9 @@ fields:
     datatype: currency
     show if: prop.financial_assets.corporate_bonds[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.corporate_bonds[i].exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.financial_assets.corporate_bonds[i].is_claiming_exemption
   - note: Second Exemption
     show if: prop.financial_assets.corporate_bonds[i].is_claiming_exemption
@@ -2758,8 +2815,9 @@ fields:
     show if: prop.financial_assets.corporate_bonds[i].sub_100
     required: False
   - Specific laws that allow exemption: prop.financial_assets.corporate_bonds[i].exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.financial_assets.corporate_bonds[i].is_claiming_exemption
     required: False
 list collect: True
@@ -2845,8 +2903,12 @@ fields:
     datatype: currency
     show if: prop.financial_assets.retirement_accounts[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.retirement_accounts[i].exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Retirement accounts (Neb. Rev. Stat. § 25-1563.01)
+      - Social Security (42 U.S.C. § 407)
+      - VA Benefits (38 U.S.C. § 5301(a))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.financial_assets.retirement_accounts[i].has_claim
   - note: Second Exemption
     show if: prop.financial_assets.retirement_accounts[i].has_claim
@@ -2856,8 +2918,12 @@ fields:
     show if: prop.financial_assets.retirement_accounts[i].sub_100
     required: False
   - Specific laws that allow exemption: prop.financial_assets.retirement_accounts[i].exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'all')
+    choices:
+      - Retirement accounts (Neb. Rev. Stat. § 25-1563.01)
+      - Social Security (42 U.S.C. § 407)
+      - VA Benefits (38 U.S.C. § 5301(a))
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.financial_assets.retirement_accounts[i].has_claim
     required: False
 list collect: True
