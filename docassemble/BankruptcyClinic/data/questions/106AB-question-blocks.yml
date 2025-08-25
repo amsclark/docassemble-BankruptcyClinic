@@ -1561,6 +1561,7 @@ fields:
         ))
     show if: prop.interests[i].is_claiming_exemption
     required: False
+list collect: True
 ---
 table: prop_ab_vehicles_table
 rows: prop.ab_vehicles
