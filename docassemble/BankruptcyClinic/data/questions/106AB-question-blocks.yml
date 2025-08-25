@@ -1537,8 +1537,11 @@ fields:
     datatype: currency
     show if: prop.interests[i].claiming_sub_100
   - Specific laws that allow exemption: prop.interests[i].exemption_laws
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'real_property')
+    choices:
+      - Homestead (Neb. Rev. Stat. §§ 40-101 - 40-118)
+      - Homestead, proceeds of sale (Neb. Rev. Stat. § 40-116)
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.interests[i].is_claiming_exemption
   - note: Second Exemption
     show if: prop.interests[i].is_claiming_exemption
@@ -1548,8 +1551,11 @@ fields:
     show if: prop.interests[i].claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.interests[i].exemption_laws_2
-    choices: |
-      get_exemption_choices(debtor[0].address.state, 'real_property')
+    choices:
+      - Homestead (Neb. Rev. Stat. §§ 40-101 - 40-118)
+      - Homestead, proceeds of sale (Neb. Rev. Stat. § 40-116)
+      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
+      - Unknown law
     show if: prop.interests[i].is_claiming_exemption
     required: False
 ---
