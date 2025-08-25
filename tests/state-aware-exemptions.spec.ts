@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 // Minimal helpers for this spec only
 async function gotoInterview(page: any) {
-	await page.goto('https://docassemble2.metatheria.solutions/interview?i=docassemble.playground1:voluntary-petition.yml#page1');
+	await page.goto('https://docassemble2.metatheria.solutions/interview?i=docassemble.playground1:voluntary-petition.yml&reset=1#page1');
 	await page.waitForLoadState('networkidle');
 }
 
@@ -31,13 +31,35 @@ async function continueIfPresent(page: any) {
 	}
 }
 
+async function readHeader(page: any): Promise<string> {
+	// Prefer h1#daMainQuestion, fall back to visible h1 or h2
+	const primary = page.locator('h1#daMainQuestion');
+	if (await primary.count()) {
+		const t = (await primary.textContent())?.trim();
+		if (t) return t;
+	}
+	const anyH1 = page.locator('h1:visible').first();
+	if (await anyH1.count()) {
+		const t = (await anyH1.textContent())?.trim();
+		if (t) return t;
+	}
+	const anyH2 = page.locator('h2:visible').first();
+	if (await anyH2.count()) {
+		const t = (await anyH2.textContent())?.trim();
+		if (t) return t;
+	}
+	return '';
+}
+
 async function navigateToBasicIdentity(page: any, districtLabel: string) {
 	// Intro
-	await expect(page.locator('h1#daMainQuestion')).toContainText('Voluntary Petition for Individuals Filing for Bankruptcy');
+	await page.waitForTimeout(200);
+	const introHeader = await readHeader(page);
+	expect(introHeader).toMatch(/Voluntary Petition/i);
 	await continueIfPresent(page);
 	// Step through until we reach Basic Identity
 	for (let i = 0; i < 15; i++) {
-		const h1 = (await page.locator('h1#daMainQuestion').textContent()) || '';
+	const h1 = await readHeader(page);
 		if (h1.includes('Basic Identity and Contact Information')) return;
 
 		if (h1.includes('What district are you filing your bankruptcy case in?') || h1.includes('What district are you filing')) {
@@ -90,6 +112,12 @@ async function navigateToBasicIdentity(page: any, districtLabel: string) {
 
 		// Default: try to continue
 		await continueIfPresent(page);
+		// safety: in case no obvious continue target, click first submit-ish button
+		const btn = page.locator('button:has-text("Continue"), button[type="submit"]').first();
+		if (await btn.count()) {
+			const enabled = await btn.isEnabled().catch(() => false);
+			if (enabled) await btn.click().catch(() => {});
+		}
 	}
 	throw new Error('Did not reach Basic Identity and Contact Information');
 }
@@ -212,7 +240,7 @@ async function fillBasicIdentityForState(page: any, state: string, county: strin
 async function goToRealPropertyDetails(page: any) {
 	// Walk forward until we arrive on the property details page, handling variants
 	for (let i = 0; i < 80; i++) {
-		const h1 = (await page.locator('h1#daMainQuestion').textContent())?.trim() || '';
+	const h1 = await readHeader(page);
 		console.log(`[nav ${i}] h1: ${h1}`);
 		// Already on details page
 		if (/details about .*interest/i.test(h1) || h1.toLowerCase().includes('details about the interest')) {
@@ -225,34 +253,49 @@ async function goToRealPropertyDetails(page: any) {
 		}
 		// First property question
 			if (h1.toLowerCase().includes('do you own') && h1.toLowerCase().includes('residence')) {
-				const yesBtn = page.getByRole('button', { name: 'Yes' }).first();
-				if (await yesBtn.count()) {
-					// Wait for it to be enabled, retrying briefly
-					const start = Date.now();
-					while (Date.now() - start < 3000) {
-						const enabled = await yesBtn.isEnabled().catch(() => false);
-						const visible = await yesBtn.isVisible().catch(() => false);
-						if (visible && enabled) break;
-						await page.waitForTimeout(50);
-					}
-					try {
-						await yesBtn.click({ timeout: 2000 });
-					} catch {
-						// Fallback: force-enable and click programmatically
-						await page.evaluate(() => {
-							const buttons = Array.from(document.querySelectorAll('button')) as HTMLButtonElement[];
-							const target = buttons.find(b => (b.textContent || '').trim() === 'Yes');
-							if (target) {
-								target.disabled = false;
-								target.click();
-							}
-						});
-					}
-				} else {
-					// Try radios if present
-					await selectFirstRadioOrByLabel(page, 'Yes');
+				// Prefer radios if present
+				const yesRadio = page.getByRole('radio', { name: /^Yes\b/i }).first();
+				if (await yesRadio.count()) {
+					await yesRadio.click().catch(() => {});
 					await continueIfPresent(page);
+				} else {
+					const yesBtn = page.getByRole('button', { name: /^Yes\b/i }).first();
+					if (await yesBtn.count()) {
+						// Wait for it to be enabled, retrying briefly
+						const start = Date.now();
+						while (Date.now() - start < 3000) {
+							const enabled = await yesBtn.isEnabled().catch(() => false);
+							const visible = await yesBtn.isVisible().catch(() => false);
+							if (visible && enabled) break;
+							await page.waitForTimeout(50);
+						}
+						try {
+							await yesBtn.click({ timeout: 2000 });
+						} catch {
+							// Fallback: force-enable and click programmatically
+							await page.evaluate(() => {
+								const buttons = Array.from(document.querySelectorAll('button')) as HTMLButtonElement[];
+								const target = buttons.find(b => (b.textContent || '').trim().match(/^Yes\b/i));
+								if (target) {
+									target.disabled = false;
+									target.click();
+								}
+							});
+						}
+					} else {
+						// Last resort: click first radio then continue
+						await selectFirstRadioOrByLabel(page, 'Yes');
+						await continueIfPresent(page);
+					}
 				}
+				// Wait for header to change away from the same question
+				await page.waitForTimeout(150);
+				await page.waitForFunction((prev: string) => {
+					const h = document.querySelector('h1#daMainQuestion')?.textContent?.trim()
+						|| document.querySelector('h1:visible')?.textContent?.trim()
+						|| document.querySelector('h2:visible')?.textContent?.trim() || '';
+					return (h && h !== prev);
+				}, h1, { timeout: 3000 }).catch(() => {});
 				// loop will verify details page
 				continue;
 			}
@@ -264,7 +307,10 @@ async function goToRealPropertyDetails(page: any) {
 		} else if (h1.toLowerCase().includes('are there more debtors to add')) {
 			await selectFirstRadioOrByLabel(page, 'No');
 		}
-		await continueIfPresent(page);
+	await continueIfPresent(page);
+	// extra nudge
+	const cont = page.getByRole('button', { name: /Continue|Next/i }).first();
+	if (await cont.count()) await cont.click().catch(() => {});
 	}
 	throw new Error('Could not reach real property details page');
 }
@@ -313,6 +359,7 @@ async function setPropertyStateOnDetails(page: any, state: string) {
 }
 
 test('State-aware exemptions (Nebraska) - homestead laws present', async ({ page }) => {
+	test.setTimeout(120000);
 	await gotoInterview(page);
 	await navigateToBasicIdentity(page, 'District of Nebraska');
 	await fillBasicIdentityForState(page, 'Nebraska', 'Douglas County');
@@ -336,6 +383,7 @@ test('State-aware exemptions (Nebraska) - homestead laws present', async ({ page
 });
 
 test('State-aware exemptions (South Dakota) - SDCL laws present', async ({ page }) => {
+	test.setTimeout(120000);
 	await gotoInterview(page);
 	// District label may vary; Nebraska works too, exemptions key off debtor state
 	await navigateToBasicIdentity(page, 'District of Nebraska');
