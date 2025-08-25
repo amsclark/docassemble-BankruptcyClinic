@@ -1462,7 +1462,7 @@ fields:
   - City: prop.interests[i].city
     # default: Tampa
   - State: prop.interests[i].state
-  reload: True
+    reload: True
     # default: Florida
   - Zip: prop.interests[i].zip
     datatype: number
