@@ -116,8 +116,45 @@ window.getExemptionChoicesForState = function(userState, propertyType) {
 function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claiming_sub_100,
     current_owned_value, exemption_value, exemption_laws, exemption_value_2,
     exemption_laws_2, userState) {
-    if (userState) {
-      currentExemptions = getCurrentExemptions(userState);
+    // Helper: build choices for the law selects based on current state and property type
+  function setSelectOptions(selectElem, options) {
+      if (!selectElem) return;
+      // Preserve current value if possible
+      const previous = selectElem.value;
+      // Clear and rebuild
+      while (selectElem.options.length) selectElem.remove(0);
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = 'Select...';
+      selectElem.appendChild(placeholder);
+      (options || []).forEach(o => {
+        const opt = document.createElement('option');
+        opt.value = o;
+        opt.textContent = o;
+        selectElem.appendChild(opt);
+      });
+      // Restore selection if still valid
+      if (previous && options && options.includes(previous)) {
+        selectElem.value = previous;
+      }
+    }
+
+    function inferPropertyType() {
+      const key = String(exemption_laws || '').toLowerCase();
+      if (key.includes('.ab_vehicles')) return 'vehicle';
+      if (key.includes('.interests[')) return 'real_property';
+      return 'all';
+    }
+
+    function buildLawIndex(exemptionsObj) {
+      const idx = {};
+      try {
+        Object.keys(exemptionsObj || {}).forEach(k => {
+          const e = exemptionsObj[k];
+          if (e && e.law) idx[e.law] = e;
+        });
+      } catch(e) {}
+      return idx;
     }
 
   function runExemptionCheck() {
@@ -140,9 +177,9 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
 
 
       // If not claiming exemptions skip check
-      if (!isClaimingExemption) {return;}
+  if (!isClaimingExemption) {return;}
 
-      if (!isCustomExemption && law1Element.value && currentExemptions[law1]) {
+  if (!isCustomExemption && law1Element.value && currentExemptions[law1]) {
         if (parseFloat(currentValue) > currentExemptions[law1].limit && currentExemptions[law1].limit !== 0) {
           console.log('ERROR OVER LIMIT');
           flash(currentValue + " is over " + law1 + " limit.", "danger");
@@ -199,8 +236,9 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
     }
 
 
-    function addOnChangeListener(element) {
+    function addOnChangeListener(element, extraHandler) {
       element.addEventListener('change', event => {
+        try { if (typeof extraHandler === 'function') extraHandler(); } catch(e) { console.log(e); }
         runExemptionCheck();
       });
     }
@@ -219,9 +257,71 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
     var value2Element = getFormElement(getBtoaSearchString(exemption_value_2), "input")[0];
     var law2Element = getFormElement(getBtoaSearchString(exemption_laws_2), "select")[0];
 
-    // Apply change listener to every element
-    addOnChangeListener(isClaimingExemptionElement);
-    addOnChangeListener(isNotClaimingExemptionElement);
+    // Resolve the actual state input element from the provided userState variable name
+    var stateElement = null;
+    if (userState) {
+      stateElement = getFormElementByName(getBtoaSearchName(userState))[0];
+      if (!stateElement) {
+        // Fallback if not found by name
+        var inputs = getFormElement(getBtoaSearchString(userState), 'input');
+        if (inputs && inputs.length) stateElement = inputs[0];
+      }
+    }
+    // Last-resort: find by label caption "State"
+    if (!stateElement) {
+      try {
+        var labels = document.querySelectorAll('label');
+        for (var i = 0; i < labels.length; i++) {
+          var txt = (labels[i].textContent || '').trim().toLowerCase();
+          if (txt === 'state' || txt === 'state*' || txt.startsWith('state')) {
+            var forId = labels[i].getAttribute('for');
+            if (forId) {
+              var candidate = document.getElementById(forId);
+              if (candidate) { stateElement = candidate; break; }
+            }
+            // try next sibling input/select
+            var next = labels[i].nextElementSibling;
+            while (next && !(next.tagName === 'INPUT' || next.tagName === 'SELECT' || next.tagName === 'TEXTAREA')) {
+              next = next.nextElementSibling;
+            }
+            if (next) { stateElement = next; break; }
+          }
+        }
+      } catch(e) { console.log(e); }
+    }
+
+    function refreshExemptionContext() {
+  var stateVal = stateElement ? stateElement.value : null;
+  // Set the currentExemptions map used by validations, keyed by law string
+  currentExemptions = buildLawIndex(getCurrentExemptions(stateVal));
+      // Populate the law selects with the correct choices for this property type
+      var propertyType = inferPropertyType();
+      var choices = window.getExemptionChoicesForState(stateVal, propertyType);
+      function updateAll(nameExpr, fallbackElem) {
+        var updated = 0;
+        try {
+          var byName = getFormElementByName(getBtoaSearchName(nameExpr));
+          if (byName && byName.length) {
+            for (var i = 0; i < byName.length; i++) {
+              if (byName[i].tagName === 'SELECT') { setSelectOptions(byName[i], choices); updated++; }
+            }
+          }
+        } catch(e) {}
+        try {
+          var byData = getFormElement(getBtoaSearchString(nameExpr), "select");
+          if (byData && byData.length) {
+            for (var j = 0; j < byData.length; j++) { setSelectOptions(byData[j], choices); updated++; }
+          }
+        } catch(e) {}
+        if (!updated && fallbackElem) setSelectOptions(fallbackElem, choices);
+      }
+      updateAll(exemption_laws, law1Element);
+      updateAll(exemption_laws_2, law2Element);
+    }
+
+  // Apply change listener to every element
+  addOnChangeListener(isClaimingExemptionElement, refreshExemptionContext);
+  addOnChangeListener(isNotClaimingExemptionElement, refreshExemptionContext);
     addOnChangeListener(isCustomExemptionElement);
     addOnChangeListener(isNotCustomExemptionElement);
     addOnChangeListener(currentValueElement);
@@ -229,5 +329,26 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
     addOnChangeListener(law1Element);
     addOnChangeListener(value2Element);
     addOnChangeListener(law2Element);
+    if (stateElement) {
+      addOnChangeListener(stateElement, refreshExemptionContext);
+      try { stateElement.addEventListener('input', refreshExemptionContext); } catch(e) { console.log(e); }
+    }
+
+    // Observe DOM changes to law selects and refresh when they appear/re-render
+    try {
+      const mo = new MutationObserver(() => {
+        try { refreshExemptionContext(); } catch(e) { console.log(e); }
+      });
+      mo.observe(document.body, { childList: true, subtree: true });
+    } catch(e) { console.log(e); }
+
+    // Initial populate/refresh using the current state value (and a slight delay for safety)
+    try {
+      refreshExemptionContext();
+      setTimeout(refreshExemptionContext, 250);
+      setTimeout(refreshExemptionContext, 750);
+    } catch (e) {
+      console.log('Failed to refresh exemption context:', e);
+    }
 
   }
