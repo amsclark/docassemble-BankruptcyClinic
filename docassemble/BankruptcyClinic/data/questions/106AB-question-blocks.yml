@@ -1462,7 +1462,6 @@ fields:
   - City: prop.interests[i].city
     # default: Tampa
   - State: prop.interests[i].state
-    reload: True
     # default: Florida
   - Zip: prop.interests[i].zip
     datatype: number
@@ -1645,7 +1644,6 @@ fields:
     # default: 200000
     datatype: currency
   - State: prop.ab_vehicles[i].state
-    reload: True
   - Do you have a mortgage/loan on the vehicle?: prop.ab_vehicles[i].has_loan
     # default: false
     datatype: yesno
