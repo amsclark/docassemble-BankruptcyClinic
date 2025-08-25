@@ -3001,3 +3001,6 @@ test('Variant 16: Complete end-to-end workflow validation', async ({ page }) => 
   console.log('🎉 Complete end-to-end workflow test completed successfully');
   console.log('✅ All 21 test variants completed successfully');
 });
+
+// Removed non-NE/SD state-aware tests per scope
+
