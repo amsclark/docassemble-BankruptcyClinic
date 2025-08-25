@@ -2,18 +2,25 @@
 // Nebraska exemptions (example, fill in as needed)
 const nebraskaExemptions = {
   homestead: { law: 'Homestead (Neb. Rev. Stat. § 40-101)', limit: 60000, amount: 0 },
-  // ... add other NE exemptions here ...
+  homestead_proceeds: { law: 'Homestead, proceeds of sale (Neb. Rev. Stat. § 40-116)', limit: 60000, amount: 0 },
+  wildcard: { law: 'Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))', limit: 2500, amount: 0 },
+  motor_vehicle: { law: 'Motor vehicle (Neb. Rev. Stat. § 25-1556(1)(e))', limit: 2400, amount: 0 },
+  unknown: { law: 'Unknown law', limit: 0, amount: 0 }
 };
 
 // South Dakota exemptions
 const southDakotaExemptions = {
   homestead: { law: 'Homestead (SDCL 43-31-1 – 43-31-6)', limit: 120000, amount: 0 },
-  homestead_proceeds: { law: 'Homestead, proceeds of sale (SDCL 43-31-4)', limit: 60000, amount: 0 },
+  homestead_proceeds: { law: 'Homestead, proceeds of sale (SDCL 43-31-4)', limit: 60000, amount: 0 }, // Note: 170000 for 70 and older
   household_goods: { law: 'Furniture and bedding (SDCL 43-45-5(5))', limit: 200, amount: 0 },
-  wildcard: { law: 'Wildcard (SDCL 43-5-4)', limit: 2000, amount: 0 }, // adjust for head of household
+  wildcard: { law: 'Wildcard (SDCL 43-5-4)', limit: 2000, amount: 0 }, // 2000 not head of household, 5000 head of household, 7000 total max
   personal_property: { law: 'Bible, books, family pictures, burial plots, all wearing apparel, church pew, food & fuel to last one year, and clothing (SDCL 43-45-2)', limit: 0, amount: 0 },
+  domestic_support: { law: 'alimony, maintenance, or support of the debtor (SDCL 43-45-2)', limit: 0, amount: 0 },
   health_aids: { law: 'Health Aids (SDCL 43-45-2)', limit: 0, amount: 0 },
+  city_employee_pensions: { law: 'city employee pensions (SDCL 9-16-47)', limit: 0, amount: 0 },
+  public_employee_pensions: { law: 'public employee pensions (SDCL 3-12-115)', limit: 0, amount: 0 },
   retirement: { law: 'retirement (SDCL 43-45-26)', limit: 1000000, amount: 0 },
+  public_assistance: { law: 'public assistance (SDCL 28-7-16)', limit: 0, amount: 0 },
   wages: { law: 'Wages (SDCL 15-20-12)', limit: 0, amount: 0 },
   life_insurance: { law: 'Life insurance proceeds (SDCL 58-12-4. 43-45-6)', limit: 10000, amount: 0 },
   workers_comp: { law: 'Workers Compensation (SDCL 62-4-42)', limit: 0, amount: 0 },
@@ -21,7 +28,7 @@ const southDakotaExemptions = {
   student_loan: { law: 'Student Loan (20 U.S.C. § 1095a(d))', limit: 0, amount: 0 },
   social_security: { law: 'Social Security (42 U.S.C. § 407)', limit: 0, amount: 0 },
   va: { law: 'VA Benefits (38 U.S.C. § 5301(a))', limit: 0, amount: 0 },
-  // ... add other SD exemptions here ...
+  unknown: { law: 'Unknown law', limit: 0, amount: 0 }
 };
 
 // Helper to select the correct exemption set
@@ -32,6 +39,78 @@ function getCurrentExemptions(userState) {
   // Default to Nebraska
   return nebraskaExemptions;
 }
+
+// Helper to get exemption law names for real property (homestead, wildcard, etc.)
+function getRealPropertyExemptionLaws(userState) {
+  const exemptions = getCurrentExemptions(userState);
+  const realPropertyLaws = [];
+  
+  if (userState && userState.toLowerCase().includes('south dakota')) {
+    // South Dakota real property exemptions
+    realPropertyLaws.push(exemptions.homestead.law);
+    realPropertyLaws.push(exemptions.homestead_proceeds.law);
+    realPropertyLaws.push(exemptions.wildcard.law);
+    realPropertyLaws.push(exemptions.unknown.law);
+  } else {
+    // Nebraska real property exemptions
+    realPropertyLaws.push(exemptions.homestead.law);
+    realPropertyLaws.push(exemptions.homestead_proceeds.law);
+    realPropertyLaws.push(exemptions.wildcard.law);
+    realPropertyLaws.push(exemptions.unknown.law);
+  }
+  
+  return realPropertyLaws;
+}
+
+// Helper to get exemption law names for vehicles
+function getVehicleExemptionLaws(userState) {
+  const exemptions = getCurrentExemptions(userState);
+  const vehicleLaws = [];
+  
+  if (userState && userState.toLowerCase().includes('south dakota')) {
+    // South Dakota vehicle exemptions
+    vehicleLaws.push(exemptions.wildcard.law);
+    vehicleLaws.push(exemptions.unknown.law);
+  } else {
+    // Nebraska vehicle exemptions
+    vehicleLaws.push(exemptions.motor_vehicle.law);
+    vehicleLaws.push(exemptions.wildcard.law);
+    vehicleLaws.push(exemptions.unknown.law);
+  }
+  
+  return vehicleLaws;
+}
+
+// Helper to get all exemption law names
+function getAllExemptionLaws(userState) {
+  const exemptions = getCurrentExemptions(userState);
+  const allLaws = [];
+  
+  for (const key in exemptions) {
+    if (exemptions.hasOwnProperty(key)) {
+      allLaws.push(exemptions[key].law);
+    }
+  }
+  
+  return allLaws;
+}
+
+// Global function that can be called from Docassemble to populate dropdown choices
+window.getExemptionChoicesForState = function(userState, propertyType) {
+  propertyType = propertyType || 'all';
+  
+  switch(propertyType.toLowerCase()) {
+    case 'real_property':
+    case 'homestead':
+      return getRealPropertyExemptionLaws(userState);
+    case 'vehicle':
+    case 'motor_vehicle':
+      return getVehicleExemptionLaws(userState);
+    case 'all':
+    default:
+      return getAllExemptionLaws(userState);
+  }
+};
 
 // Main function, now expects userState as an extra argument
 function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claiming_sub_100,

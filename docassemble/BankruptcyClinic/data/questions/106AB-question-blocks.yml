@@ -1,3 +1,7 @@
+---
+modules:
+  - docassemble.BankruptcyClinic.objects
+---
 id: schedule_ab_property_intro
 event: property_intro
 section: schedule_ab
@@ -1533,11 +1537,8 @@ fields:
     datatype: currency
     show if: prop.interests[i].claiming_sub_100
   - Specific laws that allow exemption: prop.interests[i].exemption_laws
-    choices:
-      - Homestead (Neb. Rev. Stat. §§ 40-101 - 40-118)
-      - Homestead, proceeds of sale (Neb. Rev. Stat. § 40-116)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+    choices: |
+      get_exemption_choices(debtor[0].address.state, 'real_property')
     show if: prop.interests[i].is_claiming_exemption
   - note: Second Exemption
     show if: prop.interests[i].is_claiming_exemption
@@ -1547,11 +1548,8 @@ fields:
     show if: prop.interests[i].claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.interests[i].exemption_laws_2
-    choices:
-      - Homestead (Neb. Rev. Stat. §§ 40-101 - 40-118)
-      - Homestead, proceeds of sale (Neb. Rev. Stat. § 40-116)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+    choices: |
+      get_exemption_choices(debtor[0].address.state, 'real_property')
     show if: prop.interests[i].is_claiming_exemption
     required: False
 ---
@@ -1795,10 +1793,8 @@ fields:
     datatype: currency
     show if: prop.ab_other_vehicles[i].claiming_sub_100
   - Specific laws that allow exemption: prop.ab_other_vehicles[i].exemption_laws
-    choices:
-      - Motor vehicle (Neb. Rev. Stat. § 25-1556(1)(e))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+    choices: |
+      get_exemption_choices(debtor[0].address.state, 'vehicle')
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
   - note: Exemption 2
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
@@ -1808,10 +1804,8 @@ fields:
     show if: prop.ab_other_vehicles[i].claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.ab_other_vehicles[i].exemption_laws_2
-    choices:
-      - Motor vehicle (Neb. Rev. Stat. § 25-1556(1)(e))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+    choices: |
+      get_exemption_choices(debtor[0].address.state, 'vehicle')
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
     required: False
 list collect: True
@@ -1951,10 +1945,8 @@ fields:
     datatype: currency
     show if: prop.household_goods_claiming_sub_100
   - Specific laws that allow exemption: prop.household_goods_exemption_laws
-    choices:
-      - Household goods (Neb. Rev. Stat. § 25-1556(1)(c))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+    choices: |
+      get_exemption_choices(debtor[0].address.state, 'all')
     show if: prop.household_goods_is_claiming_exemption
   - note: Exemption 2
     show if: prop.household_goods_is_claiming_exemption
@@ -1964,10 +1956,8 @@ fields:
     show if: prop.household_goods_claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.household_goods_exemption_laws_2
-    choices:
-      - Household goods (Neb. Rev. Stat. § 25-1556(1)(c))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+    choices: |
+      get_exemption_choices(debtor[0].address.state, 'all')
     show if: prop.household_goods_is_claiming_exemption
     required: False
 
@@ -1998,10 +1988,8 @@ fields:
     datatype: currency
     show if: prop.secured_household_goods_claiming_sub_100
   - Specific laws that allow exemption: prop.secured_household_goods_exemption_laws
-    choices:
-      - Household goods (Neb. Rev. Stat. § 25-1556(1)(c))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+    choices: |
+      get_exemption_choices(debtor[0].address.state, 'all')
     show if: prop.secured_household_goods_is_claiming_exemption
   - note: Exemption 2
     show if: prop.secured_household_goods_is_claiming_exemption
@@ -2011,10 +1999,8 @@ fields:
     show if: prop.secured_household_goods_claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.secured_household_goods_exemption_laws_2
-    choices:
-      - Household goods (Neb. Rev. Stat. § 25-1556(1)(c))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+    choices: |
+      get_exemption_choices(debtor[0].address.state, 'all')
     show if: prop.secured_household_goods_is_claiming_exemption
     required: False
 
@@ -2044,11 +2030,8 @@ fields:
     datatype: currency
     show if: prop.electronics_claiming_sub_100
   - Specific laws that allow exemption: prop.electronics_exemption_laws
-    choices:
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Household goods (Neb. Rev. Stat. § 25-1556(1)(c))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+    choices: |
+      get_exemption_choices(debtor[0].address.state, 'all')
     show if: prop.electronics_is_claiming_exemption
   - note: Second Exemption
     show if: prop.electronics_is_claiming_exemption
@@ -2058,11 +2041,8 @@ fields:
     show if: prop.electronics_claiming_sub_100
     required: False
   - Specific laws that allow exemption: prop.electronics_exemption_laws_2
-    choices:
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Household goods (Neb. Rev. Stat. § 25-1556(1)(c))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+    choices: |
+      get_exemption_choices(debtor[0].address.state, 'all')
     show if: prop.electronics_is_claiming_exemption
     required: False
 
