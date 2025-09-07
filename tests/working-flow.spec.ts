@@ -7,8 +7,358 @@ import { McpAssistant } from './mcp-assistant';
  */
 
 test.describe('Working Bankruptcy Interview Flow', () => {
-  test.setTimeout(600000); // 10 minutes for full completion
+  test.setTimeout(600000); // 10 minutes 
   
+  async function navigateIntelligently(page: any, analysis?: any) {
+    const pageTitle = await page.title();
+    const pageTitleLower = pageTitle.toLowerCase();
+    const currentUrl = page.url();
+    
+    console.log(`  📋 Analyzing page: "${pageTitle}"`);
+    console.log(`  🔗 URL: ${currentUrl}`);
+
+    // Handle "updating bankruptcy filing" specifically
+    if (pageTitleLower.includes('updating') && pageTitleLower.includes('bankruptcy') && pageTitleLower.includes('filing')) {
+      console.log(`  🔘 Bankruptcy filing update - clicking "Yes" button`);
+      try {
+        const yesButton = page.locator('button:has-text("Yes")').first();
+        await yesButton.click();
+        await page.waitForLoadState('networkidle');
+        console.log(`  ✅ Clicked Yes for bankruptcy filing update`);
+        return;
+      } catch (error) {
+        console.log(`  ⚠️ Could not click Yes button: ${error}`);
+      }
+    }
+
+    // Handle "filing individually or with spouse" specifically
+    if (pageTitleLower.includes('filing') && (pageTitleLower.includes('individually') || pageTitleLower.includes('spouse'))) {
+      console.log(`  🔘 Filing type question - clicking "Individually" option`);
+      try {
+        // Use the specific CSS selector you provided
+        const individuallyOption = page.locator('label[for="cHJvcC5zcG91c2VfaW5mb19maWxpbmdfam9pbnRseSJGYWxzZSI"]');
+        await individuallyOption.click();
+        await page.waitForLoadState('networkidle');
+        console.log(`  ✅ Selected "Individually" filing option`);
+        return;
+      } catch (error) {
+        console.log(`  ⚠️ Could not click individually option: ${error}`);
+      }
+    }
+    
+    // Handle "other names" page using XPath selector
+    if (pageTitleLower.includes('other names') || 
+        (pageTitleLower.includes('known') && pageTitleLower.includes('names'))) {
+      console.log(`  🔘 Other names question - clicking "No" button`);
+      try {
+        // Use the XPath selector for the No button
+        const noButton = page.locator('xpath=//button[@name="cHJvcC5pbmRpdmlkdWFsX2RlYnRvci5vdGhlcl9uYW1lcy50aGVyZV9hcmVfYW55" and @value="False"]');
+        await noButton.click();
+        await page.waitForLoadState('networkidle');
+        console.log(`  ✅ Clicked No for other names`);
+        return;
+      } catch (error) {
+        console.log(`  ⚠️ Could not click No button for other names: ${error}`);
+      }
+    }
+
+    // Handle "180 days district" specifically
+    if (pageTitleLower.includes('180') && pageTitleLower.includes('district')) {
+      console.log(`  🔘 180 days district question - clicking "No" button`);
+      try {
+        const noButton = page.locator('button[name="cHJvcC5pbmRpdmlkdWFsX2RlYnRvci5kaXN0cmljdF8xODBfZGF5cy50aGVyZV9hcmVfYW55"][value="False"]');
+        await noButton.click();
+        await page.waitForLoadState('networkidle');
+        console.log(`  ✅ Clicked No for 180 days district`);
+        return;
+      } catch (error) {
+        console.log(`  ⚠️ Could not click No button for 180 days district: ${error}`);
+      }
+    }
+
+    // Handle "district reason" specifically  
+    if (pageTitleLower.includes('district') && pageTitleLower.includes('reason')) {
+      console.log(`  🔘 District reason question - filling text field`);
+      try {
+        const textField = page.locator('textarea[name="cHJvcC5pbmRpdmlkdWFsX2RlYnRvci5kaXN0cmljdF9yZWFzb24"]');
+        await textField.fill('i just moved');
+        await page.waitForLoadState('networkidle');
+        console.log(`  ✅ Filled district reason with "i just moved"`);
+        return;
+      } catch (error) {
+        console.log(`  ⚠️ Could not fill district reason: ${error}`);
+      }
+    }
+
+    // Handle "more dependents" question specifically  
+    if (pageTitleLower.includes('more dependents') || 
+        (pageTitleLower.includes('dependents') && (pageTitleLower.includes('any') || pageTitleLower.includes('more')))) {
+      console.log(`  🔘 More dependents question - clicking "No" button`);
+      try {
+        const noButton = page.locator('button:has-text("No")').first();
+        await noButton.click();
+        await page.waitForLoadState('networkidle');
+        console.log(`  ✅ Clicked No for more dependents`);
+        return;
+      } catch (error) {
+        console.log(`  ⚠️ Could not click No button for dependents: ${error}`);
+      }
+    }
+
+    // Handle property interest question specifically
+    if (pageTitleLower.includes('legal or equitable interest in any real property') || 
+        (pageTitleLower.includes('property') && pageTitleLower.includes('interest'))) {
+      console.log(`  🔘 Property interest question - clicking "No" button`);
+      try {
+        // Click the specific "No" button using the exact selector you provided
+        const propertyNoButton = page.locator('button[name="cHJvcC5yZWFsX3Byb3BlcnR5LnRoZXJlX2FyZV9hbnk"][value="False"]');
+        await propertyNoButton.click();
+        await page.waitForLoadState('networkidle');
+        console.log(`  ✅ Clicked No for property interest`);
+        return;
+      } catch (error) {
+        console.log(`  ⚠️ Could not click No button for property interest: ${error}`);
+      }
+    }
+
+    // Handle vehicles question specifically
+    if (pageTitleLower.includes('do you own, lease, or have legal or equitable interest in any vehicles') || 
+        (pageTitleLower.includes('vehicles') && pageTitleLower.includes('legal or equitable interest'))) {
+      console.log(`  🔘 Vehicles question - clicking "No" button`);
+      try {
+        // Click the specific "No" button using the exact selector you provided
+        const vehiclesNoButton = page.locator('button[name="cHJvcC52ZWhpY2xlcy50aGVyZV9hcmVfYW55"][value="False"]');
+        await vehiclesNoButton.click();
+        await page.waitForLoadState('networkidle');
+        console.log(`  ✅ Clicked No for vehicles`);
+        return;
+      } catch (error) {
+        console.log(`  ⚠️ Could not click No button for vehicles: ${error}`);
+      }
+    }
+
+    // Handle other vehicle types question specifically
+    if (pageTitleLower.includes('do you own, lease, or have legal or equitable interest in any other vehicle types') || 
+        (pageTitleLower.includes('other vehicle types') && pageTitleLower.includes('legal or equitable interest'))) {
+      console.log(`  🔘 Other vehicle types question - clicking "Yes" button`);
+      try {
+        // Click the specific "Yes" button using the exact selector you provided
+        const otherVehiclesYesButton = page.locator('button[name="cHJvcC5hYl9vdGhlcl92ZWhpY2xlcy50aGVyZV9hcmVfYW55"][value="True"]');
+        await otherVehiclesYesButton.click();
+        await page.waitForLoadState('networkidle');
+        console.log(`  ✅ Clicked Yes for other vehicle types`);
+        return;
+      } catch (error) {
+        console.log(`  ⚠️ Could not click Yes button for other vehicle types: ${error}`);
+      }
+    }
+
+    // Handle vehicle info form specifically
+    if (pageTitleLower.includes('vehicle') && (pageTitleLower.includes('year') || pageTitleLower.includes('make'))) {
+      console.log(`  🔘 Vehicle info form - filling details`);
+      try {
+        // First, check if there's a loan checkbox and click it
+        const loanCheckbox = page.locator('input[name="cHJvcC5hYl9vdGhlcl92ZWhpY2xlcy5nYXRoZXJbMF0ubG9hbl9jaGVja2JveA"]');
+        if (await loanCheckbox.isVisible()) {
+          console.log(`  📋 Clicking loan checkbox first`);
+          await loanCheckbox.click();
+          await page.waitForTimeout(500); // Wait for any dynamic content to load
+        }
+
+        // Fill the vehicle details
+        await page.fill('input[name="cHJvcC5hYl9vdGhlcl92ZWhpY2xlcy5nYXRoZXJbMF0ueWVhcg"]', '2020');
+        await page.fill('input[name="cHJvcC5hYl9vdGhlcl92ZWhpY2xlcy5nYXRoZXJbMF0ubWFrZQ"]', 'Toyota');
+        await page.fill('input[name="cHJvcC5hYl9vdGhlcl92ZWhpY2xlcy5nYXRoZXJbMF0ubW9kZWw"]', 'Camry');
+        await page.fill('input[name="cHJvcC5hYl9vdGhlcl92ZWhpY2xlcy5nYXRoZXJbMF0ubWlsZWFnZQ"]', '50000');
+
+        // Fill loan amount if the field is now visible/available
+        const loanAmountField = page.locator('input[name="cHJvcC5hYl9vdGhlcl92ZWhpY2xlcy5nYXRoZXJbMF0ubG9hbl9hbW91bnQ"]');
+        if (await loanAmountField.isVisible()) {
+          console.log(`  💰 Filling loan amount`);
+          await page.fill('input[name="cHJvcC5hYl9vdGhlcl92ZWhpY2xlcy5nYXRoZXJbMF0ubG9hbl9hbW91bnQ"]', '15000');
+        }
+
+        await page.fill('input[name="cHJvcC5hYl9vdGhlcl92ZWhpY2xlcy5nYXRoZXJbMF0udmFsdWU"]', '25000');
+
+        // Click the continue button with the specific ID
+        const continueButton = page.locator('#da-continue-button');
+        if (await continueButton.isVisible()) {
+          await continueButton.click();
+          await page.waitForLoadState('networkidle');
+          console.log(`  ✅ Filled vehicle info form and clicked continue`);
+          return;
+        }
+      } catch (error) {
+        console.log(`  ⚠️ Could not fill vehicle info form: ${error}`);
+      }
+    }
+
+    // Handle deposits question specifically
+    if (pageTitleLower.includes('do you have any deposits of money') || 
+        (pageTitleLower.includes('deposits') && pageTitleLower.includes('money'))) {
+      console.log(`  🔘 Deposits question - clicking "Yes" button`);
+      try {
+        // Click the specific "Yes" button using the exact selector you provided
+        const depositsYesButton = page.locator('button[name="cHJvcC5maW5hbmNpYWxfYXNzZXRzLmRlcG9zaXRzLnRoZXJlX2FyZV9hbnk"][value="True"]');
+        await depositsYesButton.click();
+        await page.waitForLoadState('networkidle');
+        console.log(`  ✅ Clicked Yes for deposits`);
+        return;
+      } catch (error) {
+        console.log(`  ⚠️ Could not click Yes button for deposits: ${error}`);
+      }
+    }
+
+    // Try standard form navigation if no specific handler matched
+    console.log(`  🤖 Using fallback navigation strategies`);
+
+    // First try to find and click continue/next buttons
+    const buttons = [
+      'button:has-text("Continue")',
+      'button:has-text("Next")', 
+      'button:has-text("Submit")',
+      'input[type="submit"]',
+      'button[type="submit"]',
+      '#da-continue-button',
+      '.btn-primary',
+      'a:has-text("Continue")',
+      'a:has-text("Next")'
+    ];
+
+    for (const buttonSelector of buttons) {
+      try {
+        const button = page.locator(buttonSelector);
+        if (await button.isVisible() && await button.isEnabled()) {
+          console.log(`  🔘 Found button: ${buttonSelector}`);
+          await button.click();
+          await page.waitForLoadState('networkidle');
+          console.log(`  ✅ Successfully clicked: ${buttonSelector}`);
+          return;
+        }
+      } catch (error) {
+        // Continue to next button type
+      }
+    }
+
+    // Try to handle radio buttons automatically
+    try {
+      const radioButtons = await page.locator('input[type="radio"]').count();
+      if (radioButtons > 0) {
+        console.log(`  📻 Found ${radioButtons} radio buttons`);
+        
+        // Click the first radio button as a fallback
+        await page.locator('input[type="radio"]').first().click();
+        await page.waitForTimeout(500);
+        
+        // Then try to find a continue button again
+        const continueBtn = page.locator('button:has-text("Continue"), #da-continue-button').first();
+        if (await continueBtn.isVisible()) {
+          await continueBtn.click();
+          await page.waitForLoadState('networkidle');
+          console.log(`  ✅ Selected radio option and clicked continue`);
+          return;
+        }
+      }
+    } catch (error) {
+      console.log(`  ⚠️ Could not handle radio buttons: ${error}`);
+    }
+
+    // Try to handle checkboxes
+    try {
+      const checkboxes = await page.locator('input[type="checkbox"]').count();
+      if (checkboxes > 0) {
+        console.log(`  ☑️ Found ${checkboxes} checkboxes`);
+        // For now, don't automatically check boxes as they might be optional
+      }
+    } catch (error) {
+      console.log(`  ⚠️ Could not analyze checkboxes: ${error}`);
+    }
+
+    // Try to fill any required text fields with minimal test data
+    try {
+      const textInputs = page.locator('input[type="text"]:visible, input[type="email"]:visible, input[type="tel"]:visible, textarea:visible');
+      const inputCount = await textInputs.count();
+      
+      if (inputCount > 0) {
+        console.log(`  📝 Found ${inputCount} text inputs to fill`);
+        
+        for (let i = 0; i < inputCount; i++) {
+          const input = textInputs.nth(i);
+          const inputName = await input.getAttribute('name') || '';
+          const inputType = await input.getAttribute('type') || 'text';
+          const placeholder = await input.getAttribute('placeholder') || '';
+          
+          let valueToFill = '';
+          
+          // Smart filling based on field characteristics
+          if (inputName.includes('email') || inputType === 'email') {
+            valueToFill = 'test@example.com';
+          } else if (inputName.includes('phone') || inputType === 'tel') {
+            valueToFill = '555-123-4567';
+          } else if (inputName.includes('name')) {
+            valueToFill = 'Test User';
+          } else if (inputName.includes('address')) {
+            valueToFill = '123 Test St';
+          } else if (inputName.includes('city')) {
+            valueToFill = 'Test City';
+          } else if (inputName.includes('zip') || inputName.includes('postal')) {
+            valueToFill = '12345';
+          } else if (inputName.includes('date')) {
+            valueToFill = '01/01/2020';
+          } else if (placeholder.includes('$') || inputName.includes('amount') || inputName.includes('value')) {
+            valueToFill = '1000';
+          } else {
+            valueToFill = 'Test';
+          }
+          
+          try {
+            await input.fill(valueToFill);
+            console.log(`    📝 Filled ${inputName || `input ${i}`} with: ${valueToFill}`);
+          } catch (error) {
+            console.log(`    ⚠️ Could not fill input ${i}: ${error}`);
+          }
+        }
+        
+        // After filling, try to submit
+        const continueBtn = page.locator('button:has-text("Continue"), #da-continue-button, button[type="submit"]').first();
+        if (await continueBtn.isVisible()) {
+          await continueBtn.click();
+          await page.waitForLoadState('networkidle');
+          console.log(`  ✅ Filled inputs and clicked continue`);
+          return;
+        }
+      }
+    } catch (error) {
+      console.log(`  ⚠️ Could not handle text inputs: ${error}`);
+    }
+
+    // Check for any unchecked required radio buttons
+    try {
+      await page.$$eval('input[type="radio"]', (radios: any) => {
+        const groups = new Map();
+        radios.forEach((radio: any) => {
+          const name = radio.name;
+          if (!groups.has(name)) {
+            groups.set(name, []);
+          }
+          groups.get(name).push(radio);
+        });
+        
+        groups.forEach((groupRadios: any, name: any) => {
+          const checked = groupRadios.some((radio: any) => radio.checked);
+          if (!checked && groupRadios.length > 0) {
+            console.log(`  📻 Auto-selecting first option for radio group: ${name}`);
+            groupRadios[0].click();
+          }
+        });
+      });
+    } catch (error) {
+      console.log(`  ⚠️ Could not auto-select radio buttons: ${error}`);
+    }
+
+    console.log(`  ⚠️ Could not find a way to proceed from this page`);
+  }
+
   test('should navigate through bankruptcy interview with intelligent assistance', async ({ page, context }) => {
     console.log('🚀 Starting working end-to-end test (fixed version)');
     console.log('📺 Video recording enabled - watching for progress');
@@ -144,9 +494,6 @@ test.describe('Working Bankruptcy Interview Flow', () => {
     });
   });
 });
-
-// Simple navigation helper
-async function navigateIntelligently(page: any, analysis: any) {
   console.log(`  📄 Navigating: ${analysis.h1Text.substring(0, 40)}...`);
   
   const pageTitleLower = analysis.h1Text.toLowerCase();
@@ -156,6 +503,22 @@ async function navigateIntelligently(page: any, analysis: any) {
     btn.text.toLowerCase().includes('continue') || 
     btn.text.toLowerCase().includes('next')
   );
+  
+  // Handle deposits question specifically
+  if (pageTitleLower.includes('do you have any deposits of money') || 
+      (pageTitleLower.includes('deposits') && pageTitleLower.includes('money'))) {
+    console.log(`  🔘 Deposits question - clicking "Yes" button`);
+    try {
+      // Click the specific "Yes" button using the exact selector you provided
+      const depositsYesButton = page.locator('button[name="cHJvcC5maW5hbmNpYWxfYXNzZXRzLmRlcG9zaXRzLnRoZXJlX2FyZV9hbnk"][value="True"]');
+      await depositsYesButton.click();
+      await page.waitForLoadState('networkidle');
+      console.log(`  ✅ Clicked Yes for deposits`);
+      return;
+    } catch (error) {
+      console.log(`  ⚠️ Could not click Yes button for deposits: ${error}`);
+    }
+  }
   
   // Handle problematic property page carefully
   if (pageTitleLower.includes('describe all property') || pageTitleLower.includes('property you haven')) {
@@ -169,7 +532,7 @@ async function navigateIntelligently(page: any, analysis: any) {
       }
       
       // Click "No" radio buttons
-      await page.$$eval('input[type="radio"]', radios => {
+      await page.$$eval('input[type="radio"]', (radios: any) => {
         radios.forEach((radio: any) => {
           if (radio.value === 'False' || radio.value === 'No') {
             radio.click();
@@ -370,66 +733,64 @@ async function navigateIntelligently(page: any, analysis: any) {
     }
   }
   
-  // Handle vehicle information form specifically
+    // Handle vehicle information form specifically
   if (pageTitleLower.includes('tell the court about one of your other vehicles') || 
       (pageTitleLower.includes('other vehicles') && pageTitleLower.includes('tell the court'))) {
     console.log(`  📝 Vehicle info form - filling required fields and clicking continue`);
     try {
-      // Fill text inputs - many have defaults but ensure they're filled
-      await page.fill('input[name*="make"]', 'Toyota').catch(() => {});
-      await page.fill('input[name*="model"]', 'Corolla').catch(() => {});
-      await page.fill('input[name*="year"]', '2012').catch(() => {});
-      await page.fill('textarea[name*="other_info"]', 'Vehicle description').catch(() => {});
-      await page.fill('input[name*="current_value"]', '15000').catch(() => {});
-      
-      // Handle radio buttons for "Who has an interest in the property"
-      const debtorOnlyRadio = page.locator('input[type="radio"][value*="Debtor 1 only"]');
-      if (await debtorOnlyRadio.isVisible()) {
-        await debtorOnlyRadio.click();
-        console.log(`  ✅ Selected 'Debtor 1 only' for property interest`);
-      }
-      
-      // Handle loan question - select "No" 
-      const hasLoanNoRadio = page.locator('input[type="radio"][value="False"]').first();
-      if (await hasLoanNoRadio.isVisible()) {
-        await hasLoanNoRadio.click();
-        console.log(`  ✅ Selected 'No' for vehicle loan`);
-      }
-      
-      // Handle community property - select "No"
-      const communityPropertyNo = page.locator('input[name*="is_community_property"][value="False"]');
-      if (await communityPropertyNo.isVisible()) {
-        await communityPropertyNo.click();
-        console.log(`  ✅ Selected 'No' for community property`);
-      }
-      
-      // Handle exemption claiming - select "No"
-      const exemptionNo = page.locator('input[name*="is_claiming_exemption"][value="False"]');
-      if (await exemptionNo.isVisible()) {
-        await exemptionNo.click();
-        console.log(`  ✅ Selected 'No' for claiming exemption`);
-      }
-      
-      // Fill any remaining required fields
-      const requiredInputs = await page.$$('input[required], select[required], textarea[required]');
-      for (const input of requiredInputs) {
-        const inputType = await input.getAttribute('type');
+      // Fill any required text inputs with basic values
+      const textInputs = await page.$$('input[type="text"]');
+      for (const input of textInputs) {
+        const isRequired = await input.getAttribute('required');
         const isVisible = await input.isVisible();
-        if (isVisible && inputType !== 'radio' && inputType !== 'checkbox') {
-          const currentValue = await input.inputValue();
-          if (!currentValue) {
-            if (inputType === 'number') {
-              await input.fill('0');
-            } else {
-              await input.fill('Default Value');
-            }
-            console.log(`  ✅ Filled required ${inputType} field`);
+        if (isRequired && isVisible) {
+          await input.fill('Other Vehicle');
+          console.log(`  ✅ Filled required text field`);
+        }
+      }
+      
+      // Fill any required textareas with basic values
+      const textareas = await page.$$('textarea');
+      for (const textarea of textareas) {
+        const isRequired = await textarea.getAttribute('required');
+        const isVisible = await textarea.isVisible();
+        if (isRequired && isVisible) {
+          await textarea.fill('Vehicle description');
+          console.log(`  ✅ Filled required textarea`);
+        }
+      }
+      
+      // Select any required dropdowns
+      const selects = await page.$$('select');
+      for (const select of selects) {
+        const isRequired = await select.getAttribute('required');
+        const isVisible = await select.isVisible();
+        if (isRequired && isVisible) {
+          const options = await select.$$('option');
+          if (options.length > 1) {
+            await select.selectOption({ index: 1 });
+            console.log(`  ✅ Selected required dropdown option`);
           }
         }
       }
       
-      // Wait for any form validation
-      await page.waitForTimeout(1000);
+      // Handle loan checkbox - check "Yes" to enable loan amount field
+      const hasLoanCheckbox = page.locator('#daform > div.da-container.da-fieldset.da-form-group.row.dayesnospacing.da-field-container.da-field-container-datatype-boolean.da-field-container-inputtype-yesno.da-field-container-emptylabel.dacollectmid > div > div > label');
+      if (await hasLoanCheckbox.isVisible()) {
+        await hasLoanCheckbox.click();
+        console.log(`  ✅ Clicked loan checkbox using specific selector`);
+        
+        // Wait for loan amount field to appear and fill it
+        await page.waitForTimeout(500);
+        const loanAmountField = page.locator('input[type="text"], input[type="number"]').last();
+        if (await loanAmountField.isVisible()) {
+          await loanAmountField.fill('150000');
+          console.log(`  ✅ Filled loan amount field`);
+        }
+      }
+      
+      // Wait a moment for any changes to register
+      await page.waitForTimeout(500);
       
       // Click the specific continue button using the ID selector
       const daContinueButton = page.locator('#da-continue-button');
