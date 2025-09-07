@@ -41,10 +41,10 @@ test.describe('Bankruptcy Clinic Interview - MCP Enhanced', () => {
       await mcp.captureState('02-district-selection.png');
       
       // Expect district selection question
-      await expect(page.getByText('What judicial district are you filing in?')).toBeVisible();
+      await expect(page.getByText('What district are you filing your bankruptcy case in?')).toBeVisible();
       
-      // Use getByLabel as preferred in prompt.md
-      const districtSelect = page.getByLabel('District', { exact: false });
+      // Use getByLabel as preferred in prompt.md - be more specific to avoid conflicts
+      const districtSelect = page.getByLabel('Bankruptcy Court District');
       await districtSelect.selectOption('District of Nebraska');
       
       await page.getByRole('button', { name: 'Continue' }).click();
@@ -146,7 +146,10 @@ test.describe('Bankruptcy Clinic Interview - MCP Enhanced', () => {
       await page.getByRole('button', { name: 'Continue' }).click();
       await page.waitForLoadState('networkidle');
       
-      const districtSelect = page.getByLabel('District', { exact: false });
+      // Wait for the district page and use specific label
+      await expect(page.getByText('What district are you filing your bankruptcy case in?')).toBeVisible();
+      
+      const districtSelect = page.getByLabel('Bankruptcy Court District');
       await districtSelect.selectOption('District of Nebraska');
       await page.getByRole('button', { name: 'Continue' }).click();
       await page.waitForLoadState('networkidle');
@@ -282,16 +285,19 @@ test.describe('MCP Helper Function Examples', () => {
       await page.getByRole('button', { name: 'Continue' }).click();
       await page.waitForLoadState('networkidle');
       
-      // Example of getByLabel usage
-      const districtField = page.getByLabel('District', { exact: false });
+      // Wait for district page to load and check exact text
+      await expect(page.getByText('What district are you filing your bankruptcy case in?')).toBeVisible();
+      
+      // Example of getByLabel usage - use the specific label
+      const districtField = page.getByLabel('Bankruptcy Court District');
       if (await districtField.count() > 0) {
         console.log('✅ getByLabel found district field');
       }
     });
     
     await test.step('Use getByText for content verification', async () => {
-      // Example of getByText for assertions
-      await expect(page.getByText('What judicial district')).toBeVisible();
+      // Example of getByText for assertions - use exact text from the page
+      await expect(page.getByText('What district are you filing your bankruptcy case in?')).toBeVisible();
       console.log('✅ getByText found expected question text');
     });
   });
@@ -303,8 +309,8 @@ test.describe('MCP Helper Function Examples', () => {
       // Playwright auto-waits - no need for sleep() as mentioned in prompt.md
       await page.getByRole('button', { name: 'Continue' }).click();
       
-      // Auto-wait for next page content
-      await expect(page.getByText('What judicial district')).toBeVisible();
+      // Auto-wait for next page content - use exact text from the interview
+      await expect(page.getByText('What district are you filing your bankruptcy case in?')).toBeVisible();
       
       console.log('✅ Auto-waits handled page transition without manual sleep');
     });
