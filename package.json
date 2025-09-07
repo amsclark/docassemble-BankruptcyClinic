@@ -10,7 +10,11 @@
     "test:report": "playwright show-report",
     "test:smoke": "playwright test tests/smoke.spec.ts",
     "test:mcp": "playwright test tests/mcp-assisted.spec.ts",
-    "mcp-server": "node --loader ts-node/esm mcp-server.ts"
+    "test:mcp-enhanced": "playwright test tests/mcp-enhanced.spec.ts",
+    "test:prompt-examples": "playwright test tests/mcp-enhanced.spec.ts --headed",
+    "mcp-server": "node --loader ts-node/esm mcp-server.ts",
+    "test:debug-mcp": "playwright test tests/mcp-enhanced.spec.ts --debug",
+    "test:all-mcp": "playwright test tests/mcp-assisted.spec.ts tests/mcp-enhanced.spec.ts"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^0.4.0",
