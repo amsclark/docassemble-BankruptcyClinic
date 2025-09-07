@@ -13,13 +13,21 @@
     "mcp-server": "node --loader ts-node/esm mcp-server.ts"
   },
   "devDependencies": {
-    "@playwright/test": "^1.40.0",
-    "@types/node": "^20.10.0",
-    "typescript": "^5.3.0",
     "@modelcontextprotocol/sdk": "^0.4.0",
-    "ts-node": "^10.9.0"
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^20.10.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.3.0"
   },
-  "keywords": ["playwright", "docassemble", "bankruptcy", "testing"],
+  "keywords": [
+    "playwright",
+    "docassemble",
+    "bankruptcy",
+    "testing"
+  ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@playwright/mcp": "^0.0.36"
+  }
 }

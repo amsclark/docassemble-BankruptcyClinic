@@ -95,3 +95,6 @@ ehthumbs.db
 *.tsbuildinfo
 dist/
 build/
+
+# Playwright
+/blob-report/
