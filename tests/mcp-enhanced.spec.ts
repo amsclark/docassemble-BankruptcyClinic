@@ -21,8 +21,8 @@ test.describe('Bankruptcy Clinic Interview - MCP Enhanced', () => {
       await page.goto('/interview?i=docassemble.playground1:voluntary-petition.yml#page1');
       await page.waitForLoadState('networkidle');
       
-      // Verify we're at the start
-      await expect(page.getByText('Voluntary Petition for Individuals Filing for Bankruptcy')).toBeVisible();
+      // Verify we're at the start using the h1 heading
+      await expect(page.getByRole('heading', { name: 'Voluntary Petition for Individuals Filing for Bankruptcy' })).toBeVisible();
     });
     
     await test.step('Navigate introduction with MCP analysis', async () => {
