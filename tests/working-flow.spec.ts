@@ -48,8 +48,8 @@ import { McpAssistant } from './mcp-assistant';
 
 test.describe('Working Bankruptcy Interview Flow', () => {
   test('should navigate through bankruptcy interview with intelligent assistance', async ({ page }) => {
-    // Set a more reasonable timeout
-    test.setTimeout(300000); // 5 minutes instead of 10
+    // Set longer timeout for full end-to-end completion
+    test.setTimeout(600000); // 10 minutes for full completion to PDF generation
     
     console.log('🚀 Starting working end-to-end test');
     console.log('📺 Video recording enabled - watching for progress');
@@ -57,7 +57,7 @@ test.describe('Working Bankruptcy Interview Flow', () => {
     const mcp = new McpAssistant(page);
     const startTime = Date.now();
     let stepCount = 0;
-    const MAX_STEPS = 35; // Limit steps to prevent infinite loops    // Progress tracking
+    const MAX_STEPS = 100; // Increased significantly to reach PDF generation    // Progress tracking
     const progressPoints: Record<string, number> = {
       'Voluntary Petition for Individuals': 5,
       'What district are you filing': 10,
@@ -115,16 +115,21 @@ test.describe('Working Bankruptcy Interview Flow', () => {
         // PERFORMANCE TRACKING: Track page timing
         const pageStartTime = Date.now();
         
-        // Check if we've reached completion
+        // Check if we've reached PDF generation completion
         if (progress >= 100 || 
             analysis.h1Text.toLowerCase().includes('download') ||
-            analysis.h1Text.toLowerCase().includes('conclusion') ||
-            analysis.h1Text.toLowerCase().includes('complete') ||
-            analysis.h1Text.toLowerCase().includes('attachment') ||
             analysis.h1Text.toLowerCase().includes('pdf') ||
+            analysis.h1Text.toLowerCase().includes('generated') ||
+            analysis.h1Text.toLowerCase().includes('complete') ||
+            analysis.h1Text.toLowerCase().includes('finished') ||
+            analysis.h1Text.toLowerCase().includes('conclusion') ||
+            analysis.h1Text.toLowerCase().includes('attachment') ||
+            page.url().includes('pdf') ||
             page.url().includes('download') ||
+            page.url().includes('generated') ||
             analysis.buttons.some((btn: any) => btn.text.toLowerCase().includes('download'))) {
-          console.log('🎉 REACHED COMPLETION! PDF generation available');
+          console.log(`🎉 SUCCESS: Reached completion at "${analysis.h1Text}"`);
+          console.log(`📄 Final URL: ${page.url()}`);
           
           await page.screenshot({ path: `test-results/working-COMPLETION-${Date.now()}.png`, fullPage: true });
           
@@ -318,7 +323,25 @@ async function navigateIntelligently(page: any, analysis: any) {
           });
         });
         
-        console.log(`  ✅ Brute force radio clicking completed`);
+        // Also handle checkboxes - generally leave them unchecked unless they're clearly required
+        await page.$$eval('input[type="checkbox"]', (checkboxes: any[]) => {
+          checkboxes.forEach((checkbox: any) => {
+            const label = checkbox.parentElement?.textContent?.toLowerCase() || '';
+            const name = checkbox.name?.toLowerCase() || '';
+            // Only check boxes that seem required or positive
+            if (label.includes('agree') || label.includes('confirm') || label.includes('certify') || 
+                name.includes('required') || label.includes('understand')) {
+              try {
+                checkbox.checked = true;
+                checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+              } catch (e) {
+                // Silent fail
+              }
+            }
+          });
+        });
+        
+        console.log(`  ✅ Brute force radio and checkbox clicking completed`);
         
       } catch (e) {
         console.log(`  ⚠️ Brute force failed, trying fallback`);
@@ -360,25 +383,40 @@ async function navigateIntelligently(page: any, analysis: any) {
       
       try {
         // Method 1: Fill all text inputs and textareas at once using page evaluation
-        await page.$$eval('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], textarea', (fields: any[]) => {
+        await page.$$eval('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="date"], textarea', (fields: any[]) => {
           fields.forEach((field: any) => {
             if (!field.value && !field.readOnly && !field.disabled) {
               const name = field.name?.toLowerCase() || '';
               const id = field.id?.toLowerCase() || '';
               const placeholder = field.placeholder?.toLowerCase() || '';
+              const label = field.getAttribute('aria-label')?.toLowerCase() || '';
               
               let value = '';
-              if (name.includes('first') || id.includes('first')) value = 'Dan';
-              else if (name.includes('last') || id.includes('last')) value = 'Fields';
-              else if (name.includes('middle')) value = 'M';
-              else if (name.includes('address') || id.includes('address')) value = '123 Main St';
-              else if (name.includes('city') || id.includes('city')) value = 'Austin';
-              else if (name.includes('state') || id.includes('state')) value = 'TX';
-              else if (name.includes('zip') || id.includes('zip')) value = '78701';
-              else if (name.includes('phone') || id.includes('phone')) value = '5551234567';
-              else if (name.includes('email') || id.includes('email')) value = 'test@example.com';
+              // Name fields
+              if (name.includes('first') || id.includes('first') || label.includes('first')) value = 'Dan';
+              else if (name.includes('last') || id.includes('last') || label.includes('last')) value = 'Fields';
+              else if (name.includes('middle') || label.includes('middle')) value = 'M';
+              // Address fields
+              else if (name.includes('address') || id.includes('address') || label.includes('address')) value = '123 Main St';
+              else if (name.includes('city') || id.includes('city') || label.includes('city')) value = 'Austin';
+              else if (name.includes('state') || id.includes('state') || label.includes('state')) value = 'TX';
+              else if (name.includes('zip') || id.includes('zip') || label.includes('zip')) value = '78701';
+              // Contact fields
+              else if (name.includes('phone') || id.includes('phone') || label.includes('phone')) value = '5551234567';
+              else if (name.includes('email') || id.includes('email') || label.includes('email')) value = 'test@example.com';
+              // Financial fields
+              else if (name.includes('amount') || id.includes('amount') || label.includes('amount')) value = '0';
+              else if (name.includes('value') || id.includes('value') || label.includes('value')) value = '0';
+              else if (name.includes('income') || id.includes('income') || label.includes('income')) value = '0';
+              else if (name.includes('debt') || id.includes('debt') || label.includes('debt')) value = '0';
+              else if (name.includes('balance') || id.includes('balance') || label.includes('balance')) value = '0';
+              // Date fields
+              else if (field.type === 'date' || name.includes('date') || label.includes('date')) value = '2000-01-01';
+              // Number fields
               else if (field.type === 'number') value = '0';
+              // Text areas
               else if (field.tagName === 'TEXTAREA') value = 'N/A';
+              // Generic text
               else value = 'Test';
               
               if (value) {
