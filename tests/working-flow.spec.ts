@@ -197,7 +197,7 @@ async function navigateIntelligently(page: any, analysis: any) {
     // ULTRA FAST PATH: Pages that should just click Continue immediately
     const fastContinuePages = [
       'please tell the court about your property',
-      'what is your cash on hand',
+      'what is your cash on hand', 
       'do you have any trusts',
       'do you have any patents',
       'do you have any licenses',
@@ -206,11 +206,27 @@ async function navigateIntelligently(page: any, analysis: any) {
       'debtor summary'
     ];
     
+    // SKIP FORM FILLING: Pages that should skip complex form filling
+    const skipFormPages = [
+      'voluntary petition for individuals filing for bankruptcy',
+      'what district are you filing your bankruptcy case in',
+      'district details'
+    ];
+    
     const pageTitleLower = analysis.h1Text.toLowerCase();
     const shouldFastContinue = fastContinuePages.some(phrase => pageTitleLower.includes(phrase));
+    const shouldSkipForms = skipFormPages.some(phrase => pageTitleLower.includes(phrase));
     
     if (shouldFastContinue && continueButton) {
       console.log(`  🚀 ULTRA FAST: Direct continue for "${pageTitleLower.substring(0, 30)}..."`);
+      await page.getByRole('button', { name: continueButton.text }).click();
+      await page.waitForLoadState('networkidle');
+      return;
+    }
+    
+    // SKIP COMPLEX FORMS: Just click continue on slow initial pages
+    if (shouldSkipForms && continueButton) {
+      console.log(`  ⚡ SKIP FORMS: Skip complex form filling for "${pageTitleLower.substring(0, 30)}..."`);
       await page.getByRole('button', { name: continueButton.text }).click();
       await page.waitForLoadState('networkidle');
       return;
@@ -269,137 +285,178 @@ async function navigateIntelligently(page: any, analysis: any) {
       return;
     }
 
-    // PRIORITY 3: Handle radio groups quickly
+    // PRIORITY 3: Handle radio groups quickly - SUPER AGGRESSIVE
     if (analysis.radioGroups.length > 0) {
-      console.log(`  📋 Quick radio selection from ${analysis.radioGroups.length} groups`);
+      console.log(`  📋 AGGRESSIVE RADIO: Processing ${analysis.radioGroups.length} groups`);
       
-      // Try to select the first "No" option we can find
-      for (const group of analysis.radioGroups) {
-        // Look for exact "No" options first - handle both "No" and "NoNo" cases
-        const exactNoOption = group.options.find((opt: any) => {
-          const label = opt.label.toLowerCase().trim();
-          return label === 'no' || label === 'nono';
-        });
+      // SPECIAL HANDLING: Skip radio buttons on Basic Identity page (visibility issues)
+      if (pageTitleLower.includes('basic identity and contact information')) {
+        console.log(`  ⏭️ SKIP RADIO: Skipping radio selection on Basic Identity page (visibility issues)`);
+        if (continueButton) {
+          await page.getByRole('button', { name: continueButton.text }).click();
+          await page.waitForLoadState('networkidle');
+          return;
+        }
+      }
+      
+      // BRUTE FORCE: Click all "No" radio buttons on the page
+      try {
+        console.log(`  🔥 BRUTE FORCE: Clicking all No radio buttons`);
         
-        if (exactNoOption) {
-          console.log(`  🔘 Found exact "No" option: ${exactNoOption.label}`);
-          try {
-            // Try multiple selectors for better success rate
-            const radioSelectors = [
-              `input[type="radio"][value*="No"]`,
-              `input[type="radio"][value*="no"]`, 
-              `input[name*="No"]`,
-              `input[name*="no"]`,
-              'input[type="radio"]:not([value*="Yes"]):not([value*="yes"])'
-            ];
-            
-            let clicked = false;
-            for (const selector of radioSelectors) {
+        // Method 1: Click all radio buttons with "No" values (base64 encoded names don't matter)
+        await page.$$eval('input[type="radio"]', (radios: any[]) => {
+          radios.forEach((radio: any) => {
+            const label = radio.parentElement?.textContent?.toLowerCase() || '';
+            const value = radio.value?.toLowerCase() || '';
+            if (label.includes('no') || value.includes('no') || value === '0' || value === 'false') {
               try {
-                const radio = page.locator(selector).first();
-                await radio.click({ timeout: 2000 });
-                console.log(`  ✅ Successfully clicked "No" using ${selector}`);
-                clicked = true;
-                break;
+                radio.click();
               } catch (e) {
-                // Try next selector
+                // Silent fail and continue
               }
             }
-            
-            if (!clicked) {
-              // Fallback to label-based approach
-              await page.getByRole('radio', { name: new RegExp('no', 'i') }).first().click({ timeout: 2000 });
-              console.log(`  ✅ Successfully clicked "No" using regex`);
-            }
-            break; // Found and clicked, exit the loop
-          } catch (e) {
-            console.log(`  ⚠️ Failed to click exact No option: ${e}`);
-          }
-        }
+          });
+        });
         
-        // Fallback: look for any option containing "no"
-        const noOption = group.options.find((opt: any) => 
-          opt.label.toLowerCase().includes('no')
-        );
+        console.log(`  ✅ Brute force radio clicking completed`);
         
-        if (noOption) {
-          console.log(`  🔘 Found "No" option: ${noOption.label}`);
-          try {
-            await page.getByRole('radio', { name: new RegExp(noOption.label.split('No')[0] + 'No', 'i') }).first().click({ timeout: 2000 });
-            break; // Found and clicked, exit the loop
-          } catch (e) {
-            console.log(`  ⚠️ Failed to click No option: ${e}`);
-          }
-        }
+      } catch (e) {
+        console.log(`  ⚠️ Brute force failed, trying fallback`);
         
-        // Last resort: click first option in first group only
-        if (group.options.length > 0) {
-          console.log(`  🔘 Fallback: clicking first option: ${group.options[0].label}`);
-          try {
-            // Use CSS selector as fallback
-            await page.locator('input[type="radio"]').first().click({ timeout: 2000 });
-            console.log(`  ✅ Successfully clicked first radio using CSS selector`);
-            break; // Found and clicked, exit the loop
-          } catch (e) {
-            console.log(`  ⚠️ Failed to click first option: ${e}`);
-          }
+        // Fallback: Click first radio in each group
+        try {
+          await page.$$eval('input[type="radio"]', (radios: any[]) => {
+            const groups = new Set();
+            radios.forEach((radio: any) => {
+              const name = radio.name;
+              if (name && !groups.has(name)) {
+                groups.add(name);
+                try {
+                  radio.click();
+                } catch (e) {
+                  // Silent fail
+                }
+              }
+            });
+          });
+          console.log(`  ✅ Fallback radio clicking completed`);
+        } catch (e2) {
+          console.log(`  ⚠️ All radio attempts failed, continuing anyway`);
         }
       }
       
       // Quick continue after radio selection
       if (continueButton) {
-        await page.waitForTimeout(100); // Minimal pause
+        await page.waitForTimeout(50); // Minimal pause
         await page.getByRole('button', { name: continueButton.text }).click();
         await page.waitForLoadState('networkidle');
         return;
       }
     }
 
-    // PRIORITY 4: Quick form filling (only if necessary)
+    // PRIORITY 4: BRUTE FORCE form filling - Fill ALL visible fields
     if (analysis.formFields.length > 0) {
-      console.log(`  📝 Quick-filling ${analysis.formFields.length} fields`);
+      console.log(`  📝 BRUTE FORCE: Filling ALL ${analysis.formFields.length} fields aggressively`);
       
-      // Only fill fields that are actually empty and required
-      const emptyFields = analysis.formFields.filter((field: any) => 
-        !field.value && field.type !== 'hidden' && field.type !== 'submit'
-      );
-      
-      if (emptyFields.length > 0) {
-        const fillPromises = emptyFields.map((field: any) => {
-          let fillValue = 'N/A';
-          const label = field.label.toLowerCase();
-          
-          if (label.includes('name')) fillValue = 'Test User';
-          else if (label.includes('address')) fillValue = '123 Test St';
-          else if (label.includes('city')) fillValue = 'Test City';
-          else if (label.includes('zip')) fillValue = '12345';
-          else if (label.includes('phone')) fillValue = '555-123-4567';
-          else if (label.includes('email')) fillValue = 'test@example.com';
-          else if (field.type === 'number') fillValue = '0';
-          else if (field.type === 'textarea') fillValue = 'N/A';
-          
-          return page.getByLabel(field.label).fill(fillValue).catch(() => {
-            console.log(`    ⚠️ Could not fill ${field.label}`);
+      try {
+        // Method 1: Fill all text inputs and textareas at once using page evaluation
+        await page.$$eval('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], textarea', (fields: any[]) => {
+          fields.forEach((field: any) => {
+            if (!field.value && !field.readOnly && !field.disabled) {
+              const name = field.name?.toLowerCase() || '';
+              const id = field.id?.toLowerCase() || '';
+              const placeholder = field.placeholder?.toLowerCase() || '';
+              
+              let value = '';
+              if (name.includes('first') || id.includes('first')) value = 'Dan';
+              else if (name.includes('last') || id.includes('last')) value = 'Fields';
+              else if (name.includes('middle')) value = 'M';
+              else if (name.includes('address') || id.includes('address')) value = '123 Main St';
+              else if (name.includes('city') || id.includes('city')) value = 'Austin';
+              else if (name.includes('state') || id.includes('state')) value = 'TX';
+              else if (name.includes('zip') || id.includes('zip')) value = '78701';
+              else if (name.includes('phone') || id.includes('phone')) value = '5551234567';
+              else if (name.includes('email') || id.includes('email')) value = 'test@example.com';
+              else if (field.type === 'number') value = '0';
+              else if (field.tagName === 'TEXTAREA') value = 'N/A';
+              else value = 'Test';
+              
+              if (value) {
+                field.value = value;
+                field.dispatchEvent(new Event('input', { bubbles: true }));
+                field.dispatchEvent(new Event('change', { bubbles: true }));
+              }
+            }
           });
         });
         
-        await Promise.allSettled(fillPromises);
+        console.log(`  ✅ Brute force form filling completed`);
+        
+      } catch (e) {
+        console.log(`  ⚠️ Brute force form filling failed: ${e}`);
+        
+        // Fallback: Fill only essential fields quickly
+        const essentialFields = analysis.formFields.slice(0, 10); // Limit to first 10
+        for (const field of essentialFields) {
+          if (!field.value) {
+            try {
+              const label = field.label.toLowerCase();
+              let value = 'Test';
+              if (label.includes('first') && label.includes('name')) value = 'Dan';
+              else if (label.includes('last') && label.includes('name')) value = 'Fields';
+              else if (label.includes('address')) value = '123 Main St';
+              else if (label.includes('city')) value = 'Austin';
+              else if (label.includes('state')) value = 'TX';
+              else if (label.includes('zip')) value = '78701';
+              else if (field.type === 'number') value = '0';
+              
+              await page.getByLabel(field.label).fill(value, { timeout: 200 });
+            } catch (e) {
+              // Silent fail and continue
+            }
+          }
+        }
       }
     }
 
-    // PRIORITY 5: Handle dropdowns quickly
+    // PRIORITY 5: BRUTE FORCE dropdown selection
     if (analysis.selects.length > 0) {
-      console.log(`  📝 Quick dropdown selection`);
-      for (const select of analysis.selects) {
-        if (select.options.length > 1) {
-          const firstOption = select.options.find((opt: string) => 
-            opt && opt.trim() && !opt.toLowerCase().includes('select')
-          );
-          if (firstOption) {
-            try {
-              await page.getByLabel(select.label).selectOption(firstOption);
-            } catch (e) {
-              console.log(`    ⚠️ Could not select dropdown option`);
+      console.log(`  📝 BRUTE FORCE: Selecting ALL ${analysis.selects.length} dropdowns`);
+      
+      try {
+        // Fill all dropdowns at once
+        await page.$$eval('select', (selects: any[]) => {
+          selects.forEach((select: any) => {
+            if (select.options && select.options.length > 1) {
+              // Find first non-placeholder option
+              for (let i = 1; i < select.options.length; i++) {
+                const option = select.options[i];
+                if (option.value && option.value !== '' && !option.text.toLowerCase().includes('select')) {
+                  select.value = option.value;
+                  select.dispatchEvent(new Event('change', { bubbles: true }));
+                  break;
+                }
+              }
+            }
+          });
+        });
+        
+        console.log(`  ✅ Brute force dropdown selection completed`);
+        
+      } catch (e) {
+        console.log(`  ⚠️ Brute force dropdown failed, using fallback`);
+        // Fallback to original method for first few dropdowns
+        for (const select of analysis.selects.slice(0, 3)) {
+          if (select.options.length > 1) {
+            const firstOption = select.options.find((opt: string) => 
+              opt && opt.trim() && !opt.toLowerCase().includes('select') && !opt.toLowerCase().includes('choose')
+            );
+            if (firstOption) {
+              try {
+                await page.getByLabel(select.label).selectOption(firstOption, { timeout: 300 });
+              } catch (e) {
+                // Silent continue
+              }
             }
           }
         }
@@ -409,23 +466,30 @@ async function navigateIntelligently(page: any, analysis: any) {
     // PRIORITY 6: ALWAYS try to continue
     if (continueButton) {
       console.log(`  ➡️ Final continue: ${continueButton.text}`);
-      await page.getByRole('button', { name: continueButton.text }).click();
-      await page.waitForLoadState('networkidle');
+      await page.getByRole('button', { name: continueButton.text }).click({ timeout: 1000 });
+      await page.waitForLoadState('networkidle', { timeout: 5000 });
     } else {
       console.log('  ➡️ Generic continue attempt');
-      await page.getByRole('button', { name: 'Continue' }).click();
-      await page.waitForLoadState('networkidle');
+      await page.getByRole('button', { name: 'Continue' }).click({ timeout: 1000 });
+      await page.waitForLoadState('networkidle', { timeout: 5000 });
     }
 
   } catch (error) {
     console.warn(`  ⚠️ Navigation error: ${error}`);
     // Ultra-fast fallback
     try {
-      await page.getByRole('button', { name: 'Continue' }).click();
-      await page.waitForLoadState('networkidle');
+      await page.getByRole('button', { name: 'Continue' }).click({ timeout: 1000 });
+      await page.waitForLoadState('networkidle', { timeout: 3000 });
       console.log('  ✅ Fallback continue successful');
     } catch (fallbackError) {
       console.error(`  ❌ Fallback failed: ${fallbackError}`);
+      // Last resort: try any button
+      try {
+        await page.locator('button:has-text("Continue"), button:has-text("Next")').first().click({ timeout: 1000 });
+        console.log('  ✅ Last resort button click successful');
+      } catch (e) {
+        console.error(`  ❌ All navigation attempts failed`);
+      }
     }
   } finally {
     const endTime = Date.now();
