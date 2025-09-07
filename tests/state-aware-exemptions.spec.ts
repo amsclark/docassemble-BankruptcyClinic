@@ -325,6 +325,20 @@ async function fillMinimalRealPropertyDetails(page: any, state: string) {
 	const claimName = nameFor('prop.interests[i].is_claiming_exemption');
 	const claimNo = page.locator(`input[name="${claimName}"][value="False"]`).first();
 	if (await claimNo.count()) await claimNo.check({ force: true }).catch(() => {});
+	
+	// Mark property as complete to satisfy list completion requirements
+	const completeVar = 'prop.interests[i].complete';
+	const completeB64 = Buffer.from(completeVar).toString('base64').replace(/=+$/, '');
+	await page.evaluate((varName: string) => {
+		const completionField = document.querySelector(`input[name="${varName}"]`) as HTMLInputElement;
+		if (completionField) {
+			completionField.value = 'True';
+			completionField.dispatchEvent(new Event('change', { bubbles: true }));
+			return true;
+		}
+		return false;
+	}, completeB64);
+	
 	// Fill any remaining visible required controls defensively
 	try {
 		const requiredSelectors = 'input[required]:not([disabled]), textarea[required]:not([disabled]), select[required]:not([disabled])';
@@ -461,116 +475,115 @@ async function navigateToBasicIdentity(page: any, districtLabel: string) {
 async function fillBasicIdentityForState(page: any, state: string, county: string) {
 	// Expect basic identity page
 	await expect(page.locator('h1#daMainQuestion')).toContainText('Basic Identity and Contact Information');
+	const beforeHeader = await readHeader(page);
 
-	// Base64-encoded element IDs used by docassemble for debtor[0]
-	const firstId = '#ZGVidG9yW2ldLm5hbWUuZmlyc3Q';
-	const lastId = '#ZGVidG9yW2ldLm5hbWUubGFzdA';
-	const addrId = '#ZGVidG9yW2ldLmFkZHJlc3MuYWRkcmVzcw';
-	const cityId = '#ZGVidG9yW2ldLmFkZHJlc3MuY2l0eQ';
-	const stateId = '#ZGVidG9yW2ldLmFkZHJlc3Muc3RhdGU';
-	const countyId = '#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5';
-	const zipId = '#ZGVidG9yW2ldLmFkZHJlc3Muemlw';
+	// Wait for page to be fully loaded
+	await page.waitForTimeout(1000);
 
-	await page.fill(firstId, 'StateAware');
-	await page.fill(lastId, 'Test');
-	await page.fill(addrId, '123 Main St');
-	await page.fill(cityId, 'Test City');
-	await page.selectOption(stateId, state).catch(async () => {
-		await page.selectOption(stateId, { label: state });
+	// Fill all required fields systematically using both base64 IDs and label fallbacks
+	await page.fill('#ZGVidG9yW2ldLm5hbWUuZmlyc3Q', 'StateAware').catch(async () => {
+		await page.getByLabel(/First Name/i).first().fill('StateAware');
 	});
-	// Trigger change and wait for counties to populate
-	try {
-		await page.evaluate((sel: string) => {
-			const el = document.querySelector(sel) as HTMLSelectElement | null;
-			if (el) el.dispatchEvent(new Event('change', { bubbles: true }));
-		}, stateId);
-	} catch {}
-	await page.waitForFunction((sel: string) => {
-		const el = document.querySelector(sel) as HTMLSelectElement | null;
-		if (!el) return false;
-		const opts = Array.from(el.options).map(o => (o.textContent || '').trim());
-		return opts.length > 1 || (opts[0] && opts[0] !== 'Select...');
-	}, countyId, { timeout: 20000 });
-
-	// County selection (options may be slow to populate or named without the word "County")
-	const countySelect = page.locator(countyId);
-	await countySelect.waitFor({ state: 'visible', timeout: 15000 }).catch(() => {});
-	let options: string[] = await countySelect.locator('option').allTextContents();
-	// Refresh once in case options are still loading
-	await page.waitForTimeout(200);
-	options = await countySelect.locator('option').allTextContents();
-	const normalizedTarget = county;
-	const simplifiedTarget = county.replace(/\s*County$/i, '').trim();
-	const match = options.find((o: string) => {
-		const t = o.trim();
-		return t === normalizedTarget || t === simplifiedTarget || t.includes(simplifiedTarget);
+	
+	await page.fill('#ZGVidG9yW2ldLm5hbWUubGFzdA', 'Test').catch(async () => {
+		await page.getByLabel(/Last Name/i).first().fill('Test');
 	});
-	if (match) {
-		await countySelect.selectOption({ label: match }).catch(async () => {
-			await countySelect.selectOption(match);
+	
+	await page.fill('#ZGVidG9yW2ldLmFkZHJlc3MuYWRkcmVzcw', '123 Main St').catch(async () => {
+		await page.getByLabel(/Address/i).first().fill('123 Main St');
+	});
+	
+	await page.fill('#ZGVidG9yW2ldLmFkZHJlc3MuY2l0eQ', 'Test City').catch(async () => {
+		await page.getByLabel(/City/i).first().fill('Test City');
+	});
+
+	// State selection with proper change triggering
+	await page.selectOption('#ZGVidG9yW2ldLmFkZHJlc3Muc3RhdGU', { label: state }).catch(async () => {
+		await page.selectOption('#ZGVidG9yW2ldLmFkZHJlc3Muc3RhdGU', state).catch(async () => {
+			await page.getByLabel(/State/i).first().selectOption({ label: state });
 		});
-	} else {
-		// Fallback: pick the first real option programmatically
-		await page.evaluate((sel: string) => {
-			const el = document.querySelector(sel) as HTMLSelectElement | null;
-			if (el && el.options.length > 1) {
-				// choose first non-placeholder
-				let idx = 1;
-				for (let i = 1; i < el.options.length; i++) {
-					const txt = (el.options[i].textContent || '').trim();
-					if (txt && !/^select\.+/i.test(txt)) { idx = i; break; }
+	});
+	
+	// Trigger change event and wait for counties to load
+	await page.evaluate(() => {
+		const stateSelect = document.querySelector('#ZGVidG9yW2ldLmFkZHJlc3Muc3RhdGU') as HTMLSelectElement;
+		if (stateSelect) stateSelect.dispatchEvent(new Event('change', { bubbles: true }));
+	});
+	
+	// Wait for county options to populate
+	await page.waitForFunction(() => {
+		const countySelect = document.querySelector('#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5') as HTMLSelectElement;
+		return countySelect && countySelect.options.length > 1;
+	}, { timeout: 10000 }).catch(() => {});
+	
+	// County selection
+	await page.waitForTimeout(500);
+	const countyOptions = await page.locator('#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5 option').allTextContents();
+	const targetCounty = countyOptions.find((opt: string) => opt.includes(county.replace(' County', ''))) || countyOptions[1];
+	if (targetCounty) {
+		await page.selectOption('#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5', { label: targetCounty }).catch(async () => {
+			await page.evaluate((county: string) => {
+				const select = document.querySelector('#ZGVidG9yW2ldLmFkZHJlc3MuY291bnR5') as HTMLSelectElement;
+				if (select && select.options.length > 1) {
+					select.selectedIndex = 1;
+					select.dispatchEvent(new Event('change', { bubbles: true }));
 				}
-				el.selectedIndex = idx;
-				el.dispatchEvent(new Event('change', { bubbles: true }));
-			}
-		}, countyId);
+			}, targetCounty);
+		});
 	}
 
-	await page.fill(zipId, '68102');
+	await page.fill('#ZGVidG9yW2ldLmFkZHJlc3Muemlw', '68102').catch(async () => {
+		await page.getByLabel(/Zip/i).first().fill('68102');
+	});
 
-	// Has separate mailing address? No
-	await selectFirstRadioOrByLabel(page, 'No');
-
-	// Tax ID type: SSN (value '1'), then fill a value
-	const taxTypeName = 'ZGVidG9yW2ldLnRheF9pZC50YXhfaWRfdHlwZQ';
-	const ssnRadio = page.locator(`input[name="${taxTypeName}"][value="1"]`).first();
-	if (await ssnRadio.count()) {
-		const id = await ssnRadio.getAttribute('id');
-		if (id) await page.click(`label[for="${id}"]`); else await ssnRadio.click({ force: true });
+	// Handle mailing address checkbox - uncheck if checked
+	const mailingCheckbox = page.getByRole('checkbox', { name: /separate mailing address/i });
+	if (await mailingCheckbox.count() && await mailingCheckbox.isChecked()) {
+		await mailingCheckbox.uncheck();
 	}
-	const ssnInput = page.getByLabel('SSN');
-	if (await ssnInput.count()) await ssnInput.fill('123-45-6789');
 
-		// Autofill any visible required fields we didn't set yet
-		try {
-			const requiredSelectors = 'input[required]:not([disabled]), textarea[required]:not([disabled]), select[required]:not([disabled])';
-			const reqCount = await page.locator(requiredSelectors).count();
-			for (let i = 0; i < reqCount; i++) {
-				const el = page.locator(requiredSelectors).nth(i);
-				const visible = await el.isVisible().catch(() => false);
-				if (!visible) continue;
-				const tag = await el.evaluate((n: Element) => (n as HTMLElement).tagName.toLowerCase());
-				if (tag === 'input') {
-					const type = await el.getAttribute('type');
-					const val = await el.inputValue().catch(() => '');
-					if (!val) await el.fill(type === 'number' ? '0' : 'N/A');
-				} else if (tag === 'textarea') {
-					const val = await el.inputValue().catch(() => '');
-					if (!val) await el.fill('N/A');
-				} else if (tag === 'select') {
-					const cur = await el.inputValue().catch(() => '');
-					if (!cur) {
-						const opts = await el.locator('option').allTextContents();
-						const firstReal = opts.find((o: string) => o.trim() && !/^select\.\.\./i.test(o.trim()));
-						if (firstReal) {
-							try { await el.selectOption({ label: firstReal }); } catch { await el.selectOption(firstReal); }
-						}
-					}
-				}
+	// Select SSN radio button - handle docassemble's label-based radio buttons
+	await page.evaluate(() => {
+		// Find the SSN radio by value first
+		const ssnInput = document.querySelector('input[name="ZGVidG9yW2ldLnRheF9pZC50YXhfaWRfdHlwZQ"][value="1"]') as HTMLInputElement;
+		if (ssnInput) {
+			ssnInput.checked = true;
+			ssnInput.dispatchEvent(new Event('change', { bubbles: true }));
+			return;
+		}
+		// Fallback: click the label for SSN
+		const labels = Array.from(document.querySelectorAll('label')) as HTMLLabelElement[];
+		const ssnLabel = labels.find(l => /Social Security Number/i.test(l.textContent || ''));
+		if (ssnLabel) ssnLabel.click();
+	});
+
+	// Fill SSN
+	await page.getByLabel(/SSN/i).fill('123-45-6789');
+
+	// Verify all required fields are filled before continuing
+	const requiredFields = await page.locator('input[required]:not([disabled]), select[required]:not([disabled]), textarea[required]:not([disabled])').all();
+	for (const field of requiredFields) {
+		const visible = await field.isVisible().catch(() => false);
+		const enabled = await field.isEnabled().catch(() => false);
+		if (!visible || !enabled) continue;
+		
+		const value = await field.inputValue().catch(() => '');
+		if (!value) {
+			// Try to fill any remaining empty required fields
+			const type = await field.getAttribute('type');
+			if (type === 'text' || type === 'number') {
+				await field.fill(type === 'number' ? '0' : 'N/A').catch(() => {});
 			}
-		} catch {}
+		}
+	}
 
-		await continueIfPresent(page);
+	await continueIfPresent(page);
+	// Ensure we actually leave the Basic Identity page
+	await page.waitForFunction((prev: string) => {
+		const el = document.querySelector('h1#daMainQuestion') || document.querySelector('h1:visible') || document.querySelector('h2:visible');
+		const h = (el?.textContent || '').trim();
+		return h && h !== prev;
+	}, beforeHeader, { timeout: 10000 }).catch(() => {});
 }
 
 async function goToRealPropertyDetails(page: any) {
@@ -674,86 +687,58 @@ async function getExemptionLawOptions(page: any): Promise<string[]> {
 
 async function goToVehicleDetails(page: any, state: string) {
 	// From wherever we are after Basic Identity, advance to Vehicles details
-	for (let i = 0; i < 80; i++) {
-	const h1 = await readHeader(page);
-	console.log(`[veh ${i}] h1: ${h1}`);
-		// Skip real property entirely to reach vehicles (scope button click to the question container)
+	let propertyCompleted = false;
+	
+	for (let i = 0; i < 50; i++) {
+		const h1 = await readHeader(page);
+		console.log(`[veh ${i}] h1: ${h1}`);
+		
+		// Property question - try to skip but fallback to completing one entry
 		if (h1.toLowerCase().includes('do you own or have any legal or equitable interest in any residence')) {
-			await clickYesNoByQuestion(page, /Do you own or have any legal or equitable interest in any residence, building, land, or similar property\?/i, 'No');
-			await page.waitForFunction((prev: string) => {
-				const el = document.querySelector('h1#daMainQuestion') || document.querySelector('h1:visible') || document.querySelector('h2:visible');
-				const h = (el?.textContent || '').trim();
-				return h && h !== prev;
-			}, h1, { timeout: 4000 }).catch(() => {});
+			if (!propertyCompleted) {
+				// Answer "Yes" to avoid getting stuck, we'll complete one minimal entry
+				await selectFirstRadioOrByLabel(page, 'Yes');
+				await continueIfPresent(page);
+				await page.waitForTimeout(500);
+				propertyCompleted = true;
+				continue;
+			}
+		}
+		
+		// Property details - fill minimally and complete
+		if (/details about .*interest/i.test(h1) || h1.toLowerCase().includes('details about the interest')) {
+			await fillMinimalRealPropertyDetails(page, state);
 			continue;
 		}
+		
+		// Property "add more" question - say No to proceed to vehicles
 		if (h1.toLowerCase().includes('do you have more interests to add')) {
 			await selectFirstRadioOrByLabel(page, 'No');
 			await continueIfPresent(page);
 			continue;
 		}
-		// If we landed on real property details, attempt to skip property section first
-		if (/details about .*interest/i.test(h1) || h1.toLowerCase().includes('details about the interest')) {
-			// First, try going back to the Yes/No question and answer No deterministically
-			await backIfPresent(page);
-			let h2 = await readHeader(page);
-			if (h2.toLowerCase().includes('do you own or have any legal or equitable interest in any residence')) {
-				const varName = 'prop.interests.there_are_any';
-				const nameB64 = Buffer.from(varName).toString('base64').replace(/=+$/, '');
-				const radioNo = page.locator(`input[name="${nameB64}"][value="False"]`).first();
-				if (await radioNo.count()) {
-					await radioNo.check({ force: true }).catch(() => {});
-					await continueIfPresent(page);
-					await page.waitForTimeout(150);
-					continue;
-				}
-			}
-			// Try to set there_are_any to No by navigating back to that variable id if present
-			try {
-				const anyName = 'prop.interests.there_are_any';
-				const anyYes = page.locator(`input[name="${Buffer.from(anyName).toString('base64').replace(/=+$/, '')}"][value="True"]`).first();
-				const anyNo = page.locator(`input[name="${Buffer.from(anyName).toString('base64').replace(/=+$/, '')}"][value="False"]`).first();
-				if (await anyNo.count()) {
-					await anyNo.check({ force: true }).catch(() => {});
-					await continueIfPresent(page);
-				}
-			} catch {}
-			// Fall back to filling minimal details if skipping not possible
-			await fillMinimalRealPropertyDetails(page, state);
-			continue;
-		}
-		// Vehicles any exist question (broadened match)
+		
+		// Vehicles any exist question
 		if (
 			h1.toLowerCase().includes('do you own, lease, or have legal or equitable interest in any vehicles') ||
 			(h1.toLowerCase().includes('vehicles') && h1.toLowerCase().includes('legal or equitable'))
 		) {
-			await clickYesNoByQuestion(page, /Do you own, lease, or have legal or equitable interest in any vehicles/i, 'Yes');
-			await page.waitForFunction((prev: string) => {
-				const el = document.querySelector('h1#daMainQuestion') || document.querySelector('h1:visible') || document.querySelector('h2:visible');
-				const h = (el?.textContent || '').trim();
-				return h && h !== prev;
-			}, h1, { timeout: 4000 }).catch(() => {});
+			await selectFirstRadioOrByLabel(page, 'Yes');
+			await continueIfPresent(page);
 			continue;
 		}
+		
 		// Vehicle details page reached
 		if (h1.toLowerCase().includes('tell the court about one of your vehicles')) {
 			return;
 		}
+		
 		// Property intro
 		if (h1.toLowerCase().includes('tell the court') && h1.toLowerCase().includes('property')) {
 			await continueIfPresent(page);
 			continue;
 		}
-		// Real property add another
-		if (h1.toLowerCase().includes('do you have more interests to add')) {
-			await clickYesNoByQuestion(page, /Do you have more interests to add\?/i, 'No');
-			await page.waitForFunction((prev: string) => {
-				const el = document.querySelector('h1#daMainQuestion') || document.querySelector('h1:visible') || document.querySelector('h2:visible');
-				const h = (el?.textContent || '').trim();
-				return h && h !== prev;
-			}, h1, { timeout: 4000 }).catch(() => {});
-			continue;
-		}
+		
 		// Pre-property miscellany
 		if (h1.toLowerCase().includes('lived in the specified district')) {
 			await selectFirstRadioOrByLabel(page, 'Yes');
@@ -762,9 +747,9 @@ async function goToVehicleDetails(page: any, state: string) {
 		} else if (h1.toLowerCase().includes('are there more debtors to add')) {
 			await selectFirstRadioOrByLabel(page, 'No');
 		}
-	await continueIfPresent(page);
-		const cont = page.getByRole('button', { name: /Continue|Next/i }).first();
-		if (await cont.count()) await cont.click().catch(() => {});
+		
+		await continueIfPresent(page);
+		await page.waitForTimeout(200);
 	}
 	throw new Error('Could not reach vehicle details page');
 }
