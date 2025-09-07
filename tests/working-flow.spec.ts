@@ -108,6 +108,9 @@ test.describe('Working Bankruptcy Interview Flow', () => {
       
       const maxSteps = MAX_STEPS; // Use the constant defined above
       
+      let stepCount = 0;
+      let hasRetriedThisStep = false; // Prevent multiple retries in same iteration
+      
       while (stepCount < maxSteps) {
         const analysis = await mcp.analyzePage();
         const progress = getProgress(analysis.h1Text);
@@ -119,32 +122,89 @@ test.describe('Working Bankruptcy Interview Flow', () => {
         // PERFORMANCE TRACKING: Track page timing
         const pageStartTime = Date.now();
         
-        // Check for server errors and handle them
-        if (analysis.h1Text.toLowerCase().includes('error') || 
-            analysis.h1Text.toLowerCase().includes('retry') ||
-            page.url().includes('error') ||
-            await page.locator('text=There was an error').isVisible().catch(() => false)) {
+        // Check for server errors and handle them with analysis (only once per step)
+        if (!hasRetriedThisStep && 
+            (analysis.h1Text.toLowerCase().includes('error') || 
+             analysis.h1Text.toLowerCase().includes('retry') ||
+             page.url().includes('error') ||
+             await page.locator('text=There was an error').isVisible().catch(() => false))) {
           console.log(`🚨 SERVER ERROR detected: ${analysis.h1Text}`);
+          console.log(`📍 Error occurred at step ${stepCount + 1}, URL: ${page.url()}`);
           
-          // Try to retry or navigate back
-          try {
-            const retryButton = page.locator('button:has-text("Retry"), a:has-text("Retry")');
-            if (await retryButton.isVisible({ timeout: 2000 })) {
-              console.log(`  🔄 Clicking Retry button`);
-              await retryButton.click();
-              await page.waitForLoadState('networkidle');
-              continue; // Skip to next iteration
-            }
-            
-            // If no retry, try to go back or refresh
-            console.log(`  🔄 Attempting page refresh to recover from error`);
-            await page.reload();
+          hasRetriedThisStep = true; // Mark that we've tried retry for this step
+          
+          // Only try retry ONCE
+          const retryButton = page.locator('button:has-text("Retry"), a:has-text("Retry")');
+          if (await retryButton.isVisible({ timeout: 2000 })) {
+            console.log(`🔄 Attempting ONE retry...`);
+            await retryButton.click();
             await page.waitForLoadState('networkidle');
-            continue;
             
-          } catch (e) {
-            console.log(`  ❌ Error recovery failed: ${e}`);
-            // Continue with normal navigation
+            // Check if error persists after retry
+            const newAnalysis = await mcp.analyzePage();
+            if (newAnalysis.h1Text.toLowerCase().includes('error') || 
+                newAnalysis.h1Text.toLowerCase().includes('retry')) {
+              console.log(`🚨 ERROR PERSISTS after retry. Starting error analysis...`);
+              
+              // Go back to analyze the previous page that caused the error
+              console.log(`⬅️ Going back to analyze previous page conditions`);
+              await page.goBack();
+              await page.waitForLoadState('networkidle');
+              
+              // Analyze the previous page
+              const prevPageAnalysis = await mcp.analyzePage();
+              console.log(`📋 PREVIOUS PAGE ANALYSIS:`);
+              console.log(`   Title: "${prevPageAnalysis.h1Text}"`);
+              console.log(`   URL: ${page.url()}`);
+              
+              // Click debug tools to understand the state
+              try {
+                console.log(`🔧 Activating debug tools for error analysis...`);
+                
+                // Click source toggle
+                const sourceToggle = page.locator('#dasourcetoggle');
+                if (await sourceToggle.isVisible({ timeout: 3000 })) {
+                  console.log(`📄 Clicking source toggle to view conditions`);
+                  await sourceToggle.click();
+                  await page.waitForTimeout(1000);
+                }
+                
+                // Click variables button
+                const varsButton = page.locator('button:has-text("Variables"), a:has-text("Variables")');
+                if (await varsButton.isVisible({ timeout: 3000 })) {
+                  console.log(`📊 Clicking Variables button to view state`);
+                  await varsButton.click();
+                  await page.waitForTimeout(2000);
+                  
+                  // Capture variable state
+                  const variableText = await page.textContent('body') || '';
+                  console.log(`📋 VARIABLE STATE (first 500 chars):`);
+                  console.log(`   ${variableText.substring(0, 500)}...`);
+                }
+              } catch (debugError) {
+                console.log(`⚠️ Debug tools failed: ${debugError}`);
+              }
+              
+              console.log(`🛑 ENDING TEST for error analysis. Error occurred when navigating from:`);
+              console.log(`   Previous page: "${prevPageAnalysis.h1Text}"`);
+              console.log(`   Attempted navigation to: error page`);
+              console.log(`   Total steps completed: ${stepCount + 1}`);
+              break;
+            } else {
+              console.log(`✅ Retry successful, continuing...`);
+              continue;
+            }
+          } else {
+            console.log(`⬅️ No retry button found, going back for analysis`);
+            await page.goBack();
+            await page.waitForLoadState('networkidle');
+            
+            const prevPageAnalysis = await mcp.analyzePage();
+            console.log(`📋 ANALYSIS OF PAGE THAT CAUSED ERROR:`);
+            console.log(`   Title: "${prevPageAnalysis.h1Text}"`);
+            console.log(`   URL: ${page.url()}`);
+            console.log(`🛑 ENDING TEST for manual analysis`);
+            break;
           }
         }
 
@@ -208,6 +268,7 @@ test.describe('Working Bankruptcy Interview Flow', () => {
         });
         
         stepCount++;
+        hasRetriedThisStep = false; // Reset retry flag for next step
         await page.waitForTimeout(500); // Brief pause
       }
       
