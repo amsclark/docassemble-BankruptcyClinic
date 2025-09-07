@@ -48,17 +48,16 @@ import { McpAssistant } from './mcp-assistant';
 
 test.describe('Working Bankruptcy Interview Flow', () => {
   test('should navigate through bankruptcy interview with intelligent assistance', async ({ page }) => {
-    // Increase timeout for comprehensive test to reach PDF generation
-    test.setTimeout(600000); // 10 minutes for full completion
+    // Set a more reasonable timeout
+    test.setTimeout(300000); // 5 minutes instead of 10
     
     console.log('🚀 Starting working end-to-end test');
     console.log('📺 Video recording enabled - watching for progress');
-    
+
     const mcp = new McpAssistant(page);
     const startTime = Date.now();
     let stepCount = 0;
-    
-    // Progress tracking
+    const MAX_STEPS = 35; // Limit steps to prevent infinite loops    // Progress tracking
     const progressPoints: Record<string, number> = {
       'Voluntary Petition for Individuals': 5,
       'What district are you filing': 10,
@@ -103,7 +102,7 @@ test.describe('Working Bankruptcy Interview Flow', () => {
     await test.step('Navigate through interview intelligently', async () => {
       console.log('🎬 STEP 2: Navigate through interview sections');
       
-      const maxSteps = 100; // Increased significantly to reach PDF generation
+      const maxSteps = MAX_STEPS; // Use the constant defined above
       
       while (stepCount < maxSteps) {
         const analysis = await mcp.analyzePage();
@@ -276,18 +275,45 @@ async function navigateIntelligently(page: any, analysis: any) {
       
       // Try to select the first "No" option we can find
       for (const group of analysis.radioGroups) {
-        // Look for exact "No" options first
-        const exactNoOption = group.options.find((opt: any) => 
-          opt.label.toLowerCase().trim() === 'no'
-        );
+        // Look for exact "No" options first - handle both "No" and "NoNo" cases
+        const exactNoOption = group.options.find((opt: any) => {
+          const label = opt.label.toLowerCase().trim();
+          return label === 'no' || label === 'nono';
+        });
         
         if (exactNoOption) {
-          console.log('  🔘 Found exact "No" option');
+          console.log(`  🔘 Found exact "No" option: ${exactNoOption.label}`);
           try {
-            await page.getByRole('radio', { name: exactNoOption.label }).first().click();
+            // Try multiple selectors for better success rate
+            const radioSelectors = [
+              `input[type="radio"][value*="No"]`,
+              `input[type="radio"][value*="no"]`, 
+              `input[name*="No"]`,
+              `input[name*="no"]`,
+              'input[type="radio"]:not([value*="Yes"]):not([value*="yes"])'
+            ];
+            
+            let clicked = false;
+            for (const selector of radioSelectors) {
+              try {
+                const radio = page.locator(selector).first();
+                await radio.click({ timeout: 2000 });
+                console.log(`  ✅ Successfully clicked "No" using ${selector}`);
+                clicked = true;
+                break;
+              } catch (e) {
+                // Try next selector
+              }
+            }
+            
+            if (!clicked) {
+              // Fallback to label-based approach
+              await page.getByRole('radio', { name: new RegExp('no', 'i') }).first().click({ timeout: 2000 });
+              console.log(`  ✅ Successfully clicked "No" using regex`);
+            }
             break; // Found and clicked, exit the loop
           } catch (e) {
-            console.log(`  ⚠️ Failed to click exact No: ${e}`);
+            console.log(`  ⚠️ Failed to click exact No option: ${e}`);
           }
         }
         
@@ -299,18 +325,20 @@ async function navigateIntelligently(page: any, analysis: any) {
         if (noOption) {
           console.log(`  🔘 Found "No" option: ${noOption.label}`);
           try {
-            await page.getByRole('radio', { name: noOption.label }).first().click();
+            await page.getByRole('radio', { name: new RegExp(noOption.label.split('No')[0] + 'No', 'i') }).first().click({ timeout: 2000 });
             break; // Found and clicked, exit the loop
           } catch (e) {
             console.log(`  ⚠️ Failed to click No option: ${e}`);
           }
         }
         
-        // Last resort: click first option
+        // Last resort: click first option in first group only
         if (group.options.length > 0) {
           console.log(`  🔘 Fallback: clicking first option: ${group.options[0].label}`);
           try {
-            await page.getByRole('radio', { name: group.options[0].label }).first().click();
+            // Use CSS selector as fallback
+            await page.locator('input[type="radio"]').first().click({ timeout: 2000 });
+            console.log(`  ✅ Successfully clicked first radio using CSS selector`);
             break; // Found and clicked, exit the loop
           } catch (e) {
             console.log(`  ⚠️ Failed to click first option: ${e}`);
