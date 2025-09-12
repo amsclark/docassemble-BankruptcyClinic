@@ -1437,23 +1437,23 @@ continue button field: prop.interests[i].complete
 #  % for item in tbl_data():
 #  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
 #  % endfor
-script: |
-  <script>
-    // Safely check for exemptions data
-    try {
-      checkQuestionExemptions(
-        "prop.interests[i].is_claiming_exemption",
-        "prop.interests[i].claiming_sub_100",
-        "prop.interests[i].current_owned_value",
-        "prop.interests[i].exemption_value",
-        "prop.interests[i].exemption_laws",
-        "prop.interests[i].exemption_value_2",
-        "prop.interests[i].exemption_laws_2",
-        "prop.interests[i].state");
-    } catch(e) {
-      console.log("Error in exemption check:", e);
-    }
-  </script>
+#script: |
+#  <script>
+#    // Safely check for exemptions data
+#    try {
+#      checkQuestionExemptions(
+#        "prop.interests[i].is_claiming_exemption",
+#        "prop.interests[i].claiming_sub_100",
+#        "prop.interests[i].current_owned_value",
+#        "prop.interests[i].exemption_value",
+#        "prop.interests[i].exemption_laws",
+#        "prop.interests[i].exemption_value_2",
+#        "prop.interests[i].exemption_laws_2",
+#        "prop.interests[i].state");
+#    } catch(e) {
+#      console.log("Error in exemption check:", e);
+#    }
+#  </script>
 #code: |
 #  # Set complete attribute to true to prevent looping
 #  prop.interests[i].complete = True
