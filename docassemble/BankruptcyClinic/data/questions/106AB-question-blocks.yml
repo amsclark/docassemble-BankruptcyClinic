@@ -1493,11 +1493,13 @@ fields:
     input type: radio
     choices:
       code: |
-        opts = ['Debtor 1 only']
-        if defined('debtor') and len(debtor) == 2:
-            opts += ['Debtor 2 only', 'Debtor 1 and Debtor  2 only']
-        opts.append('At least one of the debtors and  another')
-        opts
+        (['Debtor 1 only',
+          'At least one of the debtors and another']
+         if (not defined('debtor')) or len(debtor) != 2 else
+         ['Debtor 1 only',
+          'Debtor 2 only',
+          'Debtor 1 and Debtor 2 only',
+          'At least one of the debtors and another'])
   - Current property value: prop.interests[i].current_value
     # default: 200000
     datatype: currency
