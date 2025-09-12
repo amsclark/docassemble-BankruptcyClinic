@@ -1430,6 +1430,8 @@ section: schedule_ab
 question: |
   Tell the court about details about the interest in question.
 continue button field: prop.interests[i].complete
+sets:
+  - prop.interests[i].complete
 #right: |
 #  Current Exemption Summary.
 ### # Name           |Limit            |Amount
