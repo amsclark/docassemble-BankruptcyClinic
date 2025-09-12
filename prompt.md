@@ -259,3 +259,46 @@ document.getElementsByName(btoa('debtor[i].district_info.other_district_reason')
 document.getElementById('da-continue-button').click();
 ```
 
+* review page for debtors
+```js
+document.getElementById('da-continue-button').click();
+```
+
+* intro page for Please tell the court about your property
+```js
+document.getElementById('da-continue-button').click();
+```
+
+*  On the page asking if the debtor has any legal or equitable interest in any residence, building, land, or similar property?:
+```js
+document.getElementsByName(btoa('prop.interests.there_are_any').replace(/=/g,""))[0].click(); // for Yes
+document.getElementsByName(btoa('prop.interests.there_are_any').replace(/=/g,""))[1].click() // for no
+```
+
+* if the answered 'yes' to the question about interests, the next page is a gather page for each interest
+```js
+document.getElementsByName(btoa('prop.interests[0].street').replace(/=/g,""))[0].value = '123 Investment Way';
+document.getElementsByName(btoa('prop.interests[0].city').replace(/=/g,""))[0].value = 'Omaha';
+document.getElementsByName(btoa('prop.interests[0].state').replace(/=/g,""))[0].value = 'NE';
+document.getElementsByName(btoa('prop.interests[0].zip').replace(/=/g,""))[0].value = '55555';
+document.getElementsByName(btoa('prop.interests[0].county').replace(/=/g,""))[0].value = 'Douglas County';
+document.getElementById(btoa('prop.interests[0].type').replace(/=/g,"") + '_3').click(); // mobile home
+document.getElementById(btoa('prop.interests[0].current_value').replace(/=/g,"")).value = '12000';
+document.getElementById(btoa('prop.interests[0].has_loan').replace(/=/g,"")).click();
+
+document.getElementsByName(btoa('_field_0_12').replace(/=/g,""))[0].value = "1000";
+document.getElementsByName(btoa('prop.interests[0].ownership_interest').replace(/=/g,""))[0].value = "arstarst";
+document.getElementById(btoa('prop.interests[0].is_community_property').replace(/=/g,"") + '_0').click();
+document.getElementsByName(btoa('prop.interests[0].other_info').replace(/=/g,""))[0].value = "arstassssssrst";
+document.getElementById(btoa('prop.interests[0].is_claiming_exemption').replace(/=/g,"") + '_0').click();
+document.getElementById(btoa('_field_0_17').replace(/=/g,"") + '_0').click();
+document.getElementsByName(btoa('_field_0_19').replace(/=/g,""))[0].value = "1000";
+document.getElementsByName(btoa('_field_0_20').replace(/=/g,""))[0].value = "Wildcard (SDCL 43-5-4)";
+document.getElementsByName(btoa('_field_0_22').replace(/=/g,""))[0].value = "2000";
+document.getElementsByName(btoa('_field_0_23').replace(/=/g,""))[0].value = "Unknown law";
+```
+* they can also add a second interest
+```js
+
+```
+
