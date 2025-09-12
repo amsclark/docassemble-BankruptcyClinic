@@ -163,6 +163,8 @@ document.getElementsByName(btoa('debtor[i].alias[1].business').replace(/=/g,""))
 
 // the add another button index for class members also needs to be incremented if adding another after that
 document.getElementsByClassName('dacollectadd')[1].click();
+document.getElementById('da-continue-button').click();
+
 ```
 
 *  On the page asking if the debtor has lived in the specified district for over 180 days:
@@ -215,4 +217,45 @@ document.getElementById(btoa('_field_18').replace(/=/g,"")).value = '222-22-2222
 document.getElementsByName(btoa('debtor_basic_info').replace(/=/g,""))[0].click(); 
 ```
 
-* 
+* On the page with a title that contains the substring 'have any other names they’ve used in the last 8 years?' there are two ways to advance, buttons labeled yes or no. If they click 'yes' they will be asked about aliases. If they click 'no' they will not.
+
+```js
+document.getElementsByName(btoa('debtor[i].alias.there_are_any').replace(/=/g,""))[0].click(); // click yes
+document.getElementsByName(btoa('debtor[i].alias.there_are_any').replace(/=/g,""))[1].click(); // click no
+```
+
+* On the 'Add an alias for ... used in the last 8 years.' alias page, can fill in one set of aliases like this:
+```js
+document.getElementsByName(btoa('debtor[i].alias[0].first_name').replace(/=/g,""))[0].value = 'Mariana';
+document.getElementsByName(btoa('debtor[i].alias[0].middle_name').replace(/=/g,""))[0].value = 'Quincy';
+document.getElementsByName(btoa('debtor[i].alias[0].last_name').replace(/=/g,""))[0].value = 'Adams';
+document.getElementsByName(btoa('debtor[i].alias[0].business').replace(/=/g,""))[0].value = 'Mariana Cakes';
+
+// and then the add another button can be clicked like this:
+document.getElementsByClassName('dacollectadd')[0].click();
+
+
+// and another alias like this, just incrementing the alias number index:
+document.getElementsByName(btoa('debtor[i].alias[1].first_name').replace(/=/g,""))[0].value = 'Mimi';
+document.getElementsByName(btoa('debtor[i].alias[1].middle_name').replace(/=/g,""))[0].value = 'Jane';
+document.getElementsByName(btoa('debtor[i].alias[1].last_name').replace(/=/g,""))[0].value = 'Adams';
+document.getElementsByName(btoa('debtor[i].alias[1].business').replace(/=/g,""))[0].value = 'Boston Tea Too';
+
+// the add another button index for class members also needs to be incremented if adding another after that
+document.getElementsByClassName('dacollectadd')[1].click();
+document.getElementById('da-continue-button').click();
+
+```
+
+*  On the page asking if the debtor has lived in the specified district for over 180 days:
+```js
+document.getElementsByName(btoa('debtor[i].district_info.is_current_district').replace(/=/g,""))[0].click(); // for Yes
+document.getElementsByName(btoa('debtor[i].district_info.is_current_district').replace(/=/g,""))[1].click() // for no
+```
+
+* If they answered no, on the next page they will be asked 'What is your reason for specifying a district you haven’t been living in?'
+```js
+document.getElementsByName(btoa('debtor[i].district_info.other_district_reason').replace(/=/g,""))[0].value = 'I just moved 4 months ago';
+document.getElementById('da-continue-button').click();
+```
+
