@@ -164,3 +164,55 @@ document.getElementsByName(btoa('debtor[i].alias[1].business').replace(/=/g,""))
 // the add another button index for class members also needs to be incremented if adding another after that
 document.getElementsByClassName('dacollectadd')[1].click();
 ```
+
+*  On the page asking if the debtor has lived in the specified district for over 180 days:
+```js
+document.getElementsByName(btoa('debtor[i].district_info.is_current_district').replace(/=/g,""))[0].click(); // for Yes
+document.getElementsByName(btoa('debtor[i].district_info.is_current_district').replace(/=/g,""))[1].click() // for no
+```
+
+* If they answered no, on the next page they will be asked 'What is your reason for specifying a district you haven’t been living in?'
+```js
+document.getElementsByName(btoa('debtor[i].district_info.other_district_reason').replace(/=/g,""))[0].value = 'I moved 3 months ago';
+
+// then to proceed:
+document.getElementById('da-continue-button').click();
+```
+* At this point, if the user indicated there was a spouse, they will get asked another series of questions as were asked for the first debtor
+```js
+document.getElementById(btoa('debtor[i].name.first').replace(/=/g,"")).value = 'Mary'; // required
+document.getElementById(btoa('debtor[i].name.middle').replace(/=/g,"")).value = 'Quincy'; // optional 
+document.getElementById(btoa('debtor[i].name.last').replace(/=/g,"")).value = 'Adams'; // required
+document.getElementById(btoa('debtor[i].name.suffix').replace(/=/g,"")).value = ''; // optional
+document.getElementById(btoa('debtor[i].address.address').replace(/=/g,"")).value = '123 Fake Street'; // required
+document.getElementById(btoa('debtor[i].address.city').replace(/=/g,"")).value = 'Omaha'; // required
+
+const el2 = document.getElementById(
+  btoa('debtor[i].address.state').replace(/=/g,"")
+);
+el2.value = "Nebraska"; // required
+el2.dispatchEvent(new Event("change", { bubbles: true }));
+document.getElementById(btoa('debtor[i].address.zip').replace(/=/g,"")).value = '12345';
+document.getElementById(btoa('debtor[i].address.county').replace(/=/g,"")).selectedIndex = 
+  4;
+document.getElementById(btoa('debtor[i].has_other_mailing_address').replace(/=/g,"")).click(); // optional
+document.getElementById(btoa('_field_13').replace(/=/g,"")).value = '123 Mail Street'; // required if visible
+document.getElementById(btoa('_field_14').replace(/=/g,"")).value = 'Omaha'; // required if visible
+document.getElementById(btoa('_field_15').replace(/=/g,"")).value = 'Nebraska'; // required if visible
+document.getElementById(btoa('_field_16').replace(/=/g,"")).value = '54321'; // required if visible
+
+// It is required to select a tax id type with one of the following:
+document.getElementById(btoa('debtor[i].tax_id.tax_id_type').replace(/=/g,"") + "_0").click(); // ssn
+document.getElementById(btoa('debtor[i].tax_id.tax_id_type').replace(/=/g,"") + "_1").click(); // itin
+
+// if the ssn option is selected, then _field_19 should be filled in 
+document.getElementById(btoa('_field_19').replace(/=/g,"")).value = '111-11-1111'; // required if visible
+
+// Otherwise the individual taxpayer id number should be filled in
+document.getElementById(btoa('_field_18').replace(/=/g,"")).value = '222-22-2222'; // required if visible
+
+// Finally the page is advanced with:
+document.getElementsByName(btoa('debtor_basic_info').replace(/=/g,""))[0].click(); 
+```
+
+* 
