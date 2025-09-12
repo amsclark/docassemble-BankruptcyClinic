@@ -1492,19 +1492,12 @@ fields:
   - Who has an interest in the property?: prop.interests[i].who
     input type: radio
     choices:
-      - Debtor 1 only
-      - At least one of the debtors and another
-    show if: len(debtor) == 1
-    # default:       Debtor 1 only
-  - Who has an interest in the property?: prop.interests[i].who
-    input type: radio
-    choices:
-      - Debtor 1 only
-      - Debtor 2 only
-      - Debtor 1 and Debtor 2 only
-      - At least one of the debtors and another
-    show if: len(debtor) > 1
-    # default:       Debtor 1 only
+      code: |
+        opts = ['Debtor 1 only']
+        if defined('debtor') and len(debtor) == 2:
+            opts += ['Debtor 2 only', 'Debtor 1 and Debtor  2 only']
+        opts.append('At least one of the debtors and  another')
+        opts
   - Current property value: prop.interests[i].current_value
     # default: 200000
     datatype: currency
