@@ -332,20 +332,12 @@ test.describe('Human Flow', () => {
         await takeDebugScreenshot(page, 'step4');
 
         // on the page 'Are you filing individually or with a spouse?' click the element with ID for filing with spouse
-        await page.waitForTimeout(1000); // Give page time to load
+        await waitForDaPageLoad(page, 'Spouse selection page');
         const spouseElementId = base64UrlEncode('filing_status') + '_1';
         console.log(`🎯 Step 5: Looking for spouse element with ID: ${spouseElementId}`);
         
-        // Check if the element exists
-        const elementExists = await page.evaluate((id: string) => {
-            const element = document.getElementById(id);
-            console.log(`Element ${id} exists:`, !!element);
-            if (element) {
-                console.log(`Element type: ${element.tagName}, value: ${(element as any).value || 'no value'}`);
-            }
-            return !!element;
-        }, spouseElementId);
-        console.log(`📍 Step 5: Spouse element exists = ${elementExists}`);
+        // Wait for the element to be visible and enabled before clicking
+        await page.waitForSelector(`#${spouseElementId}`, { state: 'visible', timeout: 30000 });
         
         await clickElementById(page, spouseElementId, 'Step 5');
         await logCurrentPageState(page, 'Step 5');
@@ -353,7 +345,8 @@ test.describe('Human Flow', () => {
         await clickContinue(page, 'Step 5');
 
         // Fill out the "Basic Identity and Contact Information" page for the first debtor
-        await page.waitForTimeout(1000); // Give page time to load
+        await waitForDaPageLoad(page, 'Basic Identity page');
+        await page.waitForSelector(`#${base64UrlEncode('debtor[i].name.first')}`, { state: 'visible', timeout: 30000 });
         await logCurrentPageState(page, 'Step 6');
         await takeDebugScreenshot(page, 'step6-before');
         
@@ -594,7 +587,7 @@ test.describe('Human Flow', () => {
         await clickElementById(page, 'da-continue-button', 'Continue after second debtor explanation');
         
         console.log("📝 Step 11-15: Completed second debtor information collection");
-        
+         
         // Step 16: Review page - just click continue
         console.log("=== STEP 16: Review Page ===");
         await waitForDaPageLoad(page, "Review page");
@@ -627,8 +620,44 @@ test.describe('Human Flow', () => {
         console.log(`📍 Step 18: Current heading = "${pageHeading}"`);
         
         await clickNthElementByName(page, base64UrlEncode('prop.interests.there_are_any'), 0, 'Click Yes for property interests');
-        await clickElementById(page, 'da-continue-button', 'Continue to property collection form');
+        
+        // Wait for page transition to property collection form
+        await waitForDaPageLoad(page, "Waiting for property collection form to load");
+        
+        // Check current heading to confirm we're on the right page
+        pageHeading = await page.evaluate(() => {
+            const h1 = document.querySelector('h1');
+            return h1 ? h1.textContent?.trim() : 'No h1 found';
+        });
+        console.log(`📍 Property collection page: Current heading = "${pageHeading}"`);
         
         console.log("📝 Step 16-18: Completed review page and property interests question");
+        
+  // Step 19: Fill property collection form
+  console.log("=== STEP 19: Property Collection Form ===");
+
+  // Use the exact vanilla JS selectors and field names from the prompt
+  // All names/ids are base64-encoded, so use base64UrlEncode helper
+  await fillElementByName(page, base64UrlEncode('prop.interests[0].street'), '123 Investment Way', 'Property street');
+  await fillElementByName(page, base64UrlEncode('prop.interests[0].city'), 'Omaha', 'Property city');
+  await fillElementByName(page, base64UrlEncode('prop.interests[0].state'), 'NE', 'Property state');
+  await fillElementByName(page, base64UrlEncode('prop.interests[0].zip'), '55555', 'Property zip');
+  await fillElementByName(page, base64UrlEncode('prop.interests[0].county'), 'Douglas County', 'Property county');
+  await clickElementById(page, base64UrlEncode('prop.interests[0].type') + '_3', 'Property type: mobile home');
+  await fillElementById(page, base64UrlEncode('prop.interests[0].current_value'), '12000', 'Property current value');
+  await clickElementById(page, base64UrlEncode('prop.interests[0].has_loan'), 'Property has loan');
+
+  await fillElementByName(page, base64UrlEncode('_field_0_12'), '1000', 'Field 0_12');
+  await fillElementByName(page, base64UrlEncode('prop.interests[0].ownership_interest'), 'arstarst', 'Ownership interest');
+  await clickElementById(page, base64UrlEncode('prop.interests[0].is_community_property') + '_0', 'Is community property: No');
+  await fillElementByName(page, base64UrlEncode('prop.interests[0].other_info'), 'arstassssssrst', 'Other info');
+  await clickElementById(page, base64UrlEncode('prop.interests[0].is_claiming_exemption') + '_0', 'Is claiming exemption: Yes');
+  await clickElementById(page, base64UrlEncode('_field_0_17') + '_0', 'Field 0_17');
+  await fillElementByName(page, base64UrlEncode('_field_0_19'), '1000', 'Field 0_19');
+  await fillElementByName(page, base64UrlEncode('_field_0_20'), 'Wildcard (SDCL 43-5-4)', 'Field 0_20');
+  await fillElementByName(page, base64UrlEncode('_field_0_22'), '2000', 'Field 0_22');
+  await fillElementByName(page, base64UrlEncode('_field_0_23'), 'Unknown law', 'Field 0_23');
+
+  console.log("✅ Step 19: Successfully filled all property collection form fields");
     });
 });
