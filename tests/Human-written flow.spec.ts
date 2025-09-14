@@ -442,5 +442,157 @@ test.describe('Human Flow', () => {
         
         await takeDebugScreenshot(page, 'step8-after');
         console.log(`📝 Step 6-8: Completed filling basic debtor information including tax ID, and added two aliases`);
+        
+        // Step 9: District residency question - click "no"
+        console.log("=== STEP 9: District Residency ===");
+        await waitForDaPageLoad(page, "District residency question");
+        let pageHeading = await page.evaluate(() => {
+            const h1 = document.querySelector('h1');
+            return h1 ? h1.textContent?.trim() : 'No h1 found';
+        });
+        console.log(`📍 Step 9: Current heading = "${pageHeading}"`);
+        
+        await clickNthElementByName(page, base64UrlEncode('debtor[i].district_info.is_current_district'), 1, 'Click No for district residency');
+        await clickElementById(page, 'da-continue-button', 'Continue after district residency');
+
+        // Step 10: Provide explanation for not living in district
+        console.log("=== STEP 10: District Explanation ===");
+        await waitForDaPageLoad(page, "District explanation page");
+        pageHeading = await page.evaluate(() => {
+            const h1 = document.querySelector('h1');
+            return h1 ? h1.textContent?.trim() : 'No h1 found';
+        });
+        console.log(`📍 Step 10: Current heading = "${pageHeading}"`);
+        
+        await fillNthElementByName(page, base64UrlEncode('debtor[i].district_info.other_district_reason'), 0, 'I moved 3 months ago', 'Fill district explanation');
+        await clickElementById(page, 'da-continue-button', 'Continue after explanation');
+        
+        console.log("📝 Step 9-10: Completed district residency questions");
+        
+        // Wait for the next page to load (should be second debtor page)
+        await waitForDaPageLoad(page, "Waiting for next page after first debtor");
+        await page.waitForTimeout(2000); // Give extra time for page transition
+        
+        // Step 11: Second debtor - Basic Identity and Contact Information
+        console.log("=== STEP 11: Second Debtor Basic Info ===");
+        await waitForDaPageLoad(page, "Second debtor basic info");
+        pageHeading = await page.evaluate(() => {
+            const h1 = document.querySelector('h1');
+            return h1 ? h1.textContent?.trim() : 'No h1 found';
+        });
+        console.log(`📍 Step 11: Current heading = "${pageHeading}"`);
+        
+        // If we're not on the second debtor page yet, we might need to advance
+        if (!pageHeading.includes("Basic Identity and Contact Information")) {
+            console.log("🔄 Not on second debtor page yet, looking for continue button");
+            await clickElementById(page, 'da-continue-button', 'Continue to second debtor page');
+            await waitForDaPageLoad(page, "Second debtor page");
+            pageHeading = await page.evaluate(() => {
+                const h1 = document.querySelector('h1');
+                return h1 ? h1.textContent?.trim() : 'No h1 found';
+            });
+            console.log(`� Step 11 Updated: Current heading = "${pageHeading}"`);
+        }
+        
+        // Fill second debtor name fields - they should be visible on this page
+        await page.waitForTimeout(1000); // Wait for page to fully load
+        await fillElementById(page, base64UrlEncode('debtor[i].name.first'), 'Mary', 'Step 11.1');
+        await fillElementById(page, base64UrlEncode('debtor[i].name.middle'), 'Quincy', 'Step 11.2'); 
+        await fillElementById(page, base64UrlEncode('debtor[i].name.last'), 'Adams', 'Step 11.3');
+        await fillElementById(page, base64UrlEncode('debtor[i].name.suffix'), '', 'Step 11.4'); // empty suffix
+        
+        // Fill second debtor address
+        await fillElementById(page, base64UrlEncode('debtor[i].address.address'), '123 Fake Street', 'Step 11.5');
+        await fillElementById(page, base64UrlEncode('debtor[i].address.city'), 'Omaha', 'Step 11.6');
+        
+        // Select state and trigger county dropdown
+        await selectDropdownById(page, base64UrlEncode('debtor[i].address.state'), 'Nebraska', 'Step 11.7');
+        await page.evaluate((stateFieldId) => {
+            const el = document.getElementById(stateFieldId);
+            if (el) el.dispatchEvent(new Event("change", { bubbles: true }));
+        }, base64UrlEncode('debtor[i].address.state'));
+        await page.waitForTimeout(1000); // Wait for county dropdown to populate
+        
+        await fillElementById(page, base64UrlEncode('debtor[i].address.zip'), '12345', 'Step 11.8');
+        await selectDropdownByIndex(page, base64UrlEncode('debtor[i].address.county'), 4, 'Step 11.9');
+        
+        // Click separate mailing address and fill those fields
+        await clickElementById(page, base64UrlEncode('debtor[i].has_other_mailing_address'), 'Step 11.10');
+        await page.waitForTimeout(500); // Wait for fields to appear
+        await fillElementById(page, base64UrlEncode('_field_13'), '123 Mail Street', 'Step 11.11');
+        await fillElementById(page, base64UrlEncode('_field_14'), 'Omaha', 'Step 11.12');
+        await fillElementById(page, base64UrlEncode('_field_15'), 'Nebraska', 'Step 11.13');
+        await fillElementById(page, base64UrlEncode('_field_16'), '54321', 'Step 11.14');
+        
+        // Select SSN and fill SSN field
+        await clickElementById(page, base64UrlEncode('debtor[i].tax_id.tax_id_type') + '_0', 'Step 11.15');
+        await page.waitForTimeout(500); // Wait for SSN field to appear
+        await fillElementById(page, base64UrlEncode('_field_19'), '111-11-1111', 'Step 11.16');
+        
+        // Continue to next page
+        await clickNthElementByName(page, base64UrlEncode('debtor_basic_info'), 0, 'Step 11.17');
+        
+        // Step 12: Second debtor alias question - click yes
+        console.log("=== STEP 12: Second Debtor Alias Question ===");
+        await waitForDaPageLoad(page, "Second debtor alias question");
+        pageHeading = await page.evaluate(() => {
+            const h1 = document.querySelector('h1');
+            return h1 ? h1.textContent?.trim() : 'No h1 found';
+        });
+        console.log(`📍 Step 12: Current heading = "${pageHeading}"`);
+        
+        await clickNthElementByName(page, base64UrlEncode('debtor[i].alias.there_are_any'), 0, 'Click Yes for second debtor aliases');
+        
+        // Step 13: Second debtor alias collection
+        console.log("=== STEP 13: Second Debtor Alias Collection ===");
+        await waitForDaPageLoad(page, "Second debtor alias collection");
+        pageHeading = await page.evaluate(() => {
+            const h1 = document.querySelector('h1');
+            return h1 ? h1.textContent?.trim() : 'No h1 found';
+        });
+        console.log(`📍 Step 13: Current heading = "${pageHeading}"`);
+        
+        // Fill first alias
+        await fillNthElementByName(page, base64UrlEncode('debtor[i].alias[0].first_name'), 0, 'Mariana', 'Step 13.1');
+        await fillNthElementByName(page, base64UrlEncode('debtor[i].alias[0].middle_name'), 0, 'Quincy', 'Step 13.2');
+        await fillNthElementByName(page, base64UrlEncode('debtor[i].alias[0].last_name'), 0, 'Adams', 'Step 13.3');
+        await fillNthElementByName(page, base64UrlEncode('debtor[i].alias[0].business'), 0, 'Mariana Cakes', 'Step 13.4');
+        
+        // Click add another
+        await clickNthElementByClass(page, 'dacollectadd', 0, 'Step 13.5');
+        
+        // Fill second alias
+        await fillNthElementByName(page, base64UrlEncode('debtor[i].alias[1].first_name'), 0, 'Mimi', 'Step 13.6');
+        await fillNthElementByName(page, base64UrlEncode('debtor[i].alias[1].middle_name'), 0, 'Jane', 'Step 13.7');
+        await fillNthElementByName(page, base64UrlEncode('debtor[i].alias[1].last_name'), 0, 'Adams', 'Step 13.8');
+        await fillNthElementByName(page, base64UrlEncode('debtor[i].alias[1].business'), 0, 'Boston Tea Too', 'Step 13.9');
+        
+        // Click continue
+        await clickElementById(page, 'da-continue-button', 'Continue after second debtor aliases');
+        
+        // Step 14: Second debtor district residency - click no
+        console.log("=== STEP 14: Second Debtor District Residency ===");
+        await waitForDaPageLoad(page, "Second debtor district residency");
+        pageHeading = await page.evaluate(() => {
+            const h1 = document.querySelector('h1');
+            return h1 ? h1.textContent?.trim() : 'No h1 found';
+        });
+        console.log(`📍 Step 14: Current heading = "${pageHeading}"`);
+        
+        await clickNthElementByName(page, base64UrlEncode('debtor[i].district_info.is_current_district'), 1, 'Click No for second debtor district residency');
+        
+        // Step 15: Second debtor district explanation
+        console.log("=== STEP 15: Second Debtor District Explanation ===");
+        await waitForDaPageLoad(page, "Second debtor district explanation");
+        pageHeading = await page.evaluate(() => {
+            const h1 = document.querySelector('h1');
+            return h1 ? h1.textContent?.trim() : 'No h1 found';
+        });
+        console.log(`📍 Step 15: Current heading = "${pageHeading}"`);
+        
+        await fillNthElementByName(page, base64UrlEncode('debtor[i].district_info.other_district_reason'), 0, 'I just moved 4 months ago', 'Fill second debtor district explanation');
+        await clickElementById(page, 'da-continue-button', 'Continue after second debtor explanation');
+        
+        console.log("📝 Step 11-15: Completed second debtor information collection");
     });
 });
