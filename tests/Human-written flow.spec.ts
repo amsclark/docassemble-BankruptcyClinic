@@ -594,5 +594,41 @@ test.describe('Human Flow', () => {
         await clickElementById(page, 'da-continue-button', 'Continue after second debtor explanation');
         
         console.log("📝 Step 11-15: Completed second debtor information collection");
+        
+        // Step 16: Review page - just click continue
+        console.log("=== STEP 16: Review Page ===");
+        await waitForDaPageLoad(page, "Review page");
+        pageHeading = await page.evaluate(() => {
+            const h1 = document.querySelector('h1');
+            return h1 ? h1.textContent?.trim() : 'No h1 found';
+        });
+        console.log(`📍 Step 16: Current heading = "${pageHeading}"`);
+        
+        await clickElementById(page, 'da-continue-button', 'Continue from review page');
+        
+        // Step 17: Property intro page - informational only, just click continue
+        console.log("=== STEP 17: Property Introduction ===");
+        await waitForDaPageLoad(page, "Property introduction page");
+        pageHeading = await page.evaluate(() => {
+            const h1 = document.querySelector('h1');
+            return h1 ? h1.textContent?.trim() : 'No h1 found';
+        });
+        console.log(`📍 Step 17: Current heading = "${pageHeading}"`);
+        
+        await clickElementById(page, 'da-continue-button', 'Continue from property intro');
+        
+        // Step 18: Property interests question - click Yes
+        console.log("=== STEP 18: Property Interests Question ===");
+        await waitForDaPageLoad(page, "Property interests question");
+        pageHeading = await page.evaluate(() => {
+            const h1 = document.querySelector('h1');
+            return h1 ? h1.textContent?.trim() : 'No h1 found';
+        });
+        console.log(`📍 Step 18: Current heading = "${pageHeading}"`);
+        
+        await clickNthElementByName(page, base64UrlEncode('prop.interests.there_are_any'), 0, 'Click Yes for property interests');
+        await clickElementById(page, 'da-continue-button', 'Continue to property collection form');
+        
+        console.log("📝 Step 16-18: Completed review page and property interests question");
     });
 });
