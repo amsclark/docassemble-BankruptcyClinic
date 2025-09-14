@@ -15,32 +15,7 @@ test.describe('Human Flow', () => {
   };
 
   // Helper function for logging current page state
-  const l        await clickNthElementByName(page, base64UrlEncode('prop.interests.there_are_any'), 0, 'Click Yes for property interests');
-        
-        // Wait for the property collection page to load
-        await waitForDaPageLoad(page, "Waiting for property collection page");
-        await page.waitForTimeout(2000); // Give extra time for page transition
-        
-        // Step 19: Property details collection
-        console.log("=== STEP 19: Property Details Collection ===");
-        await waitForDaPageLoad(page, "Property details collection");
-        pageHeading = await page.evaluate(() => {
-            const h1 = document.querySelector('h1');
-            return h1 ? h1.textContent?.trim() : 'No h1 found';
-        });
-        console.log(`📍 Step 19: Current heading = "${pageHeading}"`);
-        
-        // Check if we need to click continue to get to the actual property form
-        if (!pageHeading.includes("Add") && !pageHeading.includes("Property")) {
-            console.log("🔄 Not on property collection page yet, looking for continue button");
-            await clickElementById(page, 'da-continue-button', 'Continue to property collection page');
-            await waitForDaPageLoad(page, "Property collection page");
-            pageHeading = await page.evaluate(() => {
-                const h1 = document.querySelector('h1');
-                return h1 ? h1.textContent?.trim() : 'No h1 found';
-            });
-            console.log(`📍 Step 19 Updated: Current heading = "${pageHeading}"`);
-        }eState = async (page: any, stepName: string) => {
+  const logCurrentPageState = async (page: any, stepName: string) => {
     await page.waitForSelector('h1, h2, h3', { timeout: 5000 }).catch(() => {});
     const heading = await page.locator('h1, h2, h3').first().textContent().catch(() => 'No heading found');
     console.log(`📍 ${stepName}: Current heading = "${heading}"`);
@@ -619,89 +594,5 @@ test.describe('Human Flow', () => {
         await clickElementById(page, 'da-continue-button', 'Continue after second debtor explanation');
         
         console.log("📝 Step 11-15: Completed second debtor information collection");
-        
-        // Step 16: Review page - just click continue
-        console.log("=== STEP 16: Review Page ===");
-        await waitForDaPageLoad(page, "Review page");
-        pageHeading = await page.evaluate(() => {
-            const h1 = document.querySelector('h1');
-            return h1 ? h1.textContent?.trim() : 'No h1 found';
-        });
-        console.log(`📍 Step 16: Current heading = "${pageHeading}"`);
-        
-        await clickElementById(page, 'da-continue-button', 'Continue from review page');
-        
-        // Step 17: Property intro page - informational only, just click continue
-        console.log("=== STEP 17: Property Introduction ===");
-        await waitForDaPageLoad(page, "Property introduction page");
-        pageHeading = await page.evaluate(() => {
-            const h1 = document.querySelector('h1');
-            return h1 ? h1.textContent?.trim() : 'No h1 found';
-        });
-        console.log(`📍 Step 17: Current heading = "${pageHeading}"`);
-        
-        await clickElementById(page, 'da-continue-button', 'Continue from property intro');
-        
-        // Step 18: Property interests question - click Yes
-        console.log("=== STEP 18: Property Interests Question ===");
-        await waitForDaPageLoad(page, "Property interests question");
-        pageHeading = await page.evaluate(() => {
-            const h1 = document.querySelector('h1');
-            return h1 ? h1.textContent?.trim() : 'No h1 found';
-        });
-        console.log(`📍 Step 18: Current heading = "${pageHeading}"`);
-        
-        await clickNthElementByName(page, base64UrlEncode('prop.interests.there_are_any'), 0, 'Click Yes for property interests');
-        
-        // Step 19: Property details collection
-        console.log("=== STEP 19: Property Details Collection ===");
-        await waitForDaPageLoad(page, "Property details collection");
-        pageHeading = await page.evaluate(() => {
-            const h1 = document.querySelector('h1');
-            return h1 ? h1.textContent?.trim() : 'No h1 found';
-        });
-        console.log(`� Step 19: Current heading = "${pageHeading}"`);
-        
-        // Fill property address
-        await fillNthElementByName(page, base64UrlEncode('prop.interests[0].street'), 0, '123 Investment Way', 'Step 19.1');
-        await fillNthElementByName(page, base64UrlEncode('prop.interests[0].city'), 0, 'Omaha', 'Step 19.2');
-        await fillNthElementByName(page, base64UrlEncode('prop.interests[0].state'), 0, 'NE', 'Step 19.3');
-        await fillNthElementByName(page, base64UrlEncode('prop.interests[0].zip'), 0, '55555', 'Step 19.4');
-        await fillNthElementByName(page, base64UrlEncode('prop.interests[0].county'), 0, 'Douglas County', 'Step 19.5');
-        
-        // Select property type (mobile home - option 3)
-        await clickElementById(page, base64UrlEncode('prop.interests[0].type') + '_3', 'Step 19.6');
-        
-        // Fill property value
-        await fillElementById(page, base64UrlEncode('prop.interests[0].current_value'), '12000', 'Step 19.7');
-        
-        // Click has loan checkbox
-        await clickElementById(page, base64UrlEncode('prop.interests[0].has_loan'), 'Step 19.8');
-        await page.waitForTimeout(500); // Wait for loan fields to appear
-        
-        // Fill loan amount
-        await fillNthElementByName(page, base64UrlEncode('_field_0_12'), 0, '1000', 'Step 19.9');
-        
-        // Fill ownership interest
-        await fillNthElementByName(page, base64UrlEncode('prop.interests[0].ownership_interest'), 0, 'arstarst', 'Step 19.10');
-        
-        // Click community property option
-        await clickElementById(page, base64UrlEncode('prop.interests[0].is_community_property') + '_0', 'Step 19.11');
-        
-        // Fill other info
-        await fillNthElementByName(page, base64UrlEncode('prop.interests[0].other_info'), 0, 'arstassssssrst', 'Step 19.12');
-        
-        // Click claiming exemption
-        await clickElementById(page, base64UrlEncode('prop.interests[0].is_claiming_exemption') + '_0', 'Step 19.13');
-        await page.waitForTimeout(500); // Wait for exemption fields to appear
-        
-        // Fill exemption details
-        await clickElementById(page, base64UrlEncode('_field_0_17') + '_0', 'Step 19.14');
-        await fillNthElementByName(page, base64UrlEncode('_field_0_19'), 0, '1000', 'Step 19.15');
-        await fillNthElementByName(page, base64UrlEncode('_field_0_20'), 0, 'Wildcard (SDCL 43-5-4)', 'Step 19.16');
-        await fillNthElementByName(page, base64UrlEncode('_field_0_22'), 0, '2000', 'Step 19.17');
-        await fillNthElementByName(page, base64UrlEncode('_field_0_23'), 0, 'Unknown law', 'Step 19.18');
-        
-        console.log("📝 Step 16-19: Completed review page, property introduction, and detailed property collection");
     });
 });
