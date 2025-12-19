@@ -7,6 +7,7 @@ edit:
   - name
   - state
 ---
+id: codebtors_any_exist
 section: schedule_h
 question: |
   Do you have any codebtors?
@@ -14,6 +15,7 @@ subquestion: |
   If you are filing a joint case, do not list either spouse as a codebtor.
 yesno: debtors.codebtors.there_are_any
 ---
+id: codebtors_add_another
 section: schedule_h
 question: |
   Are there any more codebtors?
@@ -21,6 +23,7 @@ yesno: debtors.codebtors.there_is_another
 under: |
   ${ codebtors_table }
 ---
+id: codebtor_details
 section: schedule_h
 question: |
   Tell us about your codebtor
@@ -29,29 +32,30 @@ subquestion: |
 fields:
   - note: Codebtor Address Information[i]
   - Name: debtors.codebtors[i].name
-    default: Janna
+    # default: Janna
   - Address/PO Box: debtors.codebtors[i].street
-    default: 1111 36th ave ne
+    # default: 1111 36th ave ne
   - City: debtors.codebtors[i].city
-    default: Seattle
+    # default: Seattle
   - State: debtors.codebtors[i].state
-    default: Washington
+    # default: Washington
   - Zip: debtors.codebtors[i].zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
   - note: The creditor to whom you owe the debt
   - Schedule form: debtors.codebtors[i].schedule
     choices:
       - Schedule D
       - Schedule E/F
       - Schedule G
-    default: Schedule D
+    # default: Schedule D
   - Line: debtors.codebtors[i].schedule_line
-    default: 3
+    # default: 3
 list collect: True
 ---
+id: community_property_spouse_info
 section: schedule_h
 question: |
   Within the last 8 years, have you lived in a community property state or territory?
@@ -60,39 +64,40 @@ subquestion: |
 fields:
   - In community property state: debtors.community_property
     datatype: yesnoradio
-    default: True
+    # default: True
   - Did your spouse live with you at the time?: debtors.had_spouse
     datatype: yesnoradio
-    default: True
+    # default: True
     required: False
     show if: debtors.community_property
   - What state or territory did you live in?: debtors.spouse_state
-    default: Washington
+    # default: Washington
     show if: debtors.had_spouse
     required: False
   - note: Fill in the name and current address of that person
     show if: debtors.had_spouse
   - Name: debtors.spouse_name
-    default: Brenda Livingston
+    # default: Brenda Livingston
     show if: debtors.had_spouse
     required: False
   - Address/PO Box: debtors.spouse_street
-    default: 1111 35th Ave NE
+    # default: 1111 35th Ave NE
     show if: debtors.had_spouse
     required: False
   - City: debtors.spouse_city
-    default: Seattle
+    # default: Seattle
     show if: debtors.had_spouse
     required: False
   - Zip: debtors.spouse_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: debtors.had_spouse
     required: False
 list collect: True
 ---
+id: schedule_h_review
 event: schedule_h
 section: schedule_h
 question: |

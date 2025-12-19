@@ -1,12 +1,4 @@
----
-code: |
-  # If earlier sections set temporary defaults to avoid circular variable seeking,
-  # clear them now so this section can ask the user the real answers.
-  if defined('financial_affairs._defaults_applied') and financial_affairs._defaults_applied:
-    undefine('financial_affairs.lived_elsewhere')
-    undefine('financial_affairs.has_second_address')
-    financial_affairs._defaults_applied = False
----
+id: marital_status_and_residence_history
 section: form_107
 question: |
   Give details about your marital status and where you lived before
@@ -15,38 +7,38 @@ subquestion: |
 fields:
   - Are you currently married?: financial_affairs.marital_status
     datatype: yesnoradio
-    default: True
+    # default: True
   - During the last 3 years, have you lived anywhere other than where you live now?: financial_affairs.lived_elsewhere
     datatype: yesnoradio
-    default: True
+    # default: True
   - note: List all the places you lived in the last 3 years.
     show if: financial_affairs.lived_elsewhere
   - note: Address 1
     show if: financial_affairs.lived_elsewhere
   - Address/PO Box: financial_affairs.address_street_1
-    default: 1111 36th pl
+    # default: 1111 36th pl
     show if: financial_affairs.lived_elsewhere
   - City: financial_affairs.address_city_1
-    default: Seattle
+    # default: Seattle
     show if: financial_affairs.lived_elsewhere
   - State: financial_affairs.address_state_1
-    default: Washington
+    # default: Washington
     show if: financial_affairs.lived_elsewhere
   - Zip: financial_affairs.address_zip_1
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.lived_elsewhere
   - note: Dates you lived there
     show if: financial_affairs.lived_elsewhere
   - From: financial_affairs.address_from_1
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     show if: financial_affairs.lived_elsewhere
   - To: financial_affairs.address_to_1
     datatype: date
-    default: 04/01/23
+    # default: 04/01/23
     show if: financial_affairs.lived_elsewhere
   - note: Debtor 2 Address
     show if:
@@ -57,7 +49,7 @@ fields:
       is: False
   - Same address as you?: financial_affairs.address_same_1
     datatype: yesnoradio
-    default: False
+    # default: False
     show if:
       code: |
         financial_affairs.debtor_count > 1
@@ -65,7 +57,7 @@ fields:
       variable: financial_affairs.lived_elsewhere
       is: False
   - Address/PO Box: financial_affairs.debtor2_address_street_1
-    default: 1111 36th pl
+    # default: 1111 36th pl
     show if:
       code: |
         financial_affairs.debtor_count > 1
@@ -73,7 +65,7 @@ fields:
       variable: financial_affairs.address_same_1
       is: True
   - City: financial_affairs.debtor2_address_city_1
-    default: Seattle
+    # default: Seattle
     show if:
       code: |
         financial_affairs.debtor_count > 1
@@ -81,7 +73,7 @@ fields:
       variable: financial_affairs.address_same_1
       is: True
   - State: financial_affairs.debtor2_address_state_1
-    default: Washington
+    # default: Washington
     show if:
       code: |
         financial_affairs.debtor_count > 1
@@ -92,7 +84,7 @@ fields:
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if:
       code: |
         financial_affairs.debtor_count > 1
@@ -101,13 +93,13 @@ fields:
       is: True
   - Same time period as you?: financial_affairs.address_same_dates_1
     datatype: yesnoradio
-    default: False
+    # default: False
     show if:
       code: |
         financial_affairs.debtor_count > 1
   - From: financial_affairs.debtor2_address_from_1
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     show if:
       code: |
         financial_affairs.debtor_count > 1
@@ -116,7 +108,7 @@ fields:
       is: True
   - To: financial_affairs.debtor2_address_to_1
     datatype: date
-    default: 04/01/23
+    # default: 04/01/23
     show if:
       code: |
         financial_affairs.debtor_count > 1
@@ -125,27 +117,27 @@ fields:
       is: True
   - Has second address: financial_affairs.has_second_address
     datatype: yesnoradio
-    default: True
+    # default: True
     show if: financial_affairs.lived_elsewhere
   - note: Address 2
     show if: financial_affairs.has_second_address
   - Address/PO Box: financial_affairs.address_street_2
-    default: 11111 36th pl
+    # default: 11111 36th pl
     show if: financial_affairs.has_second_address
     required: False
   - City: financial_affairs.address_city_2
-    default: Seattle
+    # default: Seattle
     show if: financial_affairs.has_second_address
     required: False
   - State: financial_affairs.address_state_2
-    default: Washington
+    # default: Washington
     show if: financial_affairs.has_second_address
     required: False
   - Zip: financial_affairs.address_zip_2
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.has_second_address
     required: False
   - note: Dates you lived there
@@ -154,12 +146,12 @@ fields:
         financial_affairs.lived_elsewhere and financial_affairs.has_second_address
   - From: financial_affairs.address_from_2
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     show if: financial_affairs.has_second_address
     required: False
   - To: financial_affairs.address_to_2
     datatype: date
-    default: 04/01/23
+    # default: 04/01/23
     show if: financial_affairs.has_second_address
     required: False
   - note: Debtor 2 Address
@@ -171,7 +163,7 @@ fields:
       is: False
   - Same address as you?: financial_affairs.address_same_2
     datatype: yesnoradio
-    default: False
+    # default: False
     show if:
       code: |
         financial_affairs.debtor_count > 1
@@ -180,7 +172,7 @@ fields:
       is: False
     required: False
   - Address/PO Box: financial_affairs.debtor2_address_street_2
-    default: 1111 36th pl
+    # default: 1111 36th pl
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_2") === false
     hide if:
@@ -188,7 +180,7 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - City: financial_affairs.debtor2_address_city_2
-    default: Seattle
+    # default: Seattle
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_2") === false
     hide if:
@@ -196,7 +188,7 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - State: financial_affairs.debtor2_address_state_2
-    default: Washington
+    # default: Washington
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_2") === false
     hide if:
@@ -207,7 +199,7 @@ fields:
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_2") === false
     hide if:
@@ -216,7 +208,7 @@ fields:
     required: False
   - Same time period as you?: financial_affairs.address_same_dates_2
     datatype: yesnoradio
-    default: False
+    # default: False
     js show if:
       val("financial_affairs.has_second_address") === true
     hide if:
@@ -225,7 +217,7 @@ fields:
     required: False
   - From: financial_affairs.debtor2_address_from_2
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_2") === false
     hide if:
@@ -234,7 +226,7 @@ fields:
     required: False
   - To: financial_affairs.debtor2_address_to_2
     datatype: date
-    default: 04/01/23
+    # default: 04/01/23
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_2") === false
     hide if:
@@ -245,22 +237,22 @@ fields:
   - note: Address 3
     show if: financial_affairs.has_second_address
   - Address/PO Box: financial_affairs.address_street_3
-    default: 1111 36th pl
+    # default: 1111 36th pl
     show if: financial_affairs.has_second_address
     required: False
   - City: financial_affairs.address_city_3
-    default: Seattle
+    # default: Seattle
     show if: financial_affairs.has_second_address
     required: False
   - State: financial_affairs.address_state_3
-    default: Washington
+    # default: Washington
     show if: financial_affairs.has_second_address
     required: False
   - Zip: financial_affairs.address_zip_3
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.has_second_address
     required: False
   - note: Dates you lived there
@@ -269,12 +261,12 @@ fields:
         financial_affairs.lived_elsewhere and financial_affairs.has_second_address
   - From: financial_affairs.address_from_3
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     show if: financial_affairs.has_second_address
     required: False
   - To: financial_affairs.address_to_3
     datatype: date
-    default: 04/01/23
+    # default: 04/01/23
     show if: financial_affairs.has_second_address
     required: False
   - note: Debtor 2 Address
@@ -286,7 +278,7 @@ fields:
       is: False
   - Same address as you?: financial_affairs.address_same_3
     datatype: yesnoradio
-    default: False
+    # default: False
     show if:
       code: |
         financial_affairs.debtor_count > 1
@@ -295,7 +287,7 @@ fields:
       is: False
     required: False
   - Address/PO Box: financial_affairs.debtor2_address_street_3
-    default: 1111 36th pl
+    # default: 1111 36th pl
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_3") === false
     hide if:
@@ -303,7 +295,7 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - City: financial_affairs.debtor2_address_city_3
-    default: Seattle
+    # default: Seattle
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_3") === false
     hide if:
@@ -311,7 +303,7 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - State: financial_affairs.debtor2_address_state_3
-    default: Washington
+    # default: Washington
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_3") === false
     hide if:
@@ -322,7 +314,7 @@ fields:
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_3") === false
     hide if:
@@ -331,7 +323,7 @@ fields:
     required: False
   - Same time period as you?: financial_affairs.address_same_dates_3
     datatype: yesnoradio
-    default: False
+    # default: False
     js show if:
       val("financial_affairs.has_second_address") === true
     hide if:
@@ -340,7 +332,7 @@ fields:
     required: False
   - From: financial_affairs.debtor2_address_from_3
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_3") === false
     hide if:
@@ -349,7 +341,7 @@ fields:
     required: False
   - To: financial_affairs.debtor2_address_to_3
     datatype: date
-    default: 04/01/23
+    # default: 04/01/23
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_3") === false
     hide if:
@@ -360,22 +352,22 @@ fields:
   - note: Address 4
     show if: financial_affairs.has_second_address
   - Address/PO Box: financial_affairs.address_street_4
-    default: 1111 36th pl
+    # default: 1111 36th pl
     show if: financial_affairs.has_second_address
     required: False
   - City: financial_affairs.address_city_4
-    default: Seattle
+    # default: Seattle
     show if: financial_affairs.has_second_address
     required: False
   - State: financial_affairs.address_state_4
-    default: Washington
+    # default: Washington
     show if: financial_affairs.has_second_address
     required: False
   - Zip: financial_affairs.address_zip_4
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.has_second_address
     required: False
   - note: Dates you lived there
@@ -384,12 +376,12 @@ fields:
         financial_affairs.lived_elsewhere and financial_affairs.has_second_address
   - From: financial_affairs.address_from_4
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     show if: financial_affairs.has_second_address
     required: False
   - To: financial_affairs.address_to_4
     datatype: date
-    default: 04/01/23
+    # default: 04/01/23
     show if: financial_affairs.has_second_address
     required: False
   - note: Debtor 2 Address
@@ -401,7 +393,7 @@ fields:
       is: False
   - Same address as you?: financial_affairs.address_same_4
     datatype: yesnoradio
-    default: False
+    # default: False
     show if:
       code: |
         financial_affairs.debtor_count > 1
@@ -410,7 +402,7 @@ fields:
       is: False
     required: False
   - Address/PO Box: financial_affairs.debtor2_address_street_4
-    default: 1111 36th pl
+    # default: 1111 36th pl
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_4") === false
     hide if:
@@ -418,7 +410,7 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - City: financial_affairs.debtor2_address_city_4
-    default: Seattle
+    # default: Seattle
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_4") === false
     hide if:
@@ -426,7 +418,7 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - State: financial_affairs.debtor2_address_state_4
-    default: Washington
+    # default: Washington
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_4") === false
     hide if:
@@ -437,7 +429,7 @@ fields:
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_4") === false
     hide if:
@@ -446,7 +438,7 @@ fields:
     required: False
   - Same time period as you?: financial_affairs.address_same_dates_4
     datatype: yesnoradio
-    default: False
+    # default: False
     js show if:
       val("financial_affairs.has_second_address") === true
     hide if:
@@ -455,7 +447,7 @@ fields:
     required: False
   - From: financial_affairs.debtor2_address_from_4
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_4") === false
     hide if:
@@ -464,7 +456,7 @@ fields:
     required: False
   - To: financial_affairs.debtor2_address_to_4
     datatype: date
-    default: 04/01/23
+    # default: 04/01/23
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_4") === false
     hide if:
@@ -475,22 +467,22 @@ fields:
   - note: Address 5
     show if: financial_affairs.has_second_address
   - Address/PO Box: financial_affairs.address_street_5
-    default: 1111 36th pl
+    # default: 1111 36th pl
     show if: financial_affairs.has_second_address
     required: False
   - City: financial_affairs.address_city_5
-    default: Seattle
+    # default: Seattle
     show if: financial_affairs.has_second_address
     required: False
   - State: financial_affairs.address_state_5
-    default: Washington
+    # default: Washington
     show if: financial_affairs.has_second_address
     required: False
   - Zip: financial_affairs.address_zip_5
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.has_second_address
     required: False
   - note: Dates you lived there
@@ -499,12 +491,12 @@ fields:
         financial_affairs.lived_elsewhere and financial_affairs.has_second_address
   - From: financial_affairs.address_from_5
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     show if: financial_affairs.has_second_address
     required: False
   - To: financial_affairs.address_to_5
     datatype: date
-    default: 04/01/23
+    # default: 04/01/23
     show if: financial_affairs.has_second_address
     required: False
   - note: Debtor 2 Address
@@ -516,7 +508,7 @@ fields:
       is: False
   - Same address as you?: financial_affairs.address_same_5
     datatype: yesnoradio
-    default: False
+    # default: False
     show if:
       code: |
         financial_affairs.debtor_count > 1
@@ -525,7 +517,7 @@ fields:
       is: False
     required: False
   - Address/PO Box: financial_affairs.debtor2_address_street_5
-    default: 1111 36th pl
+    # default: 1111 36th pl
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_5") === false
     hide if:
@@ -533,7 +525,7 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - City: financial_affairs.debtor2_address_city_5
-    default: Seattle
+    # default: Seattle
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_5") === false
     hide if:
@@ -541,7 +533,7 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - State: financial_affairs.debtor2_address_state_5
-    default: Washington
+    # default: Washington
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_5") === false
     hide if:
@@ -552,7 +544,7 @@ fields:
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_5") === false
     hide if:
@@ -561,7 +553,7 @@ fields:
     required: False
   - Same time period as you?: financial_affairs.address_same_dates_5
     datatype: yesnoradio
-    default: False
+    # default: False
     js show if:
       val("financial_affairs.has_second_address") === true
     hide if:
@@ -570,7 +562,7 @@ fields:
     required: False
   - From: financial_affairs.debtor2_address_from_5
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_5") === false
     hide if:
@@ -579,7 +571,7 @@ fields:
     required: False
   - To: financial_affairs.debtor2_address_to_5
     datatype: date
-    default: 04/01/23
+    # default: 04/01/23
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_5") === false
     hide if:
@@ -590,22 +582,22 @@ fields:
   - note: Address 6
     show if: financial_affairs.has_second_address
   - Address/PO Box: financial_affairs.address_street_6
-    default: 1111 36th pl
+    # default: 1111 36th pl
     show if: financial_affairs.has_second_address
     required: False
   - City: financial_affairs.address_city_6
-    default: Seattle
+    # default: Seattle
     show if: financial_affairs.has_second_address
     required: False
   - State: financial_affairs.address_state_6
-    default: Washington
+    # default: Washington
     show if: financial_affairs.has_second_address
     required: False
   - Zip: financial_affairs.address_zip_6
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.has_second_address
     required: False
   - note: Dates you lived there
@@ -614,12 +606,12 @@ fields:
         financial_affairs.has_second_address and financial_affairs.has_second_address
   - From: financial_affairs.address_from_6
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     show if: financial_affairs.has_second_address
     required: False
   - To: financial_affairs.address_to_6
     datatype: date
-    default: 04/01/23
+    # default: 04/01/23
     show if: financial_affairs.has_second_address
     required: False
   - note: Debtor 2 Address
@@ -631,7 +623,7 @@ fields:
       is: False
   - Same address as you?: financial_affairs.address_same_6
     datatype: yesnoradio
-    default: False
+    # default: False
     show if:
       code: |
         financial_affairs.debtor_count > 1
@@ -640,7 +632,7 @@ fields:
       is: False
     required: False
   - Address/PO Box: financial_affairs.debtor2_address_street_6
-    default: 1111 36th pl
+    # default: 1111 36th pl
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_6") === false
     hide if:
@@ -648,7 +640,7 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - City: financial_affairs.debtor2_address_city_6
-    default: Seattle
+    # default: Seattle
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_6") === false
     hide if:
@@ -656,7 +648,7 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - State: financial_affairs.debtor2_address_state_6
-    default: Washington
+    # default: Washington
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_6") === false
     hide if:
@@ -667,7 +659,7 @@ fields:
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_6") === false
     hide if:
@@ -676,7 +668,7 @@ fields:
     required: False
   - Same time period as you?: financial_affairs.address_same_dates_6
     datatype: yesnoradio
-    default: False
+    # default: False
     js show if:
       val("financial_affairs.has_second_address") === true
     hide if:
@@ -685,7 +677,7 @@ fields:
     required: False
   - From: financial_affairs.debtor2_address_from_6
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_6") === false
     hide if:
@@ -694,7 +686,7 @@ fields:
     required: False
   - To: financial_affairs.debtor2_address_to_6
     datatype: date
-    default: 04/01/23
+    # default: 04/01/23
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_6") === false
     hide if:
@@ -705,7 +697,7 @@ fields:
       Within the last 8 years, did you ever live with a spouse or legal equivalent in a community property state or territory? (Community property states and territories include Arizona, California, Idaho, Louisiana, Nevada, New Mexico, Puerto Rico, Texas, Washington, and Wisconsin.
   - no label: financial_affairs.lived_with_spouse
     datatype: yesnoradio
-    default: True
+    # default: True
 ---
 section: form_107
 question: |
@@ -715,7 +707,7 @@ fields:
       Did you have any income from employment or from operating a business during this year or the two previous calendar years?
   - no label: financial_affairs.employed
     datatype: yesnoradio
-    default: True
+    # default: True
   - note: Employment Details
     show if: financial_affairs.employed
   - note: From January 1 of the current year until the date you filed for bankruptcy
@@ -725,39 +717,39 @@ fields:
       - Wages, commissions, bonuses, tips
       - Operating a business
       - None
-    default: Operating a business
+    # default: Operating a business
     datatype: checkbox
     show if: financial_affairs.employed
     required: False
   - Gross Income: financial_affairs.current_gross_income
     datatype: currency
-    default: 20000
+    # default: 20000
     show if: financial_affairs.employed
     required: False
   - note: For last calendar year (January 1 to December 31)
     show if: financial_affairs.employed
   - Year: financial_affairs.last_year
     show if: financial_affairs.employed
-    default: 2022
+    # default: 2022
     required: False
   - Sources of income: financial_affairs.last_income_sources
     choices:
       - Wages, commissions, bonuses, tips
       - Operating a business
       - None
-    default: Wages, commissions, bonuses, tips
+    # default: Wages, commissions, bonuses, tips
     datatype: checkbox
     show if: financial_affairs.employed
     required: False
   - Gross Income: financial_affairs.last_gross_income
     datatype: currency
-    default: 30000
+    # default: 30000
     show if: financial_affairs.employed
     required: False
   - note: For the year before that (Jan 1 to December 31)
     show if: financial_affairs.employed
   - Year: financial_affairs.before_year
-    default: 2021
+    # default: 2021
     show if: financial_affairs.employed
     required: False
   - Sources of income: financial_affairs.before_income_sources
@@ -765,13 +757,13 @@ fields:
       - Wages, commissions, bonuses, tips
       - Operating a business
       - None
-    default: Operating a business
+    # default: Operating a business
     datatype: checkbox
     show if: financial_affairs.employed
     required: False
   - Gross Income: financial_affairs.before_gross_income
     datatype: currency
-    default: 10000
+    # default: 10000
     show if: financial_affairs.employed
     required: False
 ---
@@ -783,7 +775,7 @@ fields:
       Did debtor 2 have any income from employment or from operating a business during this year or the two previous calendar years?
   - no label: financial_affairs.debtor2_employed
     datatype: yesnoradio
-    default: True
+    # default: True
   - note: Employment Details
     show if: financial_affairs.debtor2_employed
   - note: From January 1 of the current year until the date you filed for bankruptcy
@@ -793,19 +785,19 @@ fields:
       - Wages, commissions, bonuses, tips
       - Operating a business
       - None
-    default: Operating a business
+    # default: Operating a business
     datatype: checkbox
     show if: financial_affairs.debtor2_employed
     required: False
   - Gross Income: financial_affairs.debtor2_current_gross_income
     datatype: currency
-    default: 20000
+    # default: 20000
     show if: financial_affairs.debtor2_employed
     required: False
   - note: For last calendar year (January 1 to December 31)
     show if: financial_affairs.debtor2_employed
   - Year: financial_affairs.debtor2_last_year
-    default: 2022
+    # default: 2022
     show if: financial_affairs.debtor2_employed
     required: False
   - Sources of income: financial_affairs.debtor2_last_income_sources
@@ -813,19 +805,19 @@ fields:
       - Wages, commissions, bonuses, tips
       - Operating a business
       - None
-    default: Wages, commissions, bonuses, tips
+    # default: Wages, commissions, bonuses, tips
     datatype: checkbox
     show if: financial_affairs.debtor2_employed
     required: False
   - Gross Income: financial_affairs.debtor2_last_gross_income
     datatype: currency
-    default: 30000
+    # default: 30000
     show if: financial_affairs.debtor2_employed
     required: False
   - note: For the year before that (Jan 1 to December 31)
     show if: financial_affairs.debtor2_employed
   - Year: financial_affairs.debtor2_before_year
-    default: 2021
+    # default: 2021
     show if: financial_affairs.debtor2_employed
     required: False
   - Sources of income: financial_affairs.debtor2_before_income_sources
@@ -833,13 +825,13 @@ fields:
       - Wages, commissions, bonuses, tips
       - Operating a business
       - None
-    default: Operating a business
+    # default: Operating a business
     datatype: checkbox
     show if: financial_affairs.debtor2_employed
     required: False
   - Gross Income: financial_affairs.debtor2_before_gross_income
     datatype: currency
-    default: 10000
+    # default: 10000
     show if: financial_affairs.debtor2_employed
     required: False
 ---
@@ -851,93 +843,93 @@ subquestion: |
 fields:
   - no label: financial_affairs.had_other_income
     datatype: yesnoradio
-    default: True
+    # default: True
   - note: Employment Details
     show if: financial_affairs.had_other_income
   - note: From January 1 of current year until the date you filed for bankruptcy
     show if: financial_affairs.had_other_income
   - Source 1: financial_affairs.current_other_source_1
-    default: Income source
+    # default: Income source
     show if: financial_affairs.had_other_income
     required: False
   - Amount: financial_affairs.current_other_source_amount_1
     datatype: currency
-    default: 1000
+    # default: 1000
     show if: financial_affairs.had_other_income
     required: False
   - Source 2: financial_affairs.current_other_source_2
-    default: Income source 2
+    # default: Income source 2
     show if: financial_affairs.had_other_income
     required: False
   - Amount: financial_affairs.current_other_source_amount_2
-    default: 1000
+    # default: 1000
     show if: financial_affairs.had_other_income
     required: False
   - Source 3: financial_affairs.current_other_source_3
-    default: Income source 3
+    # default: Income source 3
     show if: financial_affairs.had_other_income
     required: False
   - Amount: financial_affairs.current_other_source_amount_3
     datatype: currency
-    default: 1000
+    # default: 1000
     show if: financial_affairs.had_other_income
     required: False
   - note: For last calendar year (Jan 1 to Dec 31)
     show if: financial_affairs.had_other_income
   - Source 1: financial_affairs.last_other_source_1
-    default: Income source
+    # default: Income source
     show if: financial_affairs.had_other_income
     required: False
   - Amount: financial_affairs.last_other_source_amount_1
     datatype: currency
-    default: 1000
+    # default: 1000
     show if: financial_affairs.had_other_income
     required: False
   - Source 2: financial_affairs.last_other_source_2
-    default: Income source 2
+    # default: Income source 2
     show if: financial_affairs.had_other_income
     required: False
   - Amount: financial_affairs.last_other_source_amount_2
     datatype: currency
-    default: 1000
+    # default: 1000
     show if: financial_affairs.had_other_income
     required: False
   - Source 3: financial_affairs.last_other_source_3
-    default: Income source 3
+    # default: Income source 3
     show if: financial_affairs.had_other_income
     required: False
   - Amount: financial_affairs.last_other_source_amount_3
     datatype: currency
-    default: 1000
+    # default: 1000
     show if: financial_affairs.had_other_income
     required: False
   - note: For the calendar year before that.
     show if: financial_affairs.had_other_income
   - Source 1: financial_affairs.before_other_source_1
-    default: Income source
+    # default: Income source
     show if: financial_affairs.had_other_income
     required: False
   - Amount: financial_affairs.before_other_source_amount_1
     datatype: currency
-    default: 1000
+    # default: 1000
     show if: financial_affairs.had_other_income
     required: False
   - Source 2: financial_affairs.before_other_source_2
-    default: Income source 2
+    # default: Income source 2
     show if: financial_affairs.had_other_income
     required: False
   - Amount: financial_affairs.before_other_source_amount_2
     datatype: currency
-    default: 1000
+    # default: 1000
     show if: financial_affairs.had_other_income
     required: False
   - Source 3: financial_affairs.before_other_source_3
-    default: Income source 3
+    # default: Income source 3
     show if: financial_affairs.had_other_income
     required: False
   - Amount: financial_affairs.before_other_source_amount_3
     datatype: currency
-    default: 1000
+    # default: 1000
     show if: financial_affairs.had_other_income
     required: False
 ---
@@ -949,92 +941,92 @@ subquestion: |
 fields:
   - no label: financial_affairs.debtor2_had_other_income
     datatype: yesnoradio
-    default: True
+    # default: True
   - note: Employment Details
     show if: financial_affairs.debtor2_had_other_income
   - note: From January 1 of current year until the date you filed for bankruptcy
     show if: financial_affairs.debtor2_had_other_income
   - Source 1: financial_affairs.debtor2_current_other_source_1
-    default: Income source
+    # default: Income source
     show if: financial_affairs.debtor2_had_other_income
     required: False
   - Amount: financial_affairs.debtor2_current_other_source_amount_1
     datatype: currency
-    default: 1000
+    # default: 1000
     show if: financial_affairs.debtor2_had_other_income
     required: False
   - Source 2: financial_affairs.debtor2_current_other_source_2
-    default: Income source 2
+    # default: Income source 2
     show if: financial_affairs.debtor2_had_other_income
     required: False
   - Amount: financial_affairs.debtor2_current_other_source_amount_2
-    default: 1000
+    # default: 1000
     show if: financial_affairs.debtor2_had_other_income
     required: False
   - Source 3: financial_affairs.debtor2_current_other_source_3
-    default: Income source 3
+    # default: Income source 3
     show if: financial_affairs.debtor2_had_other_income
     required: False
   - Amount: financial_affairs.debtor2_current_other_source_amount_3
-    default: 1000
+    # default: 1000
     show if: financial_affairs.debtor2_had_other_income
     required: False
   - note: For last calendar year (Jan 1 to Dec 31)
     show if: financial_affairs.debtor2_had_other_income
   - Source 1: financial_affairs.debtor2_last_other_source_1
-    default: Income source
+    # default: Income source
     show if: financial_affairs.debtor2_had_other_income
     required: False
   - Amount: financial_affairs.debtor2_last_other_source_amount_1
     datatype: currency
-    default: 1000
+    # default: 1000
     show if: financial_affairs.debtor2_had_other_income
     required: False
   - Source 2: financial_affairs.debtor2_last_other_source_2
-    default: Income source 2
+    # default: Income source 2
     show if: financial_affairs.debtor2_had_other_income
     required: False
   - Amount: financial_affairs.debtor2_last_other_source_amount_2
     datatype: currency
-    default: 1000
+    # default: 1000
     show if: financial_affairs.debtor2_had_other_income
     required: False
   - Source 3: financial_affairs.debtor2_last_other_source_3
-    default: Income source 3
+    # default: Income source 3
     show if: financial_affairs.debtor2_had_other_income
     required: False
   - Amount: financial_affairs.debtor2_last_other_source_amount_3
     datatype: currency
-    default: 1000
+    # default: 1000
     show if: financial_affairs.debtor2_had_other_income
     required: False
   - note: For the calendar year before that.
     show if: financial_affairs.debtor2_had_other_income
   - Source 1: financial_affairs.debtor2_before_other_source_1
-    default: Income source
+    # default: Income source
     show if: financial_affiars.debtor2_had_other_income
     required: False
   - Amount: financial_affairs.debtor2_before_other_source_amount_1
     datatype: currency
-    default: 1000
+    # default: 1000
     show if: financial_affairs.debtor2_had_other_income
     required: False
   - Source 2: financial_affairs.debtor2_before_other_source_2
-    default: Income source 2
+    # default: Income source 2
     show if: financial_affairs.debtor2_had_other_income
     required: False
   - Amount: financial_affairs.debtor2_before_other_source_amount_2
     datatype: currency
-    default: 1000
+    # default: 1000
     show if: financial_affairs.debtor2_had_other_income
     required: False
   - Source 3: financial_affairs.debtor2_before_other_source_3
-    default: Income source 3
+    # default: Income source 3
     show if: financial_affairs.debtor2_had_other_income
     required: False
   - Amount: financial_affairs.debtor2_before_other_source_amount_3
     datatype: currency
-    default: 1000
+    # default: 1000
     show if: financial_affairs.debtor2_had_other_income
     required: False
 ---
@@ -1051,53 +1043,56 @@ edit:
   - amount_owed
   - payment_for
 ---
+id: consumer_debts_classification
 question: |
   Are either Debtor 1's or Debtor 2's debts primarily consumer debts?
 yesno: financial_affairs.primarily_consumer_debts
 ---
+id: consumer_creditor_payments
 question: |
   Did either Debtor 1 or Debtor 2 pay a consumer creditor a total of $600 or a non-consumer creditor a total of $7,575 in the last 90 days?
 yesno: financial_affairs.consumer_debt_payments.there_are_any
 ---
+id: consumer_debt_additional_creditors
 question: |
   Any other creditors you would like to add?
 yesno: financial_affairs.consumer_debt_payments.there_is_another
 under: |
   ${ consumer_debts_table }
 ---
+id: consumer_debt_payment_details
 question: |
   Tell the court about a consumer creditor you paid a total of $600 or more to OR about non-consumer creditors you paid over $7,575 to in the last 90 day.
 fields:
   - Creditor Name: financial_affairs.consumer_debt_payments[i].creditor_name
-    default: creditor name
+    # default: creditor name
   - Address/PO Box: financial_affairs.consumer_debt_payments[i].creditor_street
-    default: 1111 34th Ave
+    # default: 1111 34th Ave
   - City: financial_affairs.consumer_debt_payments[i].creditor_city
-    default: Seattle
+    # default: Seattle
   - State: financial_affairs.consumer_debt_payments[i].creditor_state
-    default: Washington
+    # default: Washington
   - Zip: financial_affairs.consumer_debt_payments[i].creditor_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
   - note: Tell the court about payments you made.
   - Payment Dates: financial_affairs.consumer_debt_payments[i].paymentDates
     input type: area
     rows: 7
-    default: |
-      9/1/23 $595.55
-      8/4/23 $585.77
-      7/3/23 $590.33
-      6/2/23 $588.33
-      5/3/23 %591.44
+    # default:       9/1/23 $595.55
+    #8/4/23 $585.77
+    #  7/3/23 $590.33
+    # 6/2/23 $588.33
+    # 5/3/23 %591.44
     required: False
   - Total Amount Paid: financial_affairs.consumer_debt_payments[i].total_amount
     datatype: currency
-    default: 600
+    # default: 600
   - Amount you still owe: financial_affairs.consumer_debt_payments[i].amount_owed
     datatype: currency
-    default: 1000
+    # default: 1000
   - Payment was for: financial_affairs.consumer_debt_payments[i].payment_for
     choices:
       - Mortgage
@@ -1106,9 +1101,9 @@ fields:
       - Load repayment
       - Suppliers or vendors
       - Other
-    default: Mortgage
+    # default: Mortgage
   - Other reason: financial_affairs.consumer_debt_payments[i].payment_for
-    default: Other
+    # default: Other
     show if:
       variable: financial_affairs.consumer_debt_payments[i].payment_for
       is: Other
@@ -1125,53 +1120,55 @@ edit:
   - total_amount
   - amount_owed
 ---
+id: insider_payments_additional
 question: |
   Any other insider payments to add?
 yesno: financial_affairs.insider_payments.there_is_another
 under: |
   ${ insider_payments_table }
 ---
+id: insider_payments_to_debt
 question: |
   Did either debtor 1 or debtor 2 make any payment on debt you owed anyone who was an insider?
 subquestion: |
   Insiders include your relatives; any general partners; relatives of any general partners; partnerships of which you are a general partner; corporations of which you are an officer, director, person in control, or owner of 20% or more of their voting securities; and any managing agent, including one for a business you operate as a sole propietor. Include payments for domestic support obligations, such as child support and alimony.
 yesno: financial_affairs.insider_payments.there_are_any
 ---
+id: insider_payment_details
 question: |
   Tell the court about the payment to an insider.
 fields:
   - Insider Name: financial_affairs.insider_payments[i].insider_name
-    default: Bill
+    # default: Bill
   - Address/PO Box: financial_affairs.insider_payments[i].street
-    default: 111 34th Ave
+    # default: 111 34th Ave
   - City: financial_affairs.insider_payments[i].city
-    default: Seattle
+    # default: Seattle
   - State: financial_affairs.insider_payments[i].state
-    default: Washington
+    # default: Washington
   - Zip: financial_affairs.insider_payments[i].zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
   - note: Tell the court more about the payment
   - Payment Dates: financial_affairs.insider_payments[i].paymentDates
     input type: area
     required: false
-    default: |
-      9/1/23 $500.23
-      8/2/23 $523.33
-      7/1/23 $602.23
-      6/4/23 $543.33
-      5/3/23 $333.33
+    # default:       9/1/23 $500.23
+    #  8/2/23 $523.33
+    #  7/1/23 $602.23
+    #  6/4/23 $543.33
+    #  5/3/23 $333.33
   - Total amount paid: financial_affairs.insider_payments[i].total_amount
     datatype: currency
-    default: 1000
+    # default: 1000
   - Amount you still owe: financial_affairs.insider_payments[i].amount_owed
     datatype: currency
-    default: 3000
+    # default: 3000
   - Reason for this payment: financial_affairs.insider_payments[i].reason
     input type: area
-    default: payment reason
+    # default: payment reason
 ---
 table: insider_benefits_table
 rows: financial_affairs.insider_benefits
@@ -1184,12 +1181,14 @@ edit:
   - total_amount
   - amount_owed
 ---
+id: insider_benefit_payments_additional
 question: |
   Any other payments that benefited insiders to add?
 yesno: financial_affairs.insider_benefits.there_is_another
 under: |
   ${ insider_benefits_table }
 ---
+id: insider_benefit_payments
 question: |
   Insider Benefit
 subquestion: |
@@ -1198,43 +1197,44 @@ subquestion: |
   Include payments on debts guaranteed to cosigned by an insider.
 yesno: financial_affairs.insider_benefits.there_are_any
 ---
+id: insider_benefit_payment_details
 question: |
   Tell the court about the payment or transfer of any property on account of a debt that benefited an insider
 fields:
   - Insider Name: financial_affairs.insider_benefits[i].insider_name
-    default: Bill
+    # default: Bill
   - Address/PO Box: financial_affairs.insider_benefits[i].street
-    default: 1111 34th Ave
+    # default: 1111 34th Ave
   - City: financial_affairs.insider_benefits[i].city
-    default: Seattle
+    # default: Seattle
   - State: financial_affairs.insider_benefits[i].state
-    default: Washington
+    # default: Washington
   - Zip: financial_affairs.insider_benefits[i].zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
   - note: Tell the court more about the payment
   - Payment Date 1: financial_affairs.insider_benefits[i].payment_date_1
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
   - Payment Date 2: financial_affairs.insider_benefits[i].payment_date_2
     datatype: date
-    default: 01/02/23
+    # default: 01/02/23
     required: False
   - Payment Date 3: financial_affairs.insider_benefits[i].payment_date_3
     datatype: date
-    default: 01/02/23
+    # default: 01/02/23
     required: False
   - Total Amount: financial_affairs.insider_benefits[i].total_amount
     datatype: currency
-    default: 1000
+    # default: 1000
   - Amount you still owe: financial_affairs.insider_benefits[i].amount_owed
     datatype: currency
-    default: 3000
+    # default: 3000
   - Reason for this payment: financial_affairs.insider_benefits[i].reason
     input type: area
-    default: payment reason
+    # default: payment reason
 ---
 table: lawsuit_table
 rows: financial_affairs.lawsuits
@@ -1247,6 +1247,7 @@ edit:
   - court_name
   - case_status
 ---
+id: lawsuits_court_actions
 question: |
   Lawsuits
 subquestion: |
@@ -1255,44 +1256,46 @@ subquestion: |
   Including personal injury cases, small claims actions, divorces, collection suits, paternity actions, support or custody modifications, and contract disputes.
 yesno: financial_affairs.lawsuits.there_are_any
 ---
+id: lawsuits_additional
 question: |
   Are there any more lawsuits filed against you to report?
 yesno: financial_affairs.lawsuits.there_is_another
 under: |
   ${ lawsuit_table }
 ---
+id: lawsuit_details
 question: |
   Tell the court about the lawsuit filed against you.
 fields:
   - Case Title: financial_affairs.lawsuits[i].case_title
-    default: case name
+    # default: case name
   - Case Number: financial_affairs.lawsuits[i].case_number
     datatype: string
-    default: 2249453
+    # default: 2249453
   - note: Nature of the case
   - no label: financial_affairs.lawsuits[i].nature_of_case
     input type: area
-    default: nature of case
+    # default: nature of case
   - note: Court Info
   - Name: financial_affairs.lawsuits[i].court_name
-    default: Big court
+    # default: Big court
   - Address/PO Box: financial_affairs.lawsuits[i].court_street
-    default: 1111 34th Ave
+    # default: 1111 34th Ave
   - City: financial_affairs.lawsuits[i].court_city
-    default: Seattle
+    # default: Seattle
   - State: financial_affairs.lawsuits[i].court_state
-    default: Washington
+    # default: Washington
   - Zip: financial_affairs.lawsuits[i].court_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
   - Case Status: financial_affairs.lawsuits[i].case_status
     choices:
       - Pending
       - On appeal
       - Concluded
-    default: Pending
+    # default: Pending
 ---
 table: levies_table
 rows: financial_affairs.levies
@@ -1305,57 +1308,60 @@ edit:
   - property_value
   - property_action
 ---
+id: repossessed_property_seizure
 question: |
   Repossesed Property
 subquestion: |
   Within 1 year before you filed for bankruptcy, was any of your property repossessed, foreclosed, garnished, attached, seized, or levied?
 yesno: financial_affairs.levies.there_are_any
 ---
+id: repossessed_property_additional
 question: |
   Are there any more properties that have been repossessed, foreclosed, garnished, attached, seized, or levied in the last year?
 yesno: financial_affairs.levies.there_is_another
 under: |
   ${ levies_table }
 ---
+id: repossessed_property_details
 question: |
   Tell the court about a repossessed, foreclosed, garnished, attached, seized, or levied property in the last year.
 fields:
   - Creditor Name: financial_affairs.levies[i].creditor_name
-    default: Bill
+    # default: Bill
   - Address/PO Box: financial_affairs.levies[i].creditor_street
-    default: 1111 34th Ave
+    # default: 1111 34th Ave
   - City: financial_affairs.levies[i].creditor_city
-    default: Seattle
+    # default: Seattle
   - State: financial_affairs.levies[i].creditor_state
-    default: Washington
+    # default: Washington
   - Zip: financial_affairs.levies[i].creditor_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
   - Property Description: financial_affairs.levies[i].property_description
     input type: area
-    default: Description
+    # default: Description
   - Explain what happened: financial_affairs.levies[i].property_action
     choices:
       - Property was repossessed
       - Property was foreclosed
       - Property was garnished
       - Property was attached, seized, or levied
-    default: Property was repossessed
+    # default: Property was repossessed
   - Dates in description?: financial_affairs.levies[i].date_in_description
     datatype: yesnoradio
-    default: True
+    # default: True
   - Date: financial_affairs.levies[i].date
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     show if:
       variable: financial_affairs.levies[i].date_in_description
       is: False
     required: False
   - Property Value: financial_affairs.levies[i].property_value
     datatype: currency
-    default: 30000
+    # default: 30000
 ---
 question: |
   Payment Refusal
@@ -1364,43 +1370,43 @@ subquestion: |
 fields:
   - no label: financial_affairs.has_refusal
     datatype: yesnoradio
-    default: True
+    # default: True
   - Creditors Name: financial_affairs.refusal_creditor_name
-    default: Bill
+    # default: Bill
     show if: financial_affairs.has_refusal
   - Address/PO Box: financial_affairs.refusal_creditor_street
-    default: 111 34th Ave NE
+    # default: 111 34th Ave NE
     show if: financial_affairs.has_refusal
   - City: financial_affairs.refusal_creditor_city
-    default: Seattle
+    # default: Seattle
     show if: financial_affairs.has_refusal
   - State: financial_affairs.refusal_creditor_state
-    default: Washington
+    # default: Washington
     show if: financial_affairs.has_refusal
   - Zip: financial_affairs.refusal_creditor_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.has_refusal
   - note: Describe the action the creditor took
     show if: financial_affairs.has_refusal
   - no label: financial_affairs.refusal_description
-    default: Description
+    # default: Description
     input type: area
     show if: financial_affairs.has_refusal
   - Last 4 digits of account number XXXX-: financial_affairs.refusal_account_number
-    default: 1111
+    # default: 1111
     show if: financial_affairs.has_refusal
     required: False
   - Date action was taken: financial_affairs.refusal_date
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     show if: financial_affairs.has_refusal
     required: False
   - Amount: financial_affairs.refusal_amount
     datatype: currency
-    default: 3000
+    # default: 3000
     show if: financial_affairs.has_refusal
 ---
 question: |
@@ -1420,12 +1426,14 @@ edit:
   - relationship
   - value_1
 ---
+id: gifts_to_others
 question: |
   Gifts to other people
 subquestion: |
   Within 2 years before you filed for bankruptcy, did you give any gifts with a total value of more than $600 per person?
 yesno: financial_affairs.gifts.there_are_any
 ---
+id: gifts_additional
 question: |
   Did you make any other gifts over $600 within 2 years before you filed for bankruptcy?
 yesno: financial_affairs.gifts.there_is_another
@@ -1436,36 +1444,37 @@ question: |
   Tell the court about the gift.
 fields:
   - Person to whom you gave the gift: financial_affairs.gifts[i].person_name
-    default: Gifter
+    # default: Gifter
   - Address/PO Box: financial_affairs.gifts[i].street
-    default: 111 22nd
+    # default: 111 22nd
   - City: financial_affairs.gifts[i].city
-    default: Seattle
+    # default: Seattle
   - State: financial_affairs.gifts[i].state
-    default: Washington
+    # default: Washington
   - Zip: financial_affairs.gifts[i].zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
   - Persons relationship to you: financial_affairs.gifts[i].relationship
-    default: Parent
+    # default: Parent
   - note: Describe the gift
   - no label: financial_affairs.gifts[i].description
     input type: area
-    default: Description
+    # default: Description
   - note: Dates you gave the gifts
   - no label: financial_affairs.gifts[i].date_1
-    default: 01/01/23
+    # default: 01/01/23
     input type: area
   - note: Value
   - no label: financial_affairs.gifts[i].value_1
     datatype: currency
-    default: 1000
+    # default: 1000
   - no label: financial_affairs.gifts[i].value_2
     datatype: currency
     required: False
 ---
+id: charitable_contributions
 question: |
   Charitable Contributions Made
 subquestion: |
@@ -1473,42 +1482,42 @@ subquestion: |
 fields:
   - no label: financial_affairs.has_charity
     datatype: yesnoradio
-    default: True
+    # default: True
   - Charity name: financial_affairs.charity_name
-    default: Charity
+    # default: Charity
     show if: financial_affairs.has_charity
   - Address/PO Box: financial_affairs.charity_street
-    default: 1111 55th Ave NE
+    # default: 1111 55th Ave NE
     show if: financial_affairs.has_charity
   - City: financial_affairs.charity_city
-    default: Seattle
+    # default: Seattle
     show if: financial_affairs.has_charity
   - State: financial_affairs.charity_state
-    default: Washington
+    # default: Washington
     show if: financial_affairs.has_charity
   - Zip: financial_affairs.charity_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.has_charity
   - note: Describe what you contributed
     show if: financial_affairs.has_charity
   - no label: financial_affairs.charity_description
-    default: Description
+    # default: Description
     input type: area
     show if: financial_affairs.has_charity
   - note: Dates you contributed
     show if: financial_affairs.has_charity
   - no label: financial_affairs.charity_date_1
-    default: 01/01/23
+    # default: 01/01/23
     input type: area
     show if: financial_affairs.has_charity
   - note: Values
     show if: financial_affairs.has_charity
   - no label: financial_affairs.charity_value_1
     datatype: currency
-    default: 3000
+    # default: 3000
     show if: financial_affairs.has_charity
   - no label: financial_affairs.charity_value_2
     datatype: currency
@@ -1522,27 +1531,27 @@ subquestion: |
 fields:
   - no label: financial_affairs.has_disaster
     datatype: yesnoradio
-    default: True
+    # default: True
   - note: Describe the property you lost and how the loss occurred
     show if: financial_affairs.has_disaster
   - no label: financial_affairs.disaster_description
     input type: area
-    default: Description
+    # default: Description
   - note: Describe any insurance coverage for the loss
     show if: financial_affairs.has_disaster
   - note: Include the amount that insurance has paid.
     show if: financial_affairs.has_disaster
   - no label: financial_affairs.disaster_insurance
     input type: area
-    default: Insurance
+    # default: Insurance
     show if: financial_affairs.has_disaster
   - Date of your loss: financial_affairs.disaster_date
     input type: area
-    default: 01/01/23 with some details
+    # default: 01/01/23 with some details
     show if: financial_affairs.has_disaster
   - Value of property lost: financial_affairs.disaster_value
     datatype: currency
-    default: 3000
+    # default: 3000
     show if: financial_affairs.has_disaster
 ---
 table: bankruptcy_payments_table
@@ -1574,37 +1583,37 @@ question: |
   Tell the court about a payment or transfer of property to anyone you consulted about seeing bankruptcy.
 fields:
   - Person who was paid: financial_affairs.bankruptcy_payments[i].name
-    default: Jimbo
+    # default: Jimbo
   - Address/PO Box: financial_affairs.bankruptcy_payments[i].street
-    default: 111 34th Ave
+    # default: 111 34th Ave
   - City: financial_affairs.bankruptcy_payments[i].city
-    default: Seattle
+    # default: Seattle
   - State: financial_affairs.bankruptcy_payments[i].state
-    default: washington
+    # default: washington
   - Zip: financial_affairs.bankruptcy_payments[i].zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
   - Email or website: financial_affairs.bankruptcy_payments[i].email_or_website
-    default: www.bankruptcyconsultants.net
+    # default: www.bankruptcyconsultants.net
   - Person who made the payment if not you: financial_affairs.bankruptcy_payments[i].payment_person
     required: False
   - note: Description of value of any property transferred
   - no label: financial_affairs.bankruptcy_payments[i].property_description
     input type: area
-    default: Description
+    # default: Description
   - note: Date payment or trasfer was made
   - no label: financial_affairs.bankruptcy_payments[i].date_1
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
   - no label: financial_affairs.bankruptcy_payments[i].date_2
     datatype: date
     required: False
   - note: Amount of payment
   - no label: financial_affairs.bankruptcy_payments[i].value_1
     datatype: currency
-    default: 4000
+    # default: 4000
   - no label: financial_affairs.bankruptcy_payments[i].value_2
     datatype: currency
     required: False
@@ -1618,36 +1627,36 @@ subquestion: |
 fields:
   - no label: financial_affairs.has_creditor_help
     datatype: yesnoradio
-    default: True
+    # default: True
   - Person who was paid: financial_affairs.creditor_help.name
-    default: Bill
+    # default: Bill
     show if: financial_affairs.has_creditor_help
   - Address/PO Box: financial_affairs.creditor_help.street
-    default: 1111 54th Ave NE
+    # default: 1111 54th Ave NE
     show if: financial_affairs.has_creditor_help
   - City: financial_affairs.creditor_help.city
-    default: Seattle
+    # default: Seattle
     show if: financial_affairs.has_creditor_help
   - State: financial_affairs.creditor_help.state
-    default: Washington
+    # default: Washington
     show if: financial_affairs.has_creditor_help
   - Zip: financial_affairs.creditor_help.zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.has_creditor_help
   - note: Description and value of any property transferred
     show if: financial_affairs.has_creditor_help
   - no label: financial_affairs.creditor_help.property_description
     input type: area
-    default: Description
+    # default: Description
     show if: financial_affairs.has_creditor_help
   - note: Date payment or transfer was made
     show if: financial_affairs.has_creditor_help
   - no label: financial_affairs.creditor_help.date_1
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     show if: financial_affairs.has_creditor_help
   - no label: financial_affairs.creditor_help.date_2
     datatype: date
@@ -1657,7 +1666,7 @@ fields:
     show if: financial_affairs.has_creditor_help
   - no label: financial_affairs.creditor_help.value_1
     datatype: currency
-    default: 2000
+    # default: 2000
     show if: financial_affairs.has_creditor_help
   - no label: financial_affairs.creditor_help.value_2
     datatype: currency
@@ -1693,31 +1702,31 @@ question: |
   Tell the court about the transfer.
 fields:
   - Person who received transfer: financial_affairs.other_transfers[i].name
-    default: Billy
+    # default: Billy
   - Address/PO Box: financial_affairs.other_transfers[i].street
-    default: 1111 23rd ave ne
+    # default: 1111 23rd ave ne
   - City: financial_affairs.other_transfers[i].city
-    default: Seattle
+    # default: Seattle
   - State: financial_affairs.other_transfers[i].state
-    default: Washington
+    # default: Washington
   - Zip: financial_affairs.other_transfers[i].zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
   - Persons realtionship to you: financial_affairs.other_transfers[i].relationship
-    default: Father
+    # default: Father
   - note: Description and value of property transferred
   - no label: financial_affairs.other_transfers[i].property_description
     input type: area
-    default: Description
+    # default: Description
   - note: Describe any property or payments received or debts paid in exchange
   - no label: financial_affairs.other_transfers[i].exchange_description
     input type: area
-    default: Exchange Description
+    # default: Exchange Description
   - Date transfer was made: financial_affairs.other_transfers[i].date
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
 ---
 question: |
   Self-settled Trusts
@@ -1726,20 +1735,20 @@ subquestion: |
 fields:
   - no label: financial_affairs.has_self_settled_trust
     datatype: yesnoradio
-    default: True
+    # default: True
   - Name of trust: financial_affairs.self_settled_trust.name
     input type: area
-    default: Trust Name
+    # default: Trust Name
     show if: financial_affairs.has_self_settled_trust
   - note: Description and value of the property transferred
     show if: financial_affairs.has_self_settled_trust
   - no label: financial_affairs.self_settled_trust.description
     input type: area
-    default: Description
+    # default: Description
     show if: financial_affairs.has_self_settled_trust
   - Date transfer was made: financial_affairs.self_settled_trust.date
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     show if: financial_affairs.has_self_settled_trust
 ---
 table: instruments_table
@@ -1771,22 +1780,22 @@ question: |
   Tell the court about the financial account or instrument.
 fields:
   - Name of financial institution: financial_affairs.instruments[i].name
-    default: Big bank
+    # default: Big bank
   - Address/PO Box: financial_affairs.instruments[i].street
-    default: 1111 21st St S
+    # default: 1111 21st St S
   - City: financial_affairs.instruments[i].city
-    default: seattle
+    # default: seattle
   - State: financial_affairs.instruments[i].state
-    default: Washington
+    # default: Washington
   - Zip: financial_affairs.instruments[i].zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
   - note: Last 4 digits of account number
   - no label: financial_affairs.instruments[i].account_number
     datatype: string
-    default: 1111
+    # default: 1111
     required: False
   - note: Type of account or instrument
   - no label: financial_affairs.instruments[i].account_type
@@ -1796,20 +1805,20 @@ fields:
       - Money Market
       - Brokerage
       - Other
-    default: Savings
+    # default: Savings
   - Other type of account: financial_affairs.instruments[i].account_type
-    default: other type
+    # default: other type
     show if:
       variable: financial_affairs.instruments[i].account_type
       is: Other
   - note: Date account was closed, sold, moved, or trasferred
   - no label: financial_affairs.instruments[i].date
-    default: 01/01/23
+    # default: 01/01/23
     input type: area
   - note: Last balance before closing or transfer
   - no label: financial_affairs.instruments[i].last_balance
     datatype: currency
-    default: 3000
+    # default: 3000
 ---
 question: |
   Safe Deposit Box
@@ -1818,59 +1827,59 @@ subquestion: |
 fields:
   - no label: financial_affairs.has_deposit_box
     datatype: yesnoradio
-    default: True
+    # default: True
   - Name of financial institution: financial_affairs.deposit_box.name
-    default: BECU
+    # default: BECU
     show if: financial_affairs.has_deposit_box
   - Address/PO Box: financial_affairs.deposit_box.street
-    default: 1111 25th Ave NE
+    # default: 1111 25th Ave NE
     show if: financial_affairs.has_deposit_box
   - City: financial_affairs.deposit_box.city
-    default: Seattle
+    # default: Seattle
     show if: financial_affairs.has_deposit_box
   - State: financial_affairs.deposit_box.state
-    default: Washington
+    # default: Washington
     show if: financial_affairs.has_deposit_box
   - Zip: financial_affairs.deposit_box.zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.has_deposit_box
   - note: Who else had access to it?
     show if: financial_affairs.has_deposit_box
   - Name: financial_affairs.deposit_box.other_name
     required: False
-    default: Jan
+    # default: Jan
     show if: financial_affairs.has_deposit_box
   - Address/PO Box: financial_affairs.deposit_box.other_street
-    default: 54rd ave ne
+    # default: 54rd ave ne
     required: False
     show if: financial_affairs.has_deposit_box
   - City: financial_affairs.deposit_box.other_city
-    default: Seattle
+    # default: Seattle
     required: False
     show if: financial_affairs.has_deposit_box
   - State: financial_affairs.deposit_box.other_state
-    default: Washington
+    # default: Washington
     required: False
     show if: financial_affairs.has_deposit_box
   - Zip: financial_affairs.deposit_box.other_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     required: False
     show if: financial_affairs.has_deposit_box
   - note: Describe the contents
     show if: financial_affairs.has_deposit_box
   - no label: financial_affairs.deposit_box.contents
-    default: Deposit box contents
+    # default: Deposit box contents
     input type: area
     show if: financial_affairs.has_deposit_box
   - Do you still have it?: financial_affairs.deposit_box.still_owns
     datatype: yesnoradio
-    default: True
+    # default: True
     show if: financial_affairs.has_deposit_box
 ---
 question: |
@@ -1880,59 +1889,59 @@ subquestion: |
 fields:
   - no label: financial_affairs.has_storage_unit
     datatype: yesnoradio
-    default: True
+    # default: True
   - Name of storage facility: financial_affairs.storage_unit.name
-    default: BECU
+    # default: BECU
     show if: financial_affairs.has_storage_unit
   - Address/PO Box: financial_affairs.storage_unit.street
-    default: 1111 25th Ave NE
+    # default: 1111 25th Ave NE
     show if: financial_affairs.has_storage_unit
   - City: financial_affairs.storage_unit.city
-    default: Seattle
+    # default: Seattle
     show if: financial_affairs.has_storage_unit
   - State: financial_affairs.storage_unit.state
-    default: Washington
+    # default: Washington
     show if: financial_affairs.has_storage_unit
   - Zip: financial_affairs.storage_unit.zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.has_storage_unit
   - note: Who else had access to it?
     show if: financial_affairs.has_storage_unit
   - Name: financial_affairs.storage_unit.other_name
     required: False
-    default: Jan
+    # default: Jan
     show if: financial_affairs.has_storage_unit
   - Address/PO Box: financial_affairs.storage_unit.other_street
-    default: 1111 54rd ave ne
+    # default: 1111 54rd ave ne
     required: False
     show if: financial_affairs.has_storage_unit
   - City: financial_affairs.storage_unit.other_city
-    default: Seattle
+    # default: Seattle
     required: False
     show if: financial_affairs.has_storage_unit
   - State: financial_affairs.storage_unit.other_state
-    default: Washington
+    # default: Washington
     required: False
     show if: financial_affairs.has_storage_unit
   - Zip: financial_affairs.storage_unit.other_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     required: False
     show if: financial_affairs.has_storage_unit
   - note: Describe the contents and list value
     show if: financial_affairs.has_storage_unit
   - no label: financial_affairs.storage_unit.contents
-    default: Deposit box contents
+    # default: Deposit box contents
     input type: area
     show if: financial_affairs.has_storage_unit
   - Do you still have it?: financial_affairs.storage_unit.still_owns
     datatype: yesnoradio
-    default: True
+    # default: True
     show if: financial_affairs.has_storage_unit
 ---
 question: |
@@ -1942,53 +1951,54 @@ subquestion: |
 fields:
   - no label: financial_affairs.has_held_property
     datatype: yesnoradio
-    default: True
+    # default: True
   - Owners name: financial_affairs.held_property.name
-    default: Craig
+    # default: Craig
     show if: financial_affairs.has_held_property
   - Address/PO Box: financial_affairs.held_property.street
-    default: 34th Ave NE
+    # default: 34th Ave NE
     show if: financial_affairs.has_held_property
   - City: financial_affairs.held_property.city
-    default: Seattle
+    # default: Seattle
     show if: financial_affairs.has_held_property
   - State: financial_affairs.held_property.state
-    default: Washington
+    # default: Washington
     show if: financial_affairs.has_held_property
   - Zip: financial_affairs.held_property.zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.has_held_property
   - note: Where is the property?
     show if: financial_affairs.has_held_property
   - Address/PO Box: financial_affairs.held_property.prop_street
-    default: 1111 1st Ave
+    # default: 1111 1st Ave
     show if: financial_affairs.has_held_property
   - City: financial_affairs.held_property.prop_city
-    default: Seattle
+    # default: Seattle
     show if: financial_affairs.has_held_property
   - State: financial_affairs.held_property.prop_state
-    default: Washington
+    # default: Washington
     show if: financial_affairs.has_held_property
   - Zip: financial_affairs.held_property.prop_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.has_held_property
   - note: Describe the property
     show if: financial_affairs.has_held_property
   - no label: financial_affairs.held_property.property_description
     input type: area
-    default: property description
+    # default: property description
     show if: financial_affairs.has_held_property
   - Value: financial_affairs.held_property.value
     datatype: currency
-    default: 2000
+    # default: 2000
     show if: financial_affairs.has_held_property
 ---
+id: environmental_law_liability
 question: |
   Environmental Law Liability
 subquestion: |
@@ -2006,58 +2016,59 @@ subquestion: |
 fields:
   - no label: financial_affairs.environment.has_liability
     datatype: yesnoradio
-    default: True
+    # default: True
   - Name of site: financial_affairs.environment.liability_name
-    default: Site
+    # default: Site
     show if: financial_affairs.environment.has_liability
   - Address/PO Box: financial_affairs.environment.liability_street
-    default: 1111 54th Ave
+    # default: 1111 54th Ave
     show if: financial_affairs.environment.has_liability
   - City: financial_affairs.environment.liability_city
-    default: Seattle
+    # default: Seattle
     show if: finanical_affairs.environment.has_liability
   - State: financial_affairs.environment.liability_state
-    default: Washington
+    # default: Washington
     show if: financial_affairs.environment.has_liability
   - Zip: financial_affairs.environment.liability_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.environment.has_liability
   - note: Government Unit
     show if: financial_affairs.environment.has_liability
   - Name: financial_affairs.environment.liability_unit_name
-    default: Govt Unit
+    # default: Govt Unit
     show if: financial_affairs.environment.has_liability
   - Address/PO Box: financial_affairs.environment.liability_unit_street
-    default: 1111 23rd Ave NE
+    # default: 1111 23rd Ave NE
     show if: financial_affairs.environment.has_liability
   - City: financial_affairs.environment.liability_unit_city
-    default: Seattle
+    # default: Seattle
     show if: financial_affairs.environment.has_liability
   - State: financial_affairs.environment.liability_unit_state
-    default: Washington
+    # default: Washington
     show if: financial_affairs.environment.has_liability
   - Zip: financial_affairs.environment.liability_unit_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.environment.has_liability
   - note: Environmental law, if you know it
     show if: financial_affairs.environment.has_liability
   - no label: financial_affairs.environment.liability_law
     input type: area
-    default: Applicable law
+    # default: Applicable law
     show if: financial_affairs.environment.has_liability
   - note: Date of notice
     show if: financial_affairs.environment.has_liability
   - no label: financial_affairs.environment.liability_date
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     show if: financial_affairs.environment.has_liability
 ---
+id: hazardous_material_release
 question: |
   Hazardous Material
 subquestion: |
@@ -2065,58 +2076,59 @@ subquestion: |
 fields:
   - no label: financial_affairs.environment.has_release
     datatype: yesnoradio
-    default: True
+    # default: True
   - Name of site: financial_affairs.environment.release_name
-    default: Site
+    # default: Site
     show if: financial_affairs.environment.has_release
   - Address/PO Box: financial_affairs.environment.release_street
-    default: 111 54th Ave
+    # default: 111 54th Ave
     show if: financial_affairs.environment.has_release
   - City: financial_affairs.environment.release_city
-    default: Seattle
+    # default: Seattle
     show if: finanical_affairs.environment.has_release
   - State: financial_affairs.environment.release_state
-    default: Washington
+    # default: Washington
     show if: financial_affairs.environment.has_release
   - Zip: financial_affairs.environment.release_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.environment.has_release
   - note: Government Unit
     show if: financial_affairs.environment.has_release
   - Name: financial_affairs.environment.release_unit_name
-    default: Govt Unit
+    # default: Govt Unit
     show if: financial_affairs.environment.has_release
   - Address/PO Box: financial_affairs.environment.release_unit_street
-    default: 1111 23rd Ave NE
+    # default: 1111 23rd Ave NE
     show if: financial_affairs.environment.has_release
   - City: financial_affairs.environment.release_unit_city
-    default: Seattle
+    # default: Seattle
     show if: financial_affairs.environment.has_release
   - State: financial_affairs.environment.release_unit_state
-    default: Washington
+    # default: Washington
     show if: financial_affairs.environment.has_release
   - Zip: financial_affairs.environment.release_unit_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.environment.has_release
   - note: Environmental law, if you know it
     show if: financial_affairs.environment.has_release
   - no label: financial_affairs.environment.release_law
     input type: area
-    default: Applicable law
+    # default: Applicable law
     show if: financial_affairs.environment.has_release
   - note: Date of notice
     show if: financial_affairs.environment.has_release
   - no label: financial_affairs.environment.release_date
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     show if: financial_affairs.environment.has_release
 ---
+id: environmental_judicial_proceeding
 question: |
   Environmental Judicial Proceeding
 subquestion: |
@@ -2124,48 +2136,49 @@ subquestion: |
 fields:
   - no label: financial_affairs.environment.has_proceeding
     datatype: yesnoradio
-    default: True
+    # default: True
   - Case title: financial_affairs.environment.proceeding_case_title
     input type: area
-    default: Case Title
+    # default: Case Title
     show if: financial_affairs.environment.has_proceeding
   - Case number: financial_affairs.environment.proceeding_case_number
     datatype: string
-    default: 3343902
+    # default: 3343902
     show if: financial_affairs.environment.has_proceeding
   - note: Court or agency
   - Court Name: financial_affairs.environment.proceeding_court_name
-    default: Court Name
+    # default: Court Name
     show if: financial_affairs.environment.has_proceeding
   - Address/PO Box: financial_affairs.environment.proceeding_court_street
-    default: 1111 34th Ave NE
+    # default: 1111 34th Ave NE
     show if: financial_affairs.environment.has_proceeding
   - City: financial_affairs.environment.proceeding_court_city
-    default: Seattle
+    # default: Seattle
     show if: financial_affairs.environment.has_proceeding
   - State: financial_affairs.environment.proceeding_court_state
-    default: Washington
+    # default: Washington
     show if: financial_affairs.environment.has_proceeding
   - Zip: financial_affairs.environment.proceeding_court_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.environment.has_proceeding
   - note: Nature of the case
     show if: financial_affairs.environment.has_proceeding
   - no label: financial_affairs.environment.proceeding_description
     input type: area
-    default: Nature of the case
+    # default: Nature of the case
     show if: financial_affairs.environment.has_proceeding
   - Status of the case: financial_affairs.environment.proceeding_status
     choices:
       - Pending
       - On appeal
       - Concluded
-    default: Pending
+    # default: Pending
     show if: financial_affairs.environment.has_proceeding
 ---
+id: business_connections
 question: |
   Business Connections
 subquestion: |
@@ -2191,53 +2204,57 @@ edit:
   - from
   - to
 ---
+id: business_existence
 question: |
   Do you have any businesses or have any connections to any business?
 yesno: financial_affairs.businesses.there_are_any
 ---
+id: business_additional
 question: |
   Do you have any more businesses to tell the court about?
 yesno: financial_affairs.businesses.there_is_another
 under: |
   ${ businesses_table }
 ---
+id: business_details
 question: |
   Tell the court about the business.
 fields:
   - Business Name: financial_affairs.businesses[i].name
-    default: business name
+    # default: business name
   - Address/PO Box: financial_affairs.businesses[i].street
-    default: 34th Ave NE
+    # default: 34th Ave NE
   - City: financial_affairs.businesses[i].city
-    default: Seattle
+    # default: Seattle
   - State: financial_affairs.businesses[i].state
-    default: Washington
+    # default: Washington
   - Zip: financial_affairs.businesses[i].zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
   - note: Describe the nature of the business
   - no label: financial_affairs.businesses[i].nature
     input type: area
-    default: Business nature
+    # default: Business nature
   - note: Name of accountant or bookkeeper
   - no label: financial_affairs.businesses[i].accountant
     input type: area
-    default: Accountant
+    # default: Accountant
   - note: |
       Employer Identification number
       Do not include Social Security number or ITIN
   - EIN: financial_affairs.businesses[i].ein
-    default: 11-1111111
+    # default: 11-1111111
   - note: Dates business existed
   - From: financial_affairs.businesses[i].from_date
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
   - To: financial_affairs.businesses[i].to
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
 ---
+id: financial_statements
 question: |
   Financial Statements
 subquestion: |
@@ -2245,30 +2262,30 @@ subquestion: |
 fields:
   - no label: financial_affairs.has_statement
     datatype: yesnoradio
-    default: True
+    # default: True
   - Name: financial_affairs.statement_name
-    default: Name
+    # default: Name
     show if: financial_affairs.has_statement
   - Address/PO Box: financial_affairs.statement_street
-    default: 1111 34th Ave NE
+    # default: 1111 34th Ave NE
     show if: financial_affairs.has_statement
   - City: financial_affairs.statement_city
-    default: Seattle
+    # default: Seattle
     show if: financial_affairs.has_statement
   - State: financial_affairs.statement_state
-    default: Washington
+    # default: Washington
     show if: financial_affairs.has_statement
   - Zip: financial_affairs.statement_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: financial_affairs.has_statement
   - note: Date issued
     show if: financial_affairs.has_statement
   - no label: financial_affairs.statement_date
     datatype: date
-    default: 01/01/23
+    # default: 01/01/23
     required: False
 ---
 attachment:

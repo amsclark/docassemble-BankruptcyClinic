@@ -9,11 +9,13 @@ edit:
   - property_description
   - property_action
 ---
+id: secured_claims_any_exist
 section: form_108
 question: |
   Do you have any creditors with secured claims?
 yesno: secured_claims.there_are_any
 ---
+id: secured_claims_add_another
 section: form_108
 question: |
   Are there any more creditors with secured claims?
@@ -21,65 +23,71 @@ yesno: secured_claims.there_is_another
 under: |
   ${ secured_claims_table }
 ---
+id: secured_claims_creditor_property_details
 section: form_108
 question: |
   Identify the creditor and the property that is collateral
 fields: 
   - Creditors Name: secured_claims[i].creditor_name
-    default: Jimbo
+    # default: Jimbo
   - Description of property: secured_claims[i].property_description
     input type: area
-    default: description
+    # default: description
   - What do you intend to do with the property that secures the debt?: secured_claims[i].property_action
     choices:
       - Surrender the property
       - Retain the property and redeem it
       - Retain the property and enter into a Reaffirmation Agreement
       - Retain the property and do something else
-    default: Retain the property and do something else
+    # default: Retain the property and do something else
   - What will you do with the property?: secured_claims[i].property_action_other
     show if: 
       variable: secured_claims[i].property_action
       is: Retain the property and do something else
-    default: something
+    # default: something
   - Did you claim the property as exempt on Schedule C?: secured_claims[i].exempt
     datatype: yesnoradio
-    default: False
+    # default: False
 ---
-#rows: personal_leases
-#columns:
-#table: personal_leases_table
-#  - Name: row_item.name
-#  - Description: row_item.description
-#  - Lease Assumed: row_item.lease_assumed
-#edit:
-#  - name
-#  - description
-#  - lease_assumed
-#---
+table: personal_leases_table
+rows: personal_leases
+columns:
+  - Name: row_item.name
+  - Description: row_item.description
+  - Lease Assumed: row_item.lease_assumed
+edit:
+  - name
+  - description
+  - lease_assumed
+---
+id: personal_leases_any_exist
 section: form_108
 question: |
   Do you have any unexpired personal property leases?
 yesno: personal_leases.there_are_any
 ---
+id: personal_leases_add_another
 section: form_108
 question: |
-  Tell the court about an unexpired personal property lease.
+  Are there any more unexpired personal property leases?
+yesno: personal_leases.there_is_another
+under: |
+  ${ personal_leases_table }
+---
+id: personal_lease_details
+section: form_108
+question: |
+  Tell the court about an unexpired personal property leases
 fields:
-  - Lessor Name: personal_leases[i].j=name
-  - Description: personal_leases[i].description
-    input type: area
+  - Lessor Name: personal_leases[i].name
+    # default: Lenny
+  - Description of leased property: personal_leases[i].description
+    # default: NA
   - Will the lease be assumed?: personal_leases[i].lease_assumed
     datatype: yesnoradio
-list collect: True 
+    # default: False
 ---
-#section: form_108
-#question: |
-#  Are there any more unexpired personal property leases?
-#yesno: personal_leases.there_is_another
-#under: |
-#  ${ personal_leases_table }
----
+id: form_108_review_statement_of_intention
 event: form_108
 section: form_108
 question: |

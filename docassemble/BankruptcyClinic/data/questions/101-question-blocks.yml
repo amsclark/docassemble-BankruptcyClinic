@@ -1,3 +1,4 @@
+id: introduction_screen
 question: |
   Voluntary Petition for Individuals Filing for Bankruptcy
 subquestion: |
@@ -12,6 +13,7 @@ subquestion: |
 continue button field: introduction_screen
 ---
 #Part 0: Location and Case
+id: district_which
 section: district
 question: |
   What district are you filing your bankruptcy case in?
@@ -19,14 +21,16 @@ subquestion: |
   Please specify the district you plan on submitting your bankruptcy case to.
 fields:
   - Bankruptcy Court District: current_district
-    default: District of Nebraska
+    # default: District of Nebraska
     code: courts_list
 ---
+id: district_amended
 section: district
 question: |
   Are you updating a bankruptcy filing that has already been submitted to the court?
 yesno: amended_filing
 ---
+id: district_case_number
 section: district
 question: |
   Please provide the case number for your previously submitted bankruptcy claim.
@@ -39,6 +43,7 @@ validation code: |
     if not re.match(pattern, case_number.lower()):
       validation_error("That doesn't look like a valid South Dakota or Nebraska bankruptcy case number. Please enter it in the format D:YY-bk-NNNNN (e.g., '8:23-bk-12345').")
 ---
+id: district_final
 event: district_final
 section: district
 question: |
@@ -53,6 +58,7 @@ subquestion: |
   % endif
 continue button field: district_final
 ---
+id: district_review
 event: district
 section: district
 question: |
@@ -69,6 +75,7 @@ review:
 ---
 #Part 1: Identify Yourself
 
+id: filing_status
 question: |
   Are you filing individually or with a spouse?
 field: filing_status
@@ -97,6 +104,7 @@ columns:
   - Last Name: row_item.last_name
   - Business: row_item.business
 ---
+id: debtor_basic_info
 question: |
   Basic Identity and Contact Information
 subquestion: |
@@ -104,76 +112,164 @@ subquestion: |
 fields:
   - note: <strong>Basic Debtor Info</strong>
   - First Name: debtor[i].name.first
-    default: "Dan"
+    # default: "Dan"
   - Middle Name: debtor[i].name.middle
     required: False
   - Last Name: debtor[i].name.last
-    default: "Fields"
+    # default: "Fields"
   - Suffix: debtor[i].name.suffix
     required: False
   - note: <strong>Address</strong>
   - Address: debtor[i].address.address
-    default: "9999 333th St"
+    # default: "9999 333th St"
   - City: debtor[i].address.city
-    default: "Tampa"
+    # default: "Tampa"
   - State: debtor[i].address.state
-    default: "Florida"
+    # default: "Florida"
+    input type: dropdown
+    code: get_bk_states_list()
+    datatype: str 
   - Zip Code: debtor[i].address.zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
-  - County: debtor[i].address.unit
-    default: "Douglas County"
-    code: county_list
+    # default: 33593
+  - County: debtor[i].address.county
+    # default: "Douglas County"
+    input type: dropdown
+    choices: 
+      - N/A
+    #js enable if: val('debtor[i].address.state')
+    datatype: str
+  - field: hidden_county
+    input type: hidden
+    default: ""
   - Has separate mailing address: debtor[i].has_other_mailing_address
     datatype: yesno
-    default: True
+    # default: True
   - Mail Address/PO Box: debtor[i].mailing_street
-    default: 11111 35th Ave NE
+    # default: 11111 35th Ave NE
     show if: debtor[i].has_other_mailing_address
   - Mail City: debtor[i].mailing_city
-    default: Tampa
+    # default: Tampa
     show if: debtor[i].has_other_mailing_address
   - Mail State: debtor[i].mailing_state
-    default: Florida
+    # default: Florida
+    # TODO: this should be a dropdown
     show if: debtor[i].has_other_mailing_address
   - Mail Zip: debtor[i].mailing_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: debtor[i].has_other_mailing_address
   - ID Type: debtor[i].tax_id.tax_id_type
     input type: radio
     choices:
       - Social Security Number: 1
       - Individual Taxpayer Identification Number: 2
-    default: 1
+    # default: 1
   - Tax ID: debtor[i].tax_id.tax_id
-    default: 932-45-9999
+    # default: 932-45-9999
+    # TODO: this should have validation code
     show if:
       variable: debtor[i].tax_id.tax_id_type
       is: 2
   - SSN: debtor[i].tax_id.tax_id
-    default: 324-34-9999
+    # TODO: this should have validation code
+    # default: 324-34-9999
     show if:
       variable: debtor[i].tax_id.tax_id_type
       is: 1
+  - note: |
+      <script>
+        // Handle dynamic county population based on state selection
+        $(document).on('daPageLoad', function() {
+          var questionPage = document.getElementsByTagName("H1")[0].innerHTML;
+          if (questionPage.includes("Tell the court about")) {
+            var stateDropdown = document.getElementById(btoa("debtor[${ i }].address.state").replace(/=/g,""));
+            var countyDropdown = document.getElementById(btoa("debtor[${ i }].address.county").replace(/=/g,""));
+            var hiddenCountyField = document.getElementById(btoa("hidden_county").replace(/=/g,""));
+            
+            if (stateDropdown && countyDropdown) {
+              // Trigger change event if state is already selected
+              if (stateDropdown.value !== "") {
+                stateDropdown.dispatchEvent(new Event('change'));
+              }
+              
+              // Fetch and display the county
+              var xhr = get_interview_variables();
+              xhr.done(function(response) {
+                var state, county;
+                if (response.variables['debtor[${ i }].address.state'] && response.variables['debtor[${ i }].address.state'].length > 0) {
+                  state = response.variables['debtor[${ i }].address.state'];
+                }
+                if (response.variables['debtor[${ i }].address.county'] && response.variables['debtor[${ i }].address.county'].length > 0) {
+                  county = response.variables['debtor[${ i }].address.county'];
+                }
+                
+                // Update the state dropdown and trigger the 'change' event
+                if (state && state.length > 0) {
+                  stateDropdown.value = state;
+                  stateDropdown.dispatchEvent(new Event('change'));
+                }
+                
+                // Use a mutation observer to watch for county dropdown population
+                const observer = new MutationObserver(function(mutations) {
+                  mutations.forEach(function(mutation) {
+                    // Check if "N/A" is no longer the only option
+                    const naOption = countyDropdown.querySelector('option[value="N/A"]');
+                    if (!naOption || countyDropdown.options.length > 1) {
+                      observer.disconnect(); // Stop observing
+                      if (county) {
+                        countyDropdown.value = county; // Set the county value
+                      }
+                    }
+                  });
+                });
+                
+                // Observe changes to the county dropdown
+                observer.observe(countyDropdown, { childList: true, subtree: true });
+              });
+            }
+          }
+        });
+      </script>
 
-post: |
-  % if len(debtor) > 1:
-  <br><br><br>
-  <strong>Current Debtors</strong>
-  ${ debtor_table }
-  % endif
+check in: update_counties
+continue button field: debtor_basic_info
+
+#right: |
+#  % if all(hasattr(d, 'name') and hasattr(d.name, 'first') and hasattr(d.name, 'last') for d in debtor):
+#  <br><br><br>
+#  <strong>Current Debtors</strong>
+#  ${ debtor_table }
+#  % endif
 section: identify
 ---
+event: update_counties
+code: |
+  if action_argument('_changed') == 'debtor[i].address.state':
+    selected_state = action_argument('debtor[i].address.state')
+    background_response(
+      {
+        'debtor[i].address.county':
+          {
+            'choices': \
+              county_list(selected_state) \
+              or \
+              ['N/A']
+          }
+      }, 'fields')
+  background_response()
+---
+id: lived_in_district
 question: |
   Has ${ debtor[i].name.first } ${ debtor[i].name.last } lived in the specified district for over 180 days?
 yesno: debtor[i].district_info.is_current_district
 section: identify
 ---
+id: other_district_reason
 question: |
   What is your reason for specifying a district you haven't been living in?
 fields:
@@ -181,6 +277,7 @@ fields:
     input type: area
 section: identify
 ---
+id: debtor_alias_any
 question: |
   Does ${ debtor[i].name.first } ${ debtor[i].name.last } have any           other names they've used in the last 8 years?
 subquestion: |
@@ -188,6 +285,7 @@ subquestion: |
 yesno: debtor[i].alias.there_are_any
 section: identify
 ---
+id: debtor_add_alias
 question: |
   Add an alias for ${ debtor[i].name.first } ${ debtor[i].name.last } used   in the last 8 years.
 subquestion: |
@@ -204,24 +302,29 @@ fields:
 section: identify
 list collect: True
 ---
+id: debtor_alias_another
 question: |
   Does ${ debtor[i].name.first } ${ debtor[i].name.last } have any           other names they've used in the last 8 years?
 yesno: debtor[i].alias.there_is_another
-under: |
-  <br><br><br>
-  <strong>Current Aliases</strong>
-  ${ debtor_alias_table }
+#under: |
+#  <br><br><br>
+#  <strong>Current Aliases</strong>
+#  ${ debtor_alias_table }
 section: identify
 ---
+id: debtor_another
 question: |
   Are there more debtors to add?
 yesno: debtor.there_is_another
-under: |
-  <br><br><br>
-  <strong>Current Debtors</strong>
-  ${ debtor_table }
+#right: |
+#  % if all(hasattr(d, 'name') and hasattr(d.name, 'first') and hasattr(d.name, 'last') for d in debtor):
+#  <br><br><br>
+#  <strong>Current Debtors</strong>
+#  ${ debtor_table }
+#  % endif
 section: identify
 ---
+id: identify_review
 event: identify
 section: identify
 question: |
@@ -237,6 +340,7 @@ review:
       ${ debtor.add_action() }
       % endif
 ---
+id: debtor_final
 event: debtor_final
 question: |
   Debtor Summary
@@ -269,12 +373,13 @@ edit:
   - when
   - case_number
 ---
+id: payment_method
 question: |
   How are you planning on paying the fee?
 fields:
   - Payment Method: case.payment_method
     input type: radio
-    default: 1
+    # default: 1
     choices:
       - I will pay the entire fee when I file my petition: 1
       - I need to pay the fee in installments: 2
@@ -297,6 +402,7 @@ under: |
   Be aware, you may only request that your fee be waived if you are filing for Chapter 7. By law, a judge may, but is not required to, waive your fee, and may do so only if your income is less than 15% of the official poverty line that applies to your family size and you are unable to pay the fee in installments.
 section: case_det
 ---
+id: poverty_calc
 code: |
   overallIncome = sum((debt.income.net_rental_business + debt.income.family_support + debt.income.interest_and_dividends + debt.income.unemployment + debt.income.social_security + debt.income.other_govt_assist + debt.income.pension + debt.income.other_monthly_amount) + (debt.income.income_amount + debt.income.overtime_pay) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount) for debt in debtor)
   #povertyAmt = 0
@@ -321,25 +427,28 @@ code: |
     povertyAmt = (50560 + (countAbove*5140))*1.5
 
 ---
+id: previous_bankruptcy
 question: |
   Have you filed for bankruptcy within the last 8 years?
 yesno: case.has_previous_bankruptcy
 section: case_det
 ---
+id: previous_bankruptcy_details
 question: |
   Please provide the details of your previous bankruptcy in the previous 8 years.
 fields:
   - District: case.previous_bankruptcy[i].district
-    default: District of Nebraska
+    # default: District of Nebraska
     code: courts_list
   - When: case.previous_bankruptcy[i].when
-    default: 11/3/2018
+    # default: 11/3/2018
     datatype: date
   - Case Number: case.previous_bankruptcy[i].case_number
-    default: abc1234ed
+    # default: abc1234ed
 section: case_det
 list collect: True
 ---
+id: previous_bankruptcy_another
 question: |
   Do you have any other bankruptcy cases filed in the last 8 years?
 under: |
@@ -347,6 +456,7 @@ under: |
 yesno: case.previous_bankruptcy.there_is_another
 section: case_det
 ---
+id: pending_bankruptcy
 question: |
   Pending bankruptcies?
 subquestion: |
@@ -354,24 +464,26 @@ subquestion: |
 yesno: case.has_pending_bankruptcy
 section: case_det
 ---
+id: pending_bankruptcy_details
 question: |
   Please provide the details of your pending bankruptcy in the previous 8 years.
 fields:
   - Debtor: case.pending_bankruptcy[i].debtor
-    default: Dan Fields
+    # default: Dan Fields
   - Relationship: case.pending_bankruptcy[i].relationship
-    default: Self
+    # default: Self
   - District: case.pending_bankruptcy[i].district
-    default: District of Nebraska
+    # default: District of Nebraska
     code: courts_list
   - When: case.pending_bankruptcy[i].when
-    default: 11/03/20
+    # default: 11/03/20
     datatype: date
   - Case Number: case.pending_bankruptcy[i].case_number
-    default: 11222ddv2
+    # default: 11222ddv2
 section: case_det
 list collect: True
 ---
+id: pending_bankruptcy_another
 question: |
   Do you have any other pending bankruptcy cases filed in the last 8 years?
 under: |
@@ -379,16 +491,19 @@ under: |
 yesno: case.pending_bankruptcy.there_is_another
 section: case_det
 ---
+id: rents_residence
 question: |
   Do you rent your residence?
 yesno: case.rents_residence
 section: case_det
 ---
+id: eviction_judgement
 question: |
   Has your landlord obtained an eviction judgement against you?
 yesno: case.eviction_judgement
 section: case_det
 ---
+id: case_final
 event: case_final
 question: |
   Case Summary
@@ -431,6 +546,7 @@ subquestion: |
 continue button field: case_final
 section: case_det
 ---
+id: case_review
 event: case_det
 section: case_det
 question: |
@@ -504,6 +620,7 @@ edit:
   - state
   - type_name
 ---
+id: has_business
 question: |
   Are you a sole proprietor of any full- or part-time business?
 subquestion: |
@@ -511,22 +628,23 @@ subquestion: |
 yesno: business.has_business
 section: sole_prop
 ---
+id: business_details
 question: |
   Please fill in the name and location of your business.
 fields:
   - Name: business.business[i].name
-    default: Acme
+    # default: Acme
   - Address/PO Box: business.business[i].street
-    default: 11111 35th pl
+    # default: 11111 35th pl
   - City: business.business[i].city
-    default: Tampa
+    # default: Tampa
   - State: business.business[i].state
-    default: Florida
+    # default: Florida
   - Zip: business.business[i].zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
   - Type: business.business[i].type
     input type: radio
     choices:
@@ -535,7 +653,7 @@ fields:
       - Stockbroker: 3
       - Commodity Broker: 4
       - None of the above: 5
-    default: 1
+    # default: 1
   - note: <strong>Employer ID Number, if any</strong>
   - EIN: debtor[i].tax_id.first_ein
     required: False
@@ -544,6 +662,7 @@ fields:
 section: sole_prop
 list collect: True
 ---
+id: business_another
 question: |
   Are you a sole proprietor of any **other** full- or part-time businesses?
 yesno: business.business.there_is_another
@@ -552,6 +671,7 @@ under: |
   ${ business_table }
 section: sole_prop
 ---
+id: business_final
 event: business_final
 question: |
   Business Section Summary
@@ -565,6 +685,7 @@ subquestion: |
 continue button field: business_final
 section: sole_prop
 ---
+id: business_review
 event: sole_prop
 section: sole_prop
 question: |
@@ -598,6 +719,7 @@ edit:
   - immediate_attention_reason
   - number
 ---
+id: hazardous_property
 question: |
   Hazardous property?
 subquestion: |
@@ -605,27 +727,29 @@ subquestion: |
 yesno: hazardous_property.has_property
 section: haz_prop
 ---
+id: hazardous_property_details
 question: |
   Please fill in the name and location of your business.
 fields:
   - Hazard: hazardous_property.property[i].hazard
-    default: Radioactive Waste
+    # default: Radioactive Waste
   - Why is immediate attention required?: hazardous_property.property[i].immediate_attention_reason
     required: false
   - Address/PO Box: hazardous_property.property[i].street
-    default: 1111 35th pl
+    # default: 1111 35th pl
   - City: hazardous_property.property[i].city
-    default: Tampa
+    # default: Tampa
   - State: hazardous_property.property[i].state
-    default: Florida
+    # default: Florida
   - Zip: hazardous_property.property[i].zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
 section: haz_prop
 list collect: True
 ---
+id: hazardous_property_another
 question: |
   Are there any other hazardous properties you'd like to report?
 yesno: hazardous_property.property.there_is_another
@@ -635,6 +759,7 @@ under: |
   ${ hazardous_property.property.add_action() }
 section: haz_prop
 ---
+id: hazard_final
 event: hazard_final
 question: |
   Hazardous Property Summary
@@ -649,6 +774,7 @@ subquestion: |
 continue button field: hazard_final
 section: haz_prop
 ---
+id: haz_prop_review
 event: haz_prop
 section: haz_prop
 question: |
@@ -679,6 +805,7 @@ edit:
   - counseling.counseling_type
   - counseling.not_required_reason
 ---
+id: counseling
 question: |
   Have ${ debtor[i].name } recieved any credit counseling?
 subquestion: |
@@ -692,9 +819,10 @@ fields:
  - What date did you take the class?: debtor[i].counseling.counseling_date
    datatype: date
    required: False
-default: 1
+# default: 1
 section: credit_counsel
 ---
+id: counseling_not_required
 question: |
   Reason credit breifing is not required?
 field: debtor[i].counseling.not_required_reason
@@ -704,6 +832,7 @@ choices:
   - Active duty: 3
 section: credit_counsel
 ---
+id: counseling_final
 event: counseling_final
 question: |
   Credit Counseling Summary
@@ -713,6 +842,7 @@ subquestion: |
 continue button field: counseling_final
 section: credit_counsel
 ---
+id: credit_counsel_review
 event: credit_counsel
 section: credit_counsel
 question: |
@@ -722,6 +852,7 @@ review:
       ${ counseling_table }
 ---
 #Part 6: Answer These Questions for Reporting Purposes
+id: reporting_type
 question: |
   What kind of debts do you have?
 fields:
@@ -732,19 +863,21 @@ fields:
       - Primarily business debts: 2
       - Other: 3
   - Other type: reporting.other_debt_description
-    default: other type
+    # default: other type
     required: false
     show if:
       variable: reporting.reporting_type
       is: '3'
 section: report
 ---
+id: custom_debt_type
 question: |
   State the type of debts you owe that are not consumer or business related.
 fields:
   - Debt Type: reporting.custom_type
 section: report
 ---
+id: funds_for_creditors
 question: |
   Chapter 7 unsecured creditors
 subquestion: |
@@ -752,6 +885,7 @@ subquestion: |
 yesno: reporting.funds_for_creditors
 section: report
 ---
+id: report_estimates
 question: |
   Report Estimated Amounts
 fields:
@@ -763,6 +897,7 @@ fields:
     datatype: currency
 section: report
 ---
+id: print_101
 question: Form 101 output
 event: print_101
 continue button field: print_101
@@ -773,6 +908,7 @@ attachment:
     code: main
     variable name: attach_101
 ---
+id: print_101_code
 code: |
   debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
   if len(debtor) > 1:
@@ -829,23 +965,20 @@ code: |
     else:
       main['debtor_tax_id'+str(i)] = debt.tax_id.tax_id[-4:]
 
-    main['debtor_street'+str(i)] = debt.address.address
-    main['debtor_city'+str(i)] = debt.address.city
-    main['debtor_state'+str(i)] = debt.address.state
-    main['debtor_zip'+str(i)] = debt.address.zip
-    main['debtor_county'+str(i)] = debt.address.unit
-    main['debtor_mail_street'+str(i)] = debt.mailing_street
-    main['debtor_mail_city'+str(i)] = debt.mailing_city
-    main['debtor_mail_state'+str(i)] = debt.mailing_state
-    main['debtor_mail_zip'+str(i)] = debt.mailing_zip
-    main['yesLivedInDistrict'+str(i)] = True if debt.district_info.is_current_district == True else False
-    main['noLivedInDistrict'+str(i)] = True if debt.district_info.is_current_district == False else False
-    main['debtor_ein'+str(i)+'-1'] = debt.tax_id.first_ein
-    main['debtor_ein'+str(i)+'-2'] = debt.tax_id.second_ein
-    if debt.district_info.is_current_district == False:
-      main['districtExplain'+str(i)+'-1'] = debt.district_info.other_district_reason
 
-    i += 1
+  main['debtor_county'+str(i)] = debt.address.county
+  main['debtor_mail_street'+str(i)] = debt.mailing_street
+  main['debtor_mail_city'+str(i)] = debt.mailing_city
+  main['debtor_mail_state'+str(i)] = debt.mailing_state
+  main['debtor_mail_zip'+str(i)] = debt.mailing_zip
+  main['yesLivedInDistrict'+str(i)] = True if debt.district_info.is_current_district == True else False
+  main['noLivedInDistrict'+str(i)] = True if debt.district_info.is_current_district == False else False
+  main['debtor_ein'+str(i)+'-1'] = debt.tax_id.first_ein
+  main['debtor_ein'+str(i)+'-2'] = debt.tax_id.second_ein
+  if debt.district_info.is_current_district == False:
+    main['districtExplain'+str(i)+'-1'] = debt.district_info.other_district_reason
+
+  i += 1
 
   main['payEntireFee'] = True if case.payment_method == '1' else False
   main['payInstallments'] = True if case.payment_method == '2' else False
@@ -965,7 +1098,7 @@ code: |
   main["creditors_more"] = True if reporting.creditor_estimate > 100000 else False
   main["creditors_200_999"] = True if 200 <= reporting.creditor_estimate <= 999 else False
 
-  reporting.asset_estimate = sum(interest.current_owned_value for interest in prop.interests) + sum(vehicle.current_owned_value for vehicle in prop.ab_vehicles) + sum(vehicle.current_owned_value for vehicle in prop.ab_other_vehicles) + prop.household_goods_value + prop.electronics_value + prop.collectibles_value + prop.hobby_equipment_value + prop.firearms_value + prop.clothes_value + prop.jewlery_value + prop.animal_value + prop.other_household_items_value + prop.financial_assets.cash_value + sum(deposit.amount for deposit in prop.financial_assets.deposits) + sum(bond.amount for bond in prop.financial_assets.bonds_and_stocks) + sum(ntStock.value for ntStock in prop.financial_assets.non_traded_stock) + sum(cBond.amount for cBond in prop.financial_assets.corporate_bonds) + sum(retAct.amount for retAct in prop.financial_assets.retirement_accounts) + sum(prepay.amount for prepay in prop.financial_assets.prepayments) + sum(annu.amount for annu in prop.financial_assets.annuities) + sum(edu.amount for edu in prop.financial_assets.edu_accounts) + prop.financial_assets.future_property_interest_value + prop.financial_assets.ip_interest_value + prop.financial_assets.intangible_interest_value + prop.owed_property.tax_refund_federal + prop.owed_property.tax_refund_state + prop.owed_property.tax_refund_local + prop.owed_property.family_support_alimony + prop.owed_property.family_support_maintenance + prop.owed_property.family_support_support + prop.owed_property.family_support_divorce + prop.owed_property.family_support_settlement + prop.owed_property.other_amounts_value + prop.owed_property.first_insurance_interest_amount + prop.owed_property.second_insurance_interest_amount + prop.owed_property.third_insurance_interest_amount + prop.owed_property.trust_amount + prop.owed_property.third_party_amount + prop.business_property.ar_amount + prop.business_property.equipment_amount + prop.business_property.machinery_amount + prop.business_property.inventory_amount + prop.business_property.partnershipValue1 + prop.business_property.partnershipValue2 + prop.business_property.partnershipValue3 + prop.business_property.lists_amount + prop.business_property.otherPropertyAmount1 + prop.business_property.otherPropertyAmount2 + prop.business_property.otherPropertyAmount3 + prop.business_property.otherPropertyAmount4 + prop.business_property.otherPropertyAmount5 + prop.business_property.otherPropertyAmount6 + prop.farming_property.animal_amount + prop.farming_property.crop_amount + prop.farming_property.equipment_amount + prop.farming_property.supplies_amount + prop.farming_property.commercial_amount + prop.other_prop_value + prop.other_prop_value2 + prop.other_prop_value3
+  reporting.asset_estimate = sum(interest.current_owned_value for interest in prop.interests) + sum(vehicle.current_owned_value for vehicle in prop.ab_vehicles) + sum(vehicle.current_owned_value for vehicle in prop.ab_other_vehicles) + prop.household_goods_value + prop.electronics_value + prop.collectibles_value + prop.hobby_equipment_value + prop.firearms_value + prop.clothes_value + prop.jewelry_value + prop.animal_value + prop.other_household_items_value + prop.financial_assets.cash_value + sum(deposit.amount for deposit in prop.financial_assets.deposits) + sum(bond.amount for bond in prop.financial_assets.bonds_and_stocks) + sum(ntStock.value for ntStock in prop.financial_assets.non_traded_stock) + sum(cBond.amount for cBond in prop.financial_assets.corporate_bonds) + sum(retAct.amount for retAct in prop.financial_assets.retirement_accounts) + sum(prepay.amount for prepay in prop.financial_assets.prepayments) + sum(annu.amount for annu in prop.financial_assets.annuities) + sum(edu.amount for edu in prop.financial_assets.edu_accounts) + prop.financial_assets.future_property_interest_value + prop.financial_assets.ip_interest_value + prop.financial_assets.intangible_interest_value + prop.owed_property.tax_refund_federal + prop.owed_property.tax_refund_state + prop.owed_property.tax_refund_local + prop.owed_property.family_support_alimony + prop.owed_property.family_support_maintenance + prop.owed_property.family_support_support + prop.owed_property.family_support_divorce + prop.owed_property.family_support_settlement + prop.owed_property.other_amounts_value + prop.owed_property.first_insurance_interest_amount + prop.owed_property.second_insurance_interest_amount + prop.owed_property.third_insurance_interest_amount + prop.owed_property.trust_amount + prop.owed_property.third_party_amount + prop.business_property.ar_amount + prop.business_property.equipment_amount + prop.business_property.machinery_amount + prop.business_property.inventory_amount + prop.business_property.partnershipValue1 + prop.business_property.partnershipValue2 + prop.business_property.partnershipValue3 + prop.business_property.lists_amount + prop.business_property.otherPropertyAmount1 + prop.business_property.otherPropertyAmount2 + prop.business_property.otherPropertyAmount3 + prop.business_property.otherPropertyAmount4 + prop.business_property.otherPropertyAmount5 + prop.business_property.otherPropertyAmount6 + prop.farming_property.animal_amount + prop.farming_property.crop_amount + prop.farming_property.equipment_amount + prop.farming_property.supplies_amount + prop.farming_property.commercial_amount + prop.other_prop_value + prop.other_prop_value2 + prop.other_prop_value3
 
   main["assets_0_50000"] = True if 0 <= reporting.assets_estimate <= 50000 else False
   main["assets_1000001_10m"] = True if 1000001 <= reporting.assets_estimate <= 10000000 else False
@@ -995,6 +1128,7 @@ code: |
   main["liability_100m_500m"] = True if 100000000 <= reporting.liabilities_estimate <= 500000000 else False,
   main["liability_more"] = True if reporting.liabilities_estimate > 50000000000 else False
 ---
+id: report_review
 event: report
 section: report
 question: |
@@ -1026,6 +1160,7 @@ review:
     button: |
       **Estimated liability amount:** ${ reporting.liabilities_estimate }
 ---
+id: conclusion
 question: |
   Voluntary Petition for Individuals Filing for Bankruptcy conclusion
 subquestion: |
@@ -1037,6 +1172,7 @@ attachment code: |
 continue button field: conclusion_screen
 section: fin
 ---
+id: review_answers
 event: review_answers
 question: |
   Revisit questions

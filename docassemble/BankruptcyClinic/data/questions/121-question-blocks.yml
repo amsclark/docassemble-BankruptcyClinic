@@ -1,8 +1,9 @@
+id: social_security_numbers_statement
 section: form_121
 question: |
   Statement About Your Social Security Numbers
 subquestion: |
-  Use this form to tell the court about any Social Security or federal Individual Taxpayer Identification numbers you have used. Do not file this form as part of the public case file. This form must be submitted separately and must not be included in the court’s public electronic records. Please consult local court procedures for submission requirements.
+  Use this form to tell the court about any Social Security or federal Individual Taxpayer Identification numbers you have used. Do not file this form as part of the public case file. This form must be submitted separately and must not be included in the court's public electronic records. Please consult local court procedures for submission requirements.
   <br><br>
   To protect your privacy, the court will not make this form available to the public. You should not include a full Social Security Number or Individual Taxpayer Number on any other document filed with the court. The court will make only the last four digits of your numbers known to the public. However, the full numbers will be available to your creditors, the U.S. Trustee or bankruptcy administrator, and the trustee assigned to your case.
   <br><br>
@@ -12,31 +13,31 @@ fields:
       Tell the court about all your Social Security or Federal Individual Taxpayer Identification Numbers
   - Debtor has a SSN: debtor[i].ssn_info.no_ssn
     datatype: yesnoradio
-    default: True
+    # default: True
   - Debtor SSN 1: debtor[i].ssn_info.ssn_1
     required: False
-    default: 999 55 9999
+    # default: 999 55 9999
     show if:
       variable: debtor[i].ssn_info.no_ssn
       is: True
   - Debtor SSN 2: debtor[i].ssn_info.ssn_2
     required: False
-    default: 999 55 9998
+    # default: 999 55 9998
     show if:
       variable: debtor[i].ssn_info.no_ssn
       is: True
   - Debtor has a ITIN: debtor[i].ssn_info.no_itin
     datatype: yesnoradio
-    default: False
+    # default: False
   - Debtor ITIN 1: debtor[i].ssn_info.itin_1
     required: False
-    default: 555 55 5555
+    # default: 555 55 5555
     show if:
       variable: debtor[i].ssn_info.no_itin
       is: True
   - Debtor ITIN 2: debtor[i].ssn_info.itin_2
     required: False
-    default: 555 55 5554
+    # default: 555 55 5554
     show if:
       variable: debtor[0].ssn_info.no_itin
       is: True

@@ -1,4 +1,5 @@
 #Part 0 - Intro
+id: f103b_q1_waive_fee_intro
 section: waive_fee
 event: waive_fee_intro
 question: |
@@ -8,6 +9,7 @@ subquestion: |
 continue button field: waive_fee_intro
 ---
 #Part 1 - Tell the court about your family and your family's income
+id: f103b_q2_family_income
 section: waive_fee
 question: |
   Tell the court about your family and income
@@ -16,18 +18,18 @@ subquestion: |
 fields:
   - You: family.you
     datatype: yesno
-    default: True
+    # default: True
   - Your spouse: family.has_spouse
     datatype: yesno
-    default: True
+    # default: True
   - Your dependents: family.has_dependents
     datatype: yesno
   - How many dependents: family.dependent_count
     datatype: number
-    default: 0
+    # default: 0
   - Total number of people: family.total_number
     datatype: number
-    default: 2
+    # default: 2
   - note: |
       <br>
       ### Income Information
@@ -35,14 +37,14 @@ fields:
       Make sure to include the value (if known) of any non-cash governmental assistance that you receive, such as food stamps (benefits under the Supplemental Nutrition Assistance Program) or housing subsidies.
   - Your income: family.you_income
     datatype: currency
-    default: 50000
+    # default: 50000
   - Your spouses income: family.spouse_income
     datatype: currency
     required: False
-    default: 30000
+    # default: 30000
   - Non-cash assistance: family.assistance_income
     datatype: currency
-    default: 5000
+    # default: 5000
   - note: |
       <br><br>
       Tell the court about income changes and assistance
@@ -66,10 +68,10 @@ fields:
       Tell the court why you are unable to pay the filing fee in installments within 120 days. If you have some additional circumstances that cause you not to be able to pay your filing fee in installments, explain them.
   - Explain: family.cannot_pay_explain
     input type: area
-    default: |
-      NA
+    # default: NA
 ---
 #Part 2 - Tell the court about your monthly expenses
+id: f103b_monthly_expenses
 section: waive_fee
 question: |
   Estimate your average monthly expenses.
@@ -78,7 +80,7 @@ subquestion: |
 fields:
   - Average Monthly Expense: family.average_monthly_expenses
     datatype: currency
-    default: 3500
+    # default: 3500
   - note: |
       <br><br>
       Do these expenses cover anyone who is not included in your family as reported earlier?
@@ -86,8 +88,7 @@ fields:
     datatype: yesno
   - Explain: family.others_with_expenses_explain
     input type: area
-    default: |
-      NA
+    # default:       NA
     show if: family.has_others_with_expenses
   - note: |
       <br><br>
@@ -96,7 +97,7 @@ fields:
     datatype: yesno
   - Amount: family.other_expense_payers_amount
     datatype: number
-    default: 0
+    # default: 0
     show if: family.has_other_expense_payers
   - note: |
       <br><br>
@@ -105,8 +106,7 @@ fields:
     datatype: yesno
   - Explain: family.expense_changes_explain
     input type: area
-    default: |
-      NA
+    # default:       NA
     show if: family.expense_changes
 ---
 # Part 3 - Tell the court about your property
@@ -121,6 +121,7 @@ edit:
   - institution
   - amount
 ---
+id: f103b_cash_amount
 section: waive_fee
 question: |
   How much cash do you have?
@@ -129,8 +130,9 @@ subquestion: |
 fields:
   - Cash on Hand: prop.cash_on_hand
     datatype: currency
-    default: 2000
+    # default: 2000
 ---
+id: f103b_bank_accounts_exist
 section: waive_fee
 question: |
   Do you have bank accounts and other deposits of money?
@@ -140,6 +142,7 @@ subquestion: |
   Do not include 401(k) and IRA accounts.
 yesno: prop.has_bank_accounts
 ---
+id: f103b_bank_account_details
 section: waive_fee
 question: |
   Provide details about account.
@@ -150,14 +153,15 @@ fields:
       - Savings
       - Other
   - Institution Name: prop.accounts[i].institution
-    default: BECU
+    # default: BECU
   - Amount: prop.accounts[i].amount
-    default: 1000
+    # default: 1000
     datatype: currency
 under: |
   ${ prop_accounts_table }
 list collect: True
 ---
+id: f103b_bank_accounts_add_another
 section: waive_fee
 question: |
   Do you have any other bank accounts or deposits of money?
@@ -165,6 +169,7 @@ yesno: prop.accounts.there_is_another
 under: |
   ${ prop_accounts_table }
 ---
+id: f103b_home_ownership
 section: waive_fee
 question: |
   Your home?
@@ -173,34 +178,32 @@ subquestion: |
 fields:
   - Owns home: prop.has_home
     datatype: yesnoradio
-    default: False
+    # default: False
   - Address/PO Box: prop.mortgage_street
-    default: |
-      11111 56 Pl
+    # default:       11111 56 Pl
     show if: prop.has_home
   - City: prop.mortgage_city
-    default: |
-      Tampa
+    # default:       Tampa
     show if: prop.has_home
   - State: prop.mortgage_state
-    default: |
-      Florida
+    # default:       Florida
     show if: prop.has_home
   - Zip: prop.mortgage_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: prop.has_home
   - Current Value: prop.mortgage_current_value
     datatype: currency
-    default: 150000
+    # default: 150000
     show if: prop.has_home
   - Amount owed: prop.mortgage_amount_owed
     datatype: currency
-    default: 90000
+    # default: 90000
     show if: prop.has_home
 ---
+id: f103b_other_real_estate
 section: waive_fee
 question: |
   Other real estate?
@@ -209,31 +212,28 @@ subquestion: |
 fields:
   - Has other real estate: prop.has_other_real_estate
     datatype: yesnoradio
-    default: False
+    # default: False
   - Address/PO Box: prop.other_mortgage_street
-    default: |
-      1111 56th Pl
+    # default:       1111 56th Pl
     show if: prop.has_other_real_estate
   - City: prop.other_mortgage_city
-    default: |
-      Tampa
+    # default:       Tampa
     show if: prop.has_other_real_estate
   - State: prop.other_mortgage_state
-    default: |
-      Florida
+    # default:       Florida
     show if: prop.has_other_real_estate
   - Zip: prop.other_mortgage_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
     show if: prop.has_other_real_estate
   - Current Value: prop.other_mortgage_current_value
-    default: 300000
+    # default: 300000
     datatype: currency
     show if: prop.has_other_real_estate
   - Amount owed: prop.other_mortgage_amount_owed
-    default: 250000
+    # default: 250000
     datatype: currency
     show if: prop.has_other_real_estate
 ---
@@ -254,6 +254,7 @@ edit:
   - current_value
   - amount_owed
 ---
+id: f103b_vehicles_any_exist
 section: waive_fee
 question: |
   Vehicles?
@@ -261,6 +262,7 @@ subquestion: |
   Do you own any vehicles? Examples: Cars, vans, trucks, sports utility vehicles, motorcycles, tractors, boats.
 yesno: prop.vehicles.there_are_any
 ---
+id: f103b_vehicles_add_another
 section: waive_fee
 question: |
   Do you own any more vehicles?
@@ -273,27 +275,25 @@ question: |
   Enter vehicle information
 fields:
   - Make: prop.vehicles[i].make
-    default: |
-      Toyota
+    # default:       Toyota
   - Model: prop.vehicles[i].model
-    default: |
-      Corolla
+    # default:       Corolla
   - Year: prop.vehicles[i].year
-    default: |
-      2015
+    # default:       2015
   - Milage: prop.vehicles[i].milage
     datatype: number
-    default: 200000
+    # default: 200000
   - note: |
       Tell us about the vehicles value and liens.
   - Current Value: prop.vehicles[i].current_value
-    default: 8000
+    # default: 8000
     datatype: currency
   - Amount owed: prop.vehicles[i].amount_owed
-    default: 14000
+    # default: 14000
     datatype: currency
 list collect: True
 ---
+id: f103b_other_assets
 section: waive_fee
 question: |
   Other assets
@@ -302,14 +302,13 @@ subquestion: |
 fields:
   - Describe other assets: prop.other_asset_description
     input type: area
-    default: |
-      Something else
+    # default:       Something else
   - Current Value: prop.other_asset_value
     datatype: currency
-    default: 1000
+    # default: 1000
   - Amount owed: prop.other_asset_owed
     datatype: currency
-    default: 500
+    # default: 500
 ---
 table: prop_owers_table
 rows: prop.owers
@@ -320,6 +319,7 @@ edit:
   - name
   - amount
 ---
+id: f103b_money_owed_to_you_any_exist
 section: waive_fee
 question: |
   Money or property due you?
@@ -327,6 +327,7 @@ subquestion: |
   Examples: Tax refunds, past due or lump sum alimony, spousal support, child support, maintenance, divorce or property settlements, Social Security benefits, workers' compensation, personal injury recovery.
 yesno: prop.owers.there_are_any
 ---
+id: f103b_money_owed_to_you_add_another
 section: waive_fee
 question: |
   Do you have any other property due?
@@ -334,33 +335,34 @@ yesno: prop.owers.there_is_another
 under: |
   ${ prop_owers_table }
 ---
+id: f103b_money_owed_to_you_details
 section: waive_fee
 question: |
   Tell us about the ower.
 fields:
   - Ower Name: prop.owers[i].name
-    default: |
-      Cindy
+    # default:       Cindy
   - How much?: prop.owers[i].amount
     datatype: currency
-    default: |
-      500
+    # default:       500
 under: |
   ${ prop_owers_table }
 list collect: True
 ---
+id: f103b_likely_payment_received
 section: waive_fee
 question: |
   Receiving payment?
 fields:
   - Do you believe you will likely receive payment in the next 180 days?: prop.will_receive_ower_payment
     datatype: yesnoradio
-    default: True
+    # default: True
   - Explain: prop.ower_payment_explain
     required: false
     input type: area
 ---
 #Part 4: Answer these additional questions
+id: f103b_paid_for_services
 section: waive_fee
 question: |
   Who's paid for filing services?
@@ -370,7 +372,7 @@ fields:
       Have you paid anyone for services for this case, including filling out this application, the bankruptcy filing package, or the schedules?
   - Paid?: additional.paid_for_services
     datatype: yesnoradio
-    default: False
+    # default: False
   - Whom did you pay?: additional.paid_for_services_who
     datatype: checkboxes
     choices:
@@ -379,11 +381,10 @@ fields:
       - Someone else
     show if: additional.paid_for_services
   - Describe who: additional.paid_for_services_who_describe
-    default: |
-      Family Friend
+    # default:       Family Friend
     show if: additional.paid_for_services
   - How much?: additional.paid_for_services_amount
-    default: 1000
+    # default: 1000
     datatype: currency
     show if: additional.paid_for_services
   - note: |
@@ -391,7 +392,7 @@ fields:
       Have you promised to pay or do you expect to pay someone for services for your bankruptcy case?
   - Promised to pay?: additional.promised_for_services
     datatype: yesnoradio
-    default: False
+    # default: False
   - Whom did you pay?: additional.promised_for_services_who
     datatype: checkboxes
     choices:
@@ -400,11 +401,10 @@ fields:
       - Someone else
     show if: additional.promised_for_services
   - Describe who: additional.promised_for_services_who_describe
-    default: |
-      Family Friend
+    # default:       Family Friend
     show if: additional.promised_for_services
   - How much?: additional.promised_for_services_amount
-    default: 1000
+    # default: 1000
     datatype: currency
     show if: additional.promised_for_services
   - note: |
@@ -412,7 +412,7 @@ fields:
       Has anyone paid someone on your behalf for services for this case?
   - Has anyone else paid on your behalf?: additional.behalf_for_services
     datatype: yesnoradio
-    default: False
+    # default: False
   - Whom was paid?: additional.behalf_for_services_who
     datatype: checkboxes
     choices:
@@ -430,11 +430,10 @@ fields:
       - Someone else
     show if: additional.behalf_for_services
   - Other payer: additional.behalf_other_payer
-    default: |
-      Someone else
+    # default:       Someone else
     show if: additional.behalf_for_services
   - How much was paid?: additional.behalf_for_services_amount
-    default: 1000
+    # default: 1000
     datatype: currency
     show if: additional.behalf_for_services
 ---
@@ -449,28 +448,31 @@ edit:
   - when
   - case_number
 ---
+id: f103b_previous_bankruptcies_any_exist
 question: |
   Have you filied for bankruptcy in the last 8 years?
 yesno: additional.bankruptcies.there_are_any
 ---
+id: f103b_previous_bankruptcies_add_another
 question: |
   Do you have any other bankruptcies in the last 8 years to report?
 yesno: additional.bankruptcies.there_is_another
 under: |
   ${ add_bankruptcy_table }
 ---
+id: f103b_previous_bankruptcy_details
 question: |
   Tell the court about your previous bankruptcy case.
 fields:
   - District: additional.bankruptcies[i].district
-    default: 'District of Nebraska'
+    # default: 'District of Nebraska'
     code: courts_list
   - When: additional.bankruptcies[i].when
-    default: 01/01/23
+    # default: 01/01/23
     datatype: date
   - Case Number: additional.bankruptcies[i].case_number
     datatype: number
-    default: 111111
+    # default: 111111
 list collect: True
 ---
 attachment:

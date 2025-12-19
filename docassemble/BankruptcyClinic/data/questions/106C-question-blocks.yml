@@ -13,6 +13,7 @@ edit:
   - laws
   - line
 ---
+id: exemption_type_selection
 section: schedule_c
 question: |
   Which set of exemptions are you claiming?
@@ -21,13 +22,15 @@ fields:
     choices:
     - You are claiming state and federal nonbankruptcy exemptions.
     - You are claiming federal exemptions.
-    default: You are claiming federal exemptions.
+    # default: You are claiming federal exemptions.
 ---
+id: exempt_property_any_exist
 section: schedule_c
 question: |
   Do you have any property to claim as exempt?
 yesno: prop.exempt_property.properties.there_are_any
 ---
+id: exempt_property_add_another
 section: schedule_c
 question: |
   Do you have any more property to claim as exempt?
@@ -35,32 +38,34 @@ yesno: prop.exempt_property.properties.there_is_another
 under: |
   ${ prop_exempt_table }
 ---
+id: exempt_property_details
 section: schedule_c
 question: |
   Tell us more about the property and claim for excemption
 fields:
   - Description: prop.exempt_property.properties[i].description
     input type: area
-    default: NA
+    # default: NA
   - Current value of the portion you own: prop.exempt_property.properties[i].value
     datatype: currency
-    default: 200
+    # default: 200
   - Are you claiming less than 100% of fair market value?: prop.exempt_property.properties[i].not_full_exemption
     datatype: yesnoradio
-    default: True
+    # default: True
   - Exemption being claimed: prop.exempt_property.properties[i].exemption
     datatype: currency
-    default: 300
+    # default: 300
     required: False
     show if: prop.exempt_property.properties[i].not_full_exemption
   - Specific laws that allow exemption: prop.exempt_property.properties[i].laws
     input type: area
-    default: NA
+    # default: NA
   - Schedule A/B line: prop.exempt_property.properties[i].line
     datatype: number
-    default: 4
+    # default: 4
 list collect: True 
 ---
+id: homestead_exemption
 section: schedule_c
 question: |
   Are you claiming a homestead exemption of more than $189,050?
@@ -69,13 +74,14 @@ subquestion: |
 fields:
   - Claiming homestead exemption: prop.exempt_property.claim_homestead_exemption
     datatype: yesnoradio
-    default: True
+    # default: True
   - Did you acquire the property within 1,215 days?: prop.exempt_property.homestead_within_timeframe
     datatype: yesnoradio
     required: False
-    default: False
+    # default: False
     show if: prop.exempt_property.claim_homestead_exemption
 ---
+id: schedule_c_review
 event: schedule_c
 section: schedule_c
 question: |

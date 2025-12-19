@@ -1,6 +1,8 @@
 modules:
   - .courts_list
   - .county_list
+  - .get_bk_states_list
+  - .objects
 ---
 include:
   - mandatory-initial-code.yml
@@ -119,7 +121,8 @@ objects:
   - debtor[i].expenses.dependents: |
       DAList.using(
         object_type=DAObject,
-        complete_attribute='complete')
+        complete_attribute='complete',
+        ask_number=True)
   - debtor[i].ssn_info: |
       DAObject.using(
         complete_attribute='complete')
@@ -336,7 +339,8 @@ code: |
   amended_filing
   if amended_filing == True:
     case_number
-  district_final
+  # next line is for an unnecessary confirmation screen. Do they want this?
+  district_final 
   filing_status
   if filing_status == "Filing individually":
     debtor.target_number = 1
@@ -345,8 +349,9 @@ code: |
     debtor.target_number = 2
     debtor[0].expenses.joint_case = True
   debtor.gather()
-  debtor[0].expenses.other_household
-  debtor[0].expenses.dependents.gather()
+  # don't do this. causes an infinite loop
+  # debtor[0].expenses.other_household
+  # debtor[0].expenses.dependents.gather()
   debtor_final
 
 
@@ -360,7 +365,7 @@ code: |
   prop.has_hobby_equipment
   prop.has_firearms
   prop.has_clothes
-  prop.has_jewlery
+  prop.has_jewelry
   prop.has_animals
   prop.has_other_household_items
   prop.financial_assets.has_cash
@@ -403,8 +408,8 @@ code: |
   prop.has_other_prop
 
   #106C
-  #prop.exempt_property.exemption_type
-  #prop.exempt_property.properties.gather()
+  prop.exempt_property.exemption_type
+  prop.exempt_property.properties.gather()
   prop.exempt_property.claim_homestead_exemption = False
 
   #107
@@ -432,7 +437,7 @@ code: |
     financial_affairs.debtor2_had_other_income
   financial_affairs.primarily_consumer_debts
 
-  #financial_affairs.large_debt_payments
+  financial_affairs.large_debt_payments
   financial_affairs.consumer_debt_payments.gather()
 
   financial_affairs.insider_payments.gather()
@@ -716,28 +721,28 @@ code: |
   reporting.complete = True
 
 
-  #if case.rents_residence:
-  #  if case.eviction_judgement:
-   #   attach_101a
-  #    if wish_to_stay == True:
-  #      attach_101b
-  #if case.payment_method == '2':
-   # form_103a_attach
-  #if case.payment_method == '3':
-  #  form_103b_attach
-  #schedule_ab_attach
-  #schedule_c_attach
-  #schedule_d_attach
-  #schedule_ef_attach
-  #schedule_g_attach
-  #schedule_h_attach
-  #schedule_i_attach
-  #schedule_j_attach
-  #form_107_attach
-  #form_108_attach
-  #form_121_attach
-  #form_122a_attach
-  #print_101
+  if case.rents_residence:
+    if case.eviction_judgement:
+      attach_101a
+      if wish_to_stay == True:
+        attach_101b
+  if case.payment_method == '2':
+    form_103a_attach
+  if case.payment_method == '3':
+    form_103b_attach
+  schedule_ab_attach
+  schedule_c_attach
+  schedule_d_attach
+  schedule_ef_attach
+  schedule_g_attach
+  schedule_h_attach
+  schedule_i_attach
+  schedule_j_attach
+  form_107_attach
+  form_108_attach
+  form_121_attach
+  form_122a_attach
+  print_101
   conclusion_screen
 ---
 question: |
@@ -754,7 +759,7 @@ code: |
   debtor[i].address.city
   debtor[i].address.state
   debtor[i].address.zip
-  debtor[i].address.unit #use for county
+  debtor[i].address.county #use for county
   debtor[i].alias.gather()
   debtor[i].district_info.is_current_district
   if not debtor[i].district_info.is_current_district:
@@ -1322,20 +1327,20 @@ review:
 
       Total Value: ${ prop.clothes_value }
     show if: prop.has_clothes
-  - Revisit: prop.has_jewlery
+  - Revisit: prop.has_jewelry
     button: |
-      % if prop.has_jewlery:
-        Owns Jewlery: Yes
+      % if prop.has_jewelry:
+        Owns jewelry: Yes
       % else:
-        Owns Jewlery: No
+        Owns jewelry: No
       % endif
-  - Revisit: prop.jewlery_description
+  - Revisit: prop.jewelry_description
     button: |
-      Jewlery Description:
-      ${ prop.jewlery_description }
+      jewelry Description:
+      ${ prop.jewelry_description }
 
-      Total Value: ${ prop.jewlery_value }
-    show if: prop.has_jewlery
+      Total Value: ${ prop.jewelry_value }
+    show if: prop.has_jewelry
   - Revisit: prop.has_animals
     button: |
       % if prop.has_animals:

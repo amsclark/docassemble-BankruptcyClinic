@@ -1,3 +1,4 @@
+---
 table: dependents_table
 rows: debtor[0].expenses.dependents
 columns:
@@ -9,36 +10,40 @@ edit:
   - age
   - same_residence
 ---
+id: household_description
 section: schedule_j
 question: Describe your household
 fields:
   - Does debtor 2 live in a separate household: debtor[0].expenses.other_household
     datatype: yesnoradio
-    default: True
+    # default: True
     show if: debtor[0].expenses.joint_case
   - Do you have dependents?: debtor[0].expenses.dependents.there_are_any
     datatype: yesnoradio
-    default: True
+    # default: True
   - Do your expenses include expenses of people other than yourself and your dependents?: debtor[0].expenses.other_people_expenses
     datatype: yesnoradio
-    default: True
+    # default: True
 ---
+id: dependents_add_another
 section: schedule_j
 question: Are there any more dependents?
 yesno: debtor[0].expenses.dependents.there_is_another
 ---
+id: dependent_details
 section: schedule_j
 question: Tell us about your dependent
 fields:
   - Dependent relationship to debtor: debtor[0].expenses.dependents[i].relationship
-    default: Child
+    # default: Child
   - Dependent age: debtor[0].expenses.dependents[i].age
     datatype: string
-    default: 12
+    # default: 12
   - Does the dependent live with you?: debtor[0].expenses.dependents[i].same_residence
     datatype: yesnoradio
-    default: True
+    # default: True
 ---
+id: monthly_expenses_details
 section: schedule_j
 question: Estimate your ongoing monthly expenses
 subquestion: |
@@ -46,171 +51,171 @@ subquestion: |
 fields:
   - The rental or home ownership expenses for your residence: debtor[0].expenses.rent_expense
     datatype: currency
-    default: 1000
+    # default: 1000
   - note: If not included above
   - Real estate taxes: debtor[0].expenses.real_estate_taxes
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - Property, homeowners, or renters insurance: debtor[0].expenses.renters_insurance
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - Home maintenance, repair, and upkeep expenses: debtor[0].expenses.upkeep_expenses
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - Homeowners association or condominium dues: debtor[0].expenses.owners_dues
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - note: <br>
   - Additional mortgage payments for your residence: debtor[0].expenses.additional_mortgage_payments
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - note: Utilities
   - Electricity, heat, natural gas: debtor[0].expenses.util_electric
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - Water, sewer, garbage collection: debtor[0].expenses.util_garbage
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - Telephone, cell phone, internet, satellite, and cable services: debtor[0].expenses.telephone
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - Do you have other utility expenses: debtor[0].expenses.util_other
     datatype: yesnoradio
-    default: True
+    # default: True
   - Specify other utility: debtor[0].expenses.util_other_specify
-    default: Other
+    # default: Other
     show if: debtor[0].expenses.util_other
   - Amount: debtor[0].expenses.util_other_amount
-    default: 100
+    # default: 100
     datatype: currency
     show if: debtor[0].expenses.util_other
   - note: <br>
   - Food and housekeeping supplies: debtor[0].expenses.house_supplies
-    default: 0
+    # default: 0
     datatype: currency
     required: False
   - Childcare and childrens education costs: debtor[0].expenses.childcare
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - Clothing, laundry, and dry cleaning: debtor[0].expenses.clothing
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - Personal care products and services: debtor[0].expenses.personal_care
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - Medical and dental expenses: debtor[0].expenses.medical
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - Transportation: debtor[0].expenses.transportation
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - Entertainment, clubs, recreation, newspapers, magazines, and books: debtor[0].expenses.entertainment
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - Charitable contributions and religious donations: debtor[0].expenses.charity
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - note: Insurance
   - Life insurance: debtor[0].expenses.life_insurance
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - Health insurance: debtor[0].expenses.health_insurance
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - Vehicle insurance: debtor[0].expenses.vehicle_insurance
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - Do you have other insurance?: debtor[0].expenses.other_insurance
     datatype: yesnoradio
-    default: True
+    # default: True
     required: False
   - Specify: debtor[0].expenses.other_insurance_specify
-    default: Other insurance
+    # default: Other insurance
     show if: debtor[0].expenses.other_insurance
   - Amount: debtor[0].expenses.other_insurance_amount
     datatype: currency
-    default: 0
+    # default: 0
     required: False
     show if: debtor[0].expenses.other_insurance
   - note: |
       Taxes. Do not include taxes deducted from your pay or already included amounts
   - Specify: debtor[0].expenses.other_tax_specify
-    default: Other taxes
+    # default: Other taxes
     required: False
   - Amount: debtor[0].expenses.other_tax_amount
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - note: |
       Installment or lease payments
   - Car payments for Vehicle 1: debtor[0].expenses.vehicle1_payments
     datatype: currency
-    default: 300
+    # default: 300
     required: False
   - Car payments for Vehicle 2: debtor[0].expenses.vehicle2_payments
     datatype: currency
-    default: 300
+    # default: 300
     required: False
   - Other Payment: debtor[0].expenses.other_payment1_specify
-    default: Other Payment 1
+    # default: Other Payment 1
     required: False
   - Other Amount: debtor[0].expenses.other_payment1_amount
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - Other Payment: debtor[0].expenses.other_payment2_specify
-    default: Other Payment 2
+    # default: Other Payment 2
     required: False
   - Other Amount: debtor[0].expenses.other_payment2_amount
     datatype: currency
-    default: 0
+    # default: 0
     required: False
   - note: <br>
   - Your payments of alimony, maintenance, and support that you did not report as deducted from pay: debtor[0].expenses.alimony
     datatype: currency
-    default: 0
+    # default: 0
   - note: |
       Other payments you make to support others who do not live with you
     show if: debtor[0].expenses.other_people_expenses
   - Specify: debtor[0].expenses.other_support_specify
-    default: Other payments
+    # default: Other payments
     show if: debtor[0].expenses.other_people_expenses
   - Amount: debtor[0].expenses.other_support_amount
     datatype: currency
-    default: 0
+    # default: 0
     required: False
     show if: debtor[0].expenses.other_people_expenses
 
   - Do you have other custom expenses to add?: debtor[0].expenses.has_other_expenses
     datatype: yesnoradio
-    default: False
+    # default: False
 
   - note: Other Custom Expense 1
     show if: debtor[0].expenses.has_other_expenses
   - Custom Expense description: debtor[0].expenses.overall_other_description_1
-    default: Other
+    # default: Other
     required: False
     show if: debtor[0].expenses.has_other_expenses
   - Amount: debtor[0].expenses.overall_other_amount_1
-    default: 300
+    # default: 300
     datatype: currency
     required: False
     show if: debtor[0].expenses.has_other_expenses
@@ -218,11 +223,11 @@ fields:
   - note: Other Custom Expense 2
     show if: debtor[0].expenses.has_other_expenses
   - Custom Expense description: debtor[0].expenses.overall_other_description_2
-    default: Other
+    # default: Other
     required: False
     show if: debtor[0].expenses.has_other_expenses
   - Amount: debtor[0].expenses.overall_other_amount_2
-    default: 300
+    # default: 300
     datatype: currency
     required: False
     show if: debtor[0].expenses.has_other_expenses
@@ -230,11 +235,11 @@ fields:
   - note: Other Custom Expense 3
     show if: debtor[0].expenses.has_other_expenses
   - Custom Expense description: debtor[0].expenses.overall_other_description_3
-    default: Other
+    # default: Other
     required: False
     show if: debtor[0].expenses.has_other_expenses
   - Amount: debtor[0].expenses.overall_other_amount_3
-    default: 300
+    # default: 300
     datatype: currency
     required: False
     show if: debtor[0].expenses.has_other_expenses
@@ -242,11 +247,11 @@ fields:
   - note: Other Custom Expense 4
     show if: debtor[0].expenses.has_other_expenses
   - Custom Expense description: debtor[0].expenses.overall_other_description_4
-    default: Other
+    # default: Other
     required: False
     show if: debtor[0].expenses.has_other_expenses
   - Amount: debtor[0].expenses.overall_other_amount_4
-    default: 300
+    # default: 300
     datatype: currency
     required: False
     show if: debtor[0].expenses.has_other_expenses
@@ -254,15 +259,16 @@ fields:
   - note: Other Custom Expense 5
     show if: debtor[0].expenses.has_other_expenses
   - Custom Expense description: debtor[0].expenses.overall_other_description_5
-    default: Other
+    # default: Other
     required: False
     show if: debtor[0].expenses.has_other_expenses
   - Amount: debtor[0].expenses.overall_other_amount_5
-    default: 300
+    # default: 300
     datatype: currency
     required: False
     show if: debtor[0].expenses.has_other_expenses
 ---
+id: expense_changes_expected
 section: schedule_j
 question: |
   Do you expect an increase or decrease in your expenses within the year after you file this form?
@@ -271,11 +277,12 @@ subquestion: |
 fields:
   - Expect a change in expenses?: debtor[0].expenses.change_in_expense
     datatype: yesnoradio
-    default: True
+    # default: True
   - Explain: debtor[0].expenses.change_explainer
-    default: Some expense to explain
+    # default: Some expense to explain
     required: False
 ---
+id: schedule_j_review
 event: schedule_j
 section: schedule_j
 question: |

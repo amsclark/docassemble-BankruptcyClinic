@@ -1,0 +1,41 @@
+{
+  "name": "docassemble-bankruptcyclinic-tests",
+  "version": "1.0.0",
+  "description": "Playwright tests for BankruptcyClinic docassemble interview",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report",
+    "test:smoke": "playwright test tests/smoke.spec.ts",
+    "test:mcp": "playwright test tests/mcp-assisted.spec.ts",
+    "test:mcp-enhanced": "playwright test tests/mcp-enhanced.spec.ts",
+    "test:prompt-examples": "playwright test tests/mcp-enhanced.spec.ts --headed",
+    "mcp-server": "node --loader ts-node/esm mcp-server.ts",
+    "test:debug-mcp": "playwright test tests/mcp-enhanced.spec.ts --debug",
+    "test:all-mcp": "playwright test tests/mcp-assisted.spec.ts tests/mcp-enhanced.spec.ts",
+    "test:watch-live": "LIVE_WATCH=1 playwright test --headed --workers=1",
+    "test:live": "LIVE_WATCH=1 playwright test --headed --workers=1",
+    "test:debug-step": "playwright test --debug --headed",
+    "test:comprehensive": "playwright test tests/voluntary-petition-comprehensive.spec.ts --headed --workers=1",
+    "test:end-to-end": "playwright test --grep=\"complete.*interview.*PDF\" --headed --workers=1",
+    "test:video-analysis": "playwright test --headed && npm run test:report"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^20.10.0",
+    "playwright": "^1.55.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.3.0"
+  },
+  "keywords": [
+    "playwright",
+    "docassemble",
+    "bankruptcy",
+    "testing"
+  ],
+  "author": "",
+  "license": "MIT"
+}

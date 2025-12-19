@@ -1,3 +1,4 @@
+id: eviction_judgment_statement
 section: form_101a
 question: |
   Initial Statment About an Eviction Judgement Against You
@@ -5,33 +6,29 @@ subquestion: |
   Please provide contact information for the landlord that has obtained a judgement for possession in an eviction, unlawful detainer action, or similar proceeding (called eviction judgement) against you to possess your residence.
 fields:
   - Landlords Name: landlord_name
-    default: |
-      Jerry Lewis
+    # default: Jerry Lewis
   - note: |
       Landlord's address:
   - Address: landlord_street
-    default: |
-      53349 56th SE
+    # default: 53349 56th SE
   - City: landlord_city
-    default: |
-      Meris
+    # default: Meris
   - State: landlord_state
-    default: |
-      KY
+    # default: KY
   - zip: landlord_zip
     datatype: number
     minlength: 5
     maxlength: 5
-    default: 33593
+    # default: 33593
   - note: |
       <strong>Certification About Applicable Law and Deposit of Rent</strong>
       I certify under penalty of perjury that:
   - Under the state or other nonbankruptcy law that applies to the judgement for possession (eviction judgement), I have the right to stay in my residence by paying my landlord the entire delinquent amount.: certify_right_to_stay
     datatype: yesnoradio
-    default: True
+    # default: True
   - I have given the bankruptcy court clerk a deposit for the rent that would be due during the 30 days after I file the Voluntary Petition for Individuals Filing for Bankruptcy (Official Form 101).: certify_deposit_paid
     datatype: yesnoradio
-    default: True
+    # default: True
   - note: |
       <strong>Stay of Eviction:</strong>
       <br><br>
@@ -42,7 +39,7 @@ fields:
       If you wish to stay in your residence after that 30-day period and continue to receive the protection of the automatic stay under 11 U.S.C. § 362(a)(3), you must pay the entire delinquent amount to your landlord as stated in the eviction judgment before the 30-day period ends. You must also fill out Statement About Payment of an Eviction Judgment Against You (Official Form 101B), file it with the bankruptcy court, and serve your landlord a copy of it before the 30-day period ends.
   - Do you wish to stay after the initial 30 days?: wish_to_stay
     datatype: yesnoradio
-    default: False
+    # default: False
 ---
 attachment:
   filename: form_b101b.pdf
