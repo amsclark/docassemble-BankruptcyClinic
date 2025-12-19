@@ -352,7 +352,6 @@ code: |
 
   #106AB
   property_intro
-  #prop.interests.gather()
   prop.interests.gather()
   prop.ab_vehicles.gather()
   prop.ab_other_vehicles.gather()
@@ -409,6 +408,18 @@ code: |
   prop.exempt_property.claim_homestead_exemption = False
 
   #107
+  # Defensive default to prevent circular seeks when other sections reference this
+  if not defined('financial_affairs._defaults_applied'):
+    financial_affairs._defaults_applied = False
+
+  if not defined('financial_affairs.lived_elsewhere'):
+    financial_affairs.lived_elsewhere = False
+    financial_affairs._defaults_applied = True
+
+  if not defined('financial_affairs.has_second_address'):
+    financial_affairs.has_second_address = False
+    financial_affairs._defaults_applied = True
+
   financial_affairs.debtor_count = len(debtor)
   financial_affairs.marital_status
 

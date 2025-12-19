@@ -11,7 +11,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "docassemble.BankruptcyClinic"
-version = "0.0.19"
+version = "0.0.20"
 description = "A docassemble extension."
 readme = "README.md"
 authors = [

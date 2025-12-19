@@ -46,17 +46,17 @@ fields:
     datatype: yesnoradio
     default: False
 ---
-table: personal_leases_table
-rows: personal_leases
-columns:
-  - Name: row_item.name
-  - Description: row_item.description
-  - Lease Assumed: row_item.lease_assumed
-edit:
-  - name
-  - description
-  - lease_assumed
----
+#rows: personal_leases
+#columns:
+#table: personal_leases_table
+#  - Name: row_item.name
+#  - Description: row_item.description
+#  - Lease Assumed: row_item.lease_assumed
+#edit:
+#  - name
+#  - description
+#  - lease_assumed
+#---
 section: form_108
 question: |
   Do you have any unexpired personal property leases?
@@ -64,22 +64,21 @@ yesno: personal_leases.there_are_any
 ---
 section: form_108
 question: |
-  Are there any more unexpired personal property leases?
-yesno: personal_leases.there_is_another
-under: |
-  ${ personal_leases_table }
----
-section: form_108
-question: |
-  Tell the court about an unexpired personal property leases
+  Tell the court about an unexpired personal property lease.
 fields:
-  - Lessor Name: personal_leases[i].name
-    default: Lenny
-  - Description of leased property: personal_leases[i].description
-    default: NA
+  - Lessor Name: personal_leases[i].j=name
+  - Description: personal_leases[i].description
+    input type: area
   - Will the lease be assumed?: personal_leases[i].lease_assumed
     datatype: yesnoradio
-    default: False
+list collect: True 
+---
+#section: form_108
+#question: |
+#  Are there any more unexpired personal property leases?
+#yesno: personal_leases.there_is_another
+#under: |
+#  ${ personal_leases_table }
 ---
 event: form_108
 section: form_108
@@ -88,7 +87,7 @@ question: |
 review:
   - note: |
      <br>
-     blblb
+    
      % if len(secured_claims) > 0:
       ${ secured_claims_table }
       ${ secured_claims.add_action() }
@@ -142,13 +141,13 @@ code: |
     leases['yesClaim'+str(i)] = True if claim.exempt == True else False
     
     i += 1
-  
-  y = 1
-  for lease in personal_leases:
-    leases['lessor'+str(y)] = lease.name
-    leases['leaseDesc'+str(y)] = lease.description
-    leases['noLease'+str(y)] = True if lease.lease_assumed == False else False
-    leases['yesLease'+str(y)] = True if lease.lease_assumed == True else False
-    
-    y += 1
-    
+  #
+  #y = 1
+  #for lease in personal_leases:
+  #  leases['lessor'+str(y)] = lease.name
+  #  leases['leaseDesc'+str(y)] = lease.description
+  #  leases['noLease'+str(y)] = True if lease.lease_assumed == False else False
+  #  leases['yesLease'+str(y)] = True if lease.lease_assumed == True else False
+  #  
+  #  y += 1
+  #  

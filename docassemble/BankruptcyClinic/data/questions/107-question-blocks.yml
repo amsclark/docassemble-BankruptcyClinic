@@ -1,3 +1,12 @@
+---
+code: |
+  # If earlier sections set temporary defaults to avoid circular variable seeking,
+  # clear them now so this section can ask the user the real answers.
+  if defined('financial_affairs._defaults_applied') and financial_affairs._defaults_applied:
+    undefine('financial_affairs.lived_elsewhere')
+    undefine('financial_affairs.has_second_address')
+    financial_affairs._defaults_applied = False
+---
 section: form_107
 question: |
   Give details about your marital status and where you lived before
