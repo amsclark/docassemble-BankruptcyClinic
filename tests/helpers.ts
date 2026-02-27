@@ -187,7 +187,10 @@ export async function clickYesNo(page: Page, fieldName: string, yes: boolean) {
   await clickNthByName(page, b64(fieldName), idx);
 }
 
-/** Fill a standard debtor identity page for debtor[i]. */
+/**
+ * Helper function to fill in debtor identity information.
+ * @param {Object} debtor - The debtor object containing identity information.
+ */
 export async function fillDebtorIdentity(
   page: Page,
   opts: {
@@ -247,3 +250,21 @@ export async function fillDebtorIdentity(
   // Submit the debtor info page
   await clickNthByName(page, b64('debtor_basic_info'), 0);
 }
+
+/**
+ * Helper function to load the interview page.
+ * @param {string} page - The page to load.
+ */
+export async function loadInterviewPage(page: Page) {
+  await page.goto(INTERVIEW_URL);
+}
+
+/**
+ * Helper function to click on a button.
+ * @param {string} buttonSelector - The selector for the button to click.
+ */
+export async function clickButton(buttonSelector: string) {
+  await page.locator(buttonSelector).click();
+}
+
+// Additional helper functions can be added here for more comprehensive testing.
