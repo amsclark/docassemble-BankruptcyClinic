@@ -60,12 +60,8 @@ test.describe('Individual Filing Flow', () => {
     // 6. Filing status: Individual
     // ──────────────────────────────────────
     await waitForDaPageLoad(page);
-    const filingStatusId = b64('filing_status') + '_0'; // First option = individual
-    await page.waitForSelector(`#${filingStatusId}`, {
-      state: 'visible',
-      timeout: 15000,
-    });
-    await clickById(page, filingStatusId);
+    await page.waitForTimeout(1000);
+    await clickById(page, b64('filing_status') + '_0'); // Individual
     await clickContinue(page);
 
     // ──────────────────────────────────────
