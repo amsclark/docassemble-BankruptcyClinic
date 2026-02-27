@@ -38,7 +38,7 @@ async function navigateToDebtorPage(
   page: Page,
   opts: { jointFiling?: boolean } = {},
 ) {
-  await page.goto(INTERVIEW_URL);
+  await page.goto(INTERVIEW_URL + '&new_session=1');
   await waitForDaPageLoad(page);
 
   // Intro → Continue
@@ -234,15 +234,27 @@ async function navigatePropertySection(page: Page) {
   await waitForDaPageLoad(page);
   h = await page.locator('h1, h2, h3').first().textContent().catch(() => '');
   console.log('[PROP] other_vehicles heading:', h);
-  await clickYesNoButton(page, 'prop.ab_other_vehicles.there_are_any', false);
+  
+  // Capture response to see where other_vehicles → No takes us
+  const [response] = await Promise.all([
+    page.waitForNavigation({ waitUntil: 'networkidle' }),
+    clickYesNoButton(page, 'prop.ab_other_vehicles.there_are_any', false),
+  ]);
+  console.log('[PROP] Response URL:', page.url());
+  console.log('[PROP] Response status:', response?.status());
 
   // Personal/household items — large question with many yesnoradio fields
-  // All default to No, just fill the required ones and continue
-  // case_number may appear here due to code block dependencies
   await waitForDaPageLoad(page);
   await handleCaseNumberIfPresent(page);
   h = await page.locator('h1, h2, h3').first().textContent().catch(() => '');
   console.log('[PROP] household heading:', h);
+  
+  // Check the question ID on the page
+  const questionId = await page.evaluate(() => {
+    const el = document.querySelector('[name="_question_name"]') as HTMLInputElement;
+    return el?.value || 'unknown';
+  });
+  console.log('[PROP] question_id:', questionId);
   await fillYesNoRadio(page, 'prop.has_household_goods', false);
   await fillYesNoRadio(page, 'prop.has_collectibles', false);
   await fillYesNoRadio(page, 'prop.has_hobby_equipment', false);
