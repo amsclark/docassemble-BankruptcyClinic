@@ -804,9 +804,33 @@ test.describe('List Collect Interactions', () => {
     await fillById(page, b64('prop.interests[i].state'), 'NE');
     await fillById(page, b64('prop.interests[i].zip'), '68508');
     await fillById(page, b64('prop.interests[i].county'), 'Lancaster');
+
+    // Property type - checkboxes field. Check "Single-family home"
+    // Checkbox name is b64('prop.interests[i].type') with value dict entries
+    await page.locator(`input[name="${b64('prop.interests[i].type[B\'Single-family home\']')}"]`).check();
+
+    // Who has an interest - radio button with code-generated choices
+    // For individual filing, first choice is "Debtor 1 only"
+    const whoName = b64('prop.interests[i].who');
+    await page.locator(`input[name="${whoName}"]`).first().click();
+
+    // Current property value
     await fillById(page, b64('prop.interests[i].current_value'), '150000');
-    await fillYesNoRadio(page, 'prop.interests[i].has_loan', false);
+
+    // Do you have a mortgage/loan? - datatype: yesno → checkbox
+    // Leave unchecked for "No" (False)
+    // setCheckbox only needed if we want True; unchecked = False by default
+
+    // Ownership interest - textarea
+    await fillById(page, b64('prop.interests[i].ownership_interest'), 'Fee simple');
+
+    // Community property? - yesnoradio → radio buttons
     await fillYesNoRadio(page, 'prop.interests[i].is_community_property', false);
+
+    // Other info
+    await fillById(page, b64('prop.interests[i].other_info'), 'N/A');
+
+    // Claiming exemption? - yesnoradio → radio buttons
     await fillYesNoRadio(page, 'prop.interests[i].is_claiming_exemption', false);
 
     // Submit this property interest
