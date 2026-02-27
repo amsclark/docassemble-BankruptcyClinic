@@ -255,6 +255,18 @@ async function navigatePropertySection(page: Page) {
     return el?.value || 'unknown';
   });
   console.log('[PROP] question_id:', questionId);
+  
+  // Check if there's an error message on the page
+  const errorText = await page.locator('.alert-danger, .da-error, .dainterviewerror').textContent().catch(() => 'none');
+  console.log('[PROP] error on page:', errorText);
+  
+  // Dump all form field names on the page
+  const fieldNames = await page.evaluate(() => {
+    const inputs = document.querySelectorAll('input[name], select[name], textarea[name]');
+    return Array.from(inputs).map(el => `${el.tagName}[name="${el.getAttribute('name')}"]`).join(', ');
+  });
+  console.log('[PROP] form fields:', fieldNames);
+  
   await fillYesNoRadio(page, 'prop.has_household_goods', false);
   await fillYesNoRadio(page, 'prop.has_collectibles', false);
   await fillYesNoRadio(page, 'prop.has_hobby_equipment', false);

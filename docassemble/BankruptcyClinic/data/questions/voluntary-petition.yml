@@ -362,7 +362,9 @@ code: |
   prop.interests.gather()
   prop.ab_vehicles.gather()
   prop.ab_other_vehicles.gather()
+  log("DEBUG: About to evaluate prop.has_household_goods, defined=" + str(defined('prop.has_household_goods')))
   prop.has_household_goods
+  log("DEBUG: prop.has_household_goods = " + str(prop.has_household_goods))
   prop.has_collectibles
   prop.has_hobby_equipment
   prop.has_firearms
