@@ -7,7 +7,7 @@ test.describe('End-to-End Tests', () => {
         // Load the interview page
         await page.goto('/');
         // Fill in debtor information
-        await fillDebtorIdentity({ name: 'John Doe', ... });
+        await fillDebtorIdentity({ name: 'John Doe', age: 30, income: 5000 }); // Complete object provided
         // Submit the form
         await page.click('button[type="submit"]');
         // Expect to see confirmation
