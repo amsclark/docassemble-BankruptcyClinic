@@ -146,31 +146,40 @@ async function clickYesNoButton(page: Page, varName: string, yes: boolean) {
 async function selectYesNoRadio(page: Page, varName: string, yes: boolean) {
   const fieldId = b64(varName);
   const suffix = yes ? '_0' : '_1';
-  await page.locator(`#${fieldId}${suffix}`).click();
+  // Docassemble uses labelauty: <input> is hidden, click the <label> instead
+  await page.locator(`label[for="${fieldId}${suffix}"]`).click();
 }
 
 /**
  * For a "fields:" question with yesnoradio items, fill them all then continue.
- * yesnoradio fields are rendered as radio buttons with name = b64(var) and
- * value "True" or "False".
+ * yesnoradio fields are rendered as radio buttons with id = b64(var) + '_0' (Yes)
+ * or '_1' (No). The actual <input> is hidden; click the <label> with for=id.
  */
 async function fillYesNoRadio(page: Page, varName: string, yes: boolean) {
-  const name = b64(varName);
-  const value = yes ? 'True' : 'False';
-  await page.locator(`input[name="${name}"][value="${value}"]`).click();
+  const fieldId = b64(varName);
+  const suffix = yes ? '_0' : '_1';
+  await page.locator(`label[for="${fieldId}${suffix}"]`).click();
 }
 
 /**
  * For a `datatype: yesno` field inside a `fields:` block (rendered as checkbox).
  * Checking it sets value to True, leaving unchecked is False.
+ * Uses the label since the input is hidden by labelauty.
  */
 async function setCheckbox(page: Page, varName: string, checked: boolean) {
-  const name = b64(varName);
-  const checkbox = page.locator(`input[name="${name}"]`).first();
+  const fieldId = b64(varName);
+  const label = page.locator(`label[for="${fieldId}"]`);
   if (checked) {
-    await checkbox.check();
+    // Only click if not already checked
+    const ariaChecked = await label.getAttribute('aria-checked');
+    if (ariaChecked !== 'true') {
+      await label.click();
+    }
   } else {
-    await checkbox.uncheck();
+    const ariaChecked = await label.getAttribute('aria-checked');
+    if (ariaChecked === 'true') {
+      await label.click();
+    }
   }
 }
 
