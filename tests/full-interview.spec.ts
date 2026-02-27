@@ -299,13 +299,23 @@ async function navigatePropertySection(page: Page) {
     await clickYesNoButton(page, varName, false);
   }
 
-  // Future property interest, IP, intangible (all have *_has_claim fields too)
+  // Future property interest (trusts_future_interests – separate page)
+  await waitForDaPageLoad(page);
+  await fillAllVisibleRadiosAsNo(page);
+  await clickContinue(page);
+
+  // Intellectual property (intellectual_property – separate page)
+  await waitForDaPageLoad(page);
+  await fillAllVisibleRadiosAsNo(page);
+  await clickContinue(page);
+
+  // Intangible interest (separate page)
   await waitForDaPageLoad(page);
   await fillAllVisibleRadiosAsNo(page);
   await clickContinue(page);
 
   // Owed property: tax refund, family support, other amounts, insurance,
-  // trust, third party, contingent claims, other assets (all with *_has_claim)
+  // trust, third party, contingent claims, other assets (all on ONE big form)
   await waitForDaPageLoad(page);
   await fillAllVisibleRadiosAsNo(page);
   await clickContinue(page);
@@ -343,11 +353,7 @@ async function navigateExemptionSection(page: Page) {
   // Exempt property list → No
   await waitForDaPageLoad(page);
   await clickYesNoButton(page, 'prop.exempt_property.properties.there_are_any', false);
-
-  // Homestead exemption → No
-  await waitForDaPageLoad(page);
-  await fillYesNoRadio(page, 'prop.exempt_property.claim_homestead_exemption', false);
-  await clickContinue(page);
+  // claim_homestead_exemption is set directly in mandatory block, no page shown
 }
 
 // ──────────────────────────────────────────────
