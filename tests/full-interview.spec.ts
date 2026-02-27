@@ -235,13 +235,28 @@ async function navigatePropertySection(page: Page) {
   h = await page.locator('h1, h2, h3').first().textContent().catch(() => '');
   console.log('[PROP] other_vehicles heading:', h);
   
-  // Capture response to see where other_vehicles → No takes us
-  const [response] = await Promise.all([
-    page.waitForNavigation({ waitUntil: 'networkidle' }),
-    clickYesNoButton(page, 'prop.ab_other_vehicles.there_are_any', false),
-  ]);
-  console.log('[PROP] Response URL:', page.url());
-  console.log('[PROP] Response status:', response?.status());
+  // Listen for console errors from the browser
+  const consoleErrors: string[] = [];
+  page.on('console', msg => {
+    if (msg.type() === 'error') {
+      consoleErrors.push(`[CONSOLE ERROR] ${msg.text()}`);
+    }
+  });
+  page.on('pageerror', error => {
+    consoleErrors.push(`[PAGE ERROR] ${error.message}`);
+  });
+  
+  // Click other_vehicles → No and wait for AJAX response
+  await clickYesNoButton(page, 'prop.ab_other_vehicles.there_are_any', false);
+  
+  // Wait for AJAX to complete (docassemble uses AJAX, not full page navigation)
+  await page.waitForTimeout(5000);
+  await page.waitForLoadState('networkidle');
+  
+  // Log all console errors
+  for (const err of consoleErrors) {
+    console.log(err);
+  }
 
   // Personal/household items — large question with many yesnoradio fields
   await waitForDaPageLoad(page);

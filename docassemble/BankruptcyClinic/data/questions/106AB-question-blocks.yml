@@ -1962,7 +1962,7 @@ fields:
   - Specific laws that allow exemption: prop.household_goods_exemption_laws
     choices:
       code: |
-        get_exemption_choices(debtor[i].address.state, 'all')
+        get_exemption_choices(debtor[0].address.state, 'all')
     show if: prop.household_goods_is_claiming_exemption
   - note: Exemption 2
     show if: prop.household_goods_is_claiming_exemption
@@ -1974,7 +1974,7 @@ fields:
   - Specific laws that allow exemption: prop.household_goods_exemption_laws_2
     choices:
       code: |
-        get_exemption_choices(debtor[i].address.state, 'all')
+        get_exemption_choices(debtor[0].address.state, 'all')
     show if: prop.household_goods_is_claiming_exemption
     required: False
 
