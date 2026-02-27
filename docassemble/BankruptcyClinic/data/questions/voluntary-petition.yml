@@ -727,21 +727,24 @@ code: |
       if wish_to_stay == True:
         attach_101b
   if case.payment_method == '2':
-    form_103a_attach
+    attach_103a
   if case.payment_method == '3':
     form_103b_attach
-  schedule_ab_attach
-  schedule_c_attach
-  schedule_d_attach
-  schedule_ef_attach
-  schedule_g_attach
-  schedule_h_attach
-  schedule_i_attach
-  schedule_j_attach
-  form_107_attach
-  form_108_attach
-  form_121_attach
-  form_122a_attach
+  ab_attach
+  c_attach
+  d_attach
+  ef_attach
+  g_attach
+  h_attach
+  i_attach
+  j_attach
+  form_107_temp
+  form_107_ext1
+  form_107_ext2
+  form_107_ext3
+  attach_108
+  attach_121
+  attach_122a
   print_101
   conclusion_screen
 ---
