@@ -214,25 +214,26 @@ async function setCheckbox(page: Page, varName: string, checked: boolean) {
 async function navigatePropertySection(page: Page) {
   // property_intro → Continue
   await waitForDaPageLoad(page);
-  console.log('[PROP] Page: property_intro');
+  let h = await page.locator('h1, h2, h3').first().textContent().catch(() => '');
+  console.log('[PROP] property_intro heading:', h);
   await clickNthByName(page, b64('property_intro'), 0);
 
   // Real property interests → No
   await waitForDaPageLoad(page);
-  console.log('[PROP] Page: interests.there_are_any');
-  await screenshot(page, 'prop-step-interests');
+  h = await page.locator('h1, h2, h3').first().textContent().catch(() => '');
+  console.log('[PROP] interests heading:', h);
   await clickYesNoButton(page, 'prop.interests.there_are_any', false);
 
   // Vehicles → No
   await waitForDaPageLoad(page);
-  console.log('[PROP] Page: ab_vehicles.there_are_any');
-  await screenshot(page, 'prop-step-vehicles');
+  h = await page.locator('h1, h2, h3').first().textContent().catch(() => '');
+  console.log('[PROP] vehicles heading:', h);
   await clickYesNoButton(page, 'prop.ab_vehicles.there_are_any', false);
 
   // Other vehicles → No
   await waitForDaPageLoad(page);
-  console.log('[PROP] Page: ab_other_vehicles.there_are_any');
-  await screenshot(page, 'prop-step-other-vehicles');
+  h = await page.locator('h1, h2, h3').first().textContent().catch(() => '');
+  console.log('[PROP] other_vehicles heading:', h);
   await clickYesNoButton(page, 'prop.ab_other_vehicles.there_are_any', false);
 
   // Personal/household items — large question with many yesnoradio fields
@@ -240,8 +241,8 @@ async function navigatePropertySection(page: Page) {
   // case_number may appear here due to code block dependencies
   await waitForDaPageLoad(page);
   await handleCaseNumberIfPresent(page);
-  console.log('[PROP] Page: household items');
-  await screenshot(page, 'prop-step-household');
+  h = await page.locator('h1, h2, h3').first().textContent().catch(() => '');
+  console.log('[PROP] household heading:', h);
   await fillYesNoRadio(page, 'prop.has_household_goods', false);
   await fillYesNoRadio(page, 'prop.has_collectibles', false);
   await fillYesNoRadio(page, 'prop.has_hobby_equipment', false);
