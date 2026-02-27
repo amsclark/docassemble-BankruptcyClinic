@@ -1537,6 +1537,7 @@ fields:
   - no label: financial_affairs.disaster_description
     input type: area
     # default: Description
+    show if: financial_affairs.has_disaster
   - note: Describe any insurance coverage for the loss
     show if: financial_affairs.has_disaster
   - note: Include the amount that insurance has paid.
