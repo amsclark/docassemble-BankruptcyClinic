@@ -2037,6 +2037,7 @@ fields:
   - Total owned value: prop.electronics_value
     datatype: currency
     # default: 500
+    show if: prop.has_electronics
   - Claiming Exemption?: prop.electronics_is_claiming_exemption
     # default: False
     datatype: yesnoradio
@@ -2085,6 +2086,7 @@ fields:
   - Total owned value: prop.collectibles_value
     datatype: currency
     # default: 100
+    show if: prop.has_collectibles
   - Claiming Exemption?: prop.collectibles_is_claiming_exemption
     # default: False
     datatype: yesnoradio
@@ -2129,6 +2131,7 @@ fields:
   - Total owned value: prop.hobby_equipment_value
     datatype: currency
     # default: 3000
+    show if: prop.has_hobby_equipment
   - Claiming Exemption?: prop.hobby_equipment_is_claiming_exemption
     # default: False
     datatype: yesnoradio
