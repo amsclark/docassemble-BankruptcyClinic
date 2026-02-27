@@ -799,42 +799,46 @@ test.describe('List Collect Interactions', () => {
     await screenshot(page, 'list-collect-property-interest');
 
     // Fill in the property interest details
-    await fillById(page, b64('prop.interests[i].street'), '456 Oak Ave');
-    await fillById(page, b64('prop.interests[i].city'), 'Lincoln');
-    await fillById(page, b64('prop.interests[i].state'), 'NE');
-    await fillById(page, b64('prop.interests[i].zip'), '68508');
-    await fillById(page, b64('prop.interests[i].county'), 'Lancaster');
+    // Note: docassemble renders list items with [0] not [i] in the HTML
+    await fillById(page, b64('prop.interests[0].street'), '456 Oak Ave');
+    await fillById(page, b64('prop.interests[0].city'), 'Lincoln');
+    await fillById(page, b64('prop.interests[0].state'), 'NE');
+    await fillById(page, b64('prop.interests[0].zip'), '68508');
+    await fillById(page, b64('prop.interests[0].county'), 'Lancaster');
 
     // Property type - checkboxes field. Check "Single-family home"
-    // Checkbox name is b64('prop.interests[i].type') with value dict entries
-    await page.locator(`input[name="${b64('prop.interests[i].type[B\'Single-family home\']')}"]`).check();
+    // Docassemble renders labelauty checkboxes; the <label> has role="checkbox"
+    // For the first list item ([0]), the checkbox id is b64("prop.interests[0].type") + "_0"
+    const typeCheckboxId = b64('prop.interests[0].type') + '_0';
+    await page.locator(`label[for="${typeCheckboxId}"]`).click();
 
     // Who has an interest - radio button with code-generated choices
     // For individual filing, first choice is "Debtor 1 only"
-    const whoName = b64('prop.interests[i].who');
-    await page.locator(`input[name="${whoName}"]`).first().click();
+    // Docassemble uses labelauty: <input> is hidden, click the <label> instead
+    const whoRadioId = b64('prop.interests[0].who') + '_0';
+    await page.locator(`label[for="${whoRadioId}"]`).click();
 
     // Current property value
-    await fillById(page, b64('prop.interests[i].current_value'), '150000');
+    await fillById(page, b64('prop.interests[0].current_value'), '150000');
 
     // Do you have a mortgage/loan? - datatype: yesno → checkbox
     // Leave unchecked for "No" (False)
     // setCheckbox only needed if we want True; unchecked = False by default
 
     // Ownership interest - textarea
-    await fillById(page, b64('prop.interests[i].ownership_interest'), 'Fee simple');
+    await fillById(page, b64('prop.interests[0].ownership_interest'), 'Fee simple');
 
     // Community property? - yesnoradio → radio buttons
-    await fillYesNoRadio(page, 'prop.interests[i].is_community_property', false);
+    await fillYesNoRadio(page, 'prop.interests[0].is_community_property', false);
 
     // Other info
-    await fillById(page, b64('prop.interests[i].other_info'), 'N/A');
+    await fillById(page, b64('prop.interests[0].other_info'), 'N/A');
 
     // Claiming exemption? - yesnoradio → radio buttons
-    await fillYesNoRadio(page, 'prop.interests[i].is_claiming_exemption', false);
+    await fillYesNoRadio(page, 'prop.interests[0].is_claiming_exemption', false);
 
     // Submit this property interest
-    await clickNthByName(page, b64('prop.interests[i].complete'), 0);
+    await clickNthByName(page, b64('prop.interests[0].complete'), 0);
 
     // Should ask "Do you have more interests?"
     await waitForDaPageLoad(page);
