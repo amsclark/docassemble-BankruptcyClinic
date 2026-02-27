@@ -160,6 +160,20 @@ async function fillYesNoRadio(page: Page, varName: string, yes: boolean) {
   await page.locator(`input[name="${name}"][value="${value}"]`).click();
 }
 
+/**
+ * For a `datatype: yesno` field inside a `fields:` block (rendered as checkbox).
+ * Checking it sets value to True, leaving unchecked is False.
+ */
+async function setCheckbox(page: Page, varName: string, checked: boolean) {
+  const name = b64(varName);
+  const checkbox = page.locator(`input[name="${name}"]`).first();
+  if (checked) {
+    await checkbox.check();
+  } else {
+    await checkbox.uncheck();
+  }
+}
+
 // ──────────────────────────────────────────────
 //  Schedule A/B – Property Section
 // ──────────────────────────────────────────────
