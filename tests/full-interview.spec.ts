@@ -846,8 +846,8 @@ test.describe('List Collect Interactions', () => {
     // Claiming exemption? - yesnoradio → radio buttons
     await fillYesNoRadio(page, 'prop.interests[0].is_claiming_exemption', false);
 
-    // Submit this property interest
-    await clickNthByName(page, b64('prop.interests[0].complete'), 0);
+    // Submit this property interest - standard Continue button
+    await clickContinue(page);
 
     // Should ask "Do you have more interests?"
     await waitForDaPageLoad(page);
