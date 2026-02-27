@@ -437,7 +437,6 @@ code: |
     financial_affairs.debtor2_had_other_income
   financial_affairs.primarily_consumer_debts
 
-  financial_affairs.large_debt_payments
   financial_affairs.consumer_debt_payments.gather()
 
   financial_affairs.insider_payments.gather()
