@@ -92,7 +92,7 @@ test.describe('Smoke Tests', () => {
     await page.goto(INTERVIEW_URL);
     await waitForDaPageLoad(page);
 
-    // Intro → District → Amendment → Case Number → District Final → Filing Status
+    // Intro → District → Amendment(Yes) → Case Number → District Final → Filing Status
     await clickNthByName(page, b64('introduction_screen'), 0);
     await waitForDaPageLoad(page);
 
@@ -103,8 +103,8 @@ test.describe('Smoke Tests', () => {
     );
     await clickContinue(page);
 
-    // Click "No" for amended filing
-    await clickNthByName(page, b64('amended_filing'), 1);
+    // Click "Yes" for amended filing (mirrors the known-good Human-written flow)
+    await clickNthByName(page, b64('amended_filing'), 0);
     await waitForDaPageLoad(page);
 
     // Case number page - fill and continue
@@ -113,6 +113,7 @@ test.describe('Smoke Tests', () => {
     await clickContinue(page);
 
     // District final page - click continue
+    await waitForDaPageLoad(page);
     await clickNthByName(page, b64('district_final'), 0);
     await waitForDaPageLoad(page);
 

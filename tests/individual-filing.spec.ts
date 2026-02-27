@@ -37,10 +37,10 @@ test.describe('Individual Filing Flow', () => {
     await clickContinue(page);
 
     // ──────────────────────────────────────
-    // 3. Not an amended filing
+    // 3. Yes for amended filing (known-good flow)
     // ──────────────────────────────────────
     await waitForDaPageLoad(page);
-    await clickNthByName(page, b64('amended_filing'), 1); // "No"
+    await clickNthByName(page, b64('amended_filing'), 0); // "Yes"
 
     // ──────────────────────────────────────
     // 4. Case number
@@ -134,7 +134,7 @@ test.describe('Individual Filing Flow', () => {
     await selectByName(page, b64('current_district'), 'District of Nebraska');
     await clickContinue(page);
 
-    await clickNthByName(page, b64('amended_filing'), 1); // No
+    await clickNthByName(page, b64('amended_filing'), 0); // Yes
     await waitForDaPageLoad(page);
     await page.waitForTimeout(500);
     await fillByName(page, b64('case_number'), '8:24-bk-00002');
