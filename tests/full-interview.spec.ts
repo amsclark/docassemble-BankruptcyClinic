@@ -235,61 +235,42 @@ async function navigatePropertySection(page: Page) {
   h = await page.locator('h1, h2, h3').first().textContent().catch(() => '');
   console.log('[PROP] other_vehicles heading:', h);
   
-  // Listen for console errors from the browser
-  const consoleErrors: string[] = [];
-  page.on('console', msg => {
-    if (msg.type() === 'error') {
-      consoleErrors.push(`[CONSOLE ERROR] ${msg.text()}`);
-    }
-  });
-  page.on('pageerror', error => {
-    consoleErrors.push(`[PAGE ERROR] ${error.message}`);
-  });
-  
   // Click other_vehicles → No and wait for AJAX response
   await clickYesNoButton(page, 'prop.ab_other_vehicles.there_are_any', false);
-  
-  // Wait for AJAX to complete (docassemble uses AJAX, not full page navigation)
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(3000);
   await page.waitForLoadState('networkidle');
-  
-  // Log all console errors
-  for (const err of consoleErrors) {
-    console.log(err);
-  }
 
-  // Personal/household items — large question with many yesnoradio fields
+  // Personal/household items — massive form with ~20 yesnoradio fields
+  // Each property category has: has_XXX + XXX_is_claiming_exemption (both always visible)
   await waitForDaPageLoad(page);
   await handleCaseNumberIfPresent(page);
-  h = await page.locator('h1, h2, h3').first().textContent().catch(() => '');
-  console.log('[PROP] household heading:', h);
-  
-  // Check the question ID on the page
-  const questionId = await page.evaluate(() => {
-    const el = document.querySelector('[name="_question_name"]') as HTMLInputElement;
-    return el?.value || 'unknown';
-  });
-  console.log('[PROP] question_id:', questionId);
-  
-  // Check if there's an error message on the page
-  const errorText = await page.locator('.alert-danger, .da-error, .dainterviewerror').textContent().catch(() => 'none');
-  console.log('[PROP] error on page:', errorText);
-  
-  // Dump all form field names on the page
-  const fieldNames = await page.evaluate(() => {
-    const inputs = document.querySelectorAll('input[name], select[name], textarea[name]');
-    return Array.from(inputs).map(el => `${el.tagName}[name="${el.getAttribute('name')}"]`).join(', ');
-  });
-  console.log('[PROP] form fields:', fieldNames);
-  
-  await fillYesNoRadio(page, 'prop.has_household_goods', false);
-  await fillYesNoRadio(page, 'prop.has_collectibles', false);
-  await fillYesNoRadio(page, 'prop.has_hobby_equipment', false);
-  await fillYesNoRadio(page, 'prop.has_firearms', false);
-  await fillYesNoRadio(page, 'prop.has_clothes', false);
-  await fillYesNoRadio(page, 'prop.has_jewelry', false);
-  await fillYesNoRadio(page, 'prop.has_animals', false);
-  await fillYesNoRadio(page, 'prop.has_other_household_items', false);
+
+  // Fill ALL required yesnoradio fields as No
+  const householdRadioFields = [
+    'prop.has_household_goods',
+    'prop.household_goods_is_claiming_exemption',
+    'prop.has_secured_household_goods',
+    'prop.secured_household_goods_is_claiming_exemption',
+    'prop.has_electronics',
+    'prop.electronics_is_claiming_exemption',
+    'prop.has_collectibles',
+    'prop.collectibles_is_claiming_exemption',
+    'prop.has_hobby_equipment',
+    'prop.hobby_equipment_is_claiming_exemption',
+    'prop.has_firearms',
+    'prop.firearms_is_claiming_exemption',
+    'prop.has_clothes',
+    'prop.clothes_is_claiming_exemption',
+    'prop.has_jewelry',
+    'prop.jewelry_is_claiming_exemption',
+    'prop.has_animals',
+    'prop.animal_is_claiming_exemption',
+    'prop.has_other_household_items',
+    'prop.other_household_items_is_claiming_exemption',
+  ];
+  for (const field of householdRadioFields) {
+    await fillYesNoRadio(page, field, false);
+  }
   await clickContinue(page);
 
   // Financial assets – cash
