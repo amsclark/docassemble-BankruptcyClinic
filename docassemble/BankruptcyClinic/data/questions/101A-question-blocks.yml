@@ -1,9 +1,9 @@
 id: eviction_judgment_statement
 section: form_101a
 question: |
-  Initial Statment About an Eviction Judgement Against You
+  Initial Statement About an Eviction Judgment Against You
 subquestion: |
-  Please provide contact information for the landlord that has obtained a judgement for possession in an eviction, unlawful detainer action, or similar proceeding (called eviction judgement) against you to possess your residence.
+  Please provide contact information for the landlord that has obtained a judgment for possession in an eviction, unlawful detainer action, or similar proceeding (called eviction judgment) against you to possess your residence.
 fields:
   - Landlords Name: landlord_name
     # default: Jerry Lewis
@@ -23,7 +23,7 @@ fields:
   - note: |
       <strong>Certification About Applicable Law and Deposit of Rent</strong>
       I certify under penalty of perjury that:
-  - Under the state or other nonbankruptcy law that applies to the judgement for possession (eviction judgement), I have the right to stay in my residence by paying my landlord the entire delinquent amount.: certify_right_to_stay
+  - Under the state or other nonbankruptcy law that applies to the judgment for possession (eviction judgment), I have the right to stay in my residence by paying my landlord the entire delinquent amount.: certify_right_to_stay
     datatype: yesnoradio
     # default: True
   - I have given the bankruptcy court clerk a deposit for the rent that would be due during the 30 days after I file the Voluntary Petition for Individuals Filing for Bankruptcy (Official Form 101).: certify_deposit_paid

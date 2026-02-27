@@ -95,7 +95,6 @@ fields:
     # default: 33593
     show if: debtors.had_spouse
     required: False
-list collect: True
 ---
 id: schedule_h_review
 event: schedule_h

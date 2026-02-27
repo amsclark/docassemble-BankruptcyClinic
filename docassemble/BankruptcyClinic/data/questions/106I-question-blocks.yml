@@ -749,5 +749,3 @@ code: |
   income1['noIncrease'] = True if debtor[0].income.expect_year_delta == False else False
   income1['hasIncrease'] = True if debtor[0].income.expect_year_delta == True else False
   income1['increaseExplain'] = debtor[0].income.year_delta_explain
-
-continue button field: test

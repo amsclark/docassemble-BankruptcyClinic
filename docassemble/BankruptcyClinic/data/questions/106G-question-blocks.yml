@@ -116,7 +116,7 @@ code: |
   else:
     debtor2_name = ''
   contracts = {}
-  leases = {}
+  leases_106g = {}
   contracts['debtor1_name_1'] = debtor_name
   contracts['debtor1_name_2'] = debtor_name
   contracts['debtor2_name_1'] = debtor2_name
@@ -136,82 +136,82 @@ code: |
     contracts['state'+str(i)] = contract.state
     contracts['zip'+str(i)] = contract.zip
     if contract.unexpired_lease:
-      leases['lessor'+str(i)] = contract.name
-      leases['leaseDesc'+str(i)] = contract.description
-      leases['noLease'+str(i)] = True if contract.lease_assumed == False else False
-      leases['yesLease'+str(i)] = True if contract.lease_assumed == True else False
+      leases_106g['lessor'+str(i)] = contract.name
+      leases_106g['leaseDesc'+str(i)] = contract.description
+      leases_106g['noLease'+str(i)] = True if contract.lease_assumed == False else False
+      leases_106g['yesLease'+str(i)] = True if contract.lease_assumed == True else False
 
     i += 1
 
-  codebtors = {}
-  codebtors['debtor1_name_1'] = debtor_name
-  codebtors['debtor1_name_2'] = debtor_name
-  codebtors['debtor2_name_1'] = debtor2_name
-  codebtors['bankruptcy_district'] = current_district
-  codebtors['case_number_1'] = case_number
-  codebtors['case_number_2'] = case_number
-  codebtors['isAmended'] = amended_filing
-  codebtors['noCommunityProperty'] = True if debtors.community_property == False else False
-  codebtors['hasCommunityProperty'] = True if debtors.community_property == True else False
-  codebtors['noSpouse'] = True if debtors.had_spouse == False else False
-  codebtors['hasspouse'] = True if debtors.had_spouse == True else False
-  codebtors['primaryState'] = debtors.spouse_state if debtors.had_spouse == True else None
-  codebtors['spousename'] = debtors.spouse_name if debtors.had_spouse == True else None
-  codebtors['spouseAddress'] = debtors.spouse_street if debtors.had_spouse == True else None
-  codebtors['spouseCity'] = debtors.spouse_city if debtors.had_spouse == True else None
-  codebtors['spouseState'] = debtors.spouse_state if debtors.had_spouse == True else None
-  codebtors['spouseZip'] = debtors.spouse_zip if debtors.had_spouse == True else None
+  codebtors_106g = {}
+  codebtors_106g['debtor1_name_1'] = debtor_name
+  codebtors_106g['debtor1_name_2'] = debtor_name
+  codebtors_106g['debtor2_name_1'] = debtor2_name
+  codebtors_106g['bankruptcy_district'] = current_district
+  codebtors_106g['case_number_1'] = case_number
+  codebtors_106g['case_number_2'] = case_number
+  codebtors_106g['isAmended'] = amended_filing
+  codebtors_106g['noCommunityProperty'] = True if debtors.community_property == False else False
+  codebtors_106g['hasCommunityProperty'] = True if debtors.community_property == True else False
+  codebtors_106g['noSpouse'] = True if debtors.had_spouse == False else False
+  codebtors_106g['hasspouse'] = True if debtors.had_spouse == True else False
+  codebtors_106g['primaryState'] = debtors.spouse_state if debtors.had_spouse == True else None
+  codebtors_106g['spousename'] = debtors.spouse_name if debtors.had_spouse == True else None
+  codebtors_106g['spouseAddress'] = debtors.spouse_street if debtors.had_spouse == True else None
+  codebtors_106g['spouseCity'] = debtors.spouse_city if debtors.had_spouse == True else None
+  codebtors_106g['spouseState'] = debtors.spouse_state if debtors.had_spouse == True else None
+  codebtors_106g['spouseZip'] = debtors.spouse_zip if debtors.had_spouse == True else None
 
   i=1
 
   c=1
   for creditor in prop.creditors:
     if creditor.has_codebtor == True:
-      codebtors['name'+str(i)] = creditor.codebtor_name
-      codebtors['address'+str(i)] = creditor.codebtor_street
-      codebtors['city'+str(i)] = creditor.codebtor_city
-      codebtors['state'+str(i)] = creditor.codebtor_state
-      codebtors['zip'+str(i)] = creditor.codebtor_zip
-      codebtors['isD'+str(i)] = True
-      codebtors['dLine'+str(i)] = c
-      codebtors['isEF'+str(i)] = False
-      codebtors['efLine'+str(i)] = None
-      codebtors['isG'+str(i)] = False
-      codebtors['gLine'+str(i)] = None
+      codebtors_106g['name'+str(i)] = creditor.codebtor_name
+      codebtors_106g['address'+str(i)] = creditor.codebtor_street
+      codebtors_106g['city'+str(i)] = creditor.codebtor_city
+      codebtors_106g['state'+str(i)] = creditor.codebtor_state
+      codebtors_106g['zip'+str(i)] = creditor.codebtor_zip
+      codebtors_106g['isD'+str(i)] = True
+      codebtors_106g['dLine'+str(i)] = c
+      codebtors_106g['isEF'+str(i)] = False
+      codebtors_106g['efLine'+str(i)] = None
+      codebtors_106g['isG'+str(i)] = False
+      codebtors_106g['gLine'+str(i)] = None
       i += 1
     c += 1
 
   c=1
   for creditor in prop.priority_claims:
     if creditor.has_codebtor == True:
-      codebtors['name'+str(i)] = creditor.codebtor_name
-      codebtors['address'+str(i)] = creditor.codebtor_street
-      codebtors['city'+str(i)] = creditor.codebtor_city
-      codebtors['state'+str(i)] = creditor.codebtor_state
-      codebtors['zip'+str(i)] = creditor.codebtor_zip
-      codebtors['isD'+str(i)] = True
-      codebtors['dLine'+str(i)] = c
-      codebtors['isEF'+str(i)] = False
-      codebtors['efLine'+str(i)] = None
-      codebtors['isG'+str(i)] = False
-      codebtors['gLine'+str(i)] = None
+      codebtors_106g['name'+str(i)] = creditor.codebtor_name
+      codebtors_106g['address'+str(i)] = creditor.codebtor_street
+      codebtors_106g['city'+str(i)] = creditor.codebtor_city
+      codebtors_106g['state'+str(i)] = creditor.codebtor_state
+      codebtors_106g['zip'+str(i)] = creditor.codebtor_zip
+      codebtors_106g['isD'+str(i)] = True
+      codebtors_106g['dLine'+str(i)] = c
+      codebtors_106g['isEF'+str(i)] = False
+      codebtors_106g['efLine'+str(i)] = None
+      codebtors_106g['isG'+str(i)] = False
+      codebtors_106g['gLine'+str(i)] = None
       i += 1
     c += 1
 
   c=1
   for creditor in prop.nonpriority_claims:
     if creditor.has_codebtor == True:
-      codebtors['name'+str(i)] = creditor.codebtor_name
-      codebtors['address'+str(i)] = creditor.codebtor_street
-      codebtors['city'+str(i)] = creditor.codebtor_city
-      codebtors['state'+str(i)] = creditor.codebtor_state
-      codebtors['zip'+str(i)] = creditor.codebtor_zip
-      codebtors['isD'+str(i)] = True
-      codebtors['dLine'+str(i)] = c
-      codebtors['isEF'+str(i)] = False
-      codebtors['efLine'+str(i)] = None
-      codebtors['isG'+str(i)] = False
-      codebtors['gLine'+str(i)] = None
+      codebtors_106g['name'+str(i)] = creditor.codebtor_name
+      codebtors_106g['address'+str(i)] = creditor.codebtor_street
+      codebtors_106g['city'+str(i)] = creditor.codebtor_city
+      codebtors_106g['state'+str(i)] = creditor.codebtor_state
+      codebtors_106g['zip'+str(i)] = creditor.codebtor_zip
+      codebtors_106g['isD'+str(i)] = True
+      codebtors_106g['dLine'+str(i)] = c
+      codebtors_106g['isEF'+str(i)] = False
+      codebtors_106g['efLine'+str(i)] = None
+      codebtors_106g['isG'+str(i)] = False
+      codebtors_106g['gLine'+str(i)] = None
       i += 1
     c += 1
 
@@ -219,17 +219,17 @@ code: |
   c=1
   for creditor in prop.contracts_and_leases:
     if creditor.has_codebtor == True:
-      codebtors['name'+str(i)] = creditor.codebtor_name
-      codebtors['address'+str(i)] = creditor.codebtor_street
-      codebtors['city'+str(i)] = creditor.codebtor_city
-      codebtors['state'+str(i)] = creditor.codebtor_state
-      codebtors['zip'+str(i)] = creditor.codebtor_zip
-      codebtors['isD'+str(i)] = True
-      codebtors['dLine'+str(i)] = c
-      codebtors['isEF'+str(i)] = False
-      codebtors['efLine'+str(i)] = None
-      codebtors['isG'+str(i)] = False
-      codebtors['gLine'+str(i)] = None
+      codebtors_106g['name'+str(i)] = creditor.codebtor_name
+      codebtors_106g['address'+str(i)] = creditor.codebtor_street
+      codebtors_106g['city'+str(i)] = creditor.codebtor_city
+      codebtors_106g['state'+str(i)] = creditor.codebtor_state
+      codebtors_106g['zip'+str(i)] = creditor.codebtor_zip
+      codebtors_106g['isD'+str(i)] = True
+      codebtors_106g['dLine'+str(i)] = c
+      codebtors_106g['isEF'+str(i)] = False
+      codebtors_106g['efLine'+str(i)] = None
+      codebtors_106g['isG'+str(i)] = False
+      codebtors_106g['gLine'+str(i)] = None
       i += 1
     c += 1
 

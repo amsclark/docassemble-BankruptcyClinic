@@ -39,7 +39,7 @@ sections:
   - schedule_h: Codebtors
   - schedule_i: Your Income
   - schedule_j: Expenses
-  - form_108: Statment of Intention
+  - form_108: Statement of Intention
   - form_122a: Monthly Income
   - form_107: Statement of Financial Affairs
   - case_det: Case Details
@@ -2114,7 +2114,7 @@ review:
       Pension         | ${ monthly_income.pension2 }
       Source 1        | ${ monthly_income.source1_amount_2 }
       Source 2        | ${ monthly_income.source2_amount_2 }
-    show if: len(debtor) > 2
+    show if: len(debtor) > 1
 
 #case
   - note: |
@@ -2216,7 +2216,7 @@ review:
       % elif reporting.reporting_type == '2':
         **Primary Debt Type:** Business
       % elif reporting.reporting_type == '3':
-        **Primary Debt Type:** Custom (${ reporting.custom_type })
+        **Primary Debt Type:** Custom (${ reporting.other_debt_description })
       % endif
   - Revisit: reporting.funds_for_creditors
     button: |

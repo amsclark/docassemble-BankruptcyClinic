@@ -5,7 +5,7 @@ event: waive_fee_intro
 question: |
   Application to Have the Chapter 7 Filing Fee Waived
 subquestion: |
-  The fee for filing a bankruptcy case under chapter 7 is $335. Because you cannot afford to pay the entire fee now in full or in installments within 120 days, you are asking the court to waive your fee. After reviewing your application, the court may waive your fee, set a hearing for further invetigation, or require you to pay the fee in isntallments.
+  The fee for filing a bankruptcy case under chapter 7 is $335. Because you cannot afford to pay the entire fee now in full or in installments within 120 days, you are asking the court to waive your fee. After reviewing your application, the court may waive your fee, set a hearing for further investigation, or require you to pay the fee in installments.
 continue button field: waive_fee_intro
 ---
 #Part 1 - Tell the court about your family and your family's income

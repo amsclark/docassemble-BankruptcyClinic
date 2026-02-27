@@ -168,16 +168,16 @@ fields:
     datatype: yesno
   - Disputed: prop.creditors[i].disputed
     datatype: yesno
-  - note: Nature of lein
+  - note: Nature of lien
   - An agreement you made (such as a mortgage or secured car loan): prop.creditors[i].agreement
     datatype: yesno
-  - Statutory lien (such as tax lein, mechanic lean): prop.creditors[i].lien
+  - Statutory lien (such as tax lien, mechanic lien): prop.creditors[i].lien
     datatype: yesno
-  - Judgement lien from a lawsuit: prop.creditors[i].lawsuit
+  - Judgment lien from a lawsuit: prop.creditors[i].lawsuit
     datatype: yesno
   - Other (including a right to offset): prop.creditors[i].has_other_lien_type
     datatype: yesno
-  - Describe other lean type: prop.creditors[i].other_lien_type
+  - Describe other lien type: prop.creditors[i].other_lien_type
     # default: NA
     required: False
     show if: prop.creditors[i].has_other_lien_type
@@ -275,20 +275,10 @@ code: |
   else:
     debtor2_name = ''
   claims = {}
-  leases = {}
-  codebtors = {}
-  codebtor_count = 1
-  leases['debtor1_name_1'] = debtor_name
-  leases['debtor1_name_2'] = debtor_name
-  leases['bankruptcy_district'] = current_district
-  leases['case_number_1'] = case_number
-  leases['case_number_2'] = case_number
-  leases['isAmended'] = amended_filing
   claims['debtor1_name_1'] = debtor_name
   claims['debtor1_name_2'] = debtor_name
   claims['debtor1_name_3'] = debtor_name
   if len(debtor) > 1:
-    leases['debtor2_name_1'] = debtor2_name
     claims['debtor2_name_1'] = debtor2_name
   claims['case_number_1'] = case_number
   claims['case_number_2'] = case_number
@@ -324,17 +314,6 @@ code: |
     claims['claimAmount'+str(i+1)] = currency(creditor.claim_amount)
     claims['collateral'+str(i+1)] = currency(creditor.collateral_value)
     claims['unsecured'+str(i+1)] = currency(creditor.claim_amount - creditor.collateral_value)
-
-    leases['name'+str(i)] = creditor.name
-    leases['desc'+str(i)] = creditor.prop_description
-
-    leases['surrender'+str(i)] = True if creditor.property_action == 'Surrender the property' else False
-    leases['redeem'+str(i)] = True if creditor.property_action == 'Retain the property and redeem it' else False
-    leases['reaffirm'+str(i)] = True if creditor.property_action == 'Retain the property and enter into a Reaffirmation Agreement' else False
-    leases['other'+str(i)] = True if creditor.property_action == 'Retain the property and do something else' else False
-    leases['otherDesc'+str(i)] = creditor.property_action_other if creditor.property_action == 'Retain the property and do something else' else None
-    leases['noClaim'+str(i)] = True if creditor.exempt == False else False
-    leases['yesClaim'+str(i)] = True if creditor.exempt == True else False
     i += 1
 
   lineNum = 1

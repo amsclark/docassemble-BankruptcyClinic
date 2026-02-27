@@ -499,7 +499,7 @@ section: case_det
 ---
 id: eviction_judgement
 question: |
-  Has your landlord obtained an eviction judgement against you?
+  Has your landlord obtained an eviction judgment against you?
 yesno: case.eviction_judgement
 section: case_det
 ---
@@ -522,7 +522,7 @@ subquestion: |
     Previous Bankruptcy Case: Yes
     ${ previous_bankruptcy_table }
   % else:
-    Pervious Bankruptcy Case: No
+    Previous Bankruptcy Case: No
   % endif
 
   % if case.has_pending_bankruptcy:
@@ -539,9 +539,9 @@ subquestion: |
   % endif
 
   % if case.eviction_judgement:
-    Eviction Judgement: Yes
+    Eviction Judgment: Yes
   % else:
-    Eviction Judgement: No
+    Eviction Judgment: No
   % endif
 continue button field: case_final
 section: case_det
@@ -870,13 +870,6 @@ fields:
       is: '3'
 section: report
 ---
-id: custom_debt_type
-question: |
-  State the type of debts you owe that are not consumer or business related.
-fields:
-  - Debt Type: reporting.custom_type
-section: report
----
 id: funds_for_creditors
 question: |
   Chapter 7 unsecured creditors
@@ -1072,10 +1065,10 @@ code: |
   if reporting.reporting_type == '1':
     main['consumer_debts_true'] = True
     main['business_debts_false'] = 1
-  if reporting.reporting_type == '2':
+  elif reporting.reporting_type == '2':
     main['consumer_debts_false'] = 1
     main['business_debts_true'] = True
-  if reporting.reporting_type == '3':
+  elif reporting.reporting_type == '3':
     main['consumer_debts_false'] = 1
     main['business_debts_false'] = 1
     main['other_business_debts_type'] = reporting.other_debt_description
