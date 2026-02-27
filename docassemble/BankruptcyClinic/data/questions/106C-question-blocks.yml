@@ -114,6 +114,8 @@ code: |
   debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
   if len(debtor) > 1:
     debtor2_name = debtor[1].name.first + " " + debtor[1].name.middle + " " + debtor[1].name.last
+  else:
+    debtor2_name = ''
 ---
 code: |
   sc = {}

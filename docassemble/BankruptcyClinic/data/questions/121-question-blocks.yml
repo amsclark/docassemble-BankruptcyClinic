@@ -46,21 +46,20 @@ code: |
   ssn = {}
   ssn['bankruptcy_district'] = current_district
   ssn['case_number'] = case_number
-  x = 1
-  for i in debtor:
-    ssn[f'debtor{i}_first_name'] = debtor[i].name.first
-    ssn[f'debtor{i}_middle_name'] = debtor[i].name.middle
-    ssn[f'debtor{i}_last_name'] = debtor[i].name.last
-    ssn[f'debtor{i}_no_itin'] = True if debt.tax_id.tax_id_type == '1' else False
-    ssn[f'debtor{i}_no_ssn'] = True if debt.tax_id.tax_id_type == '2' else False
+  for idx, debt in enumerate(debtor):
+    x = idx + 1
+    ssn[f'debtor{x}_first_name'] = debt.name.first
+    ssn[f'debtor{x}_middle_name'] = debt.name.middle
+    ssn[f'debtor{x}_last_name'] = debt.name.last
+    ssn[f'debtor{x}_no_itin'] = True if debt.tax_id.tax_id_type == '1' else False
+    ssn[f'debtor{x}_no_ssn'] = True if debt.tax_id.tax_id_type == '2' else False
 
     if debt.tax_id.tax_id_type == '1':
-      ssn[f'debtor{i}_ssn_0'] = debtor[i].tax_id.tax_id
-      ssn[f'debtor{i}_ssn_2'] = debtor[i].tax_id.tax_id
+      ssn[f'debtor{x}_ssn_0'] = debt.tax_id.tax_id
+      ssn[f'debtor{x}_ssn_2'] = debt.tax_id.tax_id
     if debt.tax_id.tax_id_type == '2':
-      ssn[f'debtor{i}_itin_1'] = debtor[i].tax_id.tax_id
-      ssn[f'debtor{i}_itin_2'] = debtor[i].tax_id.tax_id
-    x += 1
+      ssn[f'debtor{x}_itin_1'] = debt.tax_id.tax_id
+      ssn[f'debtor{x}_itin_2'] = debt.tax_id.tax_id
 ---
 attachment:
   - name: Form 121

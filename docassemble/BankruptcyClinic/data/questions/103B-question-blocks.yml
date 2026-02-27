@@ -512,7 +512,7 @@ code: |
   waive['monthly_income_spouse'] = currency(family.spouse_income)
   waive['monthly_subtotal'] = currency(family.you_income + family.spouse_income)
   waive['monthly_govt_assist'] = currency(family.assistance_income)
-  waive['monthly_net_income'] = currency((family.you_income + family.spouse_income) - family.assistance_income)
+  waive['monthly_net_income'] = currency((family.you_income + family.spouse_income) + family.assistance_income)
 
   if family.governmental_assistance == True:
     waive['yesGovtAssist'] = True

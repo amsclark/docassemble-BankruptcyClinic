@@ -272,6 +272,8 @@ code: |
   debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
   if len(debtor) > 1:
     debtor2_name = debtor[1].name.first + " " + debtor[1].name.middle + " " + debtor[1].name.last
+  else:
+    debtor2_name = ''
   claims = {}
   leases = {}
   codebtors = {}
@@ -318,7 +320,7 @@ code: |
     claims['isJudgement'+str(i+1)] = True if creditor.lawsuit == True else False
     claims['isOther'+str(i+1)] = True if creditor.has_other_lien_type == True else False
     claims['otherDesc'+str(i+1)] = creditor.other_lien_type if creditor.has_other_lien_type == True else None
-    claims['acct'+str(i+1)] = creditor.account_number[:-4]
+    claims['acct'+str(i+1)] = creditor.account_number[-4:]
     claims['claimAmount'+str(i+1)] = currency(creditor.claim_amount)
     claims['collateral'+str(i+1)] = currency(creditor.collateral_value)
     claims['unsecured'+str(i+1)] = currency(creditor.claim_amount - creditor.collateral_value)
@@ -346,7 +348,7 @@ code: |
       claims['notiState'+str(lineNum)] = notify.other_state
       claims['notiZip'+str(lineNum)] = notify.other_zip
       claims['notiCreditorLine'+str(lineNum)] = str(y)
-      claims['notiAcct'+str(lineNum)] = creditor.account_number[:-4]
+      claims['notiAcct'+str(lineNum)] = creditor.account_number[-4:]
       lineNum += 1
     y += 1
 reconsider: True

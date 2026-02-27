@@ -736,7 +736,7 @@ code: |
     income1['social'+str(i)] = currency(debt.income.social_security)
     income1['otherAssis'+str(i)] = currency(debt.income.other_govt_assist)
     income1['pension'+str(i)] = currency(debt.income.pension)
-    income1['otherIncomeDesc'] = currency(debt.income.specify_monthly_income)
+    income1['otherIncomeDesc'+str(i)] = debt.income.specify_monthly_income
     income1['totalOtherIncome'+str(i)] = currency(debt.income.other_monthly_amount)
     income1['totalIncome'+str(i)] = currency((debt.income.net_rental_business + debt.income.family_support + debt.income.interest_and_dividends + debt.income.unemployment + debt.income.social_security + debt.income.other_govt_assist + debt.income.pension + debt.income.other_monthly_amount) + (income_amount + overtime_pay) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount))
 

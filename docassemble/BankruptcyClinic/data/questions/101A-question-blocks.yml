@@ -63,7 +63,7 @@ code: |
   evict['debtor1_name_1'] = debtor_name
   evict['debtor2_name_1'] = debtor2_name
   evict['bankruptcy_district'] = current_district
-  evict['bankruptcy_state'] = debtor[0].mailing_state
+  evict['bankruptcy_state'] = debtor[0].mailing_state if debtor[0].has_other_mailing_address else debtor[0].address.state
   evict['case_number'] = case_number
   evict['landlord_name'] = landlord_name
   evict['landlord_street'] = landlord_street
@@ -85,7 +85,7 @@ code: |
   evict2['debtor1_name_1'] = debtor_name
   evict2['debtor2_name_1'] = debtor2_name
   evict2['bankruptcy_district'] = current_district
-  evict2['bankruptcy_state'] = debtor[0].mailing_state
+  evict2['bankruptcy_state'] = debtor[0].mailing_state if debtor[0].has_other_mailing_address else debtor[0].address.state
   evict2['case_number'] = case_number
   evict2['landlord_name'] = landlord_name
   evict2['landlord_street'] = landlord_street

@@ -453,8 +453,13 @@ code: |
   expenses['alimony'] = currency(debtor[0].expenses.alimony)
   expenses['otherOutsiderPayDesc'] = debtor[0].expenses.other_support_specify
   expenses['otherOutsiderPayAmount'] = currency(debtor[0].expenses.other_support_amount)
-  overall_other_description = ";\n".join([debtor[0].expenses.overall_other_description_1, debtor[0].expenses.overall_other_description_2, debtor[0].expenses.overall_other_description_3, debtor[0].expenses.overall_other_description_4, debtor[0].expenses.overall_other_description_5])
-  overall_other_amount = debtor[0].expenses.overall_other_amount_1 + debtor[0].expenses.overall_other_amount_2 + debtor[0].expenses.overall_other_amount_3 + debtor[0].expenses.overall_other_amount_4 + debtor[0].expenses.overall_other_amount_5
+  overall_other_description = ";".join(filter(None, [
+    getattr(debtor[0].expenses, 'overall_other_description_1', ''),
+    getattr(debtor[0].expenses, 'overall_other_description_2', ''),
+    getattr(debtor[0].expenses, 'overall_other_description_3', ''),
+    getattr(debtor[0].expenses, 'overall_other_description_4', ''),
+    getattr(debtor[0].expenses, 'overall_other_description_5', '')]))
+  overall_other_amount = getattr(debtor[0].expenses, 'overall_other_amount_1', 0) + getattr(debtor[0].expenses, 'overall_other_amount_2', 0) + getattr(debtor[0].expenses, 'overall_other_amount_3', 0) + getattr(debtor[0].expenses, 'overall_other_amount_4', 0) + getattr(debtor[0].expenses, 'overall_other_amount_5', 0)
   expenses['otherCatchDesc'] = overall_other_description
   expenses['otherCatchAmount'] = overall_other_amount
 
@@ -505,7 +510,7 @@ code: |
   expenses['debtor2Total'] = currency(0)
   expenses['overallTotal'] = expenses['debtor1Total']
   expenses['overallTotal2'] = expenses['debtor1Total']
-  incomeTotal = sum((debt.income.net_rental_business + debt.income.family_support + debt.income.interest_and_dividends + debt.income.unemployment + debt.income.social_security + debt.income.other_govt_assist + debt.income.pension + debt.income.other_monthly_amount) + (income_amount + overtime_pay) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount) for debt in debtor)
+  incomeTotal = sum((debt.income.net_rental_business + debt.income.family_support + debt.income.interest_and_dividends + debt.income.unemployment + debt.income.social_security + debt.income.other_govt_assist + debt.income.pension + debt.income.other_monthly_amount) + (debt.income.income_amount_1 + debt.income.income_amount_2 + debt.income.income_amount_3 + debt.income.income_amount_4 + debt.income.income_amount_5 + debt.income.income_amount_6 + debt.income.overtime_pay_1 + debt.income.overtime_pay_2 + debt.income.overtime_pay_3) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount) for debt in debtor)
   expenses['incomeTotal'] = currency(incomeTotal)
   expenses['netTotal'] = currency(incomeTotal - debtor1Total)
   expenses['noDelta'] = True if debtor[0].expenses.change_in_expense == False else False

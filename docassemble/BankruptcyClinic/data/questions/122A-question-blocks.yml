@@ -210,20 +210,20 @@ code: |
                           )
   debtor_2_income = 0
   if len(debtor) > 1:
-    debtor_2_income = (monthly_income.gross_wages1 + 
-                            monthly_income.alimony1 + 
-                            monthly_income.other_income1 +
-                            monthly_income.business_gross_receipts1 +
-                            monthly_income.rental_gross_receipts1 +
-                            monthly_income.interest1 +
-                            monthly_income.unemployment1 +
-                            monthly_income.social1 +
-                            monthly_income.pension1 +
-                            monthly_income.source1_amount_1 +
-                            monthly_income.source2_amount_1
+    debtor_2_income = (monthly_income.gross_wages2 + 
+                            monthly_income.alimony2 + 
+                            monthly_income.other_income2 +
+                            monthly_income.business_gross_receipts2 +
+                            monthly_income.rental_gross_receipts2 +
+                            monthly_income.interest2 +
+                            monthly_income.unemployment2 +
+                            monthly_income.social2 +
+                            monthly_income.pension2 +
+                            monthly_income.source1_amount_2 +
+                            monthly_income.source2_amount_2
                             ) - (
-                             monthly_income.business_operating_expenses1 +
-                             monthly_income.rental_operating_expenses1
+                             monthly_income.business_operating_expenses2 +
+                             monthly_income.rental_operating_expenses2
                             )
 
 

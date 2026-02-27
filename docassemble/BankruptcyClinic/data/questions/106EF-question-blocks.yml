@@ -495,13 +495,14 @@ code: |
     unsecured_claims['isOneDebtor'+str(clm)] = True if claim.who == 'At least one of the debtors and another' else False
     unsecured_claims['isDomestic'+str(clm)] = True if claim.type == 'Domestic support obligations' else False
     unsecured_claims['isCommunity'+str(clm)] = False
-    unsecured_claims['isTaxes'+str(clm)] = True if claim.type == 'Taxes and certain other debts you owe the government' else False,
+    unsecured_claims['isTaxes'+str(clm)] = True if claim.type == 'Taxes and certain other debts you owe the government' else False
     unsecured_claims['isDeath'+str(clm)] = True if claim.type == 'Claims for death or personal injury while you were intoxicated' else False
     unsecured_claims['isOther'+str(clm)] = True if claim.type == 'Other' else False
     if claim.type == 'Other':
       unsecured_claims['otherDesc'+str(clm)] = claim.other_type
     unsecured_claims['notSubjectToOffset'+str(clm)] = True
     unsecured_claims['isSubjectToOffset'+str(clm)] = False
+    clm += 1
 
   unsecured_claims['noNonpriorityUnsecuredCreditors'] = True if len(prop.nonpriority_claims) == 0 else False
   unsecured_claims['hasNonpriorityUnsecuredCreditors'] = True if len(prop.nonpriority_claims) > 0 else False
@@ -572,9 +573,9 @@ code: |
         clm += 1
     ref += 1
 
-  clm = 1
+  # Nonpriority notification loop
   ref = 1
-  for claim in prop.priority_claims:
+  for claim in prop.nonpriority_claims:
     if claim.has_notify:
       unsecured_claims['notiName'+str(clm)] = claim.other_name
       unsecured_claims['notiStreet'+str(clm)] = claim.other_street
@@ -590,8 +591,8 @@ code: |
         unsecured_claims['notiName'+str(clm)] = claim.other_name_2
         unsecured_claims['notiStreet'+str(clm)] = claim.other_street_2
         unsecured_claims['notiRefLine'+str(clm)] = str(ref)
-        unsecured_claims['notiIsPriority'+str(clm)] = True
-        unsecured_claims['notiIsNonpriority'+str(clm)] = False
+        unsecured_claims['notiIsPriority'+str(clm)] = False
+        unsecured_claims['notiIsNonpriority'+str(clm)] = True
         unsecured_claims['notiCity'+str(clm)] = claim.other_city_2
         unsecured_claims['notiState'+str(clm)] = claim.other_state_2
         unsecured_claims['notiZip'+str(clm)] = claim.other_zip_2
@@ -601,8 +602,8 @@ code: |
         unsecured_claims['notiName'+str(clm)] = claim.other_name_3
         unsecured_claims['notiStreet'+str(clm)] = claim.other_street_3
         unsecured_claims['notiRefLine'+str(clm)] = str(ref)
-        unsecured_claims['notiIsPriority'+str(clm)] = True
-        unsecured_claims['notiIsNonpriority'+str(clm)] = False
+        unsecured_claims['notiIsPriority'+str(clm)] = False
+        unsecured_claims['notiIsNonpriority'+str(clm)] = True
         unsecured_claims['notiCity'+str(clm)] = claim.other_city_3
         unsecured_claims['notiState'+str(clm)] = claim.other_state_3
         unsecured_claims['notiZip'+str(clm)] = claim.other_zip_3
@@ -610,14 +611,25 @@ code: |
         clm += 1
     ref += 1
 
-  unsecured_claims['domesticTotal'] = currency(sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Domestic support obligations', prop.priority_claims))))
-  unsecured_claims['taxTotal'] = currency(sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Taxes and certain other debts you owe the government', prop.priority_claims))))
-  unsecured_claims['deathTotal'] = currency(sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Claims for death or personal injury while you were intoxicated', prop.priority_claims))))
-  unsecured_claims['otherP1Total'] = currency(sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Other', prop.priority_claims))))
-  unsecured_claims['p1Total'] = currency(unsecured_claims['domesticTotal'] + unsecured_claims['taxTotal'] + unsecured_claims['deathTotal'] + unsecured_claims['otherP1Total'])
+  _domesticTotal = sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Domestic support obligations', prop.priority_claims)))
+  _taxTotal = sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Taxes and certain other debts you owe the government', prop.priority_claims)))
+  _deathTotal = sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Claims for death or personal injury while you were intoxicated', prop.priority_claims)))
+  _otherP1Total = sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Other', prop.priority_claims)))
+  unsecured_claims['domesticTotal'] = currency(_domesticTotal)
+  unsecured_claims['taxTotal'] = currency(_taxTotal)
+  unsecured_claims['deathTotal'] = currency(_deathTotal)
+  unsecured_claims['otherP1Total'] = currency(_otherP1Total)
+  unsecured_claims['p1Total'] = currency(_domesticTotal + _taxTotal + _deathTotal + _otherP1Total)
 
-  unsecured_claims['loansTotal'] = currency(sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Student loans', prop.nonpriority_claims))))
-  unsecured_claims['obligationsTotal'] = currency(sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Obligations arising out of a separation agreement or divorce that you did not report as priority claims', prop.nonpriority_claims))))
-  unsecured_claims['pensionsTotal'] = currency(sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Debts to pension or profit-sharing plans, and other similar debts', prop.nonpriority_claims))))
-  unsecured_claims['otherP2Total'] = currency(sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Other', prop.nonpriority_claims))))
-  unsecured_claims['p2Total'] = currency(unsecured_claims['loansTotal'] + unsecured_claims['obligationsTotal'] + unsecured_claims['pensionsTotal'] + unsecured_claims['otherP2Total'])
+  _loansTotal = sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Student loans', prop.nonpriority_claims)))
+  _obligationsTotal = sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Obligations arising out of a separation agreement or divorce that you did not report as priority claims', prop.nonpriority_claims)))
+  _pensionsTotal = sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Debts to pension or profit-sharing plans, and other similar debts', prop.nonpriority_claims)))
+  _otherP2Total = sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Other', prop.nonpriority_claims)))
+  _medicalTotal = sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Medical', prop.nonpriority_claims)))
+  _creditCardTotal = sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Credit Card', prop.nonpriority_claims)))
+  _contractTotal = sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Contract', prop.nonpriority_claims)))
+  unsecured_claims['loansTotal'] = currency(_loansTotal)
+  unsecured_claims['obligationsTotal'] = currency(_obligationsTotal)
+  unsecured_claims['pensionsTotal'] = currency(_pensionsTotal)
+  unsecured_claims['otherP2Total'] = currency(_otherP2Total)
+  unsecured_claims['p2Total'] = currency(_loansTotal + _obligationsTotal + _pensionsTotal + _otherP2Total + _medicalTotal + _creditCardTotal + _contractTotal)
