@@ -151,6 +151,36 @@ async function passDebtorFinal(page: Page) {
 }
 
 /**
+ * Fill ALL visible yesnoradio fields on the current page as "No".
+ * docassemble renders yesnoradio as paired radio inputs with value="True" (_0) / "False" (_1).
+ * Many property/financial pages have "Claiming Exemption?" radios that are always visible
+ * and required even when the parent "Do you have X?" is No. This helper fills them all.
+ */
+async function fillAllVisibleRadiosAsNo(page: Page) {
+  const noRadioIds = await page.evaluate(() => {
+    const ids: string[] = [];
+    // Find all radio inputs with value="False" (the "No" option)
+    const radios = document.querySelectorAll('input[type="radio"][value="False"]');
+    radios.forEach(radio => {
+      const id = radio.getAttribute('id');
+      if (!id) return;
+      // Check if the radio is visible (not hidden by show if or other CSS)
+      const label = document.querySelector(`label[for="${id}"]`) as HTMLElement;
+      if (label && label.offsetParent !== null) {
+        // Only click if not already checked
+        if (!(radio as HTMLInputElement).checked) {
+          ids.push(id);
+        }
+      }
+    });
+    return ids;
+  });
+  for (const id of noRadioIds) {
+    await page.locator(`label[for="${id}"]`).click();
+  }
+}
+
+/**
  * Click the "Yes" or "No" button for a standard yesno question.
  * For docassemble `yesno: var`, Yes is index 0, No is index 1.
  */
@@ -241,41 +271,15 @@ async function navigatePropertySection(page: Page) {
   await page.waitForLoadState('networkidle');
 
   // Personal/household items — massive form with ~20 yesnoradio fields
-  // Each property category has: has_XXX + XXX_is_claiming_exemption (both always visible)
+  // Each category has: has_XXX + XXX_is_claiming_exemption (both always visible)
   await waitForDaPageLoad(page);
   await handleCaseNumberIfPresent(page);
-
-  // Fill ALL required yesnoradio fields as No
-  const householdRadioFields = [
-    'prop.has_household_goods',
-    'prop.household_goods_is_claiming_exemption',
-    'prop.has_secured_household_goods',
-    'prop.secured_household_goods_is_claiming_exemption',
-    'prop.has_electronics',
-    'prop.electronics_is_claiming_exemption',
-    'prop.has_collectibles',
-    'prop.collectibles_is_claiming_exemption',
-    'prop.has_hobby_equipment',
-    'prop.hobby_equipment_is_claiming_exemption',
-    'prop.has_firearms',
-    'prop.firearms_is_claiming_exemption',
-    'prop.has_clothes',
-    'prop.clothes_is_claiming_exemption',
-    'prop.has_jewelry',
-    'prop.jewelry_is_claiming_exemption',
-    'prop.has_animals',
-    'prop.animal_is_claiming_exemption',
-    'prop.has_other_household_items',
-    'prop.other_household_items_is_claiming_exemption',
-  ];
-  for (const field of householdRadioFields) {
-    await fillYesNoRadio(page, field, false);
-  }
+  await fillAllVisibleRadiosAsNo(page);
   await clickContinue(page);
 
-  // Financial assets – cash
+  // Financial assets – cash (has_cash + cash_is_claiming_exemption both visible)
   await waitForDaPageLoad(page);
-  await fillYesNoRadio(page, 'prop.financial_assets.has_cash', false);
+  await fillAllVisibleRadiosAsNo(page);
   await clickContinue(page);
 
   // Financial sub-lists: deposits, bonds, non-traded stock, corporate bonds,
@@ -295,39 +299,30 @@ async function navigatePropertySection(page: Page) {
     await clickYesNoButton(page, varName, false);
   }
 
-  // Future property interest, IP, intangible
+  // Future property interest, IP, intangible (all have *_has_claim fields too)
   await waitForDaPageLoad(page);
-  await fillYesNoRadio(page, 'prop.financial_assets.has_future_property_interest', false);
-  await fillYesNoRadio(page, 'prop.financial_assets.has_ip_interest', false);
-  await fillYesNoRadio(page, 'prop.financial_assets.has_intangible_interest', false);
+  await fillAllVisibleRadiosAsNo(page);
   await clickContinue(page);
 
   // Owed property: tax refund, family support, other amounts, insurance,
-  // trust, third party, contingent claims, other assets
+  // trust, third party, contingent claims, other assets (all with *_has_claim)
   await waitForDaPageLoad(page);
-  await fillYesNoRadio(page, 'prop.owed_property.has_tax_refund', false);
-  await fillYesNoRadio(page, 'prop.owed_property.has_family_support', false);
-  await fillYesNoRadio(page, 'prop.owed_property.has_other_amounts', false);
-  await fillYesNoRadio(page, 'prop.owed_property.has_insurance_interest', false);
-  await fillYesNoRadio(page, 'prop.owed_property.has_trust', false);
-  await fillYesNoRadio(page, 'prop.owed_property.has_third_party', false);
-  await fillYesNoRadio(page, 'prop.owed_property.has_contingent_claims', false);
-  await fillYesNoRadio(page, 'prop.owed_property.has_other_assets', false);
+  await fillAllVisibleRadiosAsNo(page);
   await clickContinue(page);
 
-  // Business property → No
+  // Business property → No (with all sub-claim fields)
   await waitForDaPageLoad(page);
-  await fillYesNoRadio(page, 'prop.business_property.has_property', false);
+  await fillAllVisibleRadiosAsNo(page);
   await clickContinue(page);
 
-  // Farming property → No
+  // Farming property → No (with all sub-claim fields)
   await waitForDaPageLoad(page);
-  await fillYesNoRadio(page, 'prop.farming_property.has_property', false);
+  await fillAllVisibleRadiosAsNo(page);
   await clickContinue(page);
 
-  // Other property → No
+  // Other property → No (with other_prop_has_claim)
   await waitForDaPageLoad(page);
-  await fillYesNoRadio(page, 'prop.has_other_prop', false);
+  await fillAllVisibleRadiosAsNo(page);
   await clickContinue(page);
 }
 
