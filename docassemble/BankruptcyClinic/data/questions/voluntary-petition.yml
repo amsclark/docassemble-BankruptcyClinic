@@ -339,6 +339,8 @@ code: |
   amended_filing
   if amended_filing == True:
     case_number
+  else:
+    case_number = ""
   # next line is for an unnecessary confirmation screen. Do they want this?
   district_final 
   filing_status

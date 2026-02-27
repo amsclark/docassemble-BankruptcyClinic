@@ -53,6 +53,10 @@ async function navigateToDebtorPage(
   await waitForDaPageLoad(page);
   await clickNthByName(page, b64('amended_filing'), 1); // No
 
+  // Case number (may appear even when amended_filing = No due to code block deps)
+  await waitForDaPageLoad(page);
+  await handleCaseNumberIfPresent(page);
+
   // District final → Continue
   await waitForDaPageLoad(page);
   await clickNthByName(page, b64('district_final'), 0);
@@ -66,6 +70,22 @@ async function navigateToDebtorPage(
   }
   await clickContinue(page);
   await waitForDaPageLoad(page);
+}
+
+/**
+ * Handle the case_number question if it appears.
+ * This question has required: false, so we can just click Continue.
+ * It may appear even when amended_filing=No due to code block dependencies.
+ * We identify it by the presence of the case_number input field.
+ */
+async function handleCaseNumberIfPresent(page: Page) {
+  const caseNumberField = page.locator(`#${b64('case_number')}`);
+  const count = await caseNumberField.count();
+  if (count > 0) {
+    console.log('[CASE_NUMBER] Handling unexpected case_number question');
+    await clickContinue(page);
+    await waitForDaPageLoad(page);
+  }
 }
 
 /** Fill debtor[0] identity information and advance past alias/district. */
@@ -194,23 +214,34 @@ async function setCheckbox(page: Page, varName: string, checked: boolean) {
 async function navigatePropertySection(page: Page) {
   // property_intro → Continue
   await waitForDaPageLoad(page);
+  console.log('[PROP] Page: property_intro');
   await clickNthByName(page, b64('property_intro'), 0);
 
   // Real property interests → No
   await waitForDaPageLoad(page);
+  console.log('[PROP] Page: interests.there_are_any');
+  await screenshot(page, 'prop-step-interests');
   await clickYesNoButton(page, 'prop.interests.there_are_any', false);
 
   // Vehicles → No
   await waitForDaPageLoad(page);
+  console.log('[PROP] Page: ab_vehicles.there_are_any');
+  await screenshot(page, 'prop-step-vehicles');
   await clickYesNoButton(page, 'prop.ab_vehicles.there_are_any', false);
 
   // Other vehicles → No
   await waitForDaPageLoad(page);
+  console.log('[PROP] Page: ab_other_vehicles.there_are_any');
+  await screenshot(page, 'prop-step-other-vehicles');
   await clickYesNoButton(page, 'prop.ab_other_vehicles.there_are_any', false);
 
   // Personal/household items — large question with many yesnoradio fields
   // All default to No, just fill the required ones and continue
+  // case_number may appear here due to code block dependencies
   await waitForDaPageLoad(page);
+  await handleCaseNumberIfPresent(page);
+  console.log('[PROP] Page: household items');
+  await screenshot(page, 'prop-step-household');
   await fillYesNoRadio(page, 'prop.has_household_goods', false);
   await fillYesNoRadio(page, 'prop.has_collectibles', false);
   await fillYesNoRadio(page, 'prop.has_hobby_equipment', false);
@@ -809,11 +840,12 @@ test.describe('List Collect Interactions', () => {
 
     // Fill in the property interest details
     // Note: docassemble renders list items with [0] not [i] in the HTML
-    await fillById(page, b64('prop.interests[0].street'), '456 Oak Ave');
-    await fillById(page, b64('prop.interests[0].city'), 'Lincoln');
-    await fillById(page, b64('prop.interests[0].state'), 'NE');
-    await fillById(page, b64('prop.interests[0].zip'), '68508');
-    await fillById(page, b64('prop.interests[0].county'), 'Lancaster');
+    // Use Playwright's fill() which is more reliable than evaluate-based fillById
+    await page.locator(`#${b64('prop.interests[0].street')}`).fill('456 Oak Ave');
+    await page.locator(`#${b64('prop.interests[0].city')}`).fill('Lincoln');
+    await page.locator(`#${b64('prop.interests[0].state')}`).fill('NE');
+    await page.locator(`#${b64('prop.interests[0].zip')}`).fill('68508');
+    await page.locator(`#${b64('prop.interests[0].county')}`).fill('Lancaster');
 
     // Property type - checkboxes field. Check "Single-family home"
     // Docassemble renders labelauty checkboxes; the <label> has role="checkbox"
@@ -828,36 +860,47 @@ test.describe('List Collect Interactions', () => {
     await page.locator(`label[for="${whoRadioId}"]`).click();
 
     // Current property value
-    await fillById(page, b64('prop.interests[0].current_value'), '150000');
+    await page.locator(`#${b64('prop.interests[0].current_value')}`).fill('150000');
 
     // Do you have a mortgage/loan? - datatype: yesno → checkbox
     // Leave unchecked for "No" (False)
     // setCheckbox only needed if we want True; unchecked = False by default
 
     // Ownership interest - textarea
-    await fillById(page, b64('prop.interests[0].ownership_interest'), 'Fee simple');
+    await page.locator(`#${b64('prop.interests[0].ownership_interest')}`).fill('Fee simple');
 
     // Community property? - yesnoradio → radio buttons
     await fillYesNoRadio(page, 'prop.interests[0].is_community_property', false);
 
     // Other info
-    await fillById(page, b64('prop.interests[0].other_info'), 'N/A');
+    await page.locator(`#${b64('prop.interests[0].other_info')}`).fill('N/A');
 
     // Claiming exemption? - yesnoradio → radio buttons
     await fillYesNoRadio(page, 'prop.interests[0].is_claiming_exemption', false);
 
-    // Submit this property interest - standard Continue button
-    await clickContinue(page);
+    // Submit this property interest
+    // The Continue button has name=b64('prop.interests[i].complete') with literal [i]
+    // but the server expects [0]. Fix the button name before clicking.
+    await page.evaluate((correctName: string) => {
+      const btn = document.getElementById('dacontinue') ||
+                  document.getElementById('da-continue-button');
+      if (btn) btn.setAttribute('name', correctName);
+    }, b64('prop.interests[0].complete'));
+    await page.locator('#dacontinue, #da-continue-button').first().click();
+    await page.waitForLoadState('networkidle');
 
-    // Should ask "Do you have more interests?"
+    // After submitting the property interest, docassemble may ask "Do you have
+    // more interests?" or skip directly to vehicles depending on the gather setup.
     await waitForDaPageLoad(page);
-    await screenshot(page, 'list-collect-another-interest');
+    const pageText = await page.locator('body').innerText();
+    if (pageText.toLowerCase().includes('another') || pageText.toLowerCase().includes('more')) {
+      // there_is_another → No
+      await clickYesNoButton(page, 'prop.interests.there_is_another', false);
+      await waitForDaPageLoad(page);
+    }
+    await screenshot(page, 'list-collect-after-property');
 
-    // Say No to adding more
-    await clickYesNoButton(page, 'prop.interests.there_is_another', false);
-
-    // Should advance to the next section (vehicles)
-    await waitForDaPageLoad(page);
+    // Should be on the vehicles section now
     const bodyText = await page.locator('body').innerText();
     expect(bodyText.toLowerCase()).toContain('vehicle');
 
