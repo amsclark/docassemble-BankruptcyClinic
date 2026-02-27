@@ -1,8 +1,9 @@
 import { Page } from '@playwright/test';
 
 /** Base URL for the docassemble interview */
+const BASE_URL = process.env.BASE_URL || 'http://localhost';
 export const INTERVIEW_URL =
-  'https://docassemble2.metatheria.solutions/interview?i=docassemble.playground1:voluntary-petition.yml#page1';
+  `${BASE_URL}/interview?i=docassemble.playground1:voluntary-petition.yml#page1`;
 
 /** Base64-url-encode a docassemble field name (strips trailing '=' padding). */
 export const b64 = (str: string): string =>
