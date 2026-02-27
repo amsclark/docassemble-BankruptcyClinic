@@ -263,7 +263,7 @@ export async function loadInterviewPage(page: Page) {
  * Helper function to click on a button.
  * @param {string} buttonSelector - The selector for the button to click.
  */
-export async function clickButton(buttonSelector: string) {
+export async function clickButton(page: Page, buttonSelector: string) {
   await page.locator(buttonSelector).click();
 }
 
