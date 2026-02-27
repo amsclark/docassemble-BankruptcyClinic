@@ -32,7 +32,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.BASE_URL || 'http://localhost',
+    baseURL: process.env.BASE_URL || 'http://localhost:8080',
 
     /* Collect trace always for comprehensive debugging */
     trace: 'on',

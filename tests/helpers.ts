@@ -1,7 +1,7 @@
 import { Page } from '@playwright/test';
 
 /** Base URL for the docassemble interview */
-const BASE_URL = process.env.BASE_URL || 'http://localhost';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:8080';
 export const INTERVIEW_URL =
   `${BASE_URL}/interview?i=docassemble.playground1:voluntary-petition.yml#page1`;
 
