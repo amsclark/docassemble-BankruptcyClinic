@@ -1,0 +1,184 @@
+metadata:
+  title: Creditor Library Manager
+  short title: Creditor Library
+  description: |
+    Manage the clinic's shared library of common creditors.
+    Creditors added here will be available for quick selection
+    in all bankruptcy petition interviews.
+---
+modules:
+  - .creditor_library
+---
+features:
+  navigation: False
+  progress bar: False
+---
+objects:
+  - new_creditor: DAObject
+---
+mandatory: True
+code: |
+  admin_menu_selection
+---
+# ──────────────────────────────────────────────
+#  Main menu
+# ──────────────────────────────────────────────
+id: creditor_library_admin_menu
+question: |
+  Creditor Library Manager
+subquestion: |
+  % if len(get_creditor_table_data()) > 0:
+  **Current library (${ len(get_creditor_table_data()) } creditors):**
+
+  Name | City, State | Type
+  -----|-------------|-----
+  % for row in get_creditor_table_data():
+  ${ row['name'] } | ${ row['city'] }, ${ row['state'] } | ${ row['type'] }
+  % endfor
+
+  % else:
+  *The creditor library is empty. Add some common creditors to get started.*
+  % endif
+field: admin_menu_selection
+buttons:
+  - Add a Creditor: add
+  - Delete a Creditor: delete
+  - Refresh List: refresh
+  - Exit: exit
+---
+# ──────────────────────────────────────────────
+#  Add creditor flow
+# ──────────────────────────────────────────────
+mandatory: True
+code: |
+  if admin_menu_selection == 'add':
+    new_creditor_form_done
+    add_creditor(
+      name=new_creditor.name,
+      street=new_creditor.street,
+      city=new_creditor.city,
+      state=new_creditor.state,
+      zip_code=new_creditor.zip,
+      creditor_type=new_creditor.creditor_type,
+      account_suffix=new_creditor.account_suffix,
+      notes=new_creditor.notes,
+    )
+    creditor_added_confirmation
+    undefine('admin_menu_selection')
+    undefine('new_creditor_form_done')
+    undefine('new_creditor.name')
+    undefine('new_creditor.street')
+    undefine('new_creditor.city')
+    undefine('new_creditor.state')
+    undefine('new_creditor.zip')
+    undefine('new_creditor.creditor_type')
+    undefine('new_creditor.account_suffix')
+    undefine('new_creditor.notes')
+    undefine('creditor_added_confirmation')
+  elif admin_menu_selection == 'delete':
+    if len(get_creditor_table_data()) == 0:
+      nothing_to_delete
+      undefine('admin_menu_selection')
+      undefine('nothing_to_delete')
+    else:
+      delete_creditor_selection_done
+      for cred_id in delete_creditor_ids.true_values():
+        remove_creditor(int(cred_id))
+      creditor_deleted_confirmation
+      undefine('admin_menu_selection')
+      undefine('delete_creditor_selection_done')
+      undefine('delete_creditor_ids')
+      undefine('creditor_deleted_confirmation')
+  elif admin_menu_selection == 'refresh':
+    undefine('admin_menu_selection')
+  elif admin_menu_selection == 'exit':
+    admin_exit_screen
+---
+# ──────────────────────────────────────────────
+#  Add creditor form
+# ──────────────────────────────────────────────
+id: add_creditor_form
+question: |
+  Add a Creditor to the Library
+fields:
+  - Creditor Name: new_creditor.name
+  - Street Address / PO Box: new_creditor.street
+  - City: new_creditor.city
+  - State: new_creditor.state
+    code: |
+      us_states()
+  - ZIP Code: new_creditor.zip
+    datatype: text
+    maxlength: 5
+  - Creditor Type: new_creditor.creditor_type
+    choices:
+      - Credit Card
+      - Medical
+      - Student loans
+      - Utility
+      - Mortgage / Auto Loan
+      - Taxes
+      - Domestic support
+      - Contract
+      - Other
+  - Last 4 digits of account (optional): new_creditor.account_suffix
+    required: False
+    default: ""
+  - Notes for clinic staff (optional): new_creditor.notes
+    input type: area
+    required: False
+    default: ""
+field: new_creditor_form_done
+---
+id: creditor_added_confirmation
+question: |
+  Creditor Added
+subquestion: |
+  **${ new_creditor.name }** (${ new_creditor.creditor_type }) has been
+  added to the shared creditor library.
+field: creditor_added_confirmation
+buttons:
+  - Back to Menu: continue
+---
+# ──────────────────────────────────────────────
+#  Delete creditor flow
+# ──────────────────────────────────────────────
+id: delete_creditor_selection
+question: |
+  Delete Creditors
+subquestion: |
+  Select the creditors you want to remove from the library.
+fields:
+  - no label: delete_creditor_ids
+    datatype: checkboxes
+    code: |
+      [{str(row['id']): row['name'] + ' (' + row['type'] + ')'} for row in get_creditor_table_data()]
+field: delete_creditor_selection_done
+---
+id: creditor_deleted_confirmation
+question: |
+  Creditors Deleted
+subquestion: |
+  The selected creditors have been removed from the library.
+field: creditor_deleted_confirmation
+buttons:
+  - Back to Menu: continue
+---
+id: nothing_to_delete
+question: |
+  Nothing to Delete
+subquestion: |
+  The creditor library is empty. Add some creditors first.
+field: nothing_to_delete
+buttons:
+  - Back to Menu: continue
+---
+id: admin_exit_screen
+event: admin_exit_screen
+question: |
+  Creditor Library Manager
+subquestion: |
+  You have exited the Creditor Library Manager.
+
+  You can close this window or
+  [restart](${ url_of('restart') }) to manage more creditors.
