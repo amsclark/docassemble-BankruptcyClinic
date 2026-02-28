@@ -618,6 +618,19 @@ async function navigateFinancialAffairs(page: Page) {
 }
 
 // ──────────────────────────────────────────────
+//  Creditor Library Picker
+// ──────────────────────────────────────────────
+
+async function navigateCreditorLibraryPicker(page: Page) {
+  // The creditor library picker shows a checkbox list (or an empty message)
+  // with a Continue button. Just click Continue to skip it.
+  await waitForDaPageLoad(page);
+  const h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[CREDLIB] picker page: ${h}`);
+  await clickContinue(page);
+}
+
+// ──────────────────────────────────────────────
 //  106D – Secured creditors
 // ──────────────────────────────────────────────
 
@@ -1002,6 +1015,9 @@ test.describe('Full Interview – Individual Filing', () => {
     // ── 5. Financial Affairs (107) ──
     await navigateFinancialAffairs(page);
 
+    // ── 5b. Creditor Library Picker ──
+    await navigateCreditorLibraryPicker(page);
+
     // ── 6. Secured creditors (106D) ──
     await navigateSecuredCreditors(page);
 
@@ -1078,6 +1094,15 @@ test.describe('Full Interview – Individual Filing', () => {
       if (hasSecuredClaims > 0) {
         console.log('[DYN] Handling secured_claims');
         await clickYesNoButton(page, 'secured_claims.there_are_any', false);
+        await waitForDaPageLoad(page);
+        continue;
+      }
+
+      // ── Creditor Library Picker (may appear during DYN phase) ──
+      const hasCreditorPicker = await page.locator(`[name="${b64('creditor_library_picker_done')}"]`).count();
+      if (hasCreditorPicker > 0) {
+        console.log('[DYN] Handling creditor_library_picker — skipping');
+        await clickContinue(page);
         await waitForDaPageLoad(page);
         continue;
       }

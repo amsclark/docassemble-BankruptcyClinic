@@ -19,6 +19,52 @@ objects:
 mandatory: True
 code: |
   admin_menu_selection
+  if admin_menu_selection == 'add':
+    new_creditor_form_done
+    add_creditor(
+      name=new_creditor.name,
+      street=new_creditor.street,
+      city=new_creditor.city,
+      state=new_creditor.state,
+      zip_code=new_creditor.zip,
+      creditor_type=new_creditor.creditor_type,
+      account_suffix=new_creditor.account_suffix,
+      notes=new_creditor.notes,
+    )
+    creditor_added_confirmation
+    undefine('admin_menu_selection')
+    undefine('new_creditor_form_done')
+    undefine('new_creditor.name')
+    undefine('new_creditor.street')
+    undefine('new_creditor.city')
+    undefine('new_creditor.state')
+    undefine('new_creditor.zip')
+    undefine('new_creditor.creditor_type')
+    undefine('new_creditor.account_suffix')
+    undefine('new_creditor.notes')
+    undefine('creditor_added_confirmation')
+    force_ask('admin_menu_selection')
+  elif admin_menu_selection == 'delete':
+    if len(get_creditor_table_data()) == 0:
+      nothing_to_delete
+      undefine('admin_menu_selection')
+      undefine('nothing_to_delete')
+      force_ask('admin_menu_selection')
+    else:
+      delete_creditor_selection_done
+      for cred_id in delete_creditor_ids.true_values():
+        remove_creditor(int(cred_id))
+      creditor_deleted_confirmation
+      undefine('admin_menu_selection')
+      undefine('delete_creditor_selection_done')
+      undefine('delete_creditor_ids')
+      undefine('creditor_deleted_confirmation')
+      force_ask('admin_menu_selection')
+  elif admin_menu_selection == 'refresh':
+    undefine('admin_menu_selection')
+    force_ask('admin_menu_selection')
+  elif admin_menu_selection == 'exit':
+    admin_exit_screen
 ---
 # ──────────────────────────────────────────────
 #  Main menu
@@ -47,54 +93,6 @@ buttons:
   - Exit: exit
 ---
 # ──────────────────────────────────────────────
-#  Add creditor flow
-# ──────────────────────────────────────────────
-mandatory: True
-code: |
-  if admin_menu_selection == 'add':
-    new_creditor_form_done
-    add_creditor(
-      name=new_creditor.name,
-      street=new_creditor.street,
-      city=new_creditor.city,
-      state=new_creditor.state,
-      zip_code=new_creditor.zip,
-      creditor_type=new_creditor.creditor_type,
-      account_suffix=new_creditor.account_suffix,
-      notes=new_creditor.notes,
-    )
-    creditor_added_confirmation
-    undefine('admin_menu_selection')
-    undefine('new_creditor_form_done')
-    undefine('new_creditor.name')
-    undefine('new_creditor.street')
-    undefine('new_creditor.city')
-    undefine('new_creditor.state')
-    undefine('new_creditor.zip')
-    undefine('new_creditor.creditor_type')
-    undefine('new_creditor.account_suffix')
-    undefine('new_creditor.notes')
-    undefine('creditor_added_confirmation')
-  elif admin_menu_selection == 'delete':
-    if len(get_creditor_table_data()) == 0:
-      nothing_to_delete
-      undefine('admin_menu_selection')
-      undefine('nothing_to_delete')
-    else:
-      delete_creditor_selection_done
-      for cred_id in delete_creditor_ids.true_values():
-        remove_creditor(int(cred_id))
-      creditor_deleted_confirmation
-      undefine('admin_menu_selection')
-      undefine('delete_creditor_selection_done')
-      undefine('delete_creditor_ids')
-      undefine('creditor_deleted_confirmation')
-  elif admin_menu_selection == 'refresh':
-    undefine('admin_menu_selection')
-  elif admin_menu_selection == 'exit':
-    admin_exit_screen
----
-# ──────────────────────────────────────────────
 #  Add creditor form
 # ──────────────────────────────────────────────
 id: add_creditor_form
@@ -105,8 +103,7 @@ fields:
   - Street Address / PO Box: new_creditor.street
   - City: new_creditor.city
   - State: new_creditor.state
-    code: |
-      us_states()
+    datatype: state
   - ZIP Code: new_creditor.zip
     datatype: text
     maxlength: 5
