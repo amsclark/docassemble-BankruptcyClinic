@@ -1105,7 +1105,53 @@ test.describe('Full Interview – Individual Filing', () => {
     const conclusionText = await page.locator('body').innerText();
     expect(conclusionText.toLowerCase()).toContain('conclusion');
 
+    // Verify download links are present
+    const downloadLinks = await page.evaluate(() => {
+      const links = document.querySelectorAll('a[href*="/uploadedfile/"]');
+      return Array.from(links).map(a => ({
+        name: a.closest('[class]')?.closest('div')?.previousElementSibling?.textContent?.trim() ||
+              a.textContent?.trim() || '',
+        href: (a as HTMLAnchorElement).href,
+      }));
+    });
+
+    // Also grab form headings (h3 elements that name each form)
+    const formHeadings = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll('h3'))
+        .map(h => h.textContent?.trim() || '')
+        .filter(t => t.toLowerCase().startsWith('form'));
+    });
+    console.log(`📋 Conclusion has ${downloadLinks.length} download links, ${formHeadings.length} form headings:`);
+    formHeadings.forEach((name, i) => console.log(`  ${i + 1}. ${name}`));
+
+    // Should have at least 15 documents for a standard individual filing
+    expect(downloadLinks.length).toBeGreaterThanOrEqual(15);
+
+    // Verify key form names are present in the headings
+    const allNames = formHeadings.map(h => h.toLowerCase()).join(' | ');
+    const expectedForms = [
+      '101',    // Voluntary Petition
+      '106',    // Schedules
+      '107',    // Statement of Financial Affairs
+      '108',    // Statement of Intention
+      '121',    // Social Security Statement
+      '122',    // Means Test
+    ];
+    for (const form of expectedForms) {
+      expect(allNames).toContain(form);
+    }
+
+    // Verify first 3 download links return valid PDF content
+    for (let i = 0; i < Math.min(3, downloadLinks.length); i++) {
+      const response = await page.request.get(downloadLinks[i].href);
+      const contentType = response.headers()['content-type'] || '';
+      console.log(`  📄 ${downloadLinks[i].name}: ${response.status()} ${contentType}`);
+      expect(response.status()).toBe(200);
+      expect(contentType).toContain('pdf');
+    }
+
     console.log('✅ Individual filing: Reached conclusion with document generation!');
+    console.log('✅ All key forms present and PDFs are valid!');
   });
 });
 

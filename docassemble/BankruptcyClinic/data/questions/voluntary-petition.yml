@@ -18,6 +18,8 @@ include:
   - 106H-question-blocks.yml
   - 106I-question-blocks.yml
   - 106J-question-blocks.yml
+  - 106Sum-question-blocks.yml
+  - 106Dec-question-blocks.yml
   - 108-question-blocks.yml
   - 122A-question-blocks.yml
   - 107-question-blocks.yml
@@ -806,6 +808,8 @@ code: |
   form_107_ext2
   form_107_ext3
   attach_108
+  summary_attach
+  declaration_attach
   attach_121
   attach_122a
   print_101

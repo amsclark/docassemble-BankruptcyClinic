@@ -1,0 +1,112 @@
+---
+# Form B 106 Summary
+# A Summary of Your Assets and Liabilities and Certain Statistical Information
+# PDF template: form_b106sum.pdf (29 fillable fields)
+# This form aggregates totals from all schedules (A/B through J)
+---
+attachment:
+  - name: Form 106 Summary
+    filename: form_b106sum.pdf
+    pdf template file: form_b106sum.pdf
+    variable name: summary_attach
+    code: summary_fields
+---
+code: |
+  def _to_num(s):
+    """Convert currency string like '$1,234.56' to float."""
+    try:
+      return float(str(s).replace('$', '').replace(',', '').strip())
+    except:
+      return 0.0
+
+  summary_fields = {}
+
+  # --- Header Information ---
+  _d1_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
+  _d2_name = ''
+  if len(debtor) > 1:
+    _d2_name = debtor[1].name.first + " " + debtor[1].name.middle + " " + debtor[1].name.last
+
+  summary_fields['Debtor 1'] = _d1_name
+  summary_fields['Debtor 2'] = _d2_name
+  summary_fields['Case number'] = case_number
+  summary_fields['Bankruptcy District Information'] = current_district
+  summary_fields['Check if this is an'] = amended_filing
+
+  # --- Part 1: Schedule A/B — Assets (Property) ---
+  # 1a = Real property subtotal (Schedule A/B Part 1)
+  summary_fields['1a'] = ab.get('p1TotalAmtFinal', '$0.00')
+  # 1b = Personal property subtotal (Schedule A/B Parts 2-7)
+  summary_fields['1b'] = ab.get('totalPersonalProp', '$0.00')
+  # 1c = Total of all property
+  summary_fields['1c'] = ab.get('totalABPropertyAmt', '$0.00')
+
+  # --- Part 2: Liabilities ---
+  # Line 2 = Schedule D: Total secured claims
+  _secured_total = 0.0
+  try:
+    if defined('prop.creditors') and len(prop.creditors) > 0:
+      for _cr in prop.creditors:
+        if hasattr(_cr, 'claim_amount'):
+          _secured_total += float(_cr.claim_amount)
+  except:
+    pass
+  summary_fields['2'] = currency(_secured_total)
+
+  # Lines 3a-3c = Schedule E/F: Unsecured claims
+  _priority_total = 0.0
+  _nonpriority_total = 0.0
+  try:
+    _priority_total = _to_num(unsecured_claims.get('p1Total', '0'))
+    _nonpriority_total = _to_num(unsecured_claims.get('p2Total', '0'))
+  except:
+    pass
+  summary_fields['3a'] = currency(_priority_total)
+  summary_fields['3b'] = currency(_nonpriority_total)
+  summary_fields['3c'] = currency(_priority_total + _nonpriority_total)
+
+  # --- Part 3: Related Information ---
+  # Line 4 = Total number of creditors (D + E/F)
+  _num_secured = 0
+  try:
+    if defined('prop.creditors'):
+      _num_secured = len(prop.creditors)
+  except:
+    pass
+  summary_fields['4'] = str(_num_secured)
+
+  # Line 5 = Current monthly income (Schedule I combined total)
+  try:
+    summary_fields['5'] = income1.get('combinedMonthlyTotal', '$0.00')
+  except:
+    summary_fields['5'] = '$0.00'
+
+  # Line 8 = Current monthly expenditures (Schedule J total)
+  try:
+    summary_fields['8'] = expenses.get('overallTotal', '$0.00')
+  except:
+    summary_fields['8'] = '$0.00'
+
+  # --- Nature of Debts (checkboxes) ---
+  # check6 = Consumer debts, check7 = Business debts
+  if defined('monthly_income.non_consumer_debts'):
+    summary_fields['check6'] = True if not monthly_income.non_consumer_debts else False
+    summary_fields['check7'] = True if monthly_income.non_consumer_debts else False
+  else:
+    summary_fields['check6'] = True
+    summary_fields['check7'] = False
+
+  # --- Statistical Information (9a-9g) ---
+  # 9a = Net monthly income available after expenses
+  try:
+    summary_fields['9a'] = expenses.get('netTotal', '$0.00')
+  except:
+    summary_fields['9a'] = '$0.00'
+  # 9b = Estimated number of employees (for business debtors)
+  summary_fields['9b'] = '0'
+  # 9c-9g: Additional statistical info (left for attorney review)
+  summary_fields['9c'] = ''
+  summary_fields['9d'] = ''
+  summary_fields['9e'] = ''
+  summary_fields['9f'] = ''
+  summary_fields['9g'] = ''

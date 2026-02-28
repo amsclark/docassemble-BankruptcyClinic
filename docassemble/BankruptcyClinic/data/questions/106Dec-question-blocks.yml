@@ -1,0 +1,42 @@
+---
+# Form B 106 Declaration
+# Declaration About an Individual Debtor's Schedules
+# PDF template: form_b106dec.pdf (16 fillable fields)
+# This is the signature/declaration page for all schedules
+---
+attachment:
+  - name: Form 106 Declaration
+    filename: form_b106dec.pdf
+    pdf template file: form_b106dec.pdf
+    variable name: declaration_attach
+    code: declaration_fields
+---
+code: |
+  declaration_fields = {}
+
+  # --- Header Information ---
+  _d1_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
+  _d2_name = ''
+  if len(debtor) > 1:
+    _d2_name = debtor[1].name.first + " " + debtor[1].name.middle + " " + debtor[1].name.last
+
+  declaration_fields['Debtor 1'] = _d1_name
+  declaration_fields['Debtor 2'] = _d2_name
+  declaration_fields['Case number'] = case_number
+  declaration_fields['Bankruptcy District Information'] = current_district
+  declaration_fields['Check if this is an'] = amended_filing
+
+  # --- Declaration Content ---
+  # check1 = "I have examined the information in the Schedules..."
+  declaration_fields['check1'] = True
+
+  # Execution date
+  declaration_fields['Executed on'] = format_date(today(), format='MM/dd/yyyy')
+
+  # Signature fields (debtor typed names as signature placeholders)
+  declaration_fields['signature'] = '/s/ ' + _d1_name
+  declaration_fields['Debtor1'] = '/s/ ' + _d1_name
+  declaration_fields['Debtor2'] = '/s/ ' + _d2_name if _d2_name else ''
+
+  # Name of person paid to help (bankruptcy petition preparer, if any)
+  declaration_fields['Name of person payed to help'] = ''
