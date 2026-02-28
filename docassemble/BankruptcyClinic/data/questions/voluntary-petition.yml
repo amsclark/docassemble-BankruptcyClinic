@@ -3,6 +3,7 @@ modules:
   - .county_list
   - .get_bk_states_list
   - .objects
+  - .creditor_library
 ---
 include:
   - mandatory-initial-code.yml
@@ -25,6 +26,7 @@ include:
   - 107-question-blocks.yml
   - 121-question-blocks.yml
   - 2030-question-blocks.yml
+  - creditor-library-picker.yml
 ---
 metadata:
   title: Voluntary Petition for Individuals Filing for Bankruptcy
@@ -470,6 +472,10 @@ code: |
     financial_affairs.businesses.there_are_any = True
   financial_affairs.businesses.gather()
   financial_affairs.has_statement
+
+  # Creditor Library — let users pre-fill from shared list
+  creditor_library_picker_done
+  creditor_library_injected
 
   #106D
   prop.creditors.gather()

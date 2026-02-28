@@ -1,0 +1,83 @@
+# ──────────────────────────────────────────────
+#  Creditor Library Picker
+# ──────────────────────────────────────────────
+#  Include this file to offer users a chance to pre-populate creditors
+#  from the clinic's shared library before the manual gather() flow.
+#
+#  Sets:
+#    - creditor_library_picker_done (True when the picker step is complete)
+#
+#  The picker pre-fills name/address into the relevant DAList so the
+#  user only has to fill the debt-specific details when the gather()
+#  questions appear.
+# ──────────────────────────────────────────────
+---
+# The picker screen — shown once before the creditor-gather sections.
+# It offers checkboxes for every creditor in the library and lets
+# the user pick which ones to pre-load.
+id: creditor_library_picker
+question: |
+  Common Creditors
+subquestion: |
+  % if len(get_creditor_choices()) > 0:
+  Your clinic maintains a list of commonly-seen creditors.
+  Select any that apply to your case and their name and address will
+  be pre-filled for you.
+
+  You can always add more creditors manually in the next steps.
+  % else:
+  No common creditors have been added to the library yet.
+  Click **Continue** to enter your creditors manually.
+  % endif
+fields:
+  - Select creditors to pre-fill: library_selected_ids
+    datatype: checkboxes
+    code: |
+      [{c['value']: c['label']} for c in get_creditor_choices()]
+    required: False
+    show if:
+      code: |
+        len(get_creditor_choices()) > 0
+continue button field: creditor_library_picker_done
+---
+# Code block that runs after the picker to inject selected creditors
+# into the unsecured nonpriority claims list (the most common case).
+# Secured creditors need too many additional fields to pre-fill usefully,
+# but nonpriority unsecured creditors share the same name/address structure.
+code: |
+  _all_records = get_all_creditors()
+  _injected_count = 0
+
+  if defined('library_selected_ids'):
+    for _sel_id in library_selected_ids.true_values():
+      _rec_id = int(_sel_id)
+      if _rec_id in _all_records:
+        _data = _all_records[_rec_id]
+        # Create a new item in the nonpriority claims list
+        _idx = len(prop.nonpriority_claims)
+        prop.nonpriority_claims.appendObject()
+        _claim = prop.nonpriority_claims[_idx]
+        _claim.name = _data['name']
+        _claim.street = _data.get('street', '')
+        _claim.city = _data.get('city', '')
+        _claim.state = _data.get('state', '')
+        _claim.zip = _data.get('zip', '')
+        if _data.get('type', '') in [
+          'Student loans',
+          'Medical',
+          'Credit Card',
+          'Contract',
+          'Other',
+          'Obligations arising out of a separation agreement or divorce that you did not report as priority claims',
+          'Debts to pension or profit-sharing plans, and other similar debts',
+        ]:
+          _claim.type = _data['type']
+        else:
+          _claim.type = 'Other'
+          _claim.other_type = _data.get('type', '')
+        # Set the "who" field default for individual filing
+        _claim.who = 'Debtor 1 only'
+        _claim.account_number = _data.get('account_suffix', '')
+        _injected_count += 1
+
+  creditor_library_injected = _injected_count
