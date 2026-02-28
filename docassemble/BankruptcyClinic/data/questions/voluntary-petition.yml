@@ -815,7 +815,7 @@ code: |
   attach_121
   attach_122a
   if attorney_disclosure.has_attorney:
-    attorney_disclosure.name
+    attorney_disclosure.attorney_name
     attorney_disclosure.agreed_compensation
     attorney_disclosure.prior_received
     attorney_disclosure.source_paid

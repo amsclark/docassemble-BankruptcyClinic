@@ -32,7 +32,7 @@ question: |
 subquestion: |
   Enter the name and firm of the attorney representing the debtor(s).
 fields:
-  - Attorney Name: attorney_disclosure.name
+  - Attorney Name: attorney_disclosure.attorney_name
     required: True
   - Law Firm Name: attorney_disclosure.firm_name
     required: False
@@ -167,7 +167,7 @@ event: attorney_disclosure_review
 question: |
   Attorney Compensation Disclosure Review
 subquestion: |
-  **Attorney:** ${ attorney_disclosure.name }
+  **Attorney:** ${ attorney_disclosure.attorney_name }
 
   % if defined('attorney_disclosure.firm_name') and attorney_disclosure.firm_name:
   **Firm:** ${ attorney_disclosure.firm_name }
@@ -300,7 +300,7 @@ code: |
   # Certification
   from datetime import date
   b2030_fields['date_signed'] = date.today().strftime('%m/%d/%Y')
-  b2030_fields['attorney_signature'] = attorney_disclosure.name
+  b2030_fields['attorney_signature'] = attorney_disclosure.attorney_name
   if defined('attorney_disclosure.firm_name') and attorney_disclosure.firm_name:
     b2030_fields['law_firm_name'] = attorney_disclosure.firm_name
   else:

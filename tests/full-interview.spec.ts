@@ -571,12 +571,37 @@ async function navigateFinancialAffairs(page: Page) {
   await clickContinue(page);
 
   // Business types (checkboxes — must select at least one, click "None of the above")
+  // Note: pages may shift due to held-property retry; keep looping until we find
+  // the checkboxes page or a yesno-button page
   await waitForDaPageLoad(page);
   h = await page.locator('h1').first().textContent().catch(() => '');
   console.log(`[FA] business-types: ${h}`);
-  // The "None of the above" is the last checkbox, click its label
-  await page.locator('label').filter({ hasText: 'None of the above' }).click();
-  await clickContinue(page);
+  
+  // If we landed on a page without "None of the above", it might be the business
+  // connections page that we need to advance through first
+  const hasNoneOfAbove = await page.locator('label').filter({ hasText: 'None of the above' }).count();
+  if (hasNoneOfAbove > 0) {
+    await page.locator('label').filter({ hasText: 'None of the above' }).click();
+    await clickContinue(page);
+  } else {
+    // We're on a different page — fill radios/checkboxes and continue
+    console.log('[FA] business-types: "None of the above" not found, handling current page generically');
+    await fillAllVisibleRadiosAsNo(page);
+    await clickContinue(page);
+    // Try the next page for "None of the above"
+    await waitForDaPageLoad(page);
+    h = await page.locator('h1').first().textContent().catch(() => '');
+    console.log(`[FA] business-types-retry: ${h}`);
+    const hasNoneRetry = await page.locator('label').filter({ hasText: 'None of the above' }).count();
+    if (hasNoneRetry > 0) {
+      await page.locator('label').filter({ hasText: 'None of the above' }).click();
+      await clickContinue(page);
+    } else {
+      // No checkbox page — just continue
+      await fillAllVisibleRadiosAsNo(page);
+      await clickContinue(page);
+    }
+  }
 
   // businesses.there_are_any → No (gather triggers this even with "None" business types)
   await waitForDaPageLoad(page);
@@ -898,7 +923,7 @@ async function navigateAttorneyDisclosure(page: Page) {
   await waitForDaPageLoad(page);
   h = await page.locator('h1').first().textContent().catch(() => '');
   console.log(`[ATTY] page 2: ${h}`);
-  await fillByName(page, 'attorney_disclosure.name', 'Jane Smith, Esq.');
+  await fillByName(page, 'attorney_disclosure.attorney_name', 'Jane Smith, Esq.');
   await fillByName(page, 'attorney_disclosure.firm_name', 'Legal Aid Clinic');
   await clickContinue(page);
 
@@ -1065,19 +1090,34 @@ test.describe('Full Interview – Individual Filing', () => {
       const hasAttorneyIntro = await page.locator(`[name="${b64('attorney_disclosure.has_attorney')}"]`).count();
       if (hasAttorneyIntro > 0) {
         console.log('[DYN-B2030] Has attorney? → Yes');
-        await clickYesNoButton(page, 'attorney_disclosure.has_attorney', true);
+        await selectYesNoRadio(page, 'attorney_disclosure.has_attorney', true);
+        await page.waitForTimeout(300);
+        await clickContinue(page);
         await waitForDaPageLoad(page);
         continue;
       }
       
-      const hasAttorneyName = await page.locator(`[name="${b64('attorney_disclosure.name')}"]`).count();
+      const hasAttorneyName = await page.locator(`[name="${b64('attorney_disclosure.attorney_name')}"]`).count();
       if (hasAttorneyName > 0) {
         console.log('[DYN-B2030] Filling attorney name & firm');
-        await fillByName(page, 'attorney_disclosure.name', 'Jane Smith, Esq.');
-        const hasFirm = await page.locator(`[name="${b64('attorney_disclosure.firm_name')}"]`).count();
-        if (hasFirm > 0) {
-          await fillByName(page, 'attorney_disclosure.firm_name', 'Legal Aid Clinic');
-        }
+        // Use evaluate to fill reliably (docassemble fields can interfere with Playwright fill)
+        const nameField = b64('attorney_disclosure.attorney_name');
+        const firmField = b64('attorney_disclosure.firm_name');
+        await page.evaluate(({nameF, firmF}) => {
+          const nameInput = document.querySelector(`[name="${nameF}"]`) as HTMLInputElement;
+          if (nameInput) {
+            nameInput.value = 'Jane Smith, Esq.';
+            nameInput.dispatchEvent(new Event('input', { bubbles: true }));
+            nameInput.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+          const firmInput = document.querySelector(`[name="${firmF}"]`) as HTMLInputElement;
+          if (firmInput) {
+            firmInput.value = 'Legal Aid Clinic';
+            firmInput.dispatchEvent(new Event('input', { bubbles: true }));
+            firmInput.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        }, { nameF: nameField, firmF: firmField });
+        await page.waitForTimeout(300);
         await clickContinue(page);
         await waitForDaPageLoad(page);
         continue;
@@ -1086,8 +1126,23 @@ test.describe('Full Interview – Individual Filing', () => {
       const hasAgreedComp = await page.locator(`[name="${b64('attorney_disclosure.agreed_compensation')}"]`).count();
       if (hasAgreedComp > 0) {
         console.log('[DYN-B2030] Filling compensation amounts');
-        await fillByName(page, 'attorney_disclosure.agreed_compensation', '1500');
-        await fillByName(page, 'attorney_disclosure.prior_received', '500');
+        const compField = b64('attorney_disclosure.agreed_compensation');
+        const rcvField = b64('attorney_disclosure.prior_received');
+        await page.evaluate(({cf, rf}) => {
+          const comp = document.querySelector(`[name="${cf}"]`) as HTMLInputElement;
+          if (comp) {
+            comp.value = '1500';
+            comp.dispatchEvent(new Event('input', { bubbles: true }));
+            comp.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+          const rcv = document.querySelector(`[name="${rf}"]`) as HTMLInputElement;
+          if (rcv) {
+            rcv.value = '500';
+            rcv.dispatchEvent(new Event('input', { bubbles: true }));
+            rcv.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        }, { cf: compField, rf: rcvField });
+        await page.waitForTimeout(300);
         await clickContinue(page);
         await waitForDaPageLoad(page);
         continue;
@@ -1095,7 +1150,21 @@ test.describe('Full Interview – Individual Filing', () => {
       
       const hasSourcePaid = await page.locator(`[name="${b64('attorney_disclosure.source_paid')}"]`).count();
       if (hasSourcePaid > 0) {
-        console.log('[DYN-B2030] Source of compensation paid → debtor (default)');
+        console.log('[DYN-B2030] Source of compensation paid → debtor');
+        // Radio with choices — select "debtor" by clicking its label
+        const radioId = b64('attorney_disclosure.source_paid');
+        await page.evaluate((id) => {
+          const radios = document.querySelectorAll(`input[name="${id}"]`);
+          radios.forEach((r: any) => {
+            if (r.value === 'debtor') {
+              r.checked = true;
+              r.dispatchEvent(new Event('change', { bubbles: true }));
+              const label = document.querySelector(`label[for="${r.id}"]`) as HTMLElement;
+              if (label) label.click();
+            }
+          });
+        }, radioId);
+        await page.waitForTimeout(300);
         await clickContinue(page);
         await waitForDaPageLoad(page);
         continue;
@@ -1103,7 +1172,20 @@ test.describe('Full Interview – Individual Filing', () => {
       
       const hasSourceTopay = await page.locator(`[name="${b64('attorney_disclosure.source_topay')}"]`).count();
       if (hasSourceTopay > 0) {
-        console.log('[DYN-B2030] Source of future compensation → debtor (default)');
+        console.log('[DYN-B2030] Source of future compensation → debtor');
+        const radioId = b64('attorney_disclosure.source_topay');
+        await page.evaluate((id) => {
+          const radios = document.querySelectorAll(`input[name="${id}"]`);
+          radios.forEach((r: any) => {
+            if (r.value === 'debtor') {
+              r.checked = true;
+              r.dispatchEvent(new Event('change', { bubbles: true }));
+              const label = document.querySelector(`label[for="${r.id}"]`) as HTMLElement;
+              if (label) label.click();
+            }
+          });
+        }, radioId);
+        await page.waitForTimeout(300);
         await clickContinue(page);
         await waitForDaPageLoad(page);
         continue;
@@ -1112,7 +1194,9 @@ test.describe('Full Interview – Individual Filing', () => {
       const hasSharesFees = await page.locator(`[name="${b64('attorney_disclosure.shares_fees')}"]`).count();
       if (hasSharesFees > 0) {
         console.log('[DYN-B2030] Fee sharing → No');
-        await clickYesNoButton(page, 'attorney_disclosure.shares_fees', false);
+        await selectYesNoRadio(page, 'attorney_disclosure.shares_fees', false);
+        await page.waitForTimeout(300);
+        await clickContinue(page);
         await waitForDaPageLoad(page);
         continue;
       }
