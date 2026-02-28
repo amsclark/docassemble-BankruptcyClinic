@@ -570,42 +570,46 @@ async function navigateFinancialAffairs(page: Page) {
   await fillAllVisibleRadiosAsNo(page);
   await clickContinue(page);
 
-  // Business types (checkboxes — must select at least one, click "None of the above")
-  // Note: pages may shift due to held-property retry; keep looping until we find
-  // the checkboxes page or a yesno-button page
-  await waitForDaPageLoad(page);
-  h = await page.locator('h1').first().textContent().catch(() => '');
-  console.log(`[FA] business-types: ${h}`);
-  
-  // If we landed on a page without "None of the above", it might be the business
-  // connections page that we need to advance through first
-  const hasNoneOfAbove = await page.locator('label').filter({ hasText: 'None of the above' }).count();
-  if (hasNoneOfAbove > 0) {
-    await page.locator('label').filter({ hasText: 'None of the above' }).click();
-    await clickContinue(page);
-  } else {
-    // We're on a different page — fill radios/checkboxes and continue
-    console.log('[FA] business-types: "None of the above" not found, handling current page generically');
-    await fillAllVisibleRadiosAsNo(page);
-    await clickContinue(page);
-    // Try the next page for "None of the above"
+  // Business types / businesses.there_are_any — page order can vary.
+  // We may see: (a) "None of the above" checkboxes, (b) Yes/No buttons for
+  // businesses.there_are_any, or (c) some other page.  Handle up to 3 pages
+  // until we've answered both the checkbox and Yes/No question.
+  let businessCheckboxDone = false;
+  let businessYesNoDone = false;
+  for (let bStep = 0; bStep < 4 && !(businessCheckboxDone && businessYesNoDone); bStep++) {
     await waitForDaPageLoad(page);
     h = await page.locator('h1').first().textContent().catch(() => '');
-    console.log(`[FA] business-types-retry: ${h}`);
-    const hasNoneRetry = await page.locator('label').filter({ hasText: 'None of the above' }).count();
-    if (hasNoneRetry > 0) {
+    console.log(`[FA] business-step-${bStep}: ${h}`);
+
+    // Check for "None of the above" checkbox label
+    const hasNoneOfAbove = await page.locator('label').filter({ hasText: 'None of the above' }).count();
+    // Check for Yes/No buttons (docassemble yesnobuttons)
+    const yesBtn = page.locator('button').filter({ hasText: /^Yes$/i });
+    const noBtn = page.locator('button').filter({ hasText: /^No$/i });
+    const hasYesNoButtons = (await yesBtn.count()) > 0 && (await noBtn.count()) > 0;
+
+    if (hasNoneOfAbove > 0) {
+      console.log('[FA] business: clicking "None of the above"');
       await page.locator('label').filter({ hasText: 'None of the above' }).click();
       await clickContinue(page);
+      businessCheckboxDone = true;
+    } else if (hasYesNoButtons && !businessYesNoDone) {
+      console.log('[FA] business: clicking No button');
+      await noBtn.first().click();
+      await page.waitForLoadState('networkidle');
+      businessYesNoDone = true;
     } else {
-      // No checkbox page — just continue
+      // Some other page (e.g. radios) — fill and continue
+      console.log('[FA] business: generic page, filling radios and continuing');
       await fillAllVisibleRadiosAsNo(page);
       await clickContinue(page);
     }
   }
-
-  // businesses.there_are_any → No (gather triggers this even with "None" business types)
-  await waitForDaPageLoad(page);
-  await clickYesNoButton(page, 'financial_affairs.businesses.there_are_any', false);
+  // If we never saw the Yes/No page, try it now
+  if (!businessYesNoDone) {
+    await waitForDaPageLoad(page);
+    await clickYesNoButton(page, 'financial_affairs.businesses.there_are_any', false);
+  }
 
   // Has statement
   await waitForDaPageLoad(page);

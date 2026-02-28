@@ -114,9 +114,9 @@ test.describe('Section Navigation Regression', () => {
     const districtSelect = page.locator(`select[name="${b64('current_district')}"]`);
     expect(await districtSelect.count()).toBe(1);
 
-    // Verify district dropdown has options
+    // Verify district dropdown has all 94+ districts
     const optionCount = await districtSelect.locator('option').count();
-    expect(optionCount).toBeGreaterThanOrEqual(2); // at least 1 district + blank
+    expect(optionCount).toBeGreaterThanOrEqual(90); // 94 districts + territories + blank
 
     await selectByName(page, b64('current_district'), 'District of Nebraska');
     await clickContinue(page);
@@ -314,6 +314,7 @@ test.describe('Section Navigation Regression', () => {
       'income',
       'expense',
       'financial',
+      'attorney disclosure',
     ];
 
     for (const section of expectedSections) {
