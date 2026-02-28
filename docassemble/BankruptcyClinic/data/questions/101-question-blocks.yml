@@ -984,8 +984,6 @@ code: |
       main['debtor_mail_zip'+str(i)] = debt.mailing_zip
     main['yesLivedInDistrict'+str(i)] = True if debt.district_info.is_current_district == True else False
     main['noLivedInDistrict'+str(i)] = True if debt.district_info.is_current_district == False else False
-    main['debtor_ein'+str(i)+'-1'] = debt.tax_id.first_ein if defined('debt.tax_id.first_ein') else ''
-    main['debtor_ein'+str(i)+'-2'] = debt.tax_id.second_ein if defined('debt.tax_id.second_ein') else ''
     if debt.district_info.is_current_district == False:
       main['districtExplain'+str(i)+'-1'] = debt.district_info.other_district_reason
 
@@ -1050,6 +1048,8 @@ code: |
       main['businessIsStockbroker'+str(i)] = True if bus.type == '3' else False
       main['businessIsCommodity'+str(i)] = True if bus.type == '4' else False
       main['businessIsNone'+str(i)] = True if bus.type == '5' else False
+      main['debtor_ein'+str(i)+'-1'] = bus.first_ein if hasattr(bus, 'first_ein') and bus.first_ein else ''
+      main['debtor_ein'+str(i)+'-2'] = bus.second_ein if hasattr(bus, 'second_ein') and bus.second_ein else ''
       i += 1
   else:
     main['hasBusiness_false'] = 1
