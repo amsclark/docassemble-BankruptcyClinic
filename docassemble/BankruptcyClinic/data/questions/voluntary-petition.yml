@@ -24,6 +24,7 @@ include:
   - 122A-question-blocks.yml
   - 107-question-blocks.yml
   - 121-question-blocks.yml
+  - 2030-question-blocks.yml
 ---
 metadata:
   title: Voluntary Petition for Individuals Filing for Bankruptcy
@@ -49,6 +50,7 @@ sections:
   - haz_prop: Hazardous Property
   - credit_counsel: Credit Counseling
   - report: Reporting
+  - attorney_disc: Attorney Disclosure
   - Other
   - fin: Finish Up
 ---
@@ -812,6 +814,19 @@ code: |
   declaration_attach
   attach_121
   attach_122a
+  if attorney_disclosure.has_attorney:
+    attorney_disclosure.name
+    attorney_disclosure.agreed_compensation
+    attorney_disclosure.prior_received
+    attorney_disclosure.source_paid
+    attorney_disclosure.source_topay
+    attorney_disclosure.shares_fees
+    attorney_disclosure.service_a
+    attorney_disclosure.service_b
+    attorney_disclosure.service_c
+    attorney_disclosure.service_d
+    attorney_disclosure_review
+    attach_2030
   print_101
   conclusion_screen
 ---

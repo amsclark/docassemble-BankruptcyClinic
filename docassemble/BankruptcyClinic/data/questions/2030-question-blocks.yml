@@ -1,0 +1,307 @@
+---
+# Form B 2030
+# Disclosure of Compensation of Attorney for Debtor
+# PDF template: form_b2030.pdf (24 fillable fields)
+# Required by 11 U.S.C. § 329(a) and Fed. Bankr. P. 2016(b)
+# This form must be filed whenever a debtor is represented by an attorney
+---
+objects:
+  - attorney_disclosure: DAObject
+---
+id: attorney_disclosure_intro
+question: |
+  Attorney Disclosure of Compensation
+subquestion: |
+  Federal law requires attorneys who represent debtors in bankruptcy cases
+  to disclose their compensation arrangements.
+
+  **This section collects information for Form B2030
+  (Disclosure of Compensation of Attorney for Debtor).**
+
+  If the debtor is filing *pro se* (without an attorney), you may skip
+  this section.
+fields:
+  - Has an attorney been retained for this case?: attorney_disclosure.has_attorney
+    datatype: yesnoradio
+    default: True
+section: attorney_disc
+---
+id: attorney_info
+question: |
+  Attorney Information
+subquestion: |
+  Enter the name and firm of the attorney representing the debtor(s).
+fields:
+  - Attorney Name: attorney_disclosure.name
+    required: True
+  - Law Firm Name: attorney_disclosure.firm_name
+    required: False
+section: attorney_disc
+---
+id: attorney_compensation
+question: |
+  Attorney Compensation
+subquestion: |
+  Disclose all compensation paid or agreed to be paid within one year
+  before the filing of the petition, or agreed to be paid for services
+  rendered or to be rendered in connection with the bankruptcy case.
+fields:
+  - "Total agreed compensation for legal services": attorney_disclosure.agreed_compensation
+    datatype: currency
+    min: 0
+    required: True
+    help: |
+      Enter the total amount agreed upon for all legal services
+      related to this bankruptcy case.
+  - "Amount already received prior to filing": attorney_disclosure.prior_received
+    datatype: currency
+    min: 0
+    required: True
+    default: 0
+    help: |
+      Enter the total amount already paid to you before filing
+      this disclosure statement.
+section: attorney_disc
+---
+id: compensation_source_paid
+question: |
+  Source of Compensation Already Paid
+subquestion: |
+  Who paid the compensation you have already received?
+fields:
+  - "Source of compensation paid": attorney_disclosure.source_paid
+    input type: radio
+    choices:
+      - Debtor: debtor
+      - Other: other
+    default: debtor
+  - "Specify the source": attorney_disclosure.source_paid_other_detail
+    show if:
+      variable: attorney_disclosure.source_paid
+      is: other
+    required: True
+section: attorney_disc
+---
+id: compensation_source_future
+question: |
+  Source of Future Compensation
+subquestion: |
+  Who will pay the remaining compensation?
+fields:
+  - "Source of compensation to be paid": attorney_disclosure.source_topay
+    input type: radio
+    choices:
+      - Debtor: debtor
+      - Other: other
+    default: debtor
+  - "Specify the source": attorney_disclosure.source_topay_other_detail
+    show if:
+      variable: attorney_disclosure.source_topay
+      is: other
+    required: True
+section: attorney_disc
+---
+id: fee_sharing
+question: |
+  Fee Sharing Arrangement
+subquestion: |
+  Have you agreed to share the disclosed compensation with any person
+  who is **not** a member or associate of your law firm?
+fields:
+  - "Fee sharing arrangement": attorney_disclosure.shares_fees
+    datatype: yesnoradio
+    default: False
+    help: |
+      If you have agreed to share fees with someone outside your
+      law firm, a copy of that agreement must be attached to
+      the filed form.
+section: attorney_disc
+---
+id: services_provided
+question: |
+  Services Agreed to Provide
+subquestion: |
+  Check all services that you have agreed to provide in return for
+  the disclosed fee.
+fields:
+  - note: |
+      **Standard bankruptcy services:**
+  - "Analysis of debtor's financial situation and advice on whether to file": attorney_disclosure.service_a
+    datatype: yesno
+    default: True
+  - "Preparation and filing of the petition, schedules, and statement of affairs": attorney_disclosure.service_b
+    datatype: yesno
+    default: True
+  - "Representation at the meeting of creditors (341 hearing)": attorney_disclosure.service_c
+    datatype: yesno
+    default: True
+  - "Representation in adversary proceedings and contested matters": attorney_disclosure.service_d
+    datatype: yesno
+    default: False
+  - "Other services (describe)": attorney_disclosure.other_services
+    datatype: area
+    required: False
+    rows: 3
+    help: |
+      List any additional services you have agreed to provide.
+section: attorney_disc
+---
+id: services_excluded
+question: |
+  Services Excluded from Fee
+subquestion: |
+  List any services that are **excluded** from the disclosed fee
+  by agreement with the debtor(s).
+
+  Common exclusions include adversary proceedings, motions for relief
+  from stay, or appeals.
+fields:
+  - "Excluded services": attorney_disclosure.excluded_services
+    datatype: area
+    required: False
+    rows: 3
+section: attorney_disc
+---
+id: attorney_disclosure_review
+event: attorney_disclosure_review
+question: |
+  Attorney Compensation Disclosure Review
+subquestion: |
+  **Attorney:** ${ attorney_disclosure.name }
+
+  % if defined('attorney_disclosure.firm_name') and attorney_disclosure.firm_name:
+  **Firm:** ${ attorney_disclosure.firm_name }
+  % endif
+
+  **Agreed Compensation:** ${ currency(attorney_disclosure.agreed_compensation) }
+
+  **Prior Payments Received:** ${ currency(attorney_disclosure.prior_received) }
+
+  **Balance Due:** ${ currency(attorney_disclosure.agreed_compensation - attorney_disclosure.prior_received) }
+
+  **Source of Compensation Paid:**
+  % if attorney_disclosure.source_paid == 'debtor':
+  Debtor
+  % else:
+  Other: ${ attorney_disclosure.source_paid_other_detail }
+  % endif
+
+  **Source of Future Compensation:**
+  % if attorney_disclosure.source_topay == 'debtor':
+  Debtor
+  % else:
+  Other: ${ attorney_disclosure.source_topay_other_detail }
+  % endif
+
+  **Fee Sharing:** ${ "Yes" if attorney_disclosure.shares_fees else "No" }
+
+  **Services:**
+  % if attorney_disclosure.service_a:
+  ✓ Financial analysis and advice
+  % endif
+  % if attorney_disclosure.service_b:
+  ✓ Preparation and filing
+  % endif
+  % if attorney_disclosure.service_c:
+  ✓ 341 meeting representation
+  % endif
+  % if attorney_disclosure.service_d:
+  ✓ Adversary proceedings
+  % endif
+  % if defined('attorney_disclosure.other_services') and attorney_disclosure.other_services:
+  ✓ Other: ${ attorney_disclosure.other_services }
+  % endif
+
+  % if defined('attorney_disclosure.excluded_services') and attorney_disclosure.excluded_services:
+  **Excluded Services:** ${ attorney_disclosure.excluded_services }
+  % endif
+continue button field: attorney_disclosure_review
+section: attorney_disc
+---
+attachment:
+  - name: Form B2030 Disclosure of Compensation
+    filename: form_b2030
+    pdf template file: form_b2030.pdf
+    variable name: attach_2030
+    code: b2030_fields
+---
+code: |
+  b2030_fields = {}
+
+  # Header
+  b2030_fields['District'] = current_district
+  b2030_fields['Case Number'] = case_number
+
+  _d1_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
+  _d2_name = ''
+  if len(debtor) > 1:
+    _d2_name = debtor[1].name.first + " " + debtor[1].name.middle + " " + debtor[1].name.last
+  if _d2_name:
+    b2030_fields['Debtor 1'] = _d1_name + " and " + _d2_name
+  else:
+    b2030_fields['Debtor 1'] = _d1_name
+
+  b2030_fields['Chapter'] = '7'
+
+  # Section 1: Compensation amounts
+  _agreed = float(attorney_disclosure.agreed_compensation)
+  _received = float(attorney_disclosure.prior_received)
+  _balance = _agreed - _received
+
+  b2030_fields['agreed_compensation'] = currency(_agreed)
+  b2030_fields['prior_received'] = currency(_received)
+  b2030_fields['balance_due'] = currency(_balance)
+
+  # Section 2: Source of compensation paid
+  if attorney_disclosure.source_paid == 'debtor':
+    b2030_fields['source_paid_debtor'] = True
+    b2030_fields['source_paid_other'] = False
+    b2030_fields['source_paid_other_specify'] = ''
+  else:
+    b2030_fields['source_paid_debtor'] = False
+    b2030_fields['source_paid_other'] = True
+    b2030_fields['source_paid_other_specify'] = attorney_disclosure.source_paid_other_detail
+
+  # Section 3: Source of compensation to be paid
+  if attorney_disclosure.source_topay == 'debtor':
+    b2030_fields['source_topay_debtor'] = True
+    b2030_fields['source_topay_other'] = False
+    b2030_fields['source_topay_other_specify'] = ''
+  else:
+    b2030_fields['source_topay_debtor'] = False
+    b2030_fields['source_topay_other'] = True
+    b2030_fields['source_topay_other_specify'] = attorney_disclosure.source_topay_other_detail
+
+  # Section 4: Fee sharing
+  if attorney_disclosure.shares_fees:
+    b2030_fields['no_fee_sharing'] = False
+    b2030_fields['fee_sharing'] = True
+  else:
+    b2030_fields['no_fee_sharing'] = True
+    b2030_fields['fee_sharing'] = False
+
+  # Section 5: Services
+  b2030_fields['service_a'] = attorney_disclosure.service_a
+  b2030_fields['service_b'] = attorney_disclosure.service_b
+  b2030_fields['service_c'] = attorney_disclosure.service_c
+  b2030_fields['service_d'] = attorney_disclosure.service_d
+
+  if defined('attorney_disclosure.other_services') and attorney_disclosure.other_services:
+    b2030_fields['other_services'] = attorney_disclosure.other_services
+  else:
+    b2030_fields['other_services'] = ''
+
+  # Section 6: Excluded services
+  if defined('attorney_disclosure.excluded_services') and attorney_disclosure.excluded_services:
+    b2030_fields['excluded_services'] = attorney_disclosure.excluded_services
+  else:
+    b2030_fields['excluded_services'] = ''
+
+  # Certification
+  from datetime import date
+  b2030_fields['date_signed'] = date.today().strftime('%m/%d/%Y')
+  b2030_fields['attorney_signature'] = attorney_disclosure.name
+  if defined('attorney_disclosure.firm_name') and attorney_disclosure.firm_name:
+    b2030_fields['law_firm_name'] = attorney_disclosure.firm_name
+  else:
+    b2030_fields['law_firm_name'] = ''

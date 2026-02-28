@@ -511,7 +511,21 @@ async function navigateFinancialAffairs(page: Page) {
   await waitForDaPageLoad(page);
   h = await page.locator('h1').first().textContent().catch(() => '');
   console.log(`[FA] held-property: ${h}`);
-  await selectYesNoRadio(page, 'financial_affairs.has_held_property', false);
+  // Use JavaScript click for reliability (labelauty radios can detach during animation)
+  await page.evaluate((varName) => {
+    const encoded = btoa(varName).replace(/=/g, '');
+    const radio = document.getElementById(encoded + '_1') as HTMLInputElement;
+    if (radio) {
+      radio.checked = true;
+      radio.dispatchEvent(new Event('change', { bubbles: true }));
+      const label = document.querySelector(`label[for="${encoded}_1"]`) as HTMLElement;
+      if (label) {
+        label.classList.add('btn-primary');
+        label.classList.remove('btn-outline-secondary');
+        label.setAttribute('aria-checked', 'true');
+      }
+    }
+  }, 'financial_affairs.has_held_property');
   await page.waitForTimeout(500);
   await clickContinue(page);
 
@@ -519,8 +533,15 @@ async function navigateFinancialAffairs(page: Page) {
   await waitForDaPageLoad(page);
   h = await page.locator('h1').first().textContent().catch(() => '');
   if (h?.includes('Borrowed Property') || h?.includes('held property')) {
-    console.log('[FA] held-property page did not advance, retrying...');
-    await selectYesNoRadio(page, 'financial_affairs.has_held_property', false);
+    console.log('[FA] held-property page did not advance, retrying via JS...');
+    await page.evaluate((varName) => {
+      const encoded = btoa(varName).replace(/=/g, '');
+      const radio = document.getElementById(encoded + '_1') as HTMLInputElement;
+      if (radio) {
+        radio.checked = true;
+        radio.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }, 'financial_affairs.has_held_property');
     await page.waitForTimeout(500);
     await clickContinue(page);
     await waitForDaPageLoad(page);
@@ -866,6 +887,68 @@ async function navigateReporting(page: Page) {
   await clickYesNoButton(page, 'reporting.funds_for_creditors', false);
 }
 
+async function navigateAttorneyDisclosure(page: Page) {
+  // Page 1: Has attorney? → Yes
+  await waitForDaPageLoad(page);
+  let h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[ATTY] page 1: ${h}`);
+  await clickYesNoButton(page, 'attorney_disclosure.has_attorney', true);
+
+  // Page 2: Attorney name & firm
+  await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[ATTY] page 2: ${h}`);
+  await fillByName(page, 'attorney_disclosure.name', 'Jane Smith, Esq.');
+  await fillByName(page, 'attorney_disclosure.firm_name', 'Legal Aid Clinic');
+  await clickContinue(page);
+
+  // Page 3: Compensation amounts
+  await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[ATTY] page 3: ${h}`);
+  await fillByName(page, 'attorney_disclosure.agreed_compensation', '1500');
+  await fillByName(page, 'attorney_disclosure.prior_received', '500');
+  await clickContinue(page);
+
+  // Page 4: Source of compensation paid
+  await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[ATTY] page 4: ${h}`);
+  // Default is "debtor" — just continue
+  await clickContinue(page);
+
+  // Page 5: Source of future compensation
+  await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[ATTY] page 5: ${h}`);
+  // Default is "debtor" — just continue
+  await clickContinue(page);
+
+  // Page 6: Fee sharing → No
+  await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[ATTY] page 6: ${h}`);
+  await clickYesNoButton(page, 'attorney_disclosure.shares_fees', false);
+
+  // Page 7: Services provided (checkboxes — defaults are set, just continue)
+  await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[ATTY] page 7: ${h}`);
+  await clickContinue(page);
+
+  // Page 8: Excluded services (optional text — just continue)
+  await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[ATTY] page 8: ${h}`);
+  await clickContinue(page);
+
+  // Page 9: Attorney disclosure review
+  await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[ATTY] page 9 (review): ${h}`);
+  await clickNthByName(page, b64('attorney_disclosure_review'), 0);
+}
+
 // ──────────────────────────────────────────────
 //  TESTS
 // ──────────────────────────────────────────────
@@ -926,17 +1009,18 @@ test.describe('Full Interview – Individual Filing', () => {
     // ── 17. Reporting ──
     await navigateReporting(page);
 
-    // ── 18. Document generation ──
+    // ── 18. Document generation + Attorney Disclosure (B2030) ──
     // Attachment rendering may trigger additional questions (secured_claims, personal_leases, property details)
+    // Attorney disclosure (B2030) also appears in this phase
     // Handle them dynamically
     await waitForDaPageLoad(page);
     
-    let maxSteps = 30;
+    let maxSteps = 50;
     while (maxSteps-- > 0) {
       await page.waitForTimeout(300); // Brief pause for page stability
       const heading = await page.locator('h1, h2').first().textContent().catch(() => '');
       const qid = await page.locator('input[name="_question_name"]').getAttribute('value').catch(() => 'unknown');
-      console.log(`[DYN] step ${30 - maxSteps}: "${heading}" (qid: ${qid})`);
+      console.log(`[DYN] step ${50 - maxSteps}: "${heading}" (qid: ${qid})`);
       
       // Check for conclusion screen
       const bodyText = await page.locator('body').innerText();
@@ -973,6 +1057,86 @@ test.describe('Full Interview – Individual Filing', () => {
       if (hasPersonalLeases > 0) {
         console.log('[DYN] Handling personal_leases');
         await clickYesNoButton(page, 'personal_leases.there_are_any', false);
+        await waitForDaPageLoad(page);
+        continue;
+      }
+      
+      // ── Attorney Disclosure (B2030) pages ──
+      const hasAttorneyIntro = await page.locator(`[name="${b64('attorney_disclosure.has_attorney')}"]`).count();
+      if (hasAttorneyIntro > 0) {
+        console.log('[DYN-B2030] Has attorney? → Yes');
+        await clickYesNoButton(page, 'attorney_disclosure.has_attorney', true);
+        await waitForDaPageLoad(page);
+        continue;
+      }
+      
+      const hasAttorneyName = await page.locator(`[name="${b64('attorney_disclosure.name')}"]`).count();
+      if (hasAttorneyName > 0) {
+        console.log('[DYN-B2030] Filling attorney name & firm');
+        await fillByName(page, 'attorney_disclosure.name', 'Jane Smith, Esq.');
+        const hasFirm = await page.locator(`[name="${b64('attorney_disclosure.firm_name')}"]`).count();
+        if (hasFirm > 0) {
+          await fillByName(page, 'attorney_disclosure.firm_name', 'Legal Aid Clinic');
+        }
+        await clickContinue(page);
+        await waitForDaPageLoad(page);
+        continue;
+      }
+      
+      const hasAgreedComp = await page.locator(`[name="${b64('attorney_disclosure.agreed_compensation')}"]`).count();
+      if (hasAgreedComp > 0) {
+        console.log('[DYN-B2030] Filling compensation amounts');
+        await fillByName(page, 'attorney_disclosure.agreed_compensation', '1500');
+        await fillByName(page, 'attorney_disclosure.prior_received', '500');
+        await clickContinue(page);
+        await waitForDaPageLoad(page);
+        continue;
+      }
+      
+      const hasSourcePaid = await page.locator(`[name="${b64('attorney_disclosure.source_paid')}"]`).count();
+      if (hasSourcePaid > 0) {
+        console.log('[DYN-B2030] Source of compensation paid → debtor (default)');
+        await clickContinue(page);
+        await waitForDaPageLoad(page);
+        continue;
+      }
+      
+      const hasSourceTopay = await page.locator(`[name="${b64('attorney_disclosure.source_topay')}"]`).count();
+      if (hasSourceTopay > 0) {
+        console.log('[DYN-B2030] Source of future compensation → debtor (default)');
+        await clickContinue(page);
+        await waitForDaPageLoad(page);
+        continue;
+      }
+      
+      const hasSharesFees = await page.locator(`[name="${b64('attorney_disclosure.shares_fees')}"]`).count();
+      if (hasSharesFees > 0) {
+        console.log('[DYN-B2030] Fee sharing → No');
+        await clickYesNoButton(page, 'attorney_disclosure.shares_fees', false);
+        await waitForDaPageLoad(page);
+        continue;
+      }
+      
+      const hasServiceA = await page.locator(`[name="${b64('attorney_disclosure.service_a')}"]`).count();
+      if (hasServiceA > 0) {
+        console.log('[DYN-B2030] Services → accepting defaults');
+        await clickContinue(page);
+        await waitForDaPageLoad(page);
+        continue;
+      }
+      
+      const hasExcludedServices = await page.locator(`[name="${b64('attorney_disclosure.excluded_services')}"]`).count();
+      if (hasExcludedServices > 0) {
+        console.log('[DYN-B2030] Excluded services → empty (default)');
+        await clickContinue(page);
+        await waitForDaPageLoad(page);
+        continue;
+      }
+      
+      const hasAttorneyReview = await page.locator(`[name="${b64('attorney_disclosure_review')}"]`).count();
+      if (hasAttorneyReview > 0) {
+        console.log('[DYN-B2030] Attorney disclosure review → continue');
+        await clickNthByName(page, b64('attorney_disclosure_review'), 0);
         await waitForDaPageLoad(page);
         continue;
       }
@@ -1136,6 +1300,7 @@ test.describe('Full Interview – Individual Filing', () => {
       '108',    // Statement of Intention
       '121',    // Social Security Statement
       '122',    // Means Test
+      '2030',   // Disclosure of Compensation of Attorney
     ];
     for (const form of expectedForms) {
       expect(allNames).toContain(form);
