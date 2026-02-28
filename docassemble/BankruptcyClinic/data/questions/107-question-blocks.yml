@@ -1004,7 +1004,7 @@ fields:
     show if: financial_affairs.debtor2_had_other_income
   - Source 1: financial_affairs.debtor2_before_other_source_1
     # default: Income source
-    show if: financial_affiars.debtor2_had_other_income
+    show if: financial_affairs.debtor2_had_other_income
     required: False
   - Amount: financial_affairs.debtor2_before_other_source_amount_1
     datatype: currency
@@ -2026,7 +2026,7 @@ fields:
     show if: financial_affairs.environment.has_liability
   - City: financial_affairs.environment.liability_city
     # default: Seattle
-    show if: finanical_affairs.environment.has_liability
+    show if: financial_affairs.environment.has_liability
   - State: financial_affairs.environment.liability_state
     # default: Washington
     show if: financial_affairs.environment.has_liability
@@ -2086,7 +2086,7 @@ fields:
     show if: financial_affairs.environment.has_release
   - City: financial_affairs.environment.release_city
     # default: Seattle
-    show if: finanical_affairs.environment.has_release
+    show if: financial_affairs.environment.has_release
   - State: financial_affairs.environment.release_state
     # default: Washington
     show if: financial_affairs.environment.has_release
@@ -2147,6 +2147,7 @@ fields:
     # default: 3343902
     show if: financial_affairs.environment.has_proceeding
   - note: Court or agency
+    show if: financial_affairs.environment.has_proceeding
   - Court Name: financial_affairs.environment.proceeding_court_name
     # default: Court Name
     show if: financial_affairs.environment.has_proceeding

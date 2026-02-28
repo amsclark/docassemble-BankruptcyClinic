@@ -228,26 +228,6 @@ code: |
 
 
   overall_means_income = debtor_1_income + debtor_2_income
-
-  if monthly_income.dependents == 0.0:
-    povertyAmt = 14580 * 1.5
-  if monthly_income.dependents == 1.0:
-    povertyAmt = 19720 * 1.5
-  if monthly_income.dependents == 2.0:
-    povertyAmt = 24860 * 1.5
-  if monthly_income.dependents == 3.0:
-    povertyAmt = 30000 * 1.5
-  if monthly_income.dependents == 4.0:
-    povertyAmt = 35140 * 1.5
-  if monthly_income.dependents == 5.0:
-    povertyAmt = 40280 * 1.5
-  if monthly_income.dependents == 6.0:
-    povertyAmt = 45420 * 1.5
-  if monthly_income.dependents == 7.0:
-    povertyAmt = 50560 * 1.5
-  if monthly_income.dependents > 7.0:
-    countAbove = monthly_income.median_dependents - 7
-    povertyAmt = (50560 + (countAbove*5140))*1.5
 ---
 question: |
   Calculate the median family income that applies to you.

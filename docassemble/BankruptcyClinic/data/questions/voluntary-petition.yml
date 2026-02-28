@@ -493,6 +493,19 @@ code: |
   debtor[0].income.domestic_support
   debtor[0].income.union_dues
   debtor[0].income.other_deduction
+  if not debtor[0].income.other_deduction:
+    debtor[0].income.other_deduction_amount = 0
+    debtor[0].income.specify_other_deduction = ''
+    debtor[0].income.other_deduction_amount_2 = 0
+    debtor[0].income.specify_other_deduction_2 = ''
+    debtor[0].income.other_deduction_amount_3 = 0
+    debtor[0].income.specify_other_deduction_3 = ''
+    debtor[0].income.other_deduction_amount_4 = 0
+    debtor[0].income.specify_other_deduction_4 = ''
+    debtor[0].income.other_deduction_amount_5 = 0
+    debtor[0].income.specify_other_deduction_5 = ''
+    debtor[0].income.other_deduction_amount_6 = 0
+    debtor[0].income.specify_other_deduction_6 = ''
   debtor[0].income.net_rental_business
   debtor[0].income.interest_and_dividends
   debtor[0].income.family_support
@@ -501,6 +514,15 @@ code: |
   debtor[0].income.other_govt_assist
   debtor[0].income.pension
   debtor[0].income.other_monthly_income
+  if not debtor[0].income.other_monthly_income:
+    debtor[0].income.specify_monthly_income = ''
+    debtor[0].income.other_monthly_amount = 0
+  # Other contributions and income change expectations
+  debtor[0].income.other_regular_contributions
+  if not debtor[0].income.other_regular_contributions:
+    debtor[0].income.specify_other_regular_contributions = ''
+    debtor[0].income.other_regular_contributions_amount = 0
+  debtor[0].income.expect_year_delta
   if len(debtor) > 1 and financial_affairs.marital_status:
     debtor[1].income.employment
     if debtor[1].income.employment == 'Employed':
@@ -514,6 +536,19 @@ code: |
       debtor[1].income.domestic_support
       debtor[1].income.union_dues
       debtor[1].income.other_deduction
+      if not debtor[1].income.other_deduction:
+        debtor[1].income.other_deduction_amount = 0
+        debtor[1].income.specify_other_deduction = ''
+        debtor[1].income.other_deduction_amount_2 = 0
+        debtor[1].income.specify_other_deduction_2 = ''
+        debtor[1].income.other_deduction_amount_3 = 0
+        debtor[1].income.specify_other_deduction_3 = ''
+        debtor[1].income.other_deduction_amount_4 = 0
+        debtor[1].income.specify_other_deduction_4 = ''
+        debtor[1].income.other_deduction_amount_5 = 0
+        debtor[1].income.specify_other_deduction_5 = ''
+        debtor[1].income.other_deduction_amount_6 = 0
+        debtor[1].income.specify_other_deduction_6 = ''
       debtor[1].income.net_rental_business
       debtor[1].income.interest_and_dividends
       debtor[1].income.family_support
@@ -522,6 +557,9 @@ code: |
       debtor[1].income.other_govt_assist
       debtor[1].income.pension
       debtor[1].income.other_monthly_income
+      if not debtor[1].income.other_monthly_income:
+        debtor[1].income.specify_monthly_income = ''
+        debtor[1].income.other_monthly_amount = 0
     else:
       debtor[1].income.income_amount_1 = 0
       debtor[1].income.overtime_pay_1 = 0
@@ -533,6 +571,18 @@ code: |
       debtor[1].income.domestic_support = 0
       debtor[1].income.union_dues = 0
       debtor[1].income.other_deduction = 0
+      debtor[1].income.other_deduction_amount = 0
+      debtor[1].income.specify_other_deduction = ''
+      debtor[1].income.other_deduction_amount_2 = 0
+      debtor[1].income.specify_other_deduction_2 = ''
+      debtor[1].income.other_deduction_amount_3 = 0
+      debtor[1].income.specify_other_deduction_3 = ''
+      debtor[1].income.other_deduction_amount_4 = 0
+      debtor[1].income.specify_other_deduction_4 = ''
+      debtor[1].income.other_deduction_amount_5 = 0
+      debtor[1].income.specify_other_deduction_5 = ''
+      debtor[1].income.other_deduction_amount_6 = 0
+      debtor[1].income.specify_other_deduction_6 = ''
       debtor[1].income.net_rental_business = 0
       debtor[1].income.interest_and_dividends = 0
       debtor[1].income.family_support = 0
@@ -541,6 +591,8 @@ code: |
       debtor[1].income.other_govt_assist = 0
       debtor[1].income.pension = 0
       debtor[1].income.other_monthly_income = 0
+      debtor[1].income.specify_monthly_income = ''
+      debtor[1].income.other_monthly_amount = 0
 
 
   #106j - Expenses
@@ -580,6 +632,7 @@ code: |
 
 
   #122a - Income and means test
+  monthly_income.means_type
   monthly_income.non_consumer_debts
   if monthly_income.non_consumer_debts == False and monthly_income.disabled_veteran == False and monthly_income.reservists == False:
     monthly_income.filing_status
@@ -587,6 +640,9 @@ code: |
     if monthly_income.filing_status == "Married and your spouse is filing with you.":
       monthly_income.gross_wages2
     monthly_income.reviewed
+  # Set defaults for poverty calculation if means test was skipped
+  if not defined('monthly_income.median_dependents'):
+    monthly_income.median_dependents = 1
 
 
   case.payment_method
@@ -690,6 +746,9 @@ code: |
   if business.has_business:
     business.business.there_are_any = True
     business.business.gather()
+  else:
+    business.business.there_are_any = False
+    business.business.gathered = True
   #business.business_file_type
   business.complete = True
   business_final
@@ -697,6 +756,9 @@ code: |
   if hazardous_property.has_property:
     hazardous_property.property.there_are_any = True
     hazardous_property.property.gather()
+  else:
+    hazardous_property.property.there_are_any = False
+    hazardous_property.property.gathered = True
   hazardous_property.complete = True
   hazard_final
   for debt in debtor:

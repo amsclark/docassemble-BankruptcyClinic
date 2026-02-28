@@ -1,0 +1,75 @@
+
+Running 2 tests using 2 workers
+
+[1A[2K[1/2] [chromium] › tests/individual-filing.spec.ts:22:7 › Individual Filing Flow › Complete individual filing through debtor info and case setup
+[1A[2K[2/2] [chromium] › tests/full-interview.spec.ts:768:7 › Full Interview – Individual Filing › Complete individual filing reaches document generation
+[1A[2K[chromium] › tests/full-interview.spec.ts:768:7 › Full Interview – Individual Filing › Complete individual filing reaches document generation
+[PROP] property_intro heading: Please tell the court about your property.
+
+[1A[2K[PROP] interests heading: Do you own or have any legal or equitable interest in any residence, building, land, or similar property?
+
+[1A[2K[PROP] vehicles heading: Do you own, lease, or have legal or equitable interest in any vehicles, whether they are registered or not?
+
+[1A[2K[PROP] other_vehicles heading: Do you own, lease, or have legal or equitable interest in any other vehicle types not listed, whether they are registered or not?
+
+[1A[2K[chromium] › tests/individual-filing.spec.ts:22:7 › Individual Filing Flow › Complete individual filing through debtor info and case setup
+📍 After debtor info: "Does Jane Doe have any           other names they’ve used in the last 8 years?"
+
+[1A[2K📍 District residency: "Has Jane Doe lived in the specified district for over 180 days?"
+
+[1A[2K📍 After district: "Please tell the court about your property."
+
+[1A[2K✅ Individual filing: Successfully completed debtor info section
+
+[1A[2K[chromium] › tests/full-interview.spec.ts:768:7 › Full Interview – Individual Filing › Complete individual filing reaches document generation
+[INCOME] page 1: Fill in your employment information.
+
+[1A[2K[INCOME] page 2: Give details about monthly income
+
+[1A[2K[INCOME] page 3: List total payroll deductions in the previous month
+
+[1A[2K[INCOME] page 4: Do you have any deductions to claim?
+
+[1A[2K[INCOME] page 5: List all other income regularly received
+
+[1A[2K[INCOME] after income: Estimate your ongoing monthly expenses
+
+[1A[2K  1) [chromium] › tests/full-interview.spec.ts:768:7 › Full Interview – Individual Filing › Complete individual filing reaches document generation 
+
+    TimeoutError: locator.click: Timeout 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[name="Y2FzZS5wYXltZW50X21ldGhvZA"][value="1"]')[22m
+
+
+      697 |   // Payment method → pay in full
+      698 |   await waitForDaPageLoad(page);
+    > 699 |   await page.locator(`input[name="${b64('case.payment_method')}"][value="1"]`).click();
+          |                                                                                ^
+      700 |   await clickContinue(page);
+      701 |
+      702 |   // Previous bankruptcy → No
+        at navigateCaseDetails (/home/alex/Bankruptcy Project/docassemble-BankruptcyClinic/tests/full-interview.spec.ts:699:80)
+        at /home/alex/Bankruptcy Project/docassemble-BankruptcyClinic/tests/full-interview.spec.ts:807:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/full-interview-Full-Interv-9dcd7-reaches-document-generation-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/full-interview-Full-Interv-9dcd7-reaches-document-generation-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/full-interview-Full-Interv-9dcd7-reaches-document-generation-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/full-interview-Full-Interv-9dcd7-reaches-document-generation-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/full-interview-Full-Interv-9dcd7-reaches-document-generation-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K  1 failed
+    [chromium] › tests/full-interview.spec.ts:768:7 › Full Interview – Individual Filing › Complete individual filing reaches document generation 
+  1 passed (1.5m)

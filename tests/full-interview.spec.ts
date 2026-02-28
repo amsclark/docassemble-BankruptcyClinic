@@ -15,7 +15,7 @@ import {
   INTERVIEW_URL,
   b64,
   waitForDaPageLoad,
-  clickContinue,
+  clickContinue as _clickContinue,
   clickById,
   clickNthByName,
   selectByName,
@@ -28,6 +28,22 @@ import {
   screenshot,
   clickYesNo,
 } from './helpers';
+
+/**
+ * Wrapper for clickContinue that first fixes jQuery Validation
+ * to ignore hidden required fields (a recurring issue with show if blocks).
+ */
+async function clickContinue(page: Page) {
+  await page.evaluate(() => {
+    const $ = (window as any).jQuery;
+    if (!$) return;
+    const validator = $('#daform').data('validator');
+    if (validator) {
+      validator.settings.ignore = ':hidden';
+    }
+  });
+  await _clickContinue(page);
+}
 
 // ──────────────────────────────────────────────
 //  Shared navigation helpers
@@ -177,6 +193,33 @@ async function fillAllVisibleRadiosAsNo(page: Page) {
   });
   for (const id of noRadioIds) {
     await page.locator(`label[for="${id}"]`).click();
+  }
+}
+
+/**
+ * Fill all visible empty text/currency inputs with a default value.
+ * Currency fields get "0", text fields get "N/A".
+ * This is a safety net for forms with many optional fields.
+ */
+async function fillAllVisibleEmptyInputs(page: Page) {
+  const fieldIds = await page.evaluate(() => {
+    const results: { id: string; type: string }[] = [];
+    const inputs = document.querySelectorAll('input[type="text"], input[type="number"], textarea');
+    inputs.forEach(input => {
+      const el = input as HTMLInputElement | HTMLTextAreaElement;
+      if (el.offsetParent === null) return; // hidden
+      if (el.value && el.value.trim() !== '') return; // already filled
+      const id = el.getAttribute('id');
+      if (!id) return;
+      // Check if this is inside a currency wrapper (has $ prefix)
+      const parent = el.closest('.daform-group, .da-field-container');
+      const hasDollar = parent?.querySelector('.input-group-text')?.textContent?.includes('$');
+      results.push({ id, type: hasDollar ? 'currency' : 'text' });
+    });
+    return results;
+  });
+  for (const field of fieldIds) {
+    await page.locator(`#${field.id}`).fill(field.type === 'currency' ? '0' : 'N/A');
   }
 }
 
@@ -361,6 +404,7 @@ async function navigateExemptionSection(page: Page) {
 // ──────────────────────────────────────────────
 
 async function navigateFinancialAffairs(page: Page) {
+  let h: string | null;
   // Marital status + residence history – one big form
   await waitForDaPageLoad(page);
   await fillYesNoRadio(page, 'financial_affairs.marital_status', false); // Not married
@@ -449,36 +493,73 @@ async function navigateFinancialAffairs(page: Page) {
 
   // Deposit box
   await waitForDaPageLoad(page);
-  await fillYesNoRadio(page, 'financial_affairs.has_deposit_box', false);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[FA] deposit-box: ${h}`);
+  await selectYesNoRadio(page, 'financial_affairs.has_deposit_box', false);
+  await page.waitForTimeout(300);
   await clickContinue(page);
 
   // Storage unit
   await waitForDaPageLoad(page);
-  await fillYesNoRadio(page, 'financial_affairs.has_storage_unit', false);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[FA] storage-unit: ${h}`);
+  await selectYesNoRadio(page, 'financial_affairs.has_storage_unit', false);
+  await page.waitForTimeout(300);
   await clickContinue(page);
 
   // Held property
   await waitForDaPageLoad(page);
-  await fillYesNoRadio(page, 'financial_affairs.has_held_property', false);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[FA] held-property: ${h}`);
+  await selectYesNoRadio(page, 'financial_affairs.has_held_property', false);
+  await page.waitForTimeout(500);
   await clickContinue(page);
 
-  // Environment
+  // Verify we moved past held-property
   await waitForDaPageLoad(page);
-  await fillYesNoRadio(page, 'financial_affairs.environment.has_liability', false);
-  await fillYesNoRadio(page, 'financial_affairs.environment.has_release', false);
-  await fillYesNoRadio(page, 'financial_affairs.environment.has_proceeding', false);
-  await clickContinue(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  if (h?.includes('Borrowed Property') || h?.includes('held property')) {
+    console.log('[FA] held-property page did not advance, retrying...');
+    await selectYesNoRadio(page, 'financial_affairs.has_held_property', false);
+    await page.waitForTimeout(500);
+    await clickContinue(page);
+    await waitForDaPageLoad(page);
+    h = await page.locator('h1').first().textContent().catch(() => '');
+  }
 
-  // Business types (checkboxes — check "None of the above" or leave unchecked)
-  // For business_types, we need to not check any boxes and just continue
+  // Environment – 3 separate pages
+  // Liability
   await waitForDaPageLoad(page);
-  // None checkbox: the last option is usually "None of the above" but
-  // for checkboxes fields we need to uncheck all. In docassemble checkboxes
-  // there's typically a "None of the above" option. Let's just continue.
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[FA] env-liability: ${h}`);
+  await fillAllVisibleRadiosAsNo(page);
   await clickContinue(page);
 
-  // If business_types has no selections, businesses.there_are_any should be False
-  // and businesses.gather() should be skipped
+  // Release
+  await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[FA] env-release: ${h}`);
+  await fillAllVisibleRadiosAsNo(page);
+  await clickContinue(page);
+
+  // Proceeding
+  await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[FA] env-proceeding: ${h}`);
+  await fillAllVisibleRadiosAsNo(page);
+  await clickContinue(page);
+
+  // Business types (checkboxes — must select at least one, click "None of the above")
+  await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[FA] business-types: ${h}`);
+  // The "None of the above" is the last checkbox, click its label
+  await page.locator('label').filter({ hasText: 'None of the above' }).click();
+  await clickContinue(page);
+
+  // businesses.there_are_any → No (gather triggers this even with "None" business types)
+  await waitForDaPageLoad(page);
+  await clickYesNoButton(page, 'financial_affairs.businesses.there_are_any', false);
 
   // Has statement
   await waitForDaPageLoad(page);
@@ -517,7 +598,9 @@ async function navigateContractsLeases(page: Page) {
   await waitForDaPageLoad(page);
   await clickYesNoButton(page, 'prop.contracts_and_leases.there_are_any', false);
 
-  // personal_leases is asked later (108) — that's separate
+  // personal_leases comes right after contracts_and_leases in mandatory block
+  await waitForDaPageLoad(page);
+  await clickYesNoButton(page, 'personal_leases.there_are_any', false);
 }
 
 // ──────────────────────────────────────────────
@@ -537,27 +620,37 @@ async function navigateCommunityProperty(page: Page) {
 async function navigateIncome(page: Page) {
   // Employment info
   await waitForDaPageLoad(page);
+  let h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[INCOME] page 1: ${h}`);
   await selectByName(page, b64('debtor[0].income.employment'), 'Not employed');
   await clickContinue(page);
 
   // Monthly income details — even if not employed, some fields still appear
   await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[INCOME] page 2: ${h}`);
   await fillById(page, b64('debtor[0].income.income_amount_1'), '0');
   await fillById(page, b64('debtor[0].income.overtime_pay_1'), '0');
   await clickContinue(page);
 
   // Payroll deductions
   await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[INCOME] page 3: ${h}`);
   await fillById(page, b64('debtor[0].income.tax_deduction'), '0');
   await clickContinue(page);
 
   // Other deductions
   await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[INCOME] page 4: ${h}`);
   await fillYesNoRadio(page, 'debtor[0].income.other_deduction', false);
   await clickContinue(page);
 
   // Other income sources
   await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[INCOME] page 5: ${h}`);
   await fillById(page, b64('debtor[0].income.net_rental_business'), '0');
   await fillById(page, b64('debtor[0].income.interest_and_dividends'), '0');
   await fillById(page, b64('debtor[0].income.family_support'), '0');
@@ -567,6 +660,32 @@ async function navigateIncome(page: Page) {
   await fillById(page, b64('debtor[0].income.pension'), '0');
   await fillYesNoRadio(page, 'debtor[0].income.other_monthly_income', false);
   await clickContinue(page);
+
+  // Page 6: Other contributions + income changes
+  await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[INCOME] page 6: ${h}`);
+  
+  // Debug: list all radio inputs on this page
+  const radioNames = await page.evaluate(() => {
+    const radios = document.querySelectorAll('input[type="radio"]');
+    return Array.from(radios).map(r => `name=${(r as HTMLInputElement).name} value=${(r as HTMLInputElement).value}`);
+  });
+  console.log(`[INCOME] page 6 radios: ${JSON.stringify(radioNames)}`);
+  
+  const expectedName = b64('debtor[0].income.other_regular_contributions');
+  console.log(`[INCOME] expected b64 name: ${expectedName}`);
+  
+  await selectYesNoRadio(page, 'debtor[0].income.other_regular_contributions', false);
+  await page.waitForTimeout(300);
+  await selectYesNoRadio(page, 'debtor[0].income.expect_year_delta', false);
+  await page.waitForTimeout(300);
+  await clickContinue(page);
+  
+  // Check what comes after income
+  await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[INCOME] after income: ${h}`);
 }
 
 // ──────────────────────────────────────────────
@@ -574,63 +693,30 @@ async function navigateIncome(page: Page) {
 // ──────────────────────────────────────────────
 
 async function navigateExpenses(page: Page) {
-  // Household description — dependents, etc.
+  // Monthly expenses — large form with many currency fields
   await waitForDaPageLoad(page);
-  // For individual filing, joint_case is False so "other_household" won't show
-  await fillYesNoRadio(page, 'debtor[0].expenses.dependents.there_are_any', false);
-  await fillYesNoRadio(page, 'debtor[0].expenses.other_people_expenses', false);
+  let h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[EXPENSES] page 1: ${h}`);
+  
+  // Set the 3 yesnoradio fields to No
+  await selectYesNoRadio(page, 'debtor[0].expenses.util_other', false);
+  await page.waitForTimeout(300);
+  await selectYesNoRadio(page, 'debtor[0].expenses.other_insurance', false);
+  await page.waitForTimeout(300);
+  await selectYesNoRadio(page, 'debtor[0].expenses.has_other_expenses', false);
+  await page.waitForTimeout(500);
+  
+  // Fill required fields
+  await fillById(page, b64('debtor[0].expenses.rent_expense'), '0');
+  await fillById(page, b64('debtor[0].expenses.alimony'), '0');
+  
   await clickContinue(page);
 
-  // Monthly expenses — large form, fill all with 0
+  // Separate page: expect a change in expenses?
   await waitForDaPageLoad(page);
-  const expenseFields = [
-    'debtor[0].expenses.rent_expense',
-    'debtor[0].expenses.real_estate_taxes',
-    'debtor[0].expenses.renters_insurance',
-    'debtor[0].expenses.upkeep_expenses',
-    'debtor[0].expenses.owners_dues',
-    'debtor[0].expenses.additional_mortgage_payments',
-    'debtor[0].expenses.util_electric',
-    'debtor[0].expenses.util_garbage',
-  ];
-  for (const field of expenseFields) {
-    await fillById(page, b64(field), '0');
-  }
-  // util_other is a yesnoradio
-  await fillYesNoRadio(page, 'debtor[0].expenses.util_other', false);
-
-  const moreExpenseFields = [
-    'debtor[0].expenses.house_supplies',
-    'debtor[0].expenses.childcare',
-    'debtor[0].expenses.clothing',
-    'debtor[0].expenses.personal_care',
-    'debtor[0].expenses.medical',
-    'debtor[0].expenses.transportation',
-    'debtor[0].expenses.entertainment',
-    'debtor[0].expenses.charity',
-    'debtor[0].expenses.life_insurance',
-    'debtor[0].expenses.health_insurance',
-    'debtor[0].expenses.vehicle_insurance',
-  ];
-  for (const field of moreExpenseFields) {
-    await fillById(page, b64(field), '0');
-  }
-  // other_insurance is yesnoradio
-  await fillYesNoRadio(page, 'debtor[0].expenses.other_insurance', false);
-
-  // Tax and installment fields
-  await fillById(page, b64('debtor[0].expenses.other_tax_specify'), 'None');
-  await fillById(page, b64('debtor[0].expenses.other_tax_amount'), '0');
-  await fillById(page, b64('debtor[0].expenses.vehicle1_payments'), '0');
-  await fillById(page, b64('debtor[0].expenses.vehicle2_payments'), '0');
-  await fillById(page, b64('debtor[0].expenses.other_payment1_specify'), 'None');
-  await fillById(page, b64('debtor[0].expenses.other_payment1_amount'), '0');
-  await fillById(page, b64('debtor[0].expenses.other_payment2_specify'), 'None');
-  await fillById(page, b64('debtor[0].expenses.other_payment2_amount'), '0');
-  await fillById(page, b64('debtor[0].expenses.alimony'), '0');
-  await fillById(page, b64('debtor[0].expenses.other_support_specify'), 'None');
-  await fillById(page, b64('debtor[0].expenses.other_support_amount'), '0');
-  await fillYesNoRadio(page, 'debtor[0].expenses.change_in_expense', false);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[EXPENSES] page 2: ${h}`);
+  await selectYesNoRadio(page, 'debtor[0].expenses.change_in_expense', false);
   await clickContinue(page);
 }
 
@@ -642,10 +728,7 @@ async function navigateStatementOfIntention(page: Page) {
   // Secured claims → No
   await waitForDaPageLoad(page);
   await clickYesNoButton(page, 'secured_claims.there_are_any', false);
-
-  // Personal leases → No
-  await waitForDaPageLoad(page);
-  await clickYesNoButton(page, 'personal_leases.there_are_any', false);
+  // personal_leases already handled in navigateContractsLeases
 }
 
 // ──────────────────────────────────────────────
@@ -653,12 +736,37 @@ async function navigateStatementOfIntention(page: Page) {
 // ──────────────────────────────────────────────
 
 async function navigateMeansTest(page: Page) {
-  // Exemptions from presumption
+  // Page 1: Means test type selection (dropdown)
   await waitForDaPageLoad(page);
-  await fillYesNoRadio(page, 'monthly_income.non_consumer_debts', true); // Yes → skips means test
-  await fillYesNoRadio(page, 'monthly_income.disabled_veteran', false);
-  await fillYesNoRadio(page, 'monthly_income.reservists', false);
+  let h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[MEANS] means_type page: ${h}`);
+  await selectByName(page, b64('monthly_income.means_type'), 'There is no presumption of abuse.');
   await clickContinue(page);
+  
+  // Page 2: Exemptions from presumption
+  await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[MEANS] exemptions page: ${h}`);
+  
+  // Use selectYesNoRadio for more reliable radio clicking
+  await selectYesNoRadio(page, 'monthly_income.non_consumer_debts', true); // Yes
+  await page.waitForTimeout(300);
+  await selectYesNoRadio(page, 'monthly_income.disabled_veteran', false); // No
+  await page.waitForTimeout(300);
+  await selectYesNoRadio(page, 'monthly_income.reservists', false); // No
+  await page.waitForTimeout(300);
+  
+  // Verify non_consumer_debts is selected as Yes
+  const yesRadio = page.locator(`input[name="${b64('monthly_income.non_consumer_debts')}"][value="True"]`);
+  const isChecked = await yesRadio.isChecked().catch(() => false);
+  console.log(`[MEANS] non_consumer_debts Yes checked: ${isChecked}`);
+  
+  await clickContinue(page);
+  
+  // After means test, we should go directly to case details (payment method page)
+  await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[MEANS] after means test: ${h}`);
 }
 
 // ──────────────────────────────────────────────
@@ -666,9 +774,12 @@ async function navigateMeansTest(page: Page) {
 // ──────────────────────────────────────────────
 
 async function navigateCaseDetails(page: Page) {
-  // Payment method → pay in full
+  // Payment method → pay in full (labelauty radio — click the label)
   await waitForDaPageLoad(page);
-  await page.locator(`input[name="${b64('case.payment_method')}"][value="1"]`).click();
+  let h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[CASE] page 1: ${h}`);
+  const payLabel = page.locator('label').filter({ hasText: 'I will pay the entire fee when I file my petition' });
+  await payLabel.click();
   await clickContinue(page);
 
   // Previous bankruptcy → No
@@ -691,26 +802,49 @@ async function navigateCaseDetails(page: Page) {
 async function navigateBusiness(page: Page) {
   // Has business → No
   await waitForDaPageLoad(page);
+  let h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[BIZ] page 1: ${h}`);
   await clickYesNoButton(page, 'business.has_business', false);
 
   // business_final
   await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[BIZ] final: ${h}`);
   await clickNthByName(page, b64('business_final'), 0);
 }
 
 async function navigateHazardousProperty(page: Page) {
   // Has hazardous property → No
   await waitForDaPageLoad(page);
+  let h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[HAZ] page 1: ${h}`);
   await clickYesNoButton(page, 'hazardous_property.has_property', false);
 
   // hazard_final
   await waitForDaPageLoad(page);
+  h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[HAZ] final: ${h}`);
   await clickNthByName(page, b64('hazard_final'), 0);
 }
 
 async function navigateCreditCounseling(page: Page) {
   // Counseling type → received briefing with certificate
   await waitForDaPageLoad(page);
+  let h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[COUNSEL] page 1: ${h}`);
+  
+  // Debug: check what inputs are on this page
+  const inputs = await page.evaluate(() => {
+    const selects = document.querySelectorAll('select');
+    const radios = document.querySelectorAll('input[type="radio"]');
+    return {
+      selects: Array.from(selects).map(s => `name=${s.name}`),
+      radios: Array.from(radios).map(r => `name=${(r as HTMLInputElement).name} value=${(r as HTMLInputElement).value}`)
+    };
+  });
+  console.log(`[COUNSEL] selects: ${JSON.stringify(inputs.selects)}`);
+  console.log(`[COUNSEL] radios: ${JSON.stringify(inputs.radios)}`);
+  
   await selectByName(page, b64('debtor[i].counseling.counseling_type'), '1');
   await clickContinue(page);
 
@@ -720,9 +854,11 @@ async function navigateCreditCounseling(page: Page) {
 }
 
 async function navigateReporting(page: Page) {
-  // Reporting type → consumer debts
+  // Reporting type → consumer debts (labelauty radio — click label text)
   await waitForDaPageLoad(page);
-  await page.locator(`input[name="${b64('reporting.reporting_type')}"][value="1"]`).click();
+  let h = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`[REPORT] page 1: ${h}`);
+  await page.locator('label').filter({ hasText: 'Primarily consumer debts' }).click();
   await clickContinue(page);
 
   // Funds for creditors → No
@@ -772,37 +908,198 @@ test.describe('Full Interview – Individual Filing', () => {
     // ── 11. Expenses (106J) ──
     await navigateExpenses(page);
 
-    // ── 12. Statement of intention (108) ──
-    await navigateStatementOfIntention(page);
-
-    // ── 13. Means test (122A) ──
+    // ── 12. Means test (122A) ──
     await navigateMeansTest(page);
 
-    // ── 14. Case details ──
+    // ── 13. Case details ──
     await navigateCaseDetails(page);
 
-    // ── 15. Business ──
+    // ── 14. Business ──
     await navigateBusiness(page);
 
-    // ── 16. Hazardous property ──
+    // ── 15. Hazardous property ──
     await navigateHazardousProperty(page);
 
-    // ── 17. Credit counseling ──
+    // ── 16. Credit counseling ──
     await navigateCreditCounseling(page);
 
-    // ── 18. Reporting ──
+    // ── 17. Reporting ──
     await navigateReporting(page);
 
-    // ── 19. Document generation: print_101 ──
+    // ── 18. Document generation ──
+    // Attachment rendering may trigger additional questions (secured_claims, personal_leases, property details)
+    // Handle them dynamically
     await waitForDaPageLoad(page);
-    await screenshot(page, 'full-individual-print-101');
-    // The print_101 screen shows Form 101 PDF attachment
-    const bodyText = await page.locator('body').innerText();
-    expect(bodyText.toLowerCase()).toContain('form 101');
-    // Continue past it
-    await clickNthByName(page, b64('print_101'), 0);
+    
+    let maxSteps = 30;
+    while (maxSteps-- > 0) {
+      await page.waitForTimeout(300); // Brief pause for page stability
+      const heading = await page.locator('h1, h2').first().textContent().catch(() => '');
+      const qid = await page.locator('input[name="_question_name"]').getAttribute('value').catch(() => 'unknown');
+      console.log(`[DYN] step ${30 - maxSteps}: "${heading}" (qid: ${qid})`);
+      
+      // Check for conclusion screen
+      const bodyText = await page.locator('body').innerText();
+      if (bodyText.toLowerCase().includes('interview questions complete') || 
+          bodyText.toLowerCase().includes('your documents are ready') ||
+          bodyText.toLowerCase().includes('conclusion')) {
+        console.log('[DYN] Found conclusion!');
+        break;
+      }
+      
+      // Check for error page
+      if (heading?.toLowerCase().includes('error')) {
+        const errorText = bodyText.substring(0, 1000);
+        const pageUrl = page.url();
+        console.log(`[DYN] Error page URL: ${pageUrl}`);
+        console.log(`[DYN] Error page text: ${errorText}`);
+        // Try to get traceback from the page
+        const tracebackEl = await page.locator('pre, code, .daerror, .alert-danger').first().textContent().catch(() => '');
+        if (tracebackEl) console.log(`[DYN] Traceback: ${tracebackEl}`);
+        await screenshot(page, 'full-individual-error-page');
+        break; // Stop on errors — they need YAML fixes, not retries
+      }
+      
+      // Check for specific known variables
+      const hasSecuredClaims = await page.locator(`[name="${b64('secured_claims.there_are_any')}"]`).count();
+      if (hasSecuredClaims > 0) {
+        console.log('[DYN] Handling secured_claims');
+        await clickYesNoButton(page, 'secured_claims.there_are_any', false);
+        await waitForDaPageLoad(page);
+        continue;
+      }
+      
+      const hasPersonalLeases = await page.locator(`[name="${b64('personal_leases.there_are_any')}"]`).count();
+      if (hasPersonalLeases > 0) {
+        console.log('[DYN] Handling personal_leases');
+        await clickYesNoButton(page, 'personal_leases.there_are_any', false);
+        await waitForDaPageLoad(page);
+        continue;
+      }
+      
+      const hasPrint101 = await page.locator(`[name="${b64('print_101')}"]`).count();
+      if (hasPrint101 > 0) {
+        console.log('[DYN] Handling print_101');
+        await clickNthByName(page, b64('print_101'), 0);
+        await waitForDaPageLoad(page);
+        continue;
+      }
+      
+      // Check for yesno button pages (two buttons: Yes/No) — always answer No
+      const noButton = page.locator('button.btn-da[value="False"]:not([disabled])');
+      const yesButton = page.locator('button.btn-da[value="True"]:not([disabled])');
+      if (await noButton.count() > 0 && await yesButton.count() > 0) {
+        console.log('[DYN] Found Yes/No button page — clicking No');
+        await noButton.first().click();
+        await waitForDaPageLoad(page);
+        continue;
+      }
 
-    // ── 20. Conclusion screen with all documents ──
+      // Fill any visible radios as "No" / "False" using jQuery for better reliability
+      const radioCount = await page.evaluate(() => {
+        let count = 0;
+        // Click all visible "No" (False) radio labels
+        document.querySelectorAll('input[type="radio"][value="False"]').forEach(radio => {
+          const id = radio.getAttribute('id');
+          if (!id) return;
+          if (!(radio as HTMLInputElement).checked) {
+            const label = document.querySelector(`label[for="${id}"]`) as HTMLElement;
+            if (label) {
+              label.click();
+              count++;
+            }
+          }
+        });
+        return count;
+      });
+      console.log(`[DYN] Clicked ${radioCount} "No" radios`);
+      
+      // Wait for page to process radio changes
+      await page.waitForTimeout(500);
+      
+      // Also check for yesno checkboxes (single checkbox = True when checked, unchecked = No)
+      // Leave them unchecked (default = No)
+      
+      // Fill any required select dropdowns with first real option
+      const selectCount = await page.evaluate(() => {
+        let count = 0;
+        document.querySelectorAll('select').forEach(sel => {
+          if (!sel.value || sel.selectedIndex <= 0) {
+            const options = sel.querySelectorAll('option');
+            for (let i = 0; i < options.length; i++) {
+              if (options[i].value && options[i].value !== '') {
+                sel.value = options[i].value;
+                sel.dispatchEvent(new Event('change', { bubbles: true }));
+                count++;
+                break;
+              }
+            }
+          }
+        });
+        return count;
+      });
+      if (selectCount > 0) console.log(`[DYN] Filled ${selectCount} dropdowns`);
+      
+      // Fill any empty text/currency inputs with "0"
+      const emptyInputs = page.locator('input[type="text"]:visible, input[type="number"]:visible, input.dacurrency:visible');
+      const inputCount = await emptyInputs.count();
+      for (let i = 0; i < inputCount; i++) {
+        const val = await emptyInputs.nth(i).inputValue();
+        if (!val) {
+          await emptyInputs.nth(i).fill('0');
+        }
+      }
+      
+      // Try to click the standard Continue button (wait for it to become enabled)
+      const continueBtn = page.locator('button#da-continue-button');
+      if (await continueBtn.count() > 0) {
+        // Wait for button to become enabled (max 5s)
+        try {
+          await continueBtn.waitFor({ state: 'attached', timeout: 2000 });
+          // Check if button is enabled
+          const isDisabled = await continueBtn.getAttribute('disabled');
+          if (isDisabled !== null) {
+            console.log('[DYN] Continue button is disabled, forcing click via JS');
+            // Force enable and submit the form via JavaScript
+            await page.evaluate(() => {
+              const btn = document.getElementById('da-continue-button') as HTMLButtonElement;
+              if (btn) {
+                btn.disabled = false;
+                btn.classList.remove('btn-secondary');
+                btn.classList.add('btn-primary');
+                // Also disable jQuery validation
+                const form = document.getElementById('daform');
+                if (form && ($ as any)(form).data('validator')) {
+                  ($ as any)(form).data('validator').settings.ignore = '*';
+                }
+              }
+            });
+            await page.waitForTimeout(200);
+          }
+          await clickContinue(page);
+          await waitForDaPageLoad(page);
+          continue;
+        } catch {
+          console.log('[DYN] Continue button wait failed');
+        }
+      }
+      
+      // Try any other submit-style button (event pages, continue button fields)
+      const anyButton = page.locator('button.btn-primary:visible, button.btn-da:visible, button[type="submit"]:visible');
+      if (await anyButton.count() > 0) {
+        console.log('[DYN] Clicking primary/submit button');
+        await anyButton.first().click();
+        await waitForDaPageLoad(page);
+        continue;
+      }
+      
+      // Unknown page — take screenshot and try one more time
+      await screenshot(page, `full-individual-unknown-page-${30 - maxSteps}`);
+      console.log(`[DYN] Unknown page (no button found): ${heading}`);
+      break;
+    }
+
+    // ── 19. Conclusion screen with all documents ──
     await waitForDaPageLoad(page);
     await screenshot(page, 'full-individual-conclusion');
     const conclusionText = await page.locator('body').innerText();

@@ -404,26 +404,44 @@ section: case_det
 ---
 id: poverty_calc
 code: |
-  overallIncome = sum((debt.income.net_rental_business + debt.income.family_support + debt.income.interest_and_dividends + debt.income.unemployment + debt.income.social_security + debt.income.other_govt_assist + debt.income.pension + debt.income.other_monthly_amount) + (debt.income.income_amount_1 + debt.income.income_amount_2 + debt.income.income_amount_3 + debt.income.income_amount_4 + debt.income.income_amount_5 + debt.income.income_amount_6 + debt.income.overtime_pay_1 + debt.income.overtime_pay_2 + debt.income.overtime_pay_3) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount) for debt in debtor)
-  #povertyAmt = 0
-  if monthly_income.median_dependents == 0.0:
+  def _num(v):
+    """Convert None/empty string/non-numeric values to 0"""
+    if v is None or v == '':
+      return 0
+    try:
+      return float(v)
+    except (TypeError, ValueError):
+      return 0
+  _overall = 0
+  for _idx, debt in enumerate(debtor):
+    _ded_var = 'debtor[' + str(_idx) + '].income.other_deduction_amount'
+    _month_var = 'debtor[' + str(_idx) + '].income.other_monthly_amount'
+    _other_ded = _num(value(_ded_var)) if defined(_ded_var) else 0
+    _other_month = _num(value(_month_var)) if defined(_month_var) else 0
+    _income_total = (_num(debt.income.net_rental_business) + _num(debt.income.family_support) + _num(debt.income.interest_and_dividends) + _num(debt.income.unemployment) + _num(debt.income.social_security) + _num(debt.income.other_govt_assist) + _num(debt.income.pension) + _other_month)
+    _paystub_total = (_num(debt.income.income_amount_1) + _num(debt.income.income_amount_2) + _num(debt.income.income_amount_3) + _num(debt.income.income_amount_4) + _num(debt.income.income_amount_5) + _num(debt.income.income_amount_6) + _num(debt.income.overtime_pay_1) + _num(debt.income.overtime_pay_2) + _num(debt.income.overtime_pay_3))
+    _deductions = (_num(debt.income.tax_deduction) + _num(debt.income.mandatory_contributions) + _num(debt.income.voluntary_contributions) + _num(debt.income.fund_loans) + _num(debt.income.insurance) + _num(debt.income.domestic_support) + _num(debt.income.union_dues) + _other_ded)
+    _overall += _income_total + _paystub_total - _deductions
+  overallIncome = _overall
+  _median_dep = _num(value('monthly_income.median_dependents')) if defined('monthly_income.median_dependents') else 1
+  if _median_dep <= 0.0:
     povertyAmt = 14580 * 1.5
-  if monthly_income.median_dependents == 1.0:
+  elif _median_dep <= 1.0:
     povertyAmt = 19720 * 1.5
-  if monthly_income.median_dependents == 2.0:
+  elif _median_dep <= 2.0:
     povertyAmt = 24860 * 1.5
-  if monthly_income.median_dependents == 3.0:
+  elif _median_dep <= 3.0:
     povertyAmt = 30000 * 1.5
-  if monthly_income.median_dependents == 4.0:
+  elif _median_dep <= 4.0:
     povertyAmt = 35140 * 1.5
-  if monthly_income.median_dependents == 5.0:
+  elif _median_dep <= 5.0:
     povertyAmt = 40280 * 1.5
-  if monthly_income.median_dependents == 6.0:
+  elif _median_dep <= 6.0:
     povertyAmt = 45420 * 1.5
-  if monthly_income.median_dependents == 7.0:
+  elif _median_dep <= 7.0:
     povertyAmt = 50560 * 1.5
-  if monthly_income.median_dependents > 7.0:
-    countAbove = monthly_income.median_dependents - 7
+  else:
+    countAbove = _median_dep - 7
     povertyAmt = (50560 + (countAbove*5140))*1.5
 
 ---
@@ -655,9 +673,9 @@ fields:
       - None of the above: 5
     # default: 1
   - note: <strong>Employer ID Number, if any</strong>
-  - EIN: debtor[i].tax_id.first_ein
+  - EIN: business.business[i].first_ein
     required: False
-  - EIN: debtor[i].tax_id.second_ein
+  - EIN: business.business[i].second_ein
     required: False
 section: sole_prop
 list collect: True
@@ -966,8 +984,8 @@ code: |
       main['debtor_mail_zip'+str(i)] = debt.mailing_zip
     main['yesLivedInDistrict'+str(i)] = True if debt.district_info.is_current_district == True else False
     main['noLivedInDistrict'+str(i)] = True if debt.district_info.is_current_district == False else False
-    main['debtor_ein'+str(i)+'-1'] = debt.tax_id.first_ein
-    main['debtor_ein'+str(i)+'-2'] = debt.tax_id.second_ein
+    main['debtor_ein'+str(i)+'-1'] = debt.tax_id.first_ein if defined('debt.tax_id.first_ein') else ''
+    main['debtor_ein'+str(i)+'-2'] = debt.tax_id.second_ein if defined('debt.tax_id.second_ein') else ''
     if debt.district_info.is_current_district == False:
       main['districtExplain'+str(i)+'-1'] = debt.district_info.other_district_reason
 
