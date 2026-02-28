@@ -1,0 +1,41 @@
+# Minimal standalone interview for testing the creditor library picker.
+# Provides the necessary dependencies (prop.nonpriority_claims) so the
+# picker can be tested without navigating the entire bankruptcy interview.
+---
+modules:
+  - .creditor_library
+---
+include:
+  - creditor-library-picker.yml
+---
+objects:
+  - prop: DAObject
+  - prop.nonpriority_claims: DAList
+---
+# Pre-configure the DAList to avoid triggering gather questions
+mandatory: True
+code: |
+  prop.nonpriority_claims.auto_gather = False
+  prop.nonpriority_claims.gathered = True
+---
+mandatory: True
+code: |
+  creditor_library_picker_done
+  creditor_library_injected
+  picker_test_result
+---
+event: picker_test_result
+question: |
+  Picker Test Complete
+subquestion: |
+  **Injected ${ creditor_library_injected } creditor(s).**
+
+  % if len(prop.nonpriority_claims) > 0:
+  Pre-filled creditors:
+
+  % for c in prop.nonpriority_claims:
+  - ${ c.name } (${ c.city }, ${ c.state })
+  % endfor
+  % else:
+  No creditors were selected.
+  % endif

@@ -21,16 +21,18 @@ code: |
   admin_menu_selection
   if admin_menu_selection == 'add':
     new_creditor_form_done
-    add_creditor(
-      name=new_creditor.name,
-      street=new_creditor.street,
-      city=new_creditor.city,
-      state=new_creditor.state,
-      zip_code=new_creditor.zip,
-      creditor_type=new_creditor.creditor_type,
-      account_suffix=new_creditor.account_suffix,
-      notes=new_creditor.notes,
-    )
+    if not defined('_creditor_add_done'):
+      add_creditor(
+        name=new_creditor.name,
+        street=new_creditor.street,
+        city=new_creditor.city,
+        state=new_creditor.state,
+        zip_code=new_creditor.zip,
+        creditor_type=new_creditor.creditor_type,
+        account_suffix=new_creditor.account_suffix,
+        notes=new_creditor.notes,
+      )
+      _creditor_add_done = True
     creditor_added_confirmation
     undefine('admin_menu_selection')
     undefine('new_creditor_form_done')
@@ -43,6 +45,7 @@ code: |
     undefine('new_creditor.account_suffix')
     undefine('new_creditor.notes')
     undefine('creditor_added_confirmation')
+    undefine('_creditor_add_done')
     force_ask('admin_menu_selection')
   elif admin_menu_selection == 'delete':
     if len(get_creditor_table_data()) == 0:
@@ -52,13 +55,16 @@ code: |
       force_ask('admin_menu_selection')
     else:
       delete_creditor_selection_done
-      for cred_id in delete_creditor_ids.true_values():
-        remove_creditor(int(cred_id))
+      if not defined('_creditor_delete_done'):
+        for cred_id in delete_creditor_ids.true_values():
+          remove_creditor(int(cred_id))
+        _creditor_delete_done = True
       creditor_deleted_confirmation
       undefine('admin_menu_selection')
       undefine('delete_creditor_selection_done')
       undefine('delete_creditor_ids')
       undefine('creditor_deleted_confirmation')
+      undefine('_creditor_delete_done')
       force_ask('admin_menu_selection')
   elif admin_menu_selection == 'refresh':
     undefine('admin_menu_selection')

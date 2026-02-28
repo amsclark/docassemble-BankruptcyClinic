@@ -1,0 +1,19 @@
+metadata:
+  title: Creditor Library Cleanup
+---
+modules:
+  - .creditor_library
+---
+mandatory: True
+code: |
+  _records = get_all_creditors()
+  _count = len(_records) if _records else 0
+  for _rid in list(_records.keys()) if _records else []:
+    remove_creditor(_rid)
+  cleanup_result = _count
+---
+mandatory: True
+question: |
+  Cleanup Complete
+subquestion: |
+  Deleted ${ cleanup_result } creditor(s) from the library.
