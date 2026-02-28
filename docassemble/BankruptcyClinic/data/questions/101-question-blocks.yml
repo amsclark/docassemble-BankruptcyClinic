@@ -1175,13 +1175,47 @@ id: conclusion
 question: |
   Voluntary Petition for Individuals Filing for Bankruptcy conclusion
 subquestion: |
-  conclusion
+  Your Chapter 7 bankruptcy petition documents are ready for download.
+  Please review all documents with your attorney before filing.
 allow downloading: True
 attachment code: |
-  # attach_121, attach_122a temporarily removed
-  [ab_attach, c_attach, d_attach, ef_attach, g_attach, h_attach, i_attach, j_attach, form_107_temp, form_107_ext1, form_107_ext2, form_107_ext3, attach_108, attach_101]
+  conclusion_attachments
 continue button field: conclusion_screen
 section: fin
+---
+code: |
+  _docs = []
+  _docs.append(attach_101)
+  if case.rents_residence and case.eviction_judgement:
+    _docs.append(attach_101a)
+    if defined('wish_to_stay') and wish_to_stay:
+      _docs.append(attach_101b)
+  if case.payment_method == '2':
+    _docs.append(attach_103a)
+  if case.payment_method == '3':
+    _docs.append(form_103b_attach)
+  _docs.append(summary_attach)
+  _docs.append(ab_attach)
+  _docs.append(c_attach)
+  _docs.append(d_attach)
+  _docs.append(ef_attach)
+  _docs.append(g_attach)
+  _docs.append(h_attach)
+  _docs.append(i_attach)
+  _docs.append(j_attach)
+  _docs.append(declaration_attach)
+  _docs.append(form_107_temp)
+  _docs.append(form_107_ext1)
+  _docs.append(form_107_ext2)
+  _docs.append(form_107_ext3)
+  _docs.append(attach_108)
+  _docs.append(attach_121)
+  _docs.append(attach_122a)
+  if defined('attach_122a2'):
+    _docs.append(attach_122a2)
+  if defined('attach_2030'):
+    _docs.append(attach_2030)
+  conclusion_attachments = _docs
 ---
 id: review_answers
 event: review_answers
