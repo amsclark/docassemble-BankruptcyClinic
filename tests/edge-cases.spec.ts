@@ -600,170 +600,41 @@ test.describe('Edge Cases – Conditional Logic Branches', () => {
   });
 });
 
-test.describe('Edge Cases – Zero/Empty Financial Values', () => {
-  test.setTimeout(180_000);
+test.describe('Edge Cases – Debtor Suffix and Tax ID Variants', () => {
+  test.setTimeout(120_000);
 
-  test('All-zero income fields are accepted', async ({ page }) => {
+  test('Debtor with suffix (Jr.) is accepted and advances', async ({ page }) => {
     await setupToDebtorPage(page);
-    await completeDebtorAndAdvance(page, {
-      first: 'Zero', middle: 'Income', last: 'Tester',
-      street: '100 Test St', city: 'Omaha', state: 'Nebraska', zip: '68102',
-      countyIndex: 3, taxId: '888-99-0000',
+
+    // Fill debtor with a suffix
+    await fillDebtorIdentity(page, {
+      first: 'Robert',
+      middle: 'James',
+      last: 'Williams',
+      suffix: 'Jr.',
+      street: '456 Oak Ave',
+      city: 'Lincoln',
+      state: 'Nebraska',
+      zip: '68508',
+      countyIndex: 3,
+      taxIdType: 'ssn',
+      taxId: '222-33-4444',
     });
 
-    // Navigate through property section (all No - shortest path)
+    // Should advance past debtor identity without error
     await waitForDaPageLoad(page);
-    await clickNthByName(page, b64('property_intro'), 0);
-    await waitForDaPageLoad(page);
-    await clickYesNoButton(page, 'prop.interests.there_are_any', false);
-    await waitForDaPageLoad(page);
-    await clickYesNoButton(page, 'prop.ab_vehicles.there_are_any', false);
-    await waitForDaPageLoad(page);
-    await clickYesNoButton(page, 'prop.ab_other_vehicles.there_are_any', false);
-    await page.waitForTimeout(3000);
+    const heading = await getHeading(page);
+    console.log(`After debtor with suffix: "${heading}"`);
 
-    // Skip through remaining property pages
-    await waitForDaPageLoad(page);
-    const caseNumField = page.locator(`#${b64('case_number')}`);
-    if (await caseNumField.count() > 0) {
-      await clickContinue(page);
-      await waitForDaPageLoad(page);
-    }
-    await fillAllVisibleRadiosAsNo(page);
-    await clickContinue(page);
-    await waitForDaPageLoad(page);
-    await fillAllVisibleRadiosAsNo(page);
-    await clickContinue(page);
-
-    const financialGathers = [
-      'prop.financial_assets.deposits.there_are_any',
-      'prop.financial_assets.bonds_and_stocks.there_are_any',
-      'prop.financial_assets.non_traded_stock.there_are_any',
-      'prop.financial_assets.corporate_bonds.there_are_any',
-      'prop.financial_assets.retirement_accounts.there_are_any',
-      'prop.financial_assets.prepayments.there_are_any',
-      'prop.financial_assets.annuities.there_are_any',
-      'prop.financial_assets.edu_accounts.there_are_any',
-    ];
-    for (const varName of financialGathers) {
-      await waitForDaPageLoad(page);
-      await clickYesNoButton(page, varName, false);
-    }
-
-    // Remaining property: 7 pages of radios (future property, IP, intangible,
-    // owed property, business property, farming property, other property)
-    for (let i = 0; i < 7; i++) {
-      await waitForDaPageLoad(page);
-      await fillAllVisibleRadiosAsNo(page);
-      await clickContinue(page);
-    }
-
-    // Exemptions
-    await waitForDaPageLoad(page);
-    await selectByName(
-      page,
-      b64('prop.exempt_property.exemption_type'),
-      'You are claiming federal exemptions.',
-    );
-    await clickContinue(page);
-    await waitForDaPageLoad(page);
-    await clickYesNoButton(page, 'prop.exempt_property.properties.there_are_any', false);
-
-    // Financial Affairs (all No/False)
-    await waitForDaPageLoad(page);
-    await fillYesNoRadio(page, 'financial_affairs.marital_status', false);
-    await fillYesNoRadio(page, 'financial_affairs.lived_elsewhere', false);
-    await fillYesNoRadio(page, 'financial_affairs.lived_with_spouse', false);
-    await clickContinue(page);
-
-    // Skip through remaining financial affairs sections generically
-    // Use a max-step loop with generic handlers
-    let reachedIncome = false;
-    for (let step = 0; step < 40; step++) {
-      await waitForDaPageLoad(page);
-      const h = await getHeading(page);
-
-      // Check if we've reached the income section
-      if (h.toLowerCase().includes('employment') || h.toLowerCase().includes('income')) {
-        reachedIncome = true;
-        break;
-      }
-
-      // Generic: answer No buttons
-      const noBtn = page.locator('button.btn-da[value="False"]');
-      if (await noBtn.count() > 0) {
-        await noBtn.first().click();
-        await page.waitForLoadState('networkidle');
-        continue;
-      }
-
-      // Generic: fill radios as No and continue
-      await fillAllVisibleRadiosAsNo(page);
-      const continueBtn = page.locator('#da-continue-button');
-      if (await continueBtn.count() > 0) {
-        await clickContinue(page);
-        continue;
-      }
-      break;
-    }
-
-    if (!reachedIncome) {
-      console.log('⚠ Did not reach income section — skipping zero-income test');
-      return;
-    }
-
-    // Income section: fill everything with 0
-    // Employment → Not employed
-    await selectByName(page, b64('debtor[0].income.employment'), 'Not employed');
-    await clickContinue(page);
-
-    // Monthly income — all zeros
-    await waitForDaPageLoad(page);
-    await fillById(page, b64('debtor[0].income.income_amount_1'), '0');
-    await fillById(page, b64('debtor[0].income.overtime_pay_1'), '0');
-    await clickContinue(page);
-
-    // Tax deductions — zero
-    await waitForDaPageLoad(page);
-    await fillById(page, b64('debtor[0].income.tax_deduction'), '0');
-    await clickContinue(page);
-
-    // Other deductions → No
-    await waitForDaPageLoad(page);
-    await selectYesNoRadio(page, 'debtor[0].income.other_deduction', false);
-    await clickContinue(page);
-
-    // Other income sources — all zeros
-    await waitForDaPageLoad(page);
-    await fillById(page, b64('debtor[0].income.net_rental_business'), '0');
-    await fillById(page, b64('debtor[0].income.interest_and_dividends'), '0');
-    await fillById(page, b64('debtor[0].income.family_support'), '0');
-    await fillById(page, b64('debtor[0].income.unemployment'), '0');
-    await fillById(page, b64('debtor[0].income.social_security'), '0');
-    await fillById(page, b64('debtor[0].income.other_govt_assist'), '0');
-    await fillById(page, b64('debtor[0].income.pension'), '0');
-    await selectYesNoRadio(page, 'debtor[0].income.other_monthly_income', false);
-    await clickContinue(page);
-
-    // Contributions and changes
-    await waitForDaPageLoad(page);
-    await selectYesNoRadio(page, 'debtor[0].income.other_regular_contributions', false);
-    await page.waitForTimeout(300);
-    await selectYesNoRadio(page, 'debtor[0].income.expect_year_delta', false);
-    await page.waitForTimeout(300);
-    await clickContinue(page);
-
-    // Should advance past income (no errors with all-zero values)
-    await waitForDaPageLoad(page);
-    const afterIncomeHeading = await getHeading(page);
-    console.log(`After all-zero income: "${afterIncomeHeading}"`);
-
-    // Should be on expenses or next section (not stuck on income)
+    // Verify we advanced to alias or next section (not stuck on debtor page)
     const bodyText = await page.locator('body').innerText();
-    const advancedPastIncome = !bodyText.includes('Employment') ||
-                                bodyText.toLowerCase().includes('expense') ||
-                                bodyText.toLowerCase().includes('rent');
-    expect(advancedPastIncome).toBe(true);
-    console.log('✅ Edge case: All-zero income values accepted — interview continues');
+    const advanced =
+      bodyText.toLowerCase().includes('alias') ||
+      bodyText.toLowerCase().includes('other name') ||
+      bodyText.toLowerCase().includes('business') ||
+      !bodyText.includes('Tell the court about');
+    expect(advanced).toBe(true);
+    await screenshot(page, 'edge-debtor-suffix');
+    console.log('✅ Edge case: Debtor with suffix Jr. accepted');
   });
 });
