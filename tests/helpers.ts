@@ -19,16 +19,23 @@ export const b64 = (str: string): string =>
  *  fields" errors, etc.) immediately instead of letting tests silently proceed.
  */
 export async function waitForDaPageLoad(page: Page, label = '') {
+  // Wait for network to settle first
+  try {
+    await page.waitForLoadState('networkidle', { timeout: 15000 });
+  } catch {
+    /* timeout – continue anyway */
+  }
+
   try {
     await page.evaluate(() =>
       new Promise<void>((resolve) => {
         if (typeof (window as any).$ !== 'undefined') {
           const $ = (window as any).$;
           $(document).on('daPageLoad', () => resolve());
-          if (document.readyState === 'complete') setTimeout(resolve, 150);
+          if (document.readyState === 'complete') setTimeout(resolve, 300);
         } else {
           document.readyState === 'complete'
-            ? setTimeout(resolve, 150)
+            ? setTimeout(resolve, 300)
             : window.addEventListener('load', () => resolve());
         }
       }),
@@ -36,6 +43,9 @@ export async function waitForDaPageLoad(page: Page, label = '') {
   } catch {
     /* swallow – we'll continue anyway */
   }
+
+  // Brief pause to let any redirects or AJAX updates settle
+  await page.waitForTimeout(200);
 
   // ── Global docassemble error detection ──
   // After every page transition, check if docassemble is showing an error page.
@@ -60,7 +70,7 @@ export async function waitForDaPageLoad(page: Page, label = '') {
     if (!isError) return null;
 
     // Extract the traceback or error details
-    const traceEl = document.querySelector('pre, code, .daerror, .alert-danger');
+    const traceEl = document.querySelector('pre, code, .daerror, .alert-danger, blockquote');
     const traceback = traceEl?.textContent?.substring(0, 2000) || '';
     return {
       heading,
