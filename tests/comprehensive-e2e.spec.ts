@@ -109,48 +109,119 @@ interface TestScenario {
 async function clickContinue(page: Page) {
   await waitForDaPageLoad(page);
 
-  // Detect if this is a list collect page (many disabled fields)
-  const disabledCount = await page.evaluate(() =>
-    document.querySelectorAll('#daform input:disabled, #daform select:disabled, #daform textarea:disabled').length
-  );
+  // On some pages (especially list collect), docassemble's server doesn't send
+  // validation rules, so no jQuery Validate instance exists. Without a validator,
+  // the submitHandler (daValidationHandler) never runs, _visible never gets
+  // updated, ajax=1 never gets added, and native POST returns the same page.
+  //
+  // Fix: detect missing validator and manually replicate what daValidationHandler
+  // does — build _visible, add ajax=1, then POST via AJAX. We receive the JSON
+  // response and feed it to daProcessAjax which IS accessible via a trick:
+  // we intercept the response in Playwright and navigate the page programmatically.
+  const needsManualSubmit = await page.evaluate(() => {
+    const $ = (window as any).jQuery || (window as any).$;
+    if (!$) return false;
+    const form = document.getElementById('daform');
+    if (!form) return false;
+    return !$(form).data('validator');
+  });
 
-  if (disabledCount > 5) {
-    // List collect page — jQuery Validate blocks submission because of
-    // disabled required fields in pre-rendered slots.
-    // Nuclear option: completely destroy the validator, remove required
-    // from disabled fields, then force native form submission.
-    await page.evaluate(() => {
+  if (needsManualSubmit) {
+    // Intercept the response: do the AJAX POST from Playwright's side
+    const formData = await page.evaluate(() => {
       const $ = (window as any).jQuery;
       const form = document.getElementById('daform') as HTMLFormElement;
-      if (!form) return;
 
-      // Remove required attribute from all disabled fields (for HTML5 validation)
-      form.querySelectorAll('input:disabled, select:disabled, textarea:disabled').forEach(el => {
-        el.removeAttribute('required');
+      // Build _visible list (same logic as daValidationHandler)
+      const visibleElements: string[] = [];
+      const seen: Record<string, number> = {};
+      $(form).find('input, select, textarea').filter(':not(:disabled)').each(function(this: HTMLInputElement) {
+        if ($(this).attr('name') && $(this).attr('type') !== 'hidden' &&
+            (($(this).hasClass('da-active-invisible') && $(this).parent().is(':visible')) ||
+             $(this).is(':visible'))) {
+          const name = $(this).attr('name')!;
+          if (!seen[name]) { visibleElements.push(name); seen[name] = 1; }
+        }
       });
+      // Update _visible field
+      $(form).find('input[name="_visible"]').val(btoa(JSON.stringify(visibleElements)));
+      // Add ajax=1 (remove old one first)
+      $(form).find('input[name="ajax"]').remove();
+      $('<input>').attr({type:'hidden', name:'ajax', value:'1'}).appendTo($(form));
 
-      if ($) {
-        // Completely destroy jQuery Validate — unbind all validation events
-        const jForm = $(form);
-        jForm.removeData('validator').removeData('unobtrusiveValidation');
-        jForm.off('.validate');
-      }
-
-      // Capture Continue button's name/value before native submit
-      const btn = form.querySelector('button[type="submit"].btn-primary, #da-continue-button') as HTMLButtonElement;
-      if (btn && btn.name) {
-        const hidden = document.createElement('input');
-        hidden.type = 'hidden';
-        hidden.name = btn.name;
-        hidden.value = btn.value || '1';
-        form.appendChild(hidden);
-      }
-
-      // Native submit bypasses ALL JavaScript event handlers
-      HTMLFormElement.prototype.submit.call(form);
+      // Serialize form data
+      return $(form).serialize();
     });
+
+    // Get the CSRF token and interview URL for the POST
+    const interviewUrl = await page.evaluate(() => {
+      const form = document.getElementById('daform') as HTMLFormElement;
+      return form?.action || window.location.href;
+    });
+    const csrfToken = await page.evaluate(() => (window as any).daCsrf || '');
+
+    // Do the AJAX POST from Playwright context using page.evaluate
+    // We need to call it from browser context so daProcessAjax can handle it
+    await page.evaluate(async (params: { formData: string; url: string; csrf: string }) => {
+      const $ = (window as any).jQuery;
+      return new Promise<void>((resolve, reject) => {
+        $.ajax({
+          type: 'POST',
+          url: params.url,
+          data: params.formData,
+          beforeSend: function(xhr: any) {
+            if (params.csrf) xhr.setRequestHeader('X-CSRFToken', params.csrf);
+          },
+          xhrFields: { withCredentials: true },
+          success: function(data: any) {
+            try {
+              // daProcessAjax is in the DOMContentLoaded closure. But the
+              // global daInitialExtraScripts processing calls daProcessAjax too.
+              // Actually, we can trigger it by finding the handler that jQuery
+              // registered. Or we can just do what da-extra-collect does.
+              // Simplest: just reload with the response data.
+              // Actually, daProcessAjax IS accessible indirectly: the AJAX
+              // success handler in daValidationHandler calls it. But since
+              // we're in the page context within the closure's scope...
+              // NO — page.evaluate runs in a NEW execution context, not inside
+              // the closure. So we can't access daProcessAjax.
+              //
+              // Alternative: navigate to a URL that produces the next page.
+              // Or: inject the response body directly.
+              if (data && data.action === 'body' && data.body) {
+                // Manual page update: replicate key parts of daProcessAjax
+                const targetDiv = document.getElementById('dabody') || document.querySelector('.tab-content');
+                if (targetDiv) {
+                  $(targetDiv).html(data.body);
+                  // Trigger daPageLoad event so Playwright's waitForDaPageLoad resolves
+                  $(document).trigger('daPageLoad');
+                }
+              }
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
+          },
+          error: function(_xhr: any, _status: any, error: any) {
+            reject(new Error('AJAX error: ' + error));
+          },
+        });
+      });
+    }, { formData, url: interviewUrl, csrf: csrfToken });
+
+    // Wait for the page update
+    await page.waitForTimeout(1000);
     await page.waitForLoadState('networkidle');
   } else {
+    // Normal path: validator exists, just click Continue
+    await page.evaluate(() => {
+      const $ = (window as any).jQuery;
+      if (!$) return;
+      const validator = $('#daform').data('validator');
+      if (validator) {
+        validator.settings.ignore = ':hidden, :disabled';
+      }
+    });
     await _clickContinue(page);
   }
 }
@@ -316,9 +387,16 @@ async function navigatePropertySection(page: Page, scenario: TestScenario) {
     await fillYesNoRadio(page, 'prop.interests[0].is_community_property', false);
     await page.locator(`#${b64('prop.interests[0].other_info')}`).fill(rp.otherInfo);
     await fillYesNoRadio(page, 'prop.interests[0].is_claiming_exemption', false);
+    console.log('[PROP] Interest form filled, clicking Continue...');
     await clickContinue(page);
+    await waitForDaPageLoad(page);
+    const h1AfterInterest = await page.locator('h1').first().innerText().catch(() => 'no h1');
+    console.log('[PROP] After interest Continue, heading:', h1AfterInterest);
 
     await handleAnotherPage(page, 'prop.interests.there_is_another');
+    await waitForDaPageLoad(page);
+    const h1AfterAnotherInt = await page.locator('h1').first().innerText().catch(() => 'no h1');
+    console.log('[PROP] After handleAnotherPage (interests), heading:', h1AfterAnotherInt);
   } else {
     await clickYesNoButton(page, 'prop.interests.there_are_any', false);
   }
@@ -329,6 +407,17 @@ async function navigatePropertySection(page: Page, scenario: TestScenario) {
     await clickYesNoButton(page, 'prop.ab_vehicles.there_are_any', true);
 
     await waitForDaPageLoad(page);
+    // Check validator RIGHT after page load, before filling any fields
+    const preCheck = await page.evaluate(() => {
+      const $ = (window as any).$;
+      const form = document.getElementById('daform');
+      if (!$ || !form) return 'no jquery or form';
+      const v = $(form).data('validator');
+      const dataKeys = Object.keys($(form).data() || {});
+      return { hasValidator: !!v, dataKeys, rulesCount: v ? Object.keys(v.settings.rules || {}).length : 0 };
+    });
+    console.log('[DIAG] Pre-fill validator check:', JSON.stringify(preCheck));
+
     const v = prop.vehicle;
     await page.locator(`#${b64('prop.ab_vehicles[0].make')}`).fill(v.make);
     await page.locator(`#${b64('prop.ab_vehicles[0].model')}`).fill(v.model);
@@ -356,15 +445,130 @@ async function navigatePropertySection(page: Page, scenario: TestScenario) {
       await otherInfoField.fill(v.otherInfo || 'N/A');
     }
     await fillYesNoRadio(page, 'prop.ab_vehicles[0].is_claiming_exemption', false);
+    console.log('[PROP] Vehicle form filled, running diagnostics...');
+
+    // ── DIAGNOSTIC: Check validation state and page structure before Continue ──
+    const diagnostics = await page.evaluate(() => {
+      const $ = (window as any).$;
+      const form = document.getElementById('daform') as HTMLFormElement;
+      const validator = $ ? $(form).data('validator') : null;
+      const isValid = validator ? $(form).valid() : 'no-validator';
+      const invalidEls = validator ? validator.invalidElements().map((el: any) => ({
+        name: el.name, id: el.id, type: el.type, disabled: el.disabled,
+        value: el.value?.substring(0, 30), visible: (el as HTMLElement).offsetParent !== null,
+        required: el.required, className: el.className?.substring(0, 60),
+      })) : [];
+      // Focused button lookup
+      const continueBtn = document.getElementById('da-continue-button');
+      const extraCollectBtn = document.getElementById('da-extra-collect');
+      const continueBtnInfo = continueBtn ? {
+        visible: (continueBtn as HTMLElement).offsetParent !== null,
+        type: (continueBtn as HTMLButtonElement).type,
+        text: continueBtn.textContent?.trim(),
+        classes: continueBtn.className,
+        disabled: (continueBtn as HTMLButtonElement).disabled,
+        display: window.getComputedStyle(continueBtn).display,
+        parentDisplay: continueBtn.parentElement ? window.getComputedStyle(continueBtn.parentElement).display : 'no-parent',
+      } : 'NOT-FOUND';
+      const extraCollectBtnInfo = extraCollectBtn ? {
+        visible: (extraCollectBtn as HTMLElement).offsetParent !== null,
+        type: (extraCollectBtn as HTMLButtonElement).type,
+        text: extraCollectBtn.textContent?.trim(),
+        classes: extraCollectBtn.className,
+        disabled: (extraCollectBtn as HTMLButtonElement).disabled,
+        display: window.getComputedStyle(extraCollectBtn).display,
+      } : 'NOT-FOUND';
+      const disabledFields = Array.from(form.querySelectorAll('input:disabled, select:disabled, textarea:disabled'));
+      const disabledRequired = disabledFields.filter(el => (el as HTMLInputElement).required);
+      const enabledRequired = Array.from(form.querySelectorAll('input:enabled[required], select:enabled[required], textarea:enabled[required]')).map(el => ({
+        name: (el as HTMLInputElement).name,
+        type: (el as HTMLInputElement).type,
+        value: (el as HTMLInputElement).value?.substring(0, 30),
+        visible: (el as HTMLElement).offsetParent !== null,
+      }));
+      return {
+        isValid,
+        invalidElCount: invalidEls.length,
+        invalidEls: invalidEls.slice(0, 5),
+        continueBtnInfo,
+        extraCollectBtnInfo,
+        disabledFieldCount: disabledFields.length,
+        disabledRequiredCount: disabledRequired.length,
+        enabledRequiredEmpty: enabledRequired.filter(f => !f.value),
+        enabledRequiredCount: enabledRequired.length,
+      };
+    });
+    console.log('[DIAG] Vehicle form diagnostics:', JSON.stringify(diagnostics, null, 2));
+
+    // Deep validator check — check daValidator global and try to set up validation
+    const validatorDeep = await page.evaluate(() => {
+      const $ = (window as any).$;
+      const form = document.getElementById('daform');
+      if (!$ || !form) return { error: 'no jQuery or form' };
+      // Check all data on the form
+      const formData = $(form).data();
+      const dataKeys = Object.keys(formData || {});
+      // Check if validator class exists
+      const validatorClass = $.validator ? 'exists' : 'missing';
+      // Try calling .valid() directly
+      let validResult: any;
+      try {
+        validResult = $(form).valid();
+      } catch (e: any) {
+        validResult = 'error: ' + e.message;
+      }
+      // Check if the form has submit event handlers
+      const events = ($._data && $._data(form, 'events')) || {};
+      const submitHandlers = (events.submit || []).length;
+      return {
+        dataKeys,
+        validatorClass,
+        validResult,
+        submitHandlers,
+        formId: form.id,
+      };
+    });
+    console.log('[DIAG] Deep validator check:', JSON.stringify(validatorDeep, null, 2));
+
+    // Get Continue button info
+    const btnInfo = await page.evaluate(() => {
+      const btn = document.getElementById('da-continue-button') as HTMLButtonElement;
+      return btn ? { name: btn.name, value: btn.value, type: btn.type, formMethod: btn.formMethod, formAction: btn.formAction } : 'no button';
+    });
+    console.log('[DIAG] Continue button info:', JSON.stringify(btnInfo));
+
+    // Monitor network request during form submit
+    const responsePromise = page.waitForResponse(resp => resp.url().includes('/interview'), { timeout: 30000 }).catch(() => null);
     await clickContinue(page);
+    const resp = await responsePromise;
+    if (resp) {
+      const contentType = resp.headers()['content-type'] || 'unknown';
+      const status = resp.status();
+      const isJson = contentType.includes('json');
+      console.log('[DIAG] Network response: status=' + status + ' contentType=' + contentType + ' isJson=' + isJson);
+      if (!isJson) {
+        const bodySnippet = await resp.text().catch(() => '');
+        console.log('[DIAG] Response body (first 200):', bodySnippet.substring(0, 200));
+      }
+    } else {
+      console.log('[DIAG] No network response captured');
+    }
+    await waitForDaPageLoad(page);
+    const h1AfterVehicle = await page.locator('h1').first().innerText().catch(() => 'no h1');
+    console.log('[PROP] After vehicle Continue, heading:', h1AfterVehicle);
 
     await handleAnotherPage(page, 'prop.ab_vehicles.there_is_another');
+    await waitForDaPageLoad(page);
+    const h1AfterAnotherVeh = await page.locator('h1').first().innerText().catch(() => 'no h1');
+    console.log('[PROP] After handleAnotherPage (vehicles), heading:', h1AfterAnotherVeh);
   } else {
     await clickYesNoButton(page, 'prop.ab_vehicles.there_are_any', false);
   }
 
   // ── Other vehicles → No ──
   await waitForDaPageLoad(page);
+  const h1BeforeOtherVeh = await page.locator('h1').first().innerText().catch(() => 'no h1');
+  console.log('[PROP] Before other_vehicles, heading:', h1BeforeOtherVeh);
   await clickYesNoButton(page, 'prop.ab_other_vehicles.there_are_any', false);
   await page.waitForTimeout(3000);
   await page.waitForLoadState('networkidle');
