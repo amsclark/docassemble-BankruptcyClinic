@@ -125,13 +125,16 @@ async function clickContinue(page: Page) {
     if (!form) return true;
     return !!$(form).data('validator');
   });
+  console.log('[CC] hasValidator:', hasValidator, 'url:', page.url().substring(0, 80));
 
   if (!hasValidator) {
-    // Build _visible and submit natively
-    const visibleInfo = await page.evaluate(() => {
+    // No validator → daValidationHandler never runs → _visible never gets updated
+    // and ajax=1 never gets added. Fix: build _visible, add ajax=1, POST via
+    // AJAX from browser context, then reload the page to show the next question.
+    await page.evaluate(() => {
       const $ = (window as any).jQuery;
       const form = document.getElementById('daform') as HTMLFormElement;
-      if (!$ || !form) return { error: 'no jquery/form' };
+      if (!$ || !form) return;
 
       // Build _visible list (same logic as daValidationHandler in app.js)
       const visibleElements: string[] = [];
@@ -145,40 +148,41 @@ async function clickContinue(page: Page) {
           if (!seen[name]) { visibleElements.push(name); seen[name] = 1; }
         }
       });
-      // Update _visible hidden field (btoa = base64 encode)
+      // Update _visible hidden field
       $(form).find('input[name="_visible"]').val(btoa(JSON.stringify(visibleElements)));
-
-      // Check current _visible value
-      const currentVisible = $(form).find('input[name="_visible"]').val();
-
-      // Get the serialized form data for debugging
-      const serialized = $(form).serialize();
-      const fieldCount = serialized.split('&').length;
-
-      return { visibleElements, fieldCount, currentVisibleLength: currentVisible?.length || 0 };
+      // Add ajax=1
+      $(form).find('input[name="ajax"]').remove();
+      $('<input>').attr({type:'hidden', name:'ajax', value:'1'}).appendTo($(form));
     });
-    console.log('[SUBMIT] Visible fields:', JSON.stringify(visibleInfo));
 
-    // Capture the response
-    const responsePromise = page.waitForResponse(
-      resp => resp.url().includes('/interview'),
-      { timeout: 30000 }
-    ).catch(() => null);
+    // Do AJAX POST from browser and wait for it
+    const result = await page.evaluate(async () => {
+      const $ = (window as any).jQuery;
+      const form = document.getElementById('daform') as HTMLFormElement;
+      const csrf = (window as any).daCsrf || '';
+      return new Promise<string>((resolve) => {
+        $.ajax({
+          type: 'POST',
+          url: $(form).attr('action') || window.location.href,
+          data: $(form).serialize(),
+          beforeSend: function(xhr: any) {
+            if (csrf) xhr.setRequestHeader('X-CSRFToken', csrf);
+          },
+          xhrFields: { withCredentials: true },
+          success: function(data: any) {
+            resolve(data?.action || 'unknown-action');
+          },
+          error: function(_xhr: any, _status: any, error: any) {
+            resolve('error: ' + error);
+          },
+        });
+      });
+    });
+    console.log('[SUBMIT] AJAX result action:', result);
 
-    // Native form submit → full page navigation
-    await Promise.all([
-      page.waitForNavigation({ waitUntil: 'networkidle', timeout: 60000 }),
-      page.locator('#da-continue-button').click(),
-    ]);
-
-    // Check what we got back
-    const resp = await responsePromise;
-    if (resp) {
-      console.log('[SUBMIT] Response: status=' + resp.status() + ' type=' + (resp.headers()['content-type'] || 'unknown'));
-    }
-    const newUrl = page.url();
-    const newHeading = await page.locator('h1').first().innerText().catch(() => 'no h1');
-    console.log('[SUBMIT] After navigation: url=' + newUrl + ' heading=' + newHeading);
+    // The server-side state has advanced. Reload the page to show the next question.
+    await page.reload({ waitUntil: 'networkidle' });
+    await waitForDaPageLoad(page);
   } else {
     // Normal path: validator exists, set ignore for hidden/disabled fields
     await page.evaluate(() => {
