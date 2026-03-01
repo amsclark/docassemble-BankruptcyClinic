@@ -940,51 +940,7 @@ code: |
   prop.owers[i].name
   prop.owers[i].amount
   prop.owers[i].complete = True
----
-code: |
-  # Street address is required
-  prop.interests[i].street
-  
-  # Set defaults for any possibly missing fields to prevent errors
-  if not hasattr(prop.interests[i], 'city'):
-    prop.interests[i].city = ''
-  if not hasattr(prop.interests[i], 'state'):
-    prop.interests[i].state = ''
-  if not hasattr(prop.interests[i], 'zip'):
-    prop.interests[i].zip = ''
-  if not hasattr(prop.interests[i], 'county'):
-    prop.interests[i].county = ''
-  if not hasattr(prop.interests[i], 'type'):
-    prop.interests[i].type = ''
-  if not hasattr(prop.interests[i], 'who'):
-    prop.interests[i].who = 'Debtor 1 only'
-  
-  # Handle numeric fields safely
-  if not hasattr(prop.interests[i], 'current_value'):
-    prop.interests[i].current_value = 0
-  
-  # Check if the person has a loan
-  if hasattr(prop.interests[i], 'has_loan') and prop.interests[i].has_loan:
-    if not hasattr(prop.interests[i], 'current_owed_amount'):
-      prop.interests[i].current_owed_amount = 0
-    prop.interests[i].current_owned_value = prop.interests[i].current_value - prop.interests[i].current_owed_amount
-  else:
-    prop.interests[i].current_owned_value = prop.interests[i].current_value
-  
-  # Other optional fields
-  if not hasattr(prop.interests[i], 'ownership_interest'):
-    prop.interests[i].ownership_interest = ''
-  if not hasattr(prop.interests[i], 'is_community_property'):
-    prop.interests[i].is_community_property = False
-  if not hasattr(prop.interests[i], 'other_info'):
-    prop.interests[i].other_info = ''
-  
-  # Ensure exemption fields are present
-  if not hasattr(prop.interests[i], 'is_claiming_exemption'):
-    prop.interests[i].is_claiming_exemption = False
-    
-  # Mark this item as complete
-  prop.interests[i].complete = True
+
 ---
 code: |
   prop.ab_vehicles[i].make

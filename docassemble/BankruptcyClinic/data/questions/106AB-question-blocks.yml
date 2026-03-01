@@ -1456,6 +1456,15 @@ question: |
 #code: |
 #  # Set complete attribute to true to prevent looping
 #  prop.interests[i].complete = True
+continue button field: prop.interests[i].complete
+validation code: |
+  # Calculate owned value based on loan status
+  if hasattr(prop.interests[i], 'has_loan') and prop.interests[i].has_loan:
+    if not hasattr(prop.interests[i], 'current_owed_amount'):
+      prop.interests[i].current_owed_amount = 0
+    prop.interests[i].current_owned_value = prop.interests[i].current_value - prop.interests[i].current_owed_amount
+  else:
+    prop.interests[i].current_owned_value = prop.interests[i].current_value
 fields:
   - Street: prop.interests[i].street
     # default: "1111 SE Hamilton Ave"
