@@ -163,6 +163,25 @@ async function setCheckbox(page: Page, varName: string, checked: boolean) {
   else if (!checked && ariaChecked === 'true') await label.click();
 }
 
+/**
+ * Handle "Do you have another?" pages — either a yes/no question or a list
+ * collect review page with "Add another" / "Continue" buttons.
+ */
+async function handleAnotherPage(page: Page, thereIsAnotherVar: string) {
+  await waitForDaPageLoad(page);
+  const bodyText = await page.locator('body').innerText();
+  if (bodyText.toLowerCase().includes('another') || bodyText.toLowerCase().includes('more')) {
+    const addAnotherBtn = page.locator('button').filter({ hasText: /Add another/i });
+    if (await addAnotherBtn.count() > 0) {
+      // List collect review — click Continue to proceed
+      await clickContinue(page);
+    } else {
+      // Standard yes/no question
+      await clickYesNoButton(page, thereIsAnotherVar, false);
+    }
+  }
+}
+
 // ════════════════════════════════════════════════════════════════════
 //  PARAMETERISED NAVIGATION FUNCTIONS
 // ════════════════════════════════════════════════════════════════════
@@ -260,12 +279,7 @@ async function navigatePropertySection(page: Page, scenario: TestScenario) {
     await fillYesNoRadio(page, 'prop.interests[0].is_claiming_exemption', false);
     await clickContinue(page);
 
-    // Another? → No
-    await waitForDaPageLoad(page);
-    const bodyText = await page.locator('body').innerText();
-    if (bodyText.toLowerCase().includes('another') || bodyText.toLowerCase().includes('more')) {
-      await clickYesNoButton(page, 'prop.interests.there_is_another', false);
-    }
+    await handleAnotherPage(page, 'prop.interests.there_is_another');
   } else {
     await clickYesNoButton(page, 'prop.interests.there_are_any', false);
   }
@@ -289,11 +303,13 @@ async function navigatePropertySection(page: Page, scenario: TestScenario) {
 
     if (v.hasLoan) {
       await setCheckbox(page, 'prop.ab_vehicles[0].has_loan', true);
-      await page.waitForTimeout(1000);
-      // Wait for the loan amount field to appear
-      const loanField = page.locator(`#${b64('prop.ab_vehicles[0].current_owed_amount')}`);
+      await page.waitForTimeout(1500);
+      // Wait for the loan amount field to appear and fill it
+      const loanSelector = `#${b64('prop.ab_vehicles[0].current_owed_amount')}`;
+      const loanField = page.locator(loanSelector);
       await loanField.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
-      if (await loanField.count() > 0 && await loanField.isVisible()) {
+      if (await loanField.isVisible().catch(() => false)) {
+        await loanField.click();
         await loanField.fill(v.loanAmount || '0');
       }
     }
@@ -306,12 +322,7 @@ async function navigatePropertySection(page: Page, scenario: TestScenario) {
     await fillYesNoRadio(page, 'prop.ab_vehicles[0].is_claiming_exemption', false);
     await clickContinue(page);
 
-    // Another? → No
-    await waitForDaPageLoad(page);
-    const vText = await page.locator('body').innerText();
-    if (vText.toLowerCase().includes('another') || vText.toLowerCase().includes('more') || vText.toLowerCase().includes('other vehicle')) {
-      await clickYesNoButton(page, 'prop.ab_vehicles.there_is_another', false);
-    }
+    await handleAnotherPage(page, 'prop.ab_vehicles.there_is_another');
   } else {
     await clickYesNoButton(page, 'prop.ab_vehicles.there_are_any', false);
   }
@@ -346,12 +357,7 @@ async function navigatePropertySection(page: Page, scenario: TestScenario) {
     await fillYesNoRadio(page, 'prop.financial_assets.deposits[0].is_claiming_exemption', false);
     await clickContinue(page);
 
-    // Another? → No
-    await waitForDaPageLoad(page);
-    const dText = await page.locator('body').innerText();
-    if (dText.toLowerCase().includes('another') || dText.toLowerCase().includes('more')) {
-      await clickYesNoButton(page, 'prop.financial_assets.deposits.there_is_another', false);
-    }
+    await handleAnotherPage(page, 'prop.financial_assets.deposits.there_is_another');
   } else {
     await clickYesNoButton(page, 'prop.financial_assets.deposits.there_are_any', false);
   }
@@ -617,12 +623,7 @@ async function navigateSecuredCreditors(page: Page, scenario: TestScenario) {
       await clickYesNoButton(page, 'prop.creditors[0].notify.there_are_any', false);
     }
 
-    // Another? → No
-    await waitForDaPageLoad(page);
-    const moreText = await page.locator('body').innerText();
-    if (moreText.toLowerCase().includes('another') || moreText.toLowerCase().includes('more')) {
-      await clickYesNoButton(page, 'prop.creditors.there_is_another', false);
-    }
+    await handleAnotherPage(page, 'prop.creditors.there_is_another');
   } else {
     await clickYesNoButton(page, 'prop.creditors.there_are_any', false);
   }
@@ -656,12 +657,7 @@ async function navigateUnsecuredCreditors(page: Page, scenario: TestScenario) {
     await fillYesNoRadio(page, 'prop.priority_claims[0].has_codebtor', false);
     await clickContinue(page);
 
-    // Another? → No
-    await waitForDaPageLoad(page);
-    const morePriority = await page.locator('body').innerText();
-    if (morePriority.toLowerCase().includes('another') || morePriority.toLowerCase().includes('more')) {
-      await clickYesNoButton(page, 'prop.priority_claims.there_is_another', false);
-    }
+    await handleAnotherPage(page, 'prop.priority_claims.there_is_another');
   } else {
     await clickYesNoButton(page, 'prop.priority_claims.there_are_any', false);
   }
@@ -685,12 +681,7 @@ async function navigateUnsecuredCreditors(page: Page, scenario: TestScenario) {
     await fillYesNoRadio(page, 'prop.nonpriority_claims[0].has_codebtor', false);
     await clickContinue(page);
 
-    // Another? → No
-    await waitForDaPageLoad(page);
-    const moreNp = await page.locator('body').innerText();
-    if (moreNp.toLowerCase().includes('another') || moreNp.toLowerCase().includes('more')) {
-      await clickYesNoButton(page, 'prop.nonpriority_claims.there_is_another', false);
-    }
+    await handleAnotherPage(page, 'prop.nonpriority_claims.there_is_another');
   } else {
     await clickYesNoButton(page, 'prop.nonpriority_claims.there_are_any', false);
   }
