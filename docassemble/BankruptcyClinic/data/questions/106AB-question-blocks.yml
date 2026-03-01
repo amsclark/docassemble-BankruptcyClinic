@@ -1684,10 +1684,12 @@ fields:
   - Specific laws that allow exemption: prop.ab_vehicles[i].exemption_laws
     choices:
       code: |
-        get_exemption_choices(
-          prop.ab_vehicles[i].state if prop.ab_vehicles[i].state else debtor[0].address.state,
-          'vehicle'
-        )
+        # Use a static union of NE and SD vehicle exemptions to avoid
+        # triggering lookups of undefined variables during page render
+        list(dict.fromkeys(
+          get_exemption_choices('Nebraska', 'vehicle') +
+          get_exemption_choices('South Dakota', 'vehicle')
+        ))
     show if: prop.ab_vehicles[i].is_claiming_exemption
   - note: Second Exemption
     show if: prop.ab_vehicles[i].is_claiming_exemption
@@ -1699,10 +1701,12 @@ fields:
   - Specific laws that allow exemption: prop.ab_vehicles[i].exemption_laws_2
     choices:
       code: |
-        get_exemption_choices(
-          prop.ab_vehicles[i].state if prop.ab_vehicles[i].state else debtor[0].address.state,
-          'vehicle'
-        )
+        # Use a static union of NE and SD vehicle exemptions to avoid
+        # triggering lookups of undefined variables during page render
+        list(dict.fromkeys(
+          get_exemption_choices('Nebraska', 'vehicle') +
+          get_exemption_choices('South Dakota', 'vehicle')
+        ))
     show if: prop.ab_vehicles[i].is_claiming_exemption
     required: False
 list collect: True
@@ -1820,7 +1824,12 @@ fields:
   - Specific laws that allow exemption: prop.ab_other_vehicles[i].exemption_laws
     choices:
       code: |
-        get_exemption_choices(prop.ab_other_vehicles[i].state, 'vehicle')
+        # Use a static union of NE and SD vehicle exemptions to avoid
+        # triggering lookups of undefined variables during page render
+        list(dict.fromkeys(
+          get_exemption_choices('Nebraska', 'vehicle') +
+          get_exemption_choices('South Dakota', 'vehicle')
+        ))
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
   - note: Exemption 2
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
@@ -1832,7 +1841,12 @@ fields:
   - Specific laws that allow exemption: prop.ab_other_vehicles[i].exemption_laws_2
     choices:
       code: |
-        get_exemption_choices(prop.ab_other_vehicles[i].state, 'vehicle')
+        # Use a static union of NE and SD vehicle exemptions to avoid
+        # triggering lookups of undefined variables during page render
+        list(dict.fromkeys(
+          get_exemption_choices('Nebraska', 'vehicle') +
+          get_exemption_choices('South Dakota', 'vehicle')
+        ))
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
     required: False
 list collect: True
