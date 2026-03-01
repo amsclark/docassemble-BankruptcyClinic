@@ -129,12 +129,12 @@ async function clickContinue(page: Page) {
 
   if (!hasValidator) {
     // No validator → daValidationHandler never runs → _visible never gets updated
-    // and ajax=1 never gets added. Fix: build _visible, add ajax=1, POST via
-    // AJAX from browser context, then reload the page to show the next question.
-    await page.evaluate(() => {
+    // and ajax=1 is never added. Fix: build _visible, add ajax=1, serialize the
+    // form, POST via Playwright's request API, then reload the page.
+    const { formData, postUrl } = await page.evaluate(() => {
       const $ = (window as any).jQuery;
       const form = document.getElementById('daform') as HTMLFormElement;
-      if (!$ || !form) return;
+      if (!$ || !form) return { formData: '', postUrl: '' };
 
       // Build _visible list (same logic as daValidationHandler in app.js)
       const visibleElements: string[] = [];
@@ -153,34 +153,26 @@ async function clickContinue(page: Page) {
       // Add ajax=1
       $(form).find('input[name="ajax"]').remove();
       $('<input>').attr({type:'hidden', name:'ajax', value:'1'}).appendTo($(form));
+
+      return {
+        formData: $(form).serialize(),
+        postUrl: $(form).attr('action') || window.location.href,
+      };
     });
 
-    // Do AJAX POST from browser and wait for it
-    const result = await page.evaluate(async () => {
-      const $ = (window as any).jQuery;
-      const form = document.getElementById('daform') as HTMLFormElement;
-      const csrf = (window as any).daCsrf || '';
-      return new Promise<string>((resolve) => {
-        $.ajax({
-          type: 'POST',
-          url: $(form).attr('action') || window.location.href,
-          data: $(form).serialize(),
-          beforeSend: function(xhr: any) {
-            if (csrf) xhr.setRequestHeader('X-CSRFToken', csrf);
-          },
-          xhrFields: { withCredentials: true },
-          success: function(data: any) {
-            resolve(data?.action || 'unknown-action');
-          },
-          error: function(_xhr: any, _status: any, error: any) {
-            resolve('error: ' + error);
-          },
-        });
-      });
+    // Use Playwright's request context (shares cookies/session with browser)
+    const csrfToken = await page.evaluate(() => (window as any).daCsrf || '');
+    const response = await page.context().request.post(postUrl, {
+      form: Object.fromEntries(new URLSearchParams(formData)),
+      headers: {
+        'X-CSRFToken': csrfToken,
+        'X-Requested-With': 'XMLHttpRequest',
+      },
     });
-    console.log('[SUBMIT] AJAX result action:', result);
+    const responseAction = await response.json().then(d => d?.action || 'unknown').catch(() => 'not-json');
+    console.log('[SUBMIT] Response:', response.status(), responseAction);
 
-    // The server-side state has advanced. Reload the page to show the next question.
+    // Server state has advanced. Reload to show next question.
     await page.reload({ waitUntil: 'networkidle' });
     await waitForDaPageLoad(page);
   } else {
