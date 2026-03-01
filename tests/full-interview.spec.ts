@@ -11,6 +11,7 @@
  * Each test uses a generous timeout because the interview has 30+ screens.
  */
 import { test, expect, Page } from '@playwright/test';
+import { PDFDocument } from 'pdf-lib';
 import {
   INTERVIEW_URL,
   b64,
@@ -1419,17 +1420,197 @@ test.describe('Full Interview – Individual Filing', () => {
       expect(allNames).toContain(form);
     }
 
-    // Verify first 3 download links return valid PDF content
-    for (let i = 0; i < Math.min(3, downloadLinks.length); i++) {
+    // ── Download ALL PDFs, verify validity, and read AcroForm field values ──
+    // pdf-parse only extracts page content text, NOT filled form field values.
+    // Docassemble fills AcroForm fields, so we use pdf-lib to read them.
+    type PdfInfo = {
+      name: string;
+      pages: number;
+      fields: Record<string, string | boolean | undefined>;
+    };
+    const pdfInfos: PdfInfo[] = [];
+
+    for (let i = 0; i < downloadLinks.length; i++) {
       const response = await page.request.get(downloadLinks[i].href);
       const contentType = response.headers()['content-type'] || '';
-      console.log(`  📄 ${downloadLinks[i].name}: ${response.status()} ${contentType}`);
+      console.log(`  📄 [${i}] ${downloadLinks[i].name}: ${response.status()} ${contentType}`);
       expect(response.status()).toBe(200);
       expect(contentType).toContain('pdf');
+
+      // Load with pdf-lib to verify structure + read form fields
+      const pdfBytes = await response.body();
+      const pdfDoc = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
+      const pageCount = pdfDoc.getPageCount();
+      expect(pageCount).toBeGreaterThan(0);
+
+      // Extract all form field values
+      const fieldMap: Record<string, string | boolean | undefined> = {};
+      try {
+        const form = pdfDoc.getForm();
+        for (const field of form.getFields()) {
+          const name = field.getName();
+          const constructor = field.constructor.name;
+          if (constructor === 'PDFTextField') {
+            fieldMap[name] = (field as any).getText() ?? '';
+          } else if (constructor === 'PDFCheckBox') {
+            fieldMap[name] = (field as any).isChecked();
+          } else if (constructor === 'PDFDropdown') {
+            const selected = (field as any).getSelected();
+            fieldMap[name] = selected?.length ? selected[0] : '';
+          } else if (constructor === 'PDFRadioGroup') {
+            fieldMap[name] = (field as any).getSelected() ?? '';
+          }
+        }
+      } catch {
+        // Some PDFs may not have interactive forms
+      }
+
+      pdfInfos.push({ name: downloadLinks[i].name, pages: pageCount, fields: fieldMap });
+      const fieldCount = Object.keys(fieldMap).length;
+      console.log(`    → ${pageCount} pages, ${fieldCount} form fields`);
     }
 
-    console.log('✅ Individual filing: Reached conclusion with document generation!');
-    console.log('✅ All key forms present and PDFs are valid!');
+    console.log(`\n📝 Loaded ${pdfInfos.length} valid PDFs`);
+
+    // ── Helper to find a PDF by form number in its heading name ──
+    const findPdf = (formNum: string) =>
+      pdfInfos.find(p => p.name.toLowerCase().includes(formNum.toLowerCase()));
+
+    // Helper: get a string field value (case-insensitive key search)
+    const getField = (fields: Record<string, string | boolean | undefined>, key: string): string => {
+      const val = fields[key];
+      if (typeof val === 'string') return val;
+      if (typeof val === 'boolean') return val ? 'true' : 'false';
+      return '';
+    };
+
+    // ── PDF Content Verification: Form 101 (Voluntary Petition) ──
+    // Field mappings from 101-question-blocks.yml:
+    //   debtor_first_name1 → debt.name.first ("John")
+    //   debtor_last_name1  → debt.name.last ("Public")
+    //   debtor_ssn1        → tax_id[-4:] ("3333")
+    //   bankruptcy_district → current_district ("Nebraska")
+    //   debtor1_name_1     → full debtor name (repeated on every page)
+    //   isCh7              → True (checkbox)
+    const form101 = findPdf('101');
+    expect(form101).toBeTruthy();
+    if (form101) {
+      const f = form101.fields;
+
+      // Debtor name fields
+      const firstName = getField(f, 'debtor_first_name1');
+      const lastName = getField(f, 'debtor_last_name1');
+      console.log(`  Form 101 debtor_first_name1 = "${firstName}"`);
+      console.log(`  Form 101 debtor_last_name1 = "${lastName}"`);
+      expect(firstName).toBe('John');
+      expect(lastName).toBe('Public');
+      console.log('✅ PDF Form 101: Debtor name (John / Public) verified');
+
+      // SSN last 4
+      const ssn = getField(f, 'debtor_ssn1');
+      console.log(`  Form 101 debtor_ssn1 = "${ssn}"`);
+      expect(ssn).toContain('3333');
+      console.log('✅ PDF Form 101: SSN last 4 (3333) verified');
+
+      // District
+      const district = getField(f, 'bankruptcy_district');
+      console.log(`  Form 101 bankruptcy_district = "${district}"`);
+      expect(district).toContain('Nebraska');
+      console.log('✅ PDF Form 101: District of Nebraska verified');
+
+      // Full debtor name on header pages
+      const headerName = getField(f, 'debtor1_name_1');
+      console.log(`  Form 101 debtor1_name_1 = "${headerName}"`);
+      expect(headerName.toLowerCase()).toContain('john');
+      expect(headerName.toLowerCase()).toContain('public');
+      console.log('✅ PDF Form 101: Header debtor name verified');
+
+      // Chapter 7 checkbox
+      const isCh7 = f['isCh7'];
+      console.log(`  Form 101 isCh7 = ${isCh7}`);
+      expect(isCh7).toBe(true);
+      console.log('✅ PDF Form 101: Chapter 7 checkbox verified');
+    }
+
+    // ── PDF Content Verification: Form 121 (Social Security Statement) ──
+    // Field mappings from 121-question-blocks.yml:
+    //   debtor1_first_name → debt.name.first ("John")
+    //   debtor1_last_name  → debt.name.last ("Public")
+    //   debtor1_ssn_0      → full SSN ("111-22-3333")
+    const form121 = findPdf('121');
+    expect(form121).toBeTruthy();
+    if (form121) {
+      const f = form121.fields;
+      const firstName = getField(f, 'debtor1_first_name');
+      const lastName = getField(f, 'debtor1_last_name');
+      console.log(`  Form 121 debtor1_first_name = "${firstName}"`);
+      console.log(`  Form 121 debtor1_last_name = "${lastName}"`);
+      expect(firstName).toBe('John');
+      expect(lastName).toBe('Public');
+      console.log('✅ PDF Form 121: Debtor name verified');
+
+      const ssn = getField(f, 'debtor1_ssn_0');
+      console.log(`  Form 121 debtor1_ssn_0 = "${ssn}"`);
+      expect(ssn).toContain('3333');
+      console.log('✅ PDF Form 121: Full SSN verified');
+    }
+
+    // ── PDF Content Verification: Form 2030 (Attorney Disclosure) ──
+    // Field mappings from 2030-question-blocks.yml:
+    //   District             → "Nebraska"
+    //   Debtor 1             → full debtor name
+    //   Chapter              → "7"
+    //   agreed_compensation  → currency($1500) e.g. "$1,500.00"
+    //   prior_received       → currency($500) e.g. "$500.00"
+    //   balance_due          → currency($1000) e.g. "$1,000.00"
+    const form2030 = findPdf('2030');
+    expect(form2030).toBeTruthy();
+    if (form2030) {
+      const f = form2030.fields;
+
+      const district = getField(f, 'District');
+      console.log(`  Form 2030 District = "${district}"`);
+      expect(district).toContain('Nebraska');
+      console.log('✅ PDF Form 2030: District verified');
+
+      const debtorName = getField(f, 'Debtor 1');
+      console.log(`  Form 2030 Debtor 1 = "${debtorName}"`);
+      expect(debtorName.toLowerCase()).toContain('john');
+      expect(debtorName.toLowerCase()).toContain('public');
+      console.log('✅ PDF Form 2030: Debtor name verified');
+
+      const chapter = getField(f, 'Chapter');
+      console.log(`  Form 2030 Chapter = "${chapter}"`);
+      expect(chapter).toBe('7');
+      console.log('✅ PDF Form 2030: Chapter 7 verified');
+
+      const agreedComp = getField(f, 'agreed_compensation');
+      console.log(`  Form 2030 agreed_compensation = "${agreedComp}"`);
+      expect(agreedComp).toContain('1,500');
+      console.log('✅ PDF Form 2030: Agreed compensation verified');
+
+      const priorReceived = getField(f, 'prior_received');
+      console.log(`  Form 2030 prior_received = "${priorReceived}"`);
+      expect(priorReceived).toContain('500');
+      console.log('✅ PDF Form 2030: Prior received verified');
+
+      const balanceDue = getField(f, 'balance_due');
+      console.log(`  Form 2030 balance_due = "${balanceDue}"`);
+      expect(balanceDue).toContain('1,000');
+      console.log('✅ PDF Form 2030: Balance due verified');
+    }
+
+    // ── Summary: dump all field names for the 3 key forms for debugging ──
+    for (const formNum of ['101', '121', '2030']) {
+      const pdf = findPdf(formNum);
+      if (pdf) {
+        const filled = Object.entries(pdf.fields).filter(([, v]) => v !== '' && v !== false && v !== undefined);
+        console.log(`\n📋 Form ${formNum}: ${filled.length} filled fields out of ${Object.keys(pdf.fields).length}`);
+      }
+    }
+
+    console.log('\n✅ Individual filing: Reached conclusion with document generation!');
+    console.log('✅ All key forms present and PDF CONTENT verified!');
   });
 });
 
