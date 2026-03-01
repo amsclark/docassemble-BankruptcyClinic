@@ -13,7 +13,11 @@ export const b64 = (str: string): string =>
 //  Page-level helpers
 // ──────────────────────────────────────────────
 
-/** Wait for the docassemble `daPageLoad` jQuery event (with fallback). */
+/** Wait for the docassemble `daPageLoad` jQuery event (with fallback).
+ *  After every page load, asserts that the page is NOT a docassemble error.
+ *  This catches server-side errors (500s, traceback pages, "not in the allowed
+ *  fields" errors, etc.) immediately instead of letting tests silently proceed.
+ */
 export async function waitForDaPageLoad(page: Page, label = '') {
   try {
     await page.evaluate(() =>
@@ -31,6 +35,51 @@ export async function waitForDaPageLoad(page: Page, label = '') {
     );
   } catch {
     /* swallow – we'll continue anyway */
+  }
+
+  // ── Global docassemble error detection ──
+  // After every page transition, check if docassemble is showing an error page.
+  // This catches "variable not in allowed fields", traceback errors, 500s, etc.
+  const errorInfo = await page.evaluate(() => {
+    const body = document.body?.innerText || '';
+    const heading = document.querySelector('h1, h2')?.textContent || '';
+    const headingLower = heading.toLowerCase();
+    const bodyLower = body.toLowerCase();
+
+    // Detect docassemble error pages
+    const isError =
+      headingLower.includes('error') ||
+      bodyLower.includes('there was an error') ||
+      bodyLower.includes('traceback') ||
+      bodyLower.includes('was not in the allowed fields') ||
+      bodyLower.includes('internal server error') ||
+      bodyLower.includes('interview has an error');
+
+    if (!isError) return null;
+
+    // Extract the traceback or error details
+    const traceEl = document.querySelector('pre, code, .daerror, .alert-danger');
+    const traceback = traceEl?.textContent?.substring(0, 2000) || '';
+    return {
+      heading,
+      message: body.substring(0, 1500),
+      traceback,
+      url: window.location.href,
+    };
+  });
+
+  if (errorInfo) {
+    const ctx = label ? ` [${label}]` : '';
+    const msg = [
+      `\n🚨 DOCASSEMBLE ERROR DETECTED${ctx}`,
+      `   URL: ${errorInfo.url}`,
+      `   Heading: ${errorInfo.heading}`,
+      errorInfo.traceback
+        ? `   Traceback:\n${errorInfo.traceback}`
+        : `   Body:\n${errorInfo.message}`,
+    ].join('\n');
+    console.error(msg);
+    throw new Error(`Docassemble error page detected${ctx}: ${errorInfo.heading}`);
   }
 }
 

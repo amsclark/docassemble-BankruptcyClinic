@@ -1717,16 +1717,10 @@ test.describe('List Collect Interactions', () => {
     // Claiming exemption? - yesnoradio → radio buttons
     await fillYesNoRadio(page, 'prop.interests[0].is_claiming_exemption', false);
 
-    // Submit this property interest
-    // The Continue button has name=b64('prop.interests[i].complete') with literal [i]
-    // but the server expects [0]. Fix the button name before clicking.
-    await page.evaluate((correctName: string) => {
-      const btn = document.getElementById('dacontinue') ||
-                  document.getElementById('da-continue-button');
-      if (btn) btn.setAttribute('name', correctName);
-    }, b64('prop.interests[0].complete'));
-    await page.locator('#dacontinue, #da-continue-button').first().click();
-    await page.waitForLoadState('networkidle');
+    // Submit this property interest via the standard Continue button.
+    // After the YAML fix (removing conflicting continue button field),
+    // the form submits normally — no DOM hacks needed.
+    await clickContinue(page);
 
     // After submitting the property interest, docassemble may ask "Do you have
     // more interests?" or skip directly to vehicles depending on the gather setup.
