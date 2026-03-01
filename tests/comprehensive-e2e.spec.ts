@@ -250,7 +250,9 @@ async function navigatePropertySection(page: Page, scenario: TestScenario) {
     await page.locator(`#${b64('prop.interests[0].zip')}`).fill(rp.zip);
     await page.locator(`#${b64('prop.interests[0].county')}`).fill(rp.county);
     await page.locator(`label[for="${b64('prop.interests[0].type')}_${rp.typeIndex}"]`).click();
-    await page.locator(`label[for="${b64('prop.interests[0].who')}_0"]`).click();
+    // 'who' radio only appears for joint filings
+    const propWhoLabel = page.locator(`label[for="${b64('prop.interests[0].who')}_0"]`);
+    if (await propWhoLabel.count() > 0) await propWhoLabel.click();
     await page.locator(`#${b64('prop.interests[0].current_value')}`).fill(rp.value);
     await page.locator(`#${b64('prop.interests[0].ownership_interest')}`).fill(rp.ownershipInterest);
     await fillYesNoRadio(page, 'prop.interests[0].is_community_property', false);
@@ -279,14 +281,21 @@ async function navigatePropertySection(page: Page, scenario: TestScenario) {
     await page.locator(`#${b64('prop.ab_vehicles[0].model')}`).fill(v.model);
     await page.locator(`#${b64('prop.ab_vehicles[0].year')}`).fill(v.year);
     await page.locator(`#${b64('prop.ab_vehicles[0].milage')}`).fill(v.mileage);
-    await page.locator(`label[for="${b64('prop.ab_vehicles[0].who')}_0"]`).click();
+    // 'who' radio only appears for joint filings
+    const vehWhoLabel = page.locator(`label[for="${b64('prop.ab_vehicles[0].who')}_0"]`);
+    if (await vehWhoLabel.count() > 0) await vehWhoLabel.click();
     await page.locator(`#${b64('prop.ab_vehicles[0].current_value')}`).fill(v.value);
     await page.locator(`#${b64('prop.ab_vehicles[0].state')}`).fill(v.state);
 
     if (v.hasLoan) {
       await setCheckbox(page, 'prop.ab_vehicles[0].has_loan', true);
-      await page.waitForTimeout(500);
-      await page.locator(`#${b64('prop.ab_vehicles[0].current_owed_amount')}`).fill(v.loanAmount || '0');
+      await page.waitForTimeout(1000);
+      // Wait for the loan amount field to appear
+      const loanField = page.locator(`#${b64('prop.ab_vehicles[0].current_owed_amount')}`);
+      await loanField.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
+      if (await loanField.count() > 0 && await loanField.isVisible()) {
+        await loanField.fill(v.loanAmount || '0');
+      }
     }
 
     await fillYesNoRadio(page, 'prop.ab_vehicles[0].is_community_property', false);
@@ -571,7 +580,9 @@ async function navigateSecuredCreditors(page: Page, scenario: TestScenario) {
     await page.locator(`#${b64('prop.creditors[0].city')}`).fill(sc.city);
     await page.locator(`#${b64('prop.creditors[0].state')}`).fill(sc.state);
     await page.locator(`#${b64('prop.creditors[0].zip')}`).fill(sc.zip);
-    await page.locator(`label[for="${b64('prop.creditors[0].who')}_0"]`).click();
+    // 'who' radio only appears for joint filings
+    const secWhoLabel = page.locator(`label[for="${b64('prop.creditors[0].who')}_0"]`);
+    if (await secWhoLabel.count() > 0) await secWhoLabel.click();
     await fillYesNoRadio(page, 'prop.creditors[0].community_debt', false);
 
     const dateField = page.locator(`#${b64('prop.creditors[0].incurred_date')}`);
@@ -632,7 +643,9 @@ async function navigateUnsecuredCreditors(page: Page, scenario: TestScenario) {
     await page.locator(`#${b64('prop.priority_claims[0].city')}`).fill(pc.city);
     await page.locator(`#${b64('prop.priority_claims[0].state')}`).fill(pc.state);
     await page.locator(`#${b64('prop.priority_claims[0].zip')}`).fill(pc.zip);
-    await page.locator(`label[for="${b64('prop.priority_claims[0].who')}_0"]`).click();
+    // 'who' radio only appears for joint filings
+    const prWhoLabel = page.locator(`label[for="${b64('prop.priority_claims[0].who')}_0"]`);
+    if (await prWhoLabel.count() > 0) await prWhoLabel.click();
 
     const typeSelect = page.locator(`select#${b64('prop.priority_claims[0].type')}`);
     if (await typeSelect.count() > 0) await typeSelect.selectOption(pc.type);
@@ -665,7 +678,9 @@ async function navigateUnsecuredCreditors(page: Page, scenario: TestScenario) {
     await page.locator(`#${b64('prop.nonpriority_claims[0].city')}`).fill(np.city);
     await page.locator(`#${b64('prop.nonpriority_claims[0].state')}`).fill(np.state);
     await page.locator(`#${b64('prop.nonpriority_claims[0].zip')}`).fill(np.zip);
-    await page.locator(`label[for="${b64('prop.nonpriority_claims[0].who')}_0"]`).click();
+    // 'who' radio only appears for joint filings
+    const npWhoLabel = page.locator(`label[for="${b64('prop.nonpriority_claims[0].who')}_0"]`);
+    if (await npWhoLabel.count() > 0) await npWhoLabel.click();
     await page.locator(`#${b64('prop.nonpriority_claims[0].total_claim')}`).fill(np.totalClaim);
     await fillYesNoRadio(page, 'prop.nonpriority_claims[0].has_codebtor', false);
     await clickContinue(page);
