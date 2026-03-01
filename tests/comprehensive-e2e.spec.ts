@@ -128,53 +128,67 @@ async function clickContinue(page: Page) {
   console.log('[CC] hasValidator:', hasValidator, 'url:', page.url().substring(0, 80));
 
   if (!hasValidator) {
-    // No validator → daValidationHandler never runs → _visible never gets updated
-    // and ajax=1 is never added. Fix: build _visible, add ajax=1, serialize the
-    // form, POST via Playwright's request API, then reload the page.
-    const { formData, postUrl } = await page.evaluate(() => {
-      const $ = (window as any).jQuery;
-      const form = document.getElementById('daform') as HTMLFormElement;
-      if (!$ || !form) return { formData: '', postUrl: '' };
+    console.log('[CC] Entering no-validator path...');
+    try {
+      // Build _visible, add ajax=1, serialize form
+      const { formData, postUrl } = await page.evaluate(() => {
+        const $ = (window as any).jQuery;
+        const form = document.getElementById('daform') as HTMLFormElement;
+        if (!$ || !form) return { formData: '', postUrl: '' };
 
-      // Build _visible list (same logic as daValidationHandler in app.js)
-      const visibleElements: string[] = [];
-      const seen: Record<string, number> = {};
-      $(form).find('input, select, textarea').filter(':not(:disabled)').each(function(this: HTMLElement) {
-        const el = this as HTMLInputElement;
-        if ($(el).attr('name') && $(el).attr('type') !== 'hidden' &&
-            (($(el).hasClass('da-active-invisible') && $(el).parent().is(':visible')) ||
-             $(el).is(':visible'))) {
-          const name = $(el).attr('name')!;
-          if (!seen[name]) { visibleElements.push(name); seen[name] = 1; }
-        }
+        // Build _visible list
+        const visibleElements: string[] = [];
+        const seen: Record<string, number> = {};
+        $(form).find('input, select, textarea').filter(':not(:disabled)').each(function(this: HTMLElement) {
+          const el = this as HTMLInputElement;
+          if ($(el).attr('name') && $(el).attr('type') !== 'hidden' &&
+              (($(el).hasClass('da-active-invisible') && $(el).parent().is(':visible')) ||
+               $(el).is(':visible'))) {
+            const name = $(el).attr('name')!;
+            if (!seen[name]) { visibleElements.push(name); seen[name] = 1; }
+          }
+        });
+        $(form).find('input[name="_visible"]').val(btoa(JSON.stringify(visibleElements)));
+        $(form).find('input[name="ajax"]').remove();
+        $('<input>').attr({type:'hidden', name:'ajax', value:'1'}).appendTo($(form));
+
+        return {
+          formData: $(form).serialize(),
+          postUrl: $(form).attr('action') || window.location.href,
+        };
       });
-      // Update _visible hidden field
-      $(form).find('input[name="_visible"]').val(btoa(JSON.stringify(visibleElements)));
-      // Add ajax=1
-      $(form).find('input[name="ajax"]').remove();
-      $('<input>').attr({type:'hidden', name:'ajax', value:'1'}).appendTo($(form));
+      console.log('[CC] Form serialized, postUrl:', postUrl.substring(0, 60), 'dataLen:', formData.length);
 
-      return {
-        formData: $(form).serialize(),
-        postUrl: $(form).attr('action') || window.location.href,
-      };
-    });
+      const csrfToken = await page.evaluate(() => (window as any).daCsrf || '');
+      console.log('[CC] CSRF token:', csrfToken ? 'present' : 'missing');
 
-    // Use Playwright's request context (shares cookies/session with browser)
-    const csrfToken = await page.evaluate(() => (window as any).daCsrf || '');
-    const response = await page.context().request.post(postUrl, {
-      form: Object.fromEntries(new URLSearchParams(formData)),
-      headers: {
-        'X-CSRFToken': csrfToken,
-        'X-Requested-With': 'XMLHttpRequest',
-      },
-    });
-    const responseAction = await response.json().then(d => d?.action || 'unknown').catch(() => 'not-json');
-    console.log('[SUBMIT] Response:', response.status(), responseAction);
+      const response = await page.context().request.post(postUrl, {
+        form: Object.fromEntries(new URLSearchParams(formData)),
+        headers: {
+          'X-CSRFToken': csrfToken,
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+      });
+      console.log('[CC] POST response:', response.status());
 
-    // Server state has advanced. Reload to show next question.
-    await page.reload({ waitUntil: 'networkidle' });
-    await waitForDaPageLoad(page);
+      const responseText = await response.text();
+      const isJson = responseText.startsWith('{') || responseText.startsWith('[');
+      console.log('[CC] Response type:', isJson ? 'JSON' : 'HTML', 'length:', responseText.length);
+
+      if (isJson) {
+        const data = JSON.parse(responseText);
+        console.log('[CC] Response action:', data.action || 'no-action');
+      }
+
+      // Reload page to show next question
+      await page.reload({ waitUntil: 'networkidle' });
+      await waitForDaPageLoad(page);
+      console.log('[CC] Page reloaded after AJAX POST');
+    } catch (err: any) {
+      console.log('[CC] ERROR in no-validator path:', err.message);
+      // Fallback: try normal clickContinue
+      await _clickContinue(page);
+    }
   } else {
     // Normal path: validator exists, set ignore for hidden/disabled fields
     await page.evaluate(() => {
