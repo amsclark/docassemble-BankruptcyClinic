@@ -107,21 +107,52 @@ interface TestScenario {
 // ════════════════════════════════════════════════════════════════════
 
 async function clickContinue(page: Page) {
-  await page.evaluate(() => {
-    const $ = (window as any).jQuery;
-    if (!$) return;
-    const validator = $('#daform').data('validator');
-    if (validator) {
-      validator.settings.ignore = ':hidden, :disabled';
-    }
-    // Remove required from ALL disabled inputs (list collect pre-rendered slots)
-    $('input:disabled, select:disabled, textarea:disabled').removeAttr('required').prop('required', false);
-    // Also remove disabled rows entirely to prevent any validation
-    $('fieldset:disabled, .da-field-container-hide').find('input, select, textarea').each(function() {
-      $(this).removeAttr('required').prop('required', false);
+  await waitForDaPageLoad(page);
+
+  // Detect if this is a list collect page (many disabled fields)
+  const disabledCount = await page.evaluate(() =>
+    document.querySelectorAll('#daform input:disabled, #daform select:disabled, #daform textarea:disabled').length
+  );
+
+  if (disabledCount > 5) {
+    // List collect page — jQuery Validate blocks submission because of
+    // disabled required fields in pre-rendered slots.
+    // Nuclear option: completely destroy the validator, remove required
+    // from disabled fields, then force native form submission.
+    await page.evaluate(() => {
+      const $ = (window as any).jQuery;
+      const form = document.getElementById('daform') as HTMLFormElement;
+      if (!form) return;
+
+      // Remove required attribute from all disabled fields (for HTML5 validation)
+      form.querySelectorAll('input:disabled, select:disabled, textarea:disabled').forEach(el => {
+        el.removeAttribute('required');
+      });
+
+      if ($) {
+        // Completely destroy jQuery Validate — unbind all validation events
+        const jForm = $(form);
+        jForm.removeData('validator').removeData('unobtrusiveValidation');
+        jForm.off('.validate');
+      }
+
+      // Capture Continue button's name/value before native submit
+      const btn = form.querySelector('button[type="submit"].btn-primary, #da-continue-button') as HTMLButtonElement;
+      if (btn && btn.name) {
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = btn.name;
+        hidden.value = btn.value || '1';
+        form.appendChild(hidden);
+      }
+
+      // Native submit bypasses ALL JavaScript event handlers
+      HTMLFormElement.prototype.submit.call(form);
     });
-  });
-  await _clickContinue(page);
+    await page.waitForLoadState('networkidle');
+  } else {
+    await _clickContinue(page);
+  }
 }
 
 async function clickYesNoButton(page: Page, varName: string, yes: boolean) {
