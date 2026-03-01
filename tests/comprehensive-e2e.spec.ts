@@ -111,7 +111,7 @@ async function clickContinue(page: Page) {
     const $ = (window as any).jQuery;
     if (!$) return;
     const validator = $('#daform').data('validator');
-    if (validator) validator.settings.ignore = ':hidden';
+    if (validator) validator.settings.ignore = ':hidden, :disabled';
   });
   await _clickContinue(page);
 }
@@ -303,15 +303,12 @@ async function navigatePropertySection(page: Page, scenario: TestScenario) {
 
     if (v.hasLoan) {
       await setCheckbox(page, 'prop.ab_vehicles[0].has_loan', true);
-      await page.waitForTimeout(1500);
-      // Wait for the loan amount field to appear and fill it
-      const loanSelector = `#${b64('prop.ab_vehicles[0].current_owed_amount')}`;
-      const loanField = page.locator(loanSelector);
-      await loanField.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
-      if (await loanField.isVisible().catch(() => false)) {
-        await loanField.click();
-        await loanField.fill(v.loanAmount || '0');
-      }
+      await page.waitForTimeout(2000);
+      // List collect pre-renders multiple rows; only the first is enabled
+      const loanField = page.getByLabel(/How much do you owe on the loan/i).first();
+      await loanField.waitFor({ state: 'visible', timeout: 10000 });
+      await loanField.click();
+      await loanField.fill(v.loanAmount || '0');
     }
 
     await fillYesNoRadio(page, 'prop.ab_vehicles[0].is_community_property', false);
