@@ -29,6 +29,8 @@ question: |
   Tell us about your codebtor
 subquestion: |
   Do not include your spouse as a codebtor if your spouse is filing with you.
+allowed to set:
+  - debtors.codebtors[i].complete
 fields:
   - note: Codebtor Address Information[i]
   - Name: debtors.codebtors[i].name

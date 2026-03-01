@@ -146,6 +146,8 @@ id: f103b_bank_account_details
 section: waive_fee
 question: |
   Provide details about account.
+allowed to set:
+  - prop.accounts[i].complete
 fields:
   - Account Type: prop.accounts[i].type
     choices:
@@ -273,6 +275,8 @@ under: |
 section: waive_fee
 question: |
   Enter vehicle information
+allowed to set:
+  - prop.vehicles[i].complete
 fields:
   - Make: prop.vehicles[i].make
     # default:       Toyota
@@ -339,6 +343,8 @@ id: f103b_money_owed_to_you_details
 section: waive_fee
 question: |
   Tell us about the ower.
+allowed to set:
+  - prop.owers[i].complete
 fields:
   - Ower Name: prop.owers[i].name
     # default:       Cindy
@@ -463,6 +469,8 @@ under: |
 id: f103b_previous_bankruptcy_details
 question: |
   Tell the court about your previous bankruptcy case.
+allowed to set:
+  - additional.bankruptcies[i].complete
 fields:
   - District: additional.bankruptcies[i].district
     # default: 'District of Nebraska'

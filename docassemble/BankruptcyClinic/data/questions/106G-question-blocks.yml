@@ -25,6 +25,8 @@ id: executory_contract_lease_details
 section: schedule_g
 question: |
   Tell the court about the executory contract or unexpired lease
+allowed to set:
+  - prop.contracts_and_leases[i].complete
 fields:
   - note: Person or company with whom you have contract or lease
   - Name: prop.contracts_and_leases[i].name

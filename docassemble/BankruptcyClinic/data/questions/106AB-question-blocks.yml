@@ -1456,6 +1456,7 @@ question: |
 #code: |
 #  # Set complete attribute to true to prevent looping
 #  prop.interests[i].complete = True
+continue button field: prop.interests[i].complete
 allowed to set:
   - prop.interests[i].complete
 validation code: |
@@ -1621,6 +1622,8 @@ script: |
       "prop.ab_vehicles[i].exemption_laws_2",
       "prop.ab_vehicles[i].state");
   </script>
+allowed to set:
+  - prop.ab_vehicles[i].complete
 fields:
   - Make: prop.ab_vehicles[i].make
     # default: Toyota
@@ -1759,6 +1762,8 @@ script: |
       "prop.ab_other_vehicles[i].exemption_laws_2",
       "prop.ab_other_vehicles[i].state");
   </script>
+allowed to set:
+  - prop.ab_other_vehicles[i].complete
 fields:
   - Make: prop.ab_other_vehicles[i].make
     # default: Toyota
@@ -2525,6 +2530,8 @@ script: |
       "prop.financial_assets.deposits[i].exemption_value_2",
       "prop.financial_assets.deposits[i].exemption_laws_2");
   </script>
+allowed to set:
+  - prop.financial_assets.deposits[i].complete
 fields:
   - Account Type: prop.financial_assets.deposits[i].type
     choices:
@@ -2619,6 +2626,8 @@ script: |
       "prop.financial_assets.bonds_and_stocks[i].exemption_value_2",
       "prop.financial_assets.bonds_and_stocks[i].exemption_laws_2");
   </script>
+allowed to set:
+  - prop.financial_assets.bonds_and_stocks[i].complete
 fields:
   - Institution Name: prop.financial_assets.bonds_and_stocks[i].institution
     # default: BECU
@@ -2709,6 +2718,8 @@ script: |
       "prop.financial_assets.non_traded_stock[i].exemption_value_2",
       "prop.financial_assets.non_traded_stock[i].exemption_laws_2");
   </script>
+allowed to set:
+  - prop.financial_assets.non_traded_stock[i].complete
 fields:
   - Name of entity: prop.financial_assets.non_traded_stock[i].entity
     # default: CoolCo LLC
@@ -2800,6 +2811,8 @@ script: |
       "prop.financial_assets.corporate_bonds[i].exemption_value_2",
       "prop.financial_assets.corporate_bonds[i].exemption_laws_2");
   </script>
+allowed to set:
+  - prop.financial_assets.corporate_bonds[i].complete
 fields:
   - Issuer: prop.financial_assets.corporate_bonds[i].issuer
     # default: CoolCo LLC
@@ -2890,6 +2903,8 @@ script: |
       "prop.financial_assets.retirement_accounts[i].exemption_value_2",
       "prop.financial_assets.retirement_accounts[i].exemption_laws_2");
   </script>
+allowed to set:
+  - prop.financial_assets.retirement_accounts[i].complete
 fields:
   - Account Type: prop.financial_assets.retirement_accounts[i].type
     input type: radio
@@ -2996,6 +3011,8 @@ script: |
       "prop.financial_assets.prepayments[i].exemption_value_2",
       "prop.financial_assets.prepayments[i].exemption_laws_2");
   </script>
+allowed to set:
+  - prop.financial_assets.prepayments[i].complete
 fields:
   - Account Type: prop.financial_assets.prepayments[i].type
     input type: radio
@@ -3098,6 +3115,8 @@ script: |
       "prop.financial_assets.annuities[i].exemption_value_2",
       "prop.financial_assets.annuities[i].exemption_laws_2");
   </script>
+allowed to set:
+  - prop.financial_assets.annuities[i].complete
 fields:
   - Issuer: prop.financial_assets.annuities[i].issuer
     # default: Florida Lottery
@@ -3189,6 +3208,8 @@ script: |
       "prop.financial_assets.edu_accounts[i].exemption_value_2",
       "prop.financial_assets.edu_accounts[i].exemption_laws_2");
   </script>
+allowed to set:
+  - prop.financial_assets.edu_accounts[i].complete
 fields:
   - Institution: prop.financial_assets.edu_accounts[i].institution
     # default: Fidelity

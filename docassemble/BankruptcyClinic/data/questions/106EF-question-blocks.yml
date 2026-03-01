@@ -29,6 +29,8 @@ id: priority_unsecured_claim_details
 section: schedule_ef
 question: |
   Tell the court about an unsecured claim
+allowed to set:
+  - prop.priority_claims[i].complete
 fields:
   - Creditors Name: prop.priority_claims[i].name
     # default: Some creditor
@@ -239,6 +241,8 @@ id: nonpriority_unsecured_claim_details
 section: schedule_ef
 question: |
   Tell the court about a nonpriority unsecured claim
+allowed to set:
+  - prop.nonpriority_claims[i].complete
 fields:
   - Creditors Name: prop.nonpriority_claims[i].name
     # default: Some creditor

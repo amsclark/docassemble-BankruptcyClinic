@@ -42,6 +42,8 @@ id: exempt_property_details
 section: schedule_c
 question: |
   Tell us more about the property and claim for exemption
+allowed to set:
+  - prop.exempt_property.properties[i].complete
 fields:
   - Description: prop.exempt_property.properties[i].description
     input type: area

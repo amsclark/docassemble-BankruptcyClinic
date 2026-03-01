@@ -303,6 +303,8 @@ question: |
   Add an alias for ${ debtor[i].name.first } ${ debtor[i].name.last } used   in the last 8 years.
 subquestion: |
   Include married or maiden names and any assumed, trade names and doing business as names, as well as your name with and without your middle initial and with and without your middle name.
+allowed to set:
+  - debtor[i].complete
 fields:
   - First Name: debtor[i].alias[j].first_name
     required: False
@@ -467,6 +469,8 @@ section: case_det
 id: previous_bankruptcy_details
 question: |
   Please provide the details of your previous bankruptcy in the previous 8 years.
+allowed to set:
+  - case.previous_bankruptcy[i].complete
 fields:
   - District: case.previous_bankruptcy[i].district
     # default: District of Nebraska
@@ -498,6 +502,8 @@ section: case_det
 id: pending_bankruptcy_details
 question: |
   Please provide the details of your pending bankruptcy in the previous 8 years.
+allowed to set:
+  - case.pending_bankruptcy[i].complete
 fields:
   - Debtor: case.pending_bankruptcy[i].debtor
     # default: Dan Fields
@@ -662,6 +668,8 @@ section: sole_prop
 id: business_details
 question: |
   Please fill in the name and location of your business.
+allowed to set:
+  - business.business[i].complete
 fields:
   - Name: business.business[i].name
     # default: Acme
@@ -761,6 +769,8 @@ section: haz_prop
 id: hazardous_property_details
 question: |
   Please fill in the name and location of your business.
+allowed to set:
+  - hazardous_property.property[i].complete
 fields:
   - Hazard: hazardous_property.property[i].hazard
     # default: Radioactive Waste

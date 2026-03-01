@@ -73,6 +73,8 @@ id: secured_debt_notify_others_details
 section: schedule_d
 question: |
   Tell the court about other parties to be notifed about this debt.
+allowed to set:
+  - prop.creditors[i].complete
 fields:
   - Name: prop.creditors[i].notify[j].other_name
     # default: Other org
@@ -117,6 +119,8 @@ question: |
 subquestion: |
   If a creditor has more than one secured claim, list the creditor separately for each claim.
 check in: unsecured_claim_amount
+allowed to set:
+  - prop.creditors[i].complete
 fields:
   - Creditor Name: prop.creditors[i].name
     # default: Some creditor

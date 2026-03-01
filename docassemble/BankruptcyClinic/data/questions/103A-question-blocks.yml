@@ -109,6 +109,8 @@ question: |
   Fill in payment details.
 subquestion: |
   You may apply to pay the filing fee in up to four installments. You must propose to pay the entire fee no later than 120 days after you file this bankruptcy case. If the court approves your application, the court will set your final payment timetable.
+allowed to set:
+  - payment.payments[i].complete
 fields:
   - Amount to be paid: payment.payments[i].amount
     datatype: currency
