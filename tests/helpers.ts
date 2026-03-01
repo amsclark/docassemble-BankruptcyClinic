@@ -40,11 +40,13 @@ export async function waitForDaPageLoad(page: Page, label = '') {
   // ── Global docassemble error detection ──
   // After every page transition, check if docassemble is showing an error page.
   // This catches "variable not in allowed fields", traceback errors, 500s, etc.
-  const errorInfo = await page.evaluate(() => {
-    const body = document.body?.innerText || '';
-    const heading = document.querySelector('h1, h2')?.textContent || '';
-    const headingLower = heading.toLowerCase();
-    const bodyLower = body.toLowerCase();
+  let errorInfo: { heading: string; message: string; traceback: string; url: string } | null = null;
+  try {
+    errorInfo = await page.evaluate(() => {
+      const body = document.body?.innerText || '';
+      const heading = document.querySelector('h1, h2')?.textContent || '';
+      const headingLower = heading.toLowerCase();
+      const bodyLower = body.toLowerCase();
 
     // Detect docassemble error pages
     const isError =
@@ -67,6 +69,10 @@ export async function waitForDaPageLoad(page: Page, label = '') {
       url: window.location.href,
     };
   });
+  } catch {
+    // Page may have been closed during test teardown — not an error
+    return;
+  }
 
   if (errorInfo) {
     const ctx = label ? ` [${label}]` : '';
