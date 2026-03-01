@@ -1456,7 +1456,8 @@ question: |
 #code: |
 #  # Set complete attribute to true to prevent looping
 #  prop.interests[i].complete = True
-continue button field: prop.interests[i].complete
+allowed to set:
+  - prop.interests[i].complete
 validation code: |
   # Calculate owned value based on loan status
   if hasattr(prop.interests[i], 'has_loan') and prop.interests[i].has_loan:
