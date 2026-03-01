@@ -106,11 +106,24 @@ columns:
 ---
 id: debtor_basic_info
 question: |
+  % if i == 0:
   Basic Identity and Contact Information
+  % else:
+  Spouse / Joint Debtor — Identity and Contact Information
+  % endif
 subquestion: |
-  First we need to gather some basic information about you (and spouse if you have one). Please complete the fields below related to your name, contact information, and tax id.
+  % if i == 0:
+  First we need to gather some basic information about you. Please complete the fields below related to your name, contact information, and tax ID.
+  % else:
+  Now provide the identity and contact information for **your spouse (Debtor 2)** who is filing jointly with you.
+  % endif
 fields:
-  - note: <strong>Basic Debtor Info</strong>
+  - note: |
+      % if i == 0:
+      <strong>Debtor 1 Info</strong>
+      % else:
+      <strong>Debtor 2 (Spouse) Info</strong>
+      % endif
   - First Name: debtor[i].name.first
     # default: "Dan"
   - Middle Name: debtor[i].name.middle

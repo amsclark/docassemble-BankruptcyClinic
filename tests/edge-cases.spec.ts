@@ -595,8 +595,17 @@ test.describe('Edge Cases – Conditional Logic Branches', () => {
     const hasSecondDebtorForm = (await firstNameField.count()) > 0;
     expect(hasSecondDebtorForm).toBe(true);
 
+    // Verify the heading indicates this is the spouse / Debtor 2
+    const pageText = await page.locator('body').innerText();
+    const indicatesSpouse = heading.toLowerCase().includes('spouse') ||
+                            heading.toLowerCase().includes('joint') ||
+                            heading.toLowerCase().includes('debtor 2') ||
+                            pageText.includes('Debtor 2') ||
+                            pageText.includes('spouse');
+    expect(indicatesSpouse).toBe(true);
+
     await screenshot(page, 'edge-joint-second-debtor');
-    console.log('✅ Edge case: Joint filing correctly shows second debtor form');
+    console.log('✅ Edge case: Joint filing correctly shows second debtor form with spouse labeling');
   });
 });
 
