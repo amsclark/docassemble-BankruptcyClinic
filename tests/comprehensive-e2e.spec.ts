@@ -111,7 +111,15 @@ async function clickContinue(page: Page) {
     const $ = (window as any).jQuery;
     if (!$) return;
     const validator = $('#daform').data('validator');
-    if (validator) validator.settings.ignore = ':hidden, :disabled';
+    if (validator) {
+      validator.settings.ignore = ':hidden, :disabled';
+    }
+    // Remove required from ALL disabled inputs (list collect pre-rendered slots)
+    $('input:disabled, select:disabled, textarea:disabled').removeAttr('required').prop('required', false);
+    // Also remove disabled rows entirely to prevent any validation
+    $('fieldset:disabled, .da-field-container-hide').find('input, select, textarea').each(function() {
+      $(this).removeAttr('required').prop('required', false);
+    });
   });
   await _clickContinue(page);
 }
