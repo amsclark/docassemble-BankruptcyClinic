@@ -99,16 +99,34 @@ export async function fillDebtorAndAdvance(page: Page, d: DebtorProfile) {
     await clickNthByName(page, b64('debtor[i].alias.there_are_any'), 0); // Yes
     for (let i = 0; i < d.aliases.length; i++) {
       await waitForDaPageLoad(page);
+      const aliasH = await page.locator('h1').first().textContent().catch(() => '');
+      console.log(`  [ALIAS i=${i}] Page heading: "${aliasH}"`);
+      console.log(`  [ALIAS i=${i}] Looking for field: debtor[i].alias[${i}].name.first → ${b64(`debtor[i].alias[${i}].name.first`)}`);
+      const fieldExists = await page.locator(`#${b64(`debtor[i].alias[${i}].name.first`)}`).count();
+      console.log(`  [ALIAS i=${i}] Field exists: ${fieldExists}`);
+      if (fieldExists === 0) {
+        // Page might be on "another" or district question, not alias form
+        console.log(`  [ALIAS i=${i}] Field NOT found — dumping buttons:`);
+        const btns = await page.locator('button').allTextContents();
+        console.log(`  [ALIAS i=${i}] Buttons: ${btns.join(' | ')}`);
+        break;
+      }
       await fillById(page, b64(`debtor[i].alias[${i}].name.first`), d.aliases[i].first);
       await fillById(page, b64(`debtor[i].alias[${i}].name.last`), d.aliases[i].last);
       await clickContinue(page);
       if (i < d.aliases.length - 1) {
         // "Do you have another alias?" → Yes
         await waitForDaPageLoad(page);
+        const afterH = await page.locator('h1').first().textContent().catch(() => '');
+        console.log(`  [ALIAS after i=${i}] Next page heading: "${afterH}"`);
+        const bodySnip = (await page.locator('body').innerText()).substring(0, 300);
+        console.log(`  [ALIAS after i=${i}] Body snippet: "${bodySnip}"`);
         await handleAnotherPageWithYes(page, 'debtor[i].alias.there_is_another');
       } else {
         // Last one → No
         await waitForDaPageLoad(page);
+        const afterH = await page.locator('h1').first().textContent().catch(() => '');
+        console.log(`  [ALIAS last i=${i}] Next page heading: "${afterH}"`);
         await handleAnotherPage(page, 'debtor[i].alias.there_is_another');
       }
     }
