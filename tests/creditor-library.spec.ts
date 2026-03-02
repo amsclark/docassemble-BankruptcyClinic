@@ -26,9 +26,10 @@ import {
 // ──────────────────────────────────────────────
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8080';
-const ADMIN_URL = `${BASE_URL}/interview?i=docassemble.playground1:creditor-library-admin.yml`;
+const PKG = process.env.INTERVIEW_PACKAGE_PREFIX || 'docassemble.BankruptcyClinic:data/questions';
+const ADMIN_URL = `${BASE_URL}/interview?i=${PKG}/creditor-library-admin.yml`;
 
-const CLEANUP_URL = `${BASE_URL}/interview?i=docassemble.playground1:creditor-library-cleanup.yml`;
+const CLEANUP_URL = `${BASE_URL}/interview?i=${PKG}/creditor-library-cleanup.yml`;
 
 /** Test creditor data for seeding the library */
 const TEST_CREDITOR = {
@@ -338,7 +339,7 @@ test.describe('Creditor Library – Admin Interview', () => {
 // ══════════════════════════════════════════════
 //  Picker Tests (using standalone test interview)
 // ══════════════════════════════════════════════
-const PICKER_TEST_URL = `${BASE_URL}/interview?i=docassemble.playground1:creditor-library-picker-test.yml`;
+const PICKER_TEST_URL = `${BASE_URL}/interview?i=${PKG}/creditor-library-picker-test.yml`;
 
 test.describe('Creditor Library – Picker', () => {
   test.describe.configure({ mode: 'serial' });

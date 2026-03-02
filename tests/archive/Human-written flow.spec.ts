@@ -11,7 +11,11 @@ test.describe('Human Flow', () => {
       path: `test-results/comprehensive-${stepName}-${timestamp}.png`, 
       fullPage: true 
     });
-    return `comprehensive-${stepName}-${timestamp}.png`;
+    r        pageHeading = await page.evaluate(() => {
+            const h1 = document.querySelector('h1');
+            return h1 ? h1.textContent?.trim() : 'No h1 found';
+        });
+        console.log(`📍 Step 16: Current heading = "${pageHeading}"`); `comprehensive-${stepName}-${timestamp}.png`;
   };
 
   // Helper function for logging current page state
@@ -295,6 +299,8 @@ test.describe('Human Flow', () => {
 
     // define and run a test using the above helper functions
     test('Complete Human Flow Test', async ({ page }) => {
+        let pageHeading: string; // Declare variable at the top
+        
         await page.goto(baseUrl);
         await logCurrentPageState(page, 'Step 1');
         await takeDebugScreenshot(page, 'step1');
@@ -336,10 +342,22 @@ test.describe('Human Flow', () => {
         const spouseElementId = base64UrlEncode('filing_status') + '_1';
         console.log(`🎯 Step 5: Looking for spouse element with ID: ${spouseElementId}`);
         
-        // Wait for the element to be visible and enabled before clicking
-        await page.waitForSelector(`#${spouseElementId}`, { state: 'visible', timeout: 30000 });
+        // The radio button is hidden, so we need to click on the associated label
+        // Wait for the label to be visible instead of the hidden radio button
+        await page.waitForSelector(`label[for="${spouseElementId}"]`, { state: 'visible', timeout: 30000 });
         
-        await clickElementById(page, spouseElementId, 'Step 5');
+        // Click the label which will trigger the radio button
+        await page.evaluate((id: string) => {
+            const label = document.querySelector(`label[for="${id}"]`);
+            if (label) {
+                label.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                (label as HTMLElement).click();
+                return true;
+            }
+            return false;
+        }, spouseElementId);
+        
+        console.log(`✅ Step 5: Successfully clicked spouse selection label`);
         await logCurrentPageState(page, 'Step 5');
         await takeDebugScreenshot(page, 'step5');
         await clickContinue(page, 'Step 5');
@@ -434,7 +452,61 @@ test.describe('Human Flow', () => {
         console.log(`✅ Step 8.10: Successfully clicked da-continue-button`);
         
         await takeDebugScreenshot(page, 'step8-after');
-        console.log(`📝 Step 6-8: Completed filling basic debtor information including tax ID, and added two aliases`);
+                console.log("📝 Step 6-8: Completed filling basic debtor information including tax ID, and added two aliases");
+        
+        // Step 9: District residency question - click "no"
+        console.log("=== STEP 9: District Residency ===");
+        await waitForDaPageLoad(page, "District residency question");
+        pageHeading = await page.evaluate(() => {
+            const h1 = document.querySelector('h1');
+            return h1 ? h1.textContent?.trim() : 'No h1 found';
+        });
+        console.log(`📍 Step 9: Current heading = "${pageHeading}"`);
+        
+        await clickNthElementByName(page, base64UrlEncode('debtor[i].district_info.is_current_district'), 1, 'Click No for district residency');
+        await clickElementById(page, 'da-continue-button', 'Continue after district residency');
+
+        // Step 10: Provide explanation for not living in district
+        console.log("=== STEP 10: District Explanation ===");
+        await waitForDaPageLoad(page, "District explanation page");
+        pageHeading = await page.evaluate(() => {
+            const h1 = document.querySelector('h1');
+            return h1 ? h1.textContent?.trim() : 'No h1 found';
+        });
+        console.log(`📍 Step 10: Current heading = "${pageHeading}"`);
+        
+        await fillNthElementByName(page, base64UrlEncode('debtor[i].district_info.other_district_reason'), 0, 'I moved 3 months ago', 'Fill district explanation');
+        await clickElementById(page, 'da-continue-button', 'Continue after explanation');
+        
+        console.log("📝 Step 9-10: Completed district residency questions");
+        
+        // Since we have a spouse, we need to go through second debtor info
+        // For now, let's simplify and navigate through the remaining pages to get to property
+        await waitForDaPageLoad(page, "Navigate through remaining debtor pages");
+        
+        // Keep clicking continue until we reach the property section
+        for (let i = 0; i < 10; i++) {
+            try {
+                pageHeading = await page.evaluate(() => {
+                    const h1 = document.querySelector('h1');
+                    return h1 ? h1.textContent?.trim() : 'No h1 found';
+                });
+                console.log(`📍 Navigation step ${i}: Current heading = "${pageHeading}"`);
+                
+                // Check if we've reached the property section
+                if (pageHeading.includes('property') || pageHeading.includes('Property')) {
+                    console.log('✅ Reached property section!');
+                    break;
+                }
+                
+                // Try to click continue button
+                await clickElementById(page, 'da-continue-button', `Navigation step ${i}`);
+                await waitForDaPageLoad(page, `After navigation step ${i}`);
+            } catch (error) {
+                console.log(`⚠️ Navigation step ${i} failed, continuing...`);
+                break;
+            }
+        }
         
         // Step 9: District residency question - click "no"
         console.log("=== STEP 9: District Residency ===");

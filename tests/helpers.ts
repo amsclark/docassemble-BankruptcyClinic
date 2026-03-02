@@ -2,8 +2,9 @@ import { Page } from '@playwright/test';
 
 /** Base URL for the docassemble interview */
 const BASE_URL = process.env.BASE_URL || 'http://localhost:8080';
+const INTERVIEW_PACKAGE = process.env.INTERVIEW_PACKAGE || 'docassemble.BankruptcyClinic:data/questions/voluntary-petition.yml';
 export const INTERVIEW_URL =
-  `${BASE_URL}/interview?i=docassemble.playground1:voluntary-petition.yml#page1`;
+  `${BASE_URL}/interview?i=${INTERVIEW_PACKAGE}#page1`;
 
 /** Base64-url-encode a docassemble field name (strips trailing '=' padding). */
 export const b64 = (str: string): string =>
@@ -122,11 +123,62 @@ export async function screenshot(page: Page, name: string) {
 //  Click helpers
 // ──────────────────────────────────────────────
 
-/** Click the standard docassemble Continue button. */
-export async function clickContinue(page: Page) {
+/** Click the standard docassemble Continue button (simple version, no list-collect workaround). */
+export async function clickContinueSimple(page: Page) {
   await waitForDaPageLoad(page);
   await page.locator('#da-continue-button').click();
   await page.waitForLoadState('networkidle');
+}
+
+/**
+ * Click Continue with list-collect workaround.
+ *
+ * On list-collect pages, docassemble may not send jQuery Validate rules,
+ * and (critically) may not render the `_list_collect_list` hidden input.
+ * Without `_list_collect_list`, the server doesn't call `._allow_appending()`
+ * or mark list items as `.complete`, so the same question is re-shown.
+ *
+ * Fix: detect missing validator, manually build `_visible`, inject
+ * `_list_collect_list` if missing, clear the checkin interval (to avoid
+ * tracker mismatch), then do a native form POST.
+ */
+export async function clickContinue(page: Page) {
+  await waitForDaPageLoad(page);
+
+  // Ensure the form has a validator with daValidationHandler as the submit
+  // handler. On AJAX-rendered pages (including list-collect), daSetupValidation
+  // may create a validator that jQuery Validate doesn't properly attach to the
+  // new form element. We fix this by ensuring the validator exists and has the
+  // correct submit handler.
+  await page.evaluate(() => {
+    const $ = (window as any).jQuery;
+    if (!$ || !$.fn.validate) return;
+    const form = document.getElementById('daform');
+    if (!form) return;
+
+    // Get or create the validator
+    let validator = $(form).data('validator');
+    if (!validator) {
+      // Create the validator — this may also retrieve one that daSetupValidation
+      // already created but wasn't properly linked via $.data
+      validator = $(form).validate();
+    }
+
+    // Ensure the submit handler is daValidationHandler (handles _visible,
+    // AJAX POST, daProcessAjax for page transitions)
+    const daVH = (window as any).daValidationHandler;
+    if (validator && daVH) {
+      validator.settings.submitHandler = daVH;
+    }
+
+    // Set ignore for hidden/disabled fields — prevents jQuery Validate from
+    // rejecting hidden required fields on list-collect pages
+    if (validator) {
+      validator.settings.ignore = ':hidden:not(.da-active-invisible), :disabled';
+    }
+  });
+
+  await clickContinueSimple(page);
 }
 
 /** Click an element by its DOM id. */
@@ -333,4 +385,78 @@ export async function clickButton(page: Page, buttonSelector: string) {
   await page.locator(buttonSelector).click();
 }
 
-// Additional helper functions can be added here for more comprehensive testing.
+// ──────────────────────────────────────────────
+//  Docassemble-specific interaction helpers
+// ──────────────────────────────────────────────
+
+/** Click a yes/no button (docassemble btn-da style). `yes = true` clicks first (Yes), `false` clicks second (No). */
+export async function clickYesNoButton(page: Page, varName: string, yes: boolean) {
+  await waitForDaPageLoad(page);
+  await clickNthByName(page, b64(varName), yes ? 0 : 1);
+}
+
+/** Click a yes/no radio label (Bootstrap-styled). `yes = true` clicks _0 label, `false` clicks _1. */
+export async function selectYesNoRadio(page: Page, varName: string, yes: boolean) {
+  const fieldId = b64(varName);
+  const suffix = yes ? '_0' : '_1';
+  await page.locator(`label[for="${fieldId}${suffix}"]`).click();
+}
+
+/** Alias for selectYesNoRadio. */
+export const fillYesNoRadio = selectYesNoRadio;
+
+/** Click the "No" label on every visible radio that has value="False". */
+export async function fillAllVisibleRadiosAsNo(page: Page) {
+  const noRadioIds = await page.evaluate(() => {
+    const ids: string[] = [];
+    document.querySelectorAll('input[type="radio"][value="False"]').forEach(radio => {
+      const id = radio.getAttribute('id');
+      if (!id) return;
+      const label = document.querySelector(`label[for="${id}"]`) as HTMLElement;
+      if (label && label.offsetParent !== null && !(radio as HTMLInputElement).checked) {
+        ids.push(id);
+      }
+    });
+    return ids;
+  });
+  for (const id of noRadioIds) {
+    await page.locator(`label[for="${id}"]`).click();
+  }
+}
+
+/** If a case_number field is visible on the current page, click Continue past it. */
+export async function handleCaseNumberIfPresent(page: Page) {
+  const caseNumberField = page.locator(`#${b64('case_number')}`);
+  if (await caseNumberField.count() > 0) {
+    await clickContinue(page);
+    await waitForDaPageLoad(page);
+  }
+}
+
+/** Set a docassemble checkbox (Bootstrap-styled label with aria-checked). */
+export async function setCheckbox(page: Page, varName: string, checked: boolean) {
+  const fieldId = b64(varName);
+  const label = page.locator(`label[for="${fieldId}"]`);
+  const ariaChecked = await label.getAttribute('aria-checked');
+  if (checked && ariaChecked !== 'true') await label.click();
+  else if (!checked && ariaChecked === 'true') await label.click();
+}
+
+/**
+ * Handle "Do you have another?" pages — either a yes/no question or a list
+ * collect review page with "Add another" / "Continue" buttons.
+ */
+export async function handleAnotherPage(page: Page, thereIsAnotherVar: string) {
+  await waitForDaPageLoad(page);
+  const bodyText = await page.locator('body').innerText();
+  if (bodyText.toLowerCase().includes('another') || bodyText.toLowerCase().includes('more')) {
+    const addAnotherBtn = page.locator('button').filter({ hasText: /Add another/i });
+    if (await addAnotherBtn.count() > 0) {
+      // List collect review — click Continue to proceed
+      await clickContinue(page);
+    } else {
+      // Standard yes/no question
+      await clickYesNoButton(page, thereIsAnotherVar, false);
+    }
+  }
+}

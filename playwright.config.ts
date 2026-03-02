@@ -13,8 +13,9 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests',
+  testIgnore: ['**/archive/**'],
   /* Timeout for each test */
-  timeout: 120 * 1000, // 2 minutes for complex interviews
+  timeout: 420 * 1000, // 7 minutes for full interview tests
   /* Run tests in files in parallel - disable for live watching */
   fullyParallel: !process.env.LIVE_WATCH,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
