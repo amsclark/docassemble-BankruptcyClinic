@@ -93,34 +93,24 @@ export async function fillDebtorAndAdvance(page: Page, d: DebtorProfile) {
     mailState: d.mailState, mailZip: d.mailZip,
   });
 
-  // Alias
+  // Alias — list collect form: all fields on one page, "Add another" reveals more rows
   await waitForDaPageLoad(page);
   if (d.aliases && d.aliases.length > 0) {
     await clickNthByName(page, b64('debtor[i].alias.there_are_any'), 0); // Yes
+    await waitForDaPageLoad(page);
+
+    // Fill each alias on the list collect page
     for (let i = 0; i < d.aliases.length; i++) {
-      await waitForDaPageLoad(page);
-      // Debug: dump all input field IDs on this page
-      const inputIds = await page.evaluate(() => {
-        return Array.from(document.querySelectorAll('input[type="text"], input:not([type]), textarea'))
-          .map(el => ({ id: el.id, name: (el as HTMLInputElement).name, type: el.tagName }))
-          .filter(x => x.id);
-      });
-      console.log(`  [ALIAS i=${i}] Input IDs: ${JSON.stringify(inputIds)}`);
-      const expectedId = b64(`debtor[i].alias[${i}].name.first`);
-      console.log(`  [ALIAS i=${i}] Expected ID: ${expectedId}`);
-      await fillById(page, b64(`debtor[i].alias[${i}].name.first`), d.aliases[i].first);
-      await fillById(page, b64(`debtor[i].alias[${i}].name.last`), d.aliases[i].last);
-      await clickContinue(page);
-      if (i < d.aliases.length - 1) {
-        // "Do you have another alias?" → Yes
-        await waitForDaPageLoad(page);
-        await handleAnotherPageWithYes(page, 'debtor[i].alias.there_is_another');
-      } else {
-        // Last one → No
-        await waitForDaPageLoad(page);
-        await handleAnotherPage(page, 'debtor[i].alias.there_is_another');
+      if (i > 0) {
+        // Click "Add another" to reveal the next row
+        const addBtn = page.locator('button').filter({ hasText: /Add another/i });
+        await addBtn.first().click();
+        await page.waitForTimeout(500);
       }
+      await fillById(page, b64(`debtor[i].alias[${i}].first_name`), d.aliases[i].first);
+      await fillById(page, b64(`debtor[i].alias[${i}].last_name`), d.aliases[i].last);
     }
+    await clickContinue(page);
   } else {
     await clickNthByName(page, b64('debtor[i].alias.there_are_any'), 1); // No
   }
