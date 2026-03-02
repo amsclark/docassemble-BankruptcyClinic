@@ -141,18 +141,14 @@ fields:
       Decribe the debt
   - Who owes the debt?: prop.creditors[i].who
     choices:
-      - Debtor 1 only
-      - Debtor 2 only
-      - Debtor 1 and Debtor 2 only
-      - At least one of the debtors and another
-    show if: financial_affairs.lived_elsewhere and len(debtor) > 1
-    # default: Debtor 1 only
-  - Who owes the debt?: prop.creditors[i].who
-    choices:
-      - Debtor 1 only
-      - At least one of the debtors and another
-    show if: not financial_affairs.lived_elsewhere
-    # default: Debtor 1 only
+      code: |
+        (['Debtor 1 only',
+          'At least one of the debtors and another']
+         if (not defined('debtor')) or len(debtor) != 2 else
+         ['Debtor 1 only',
+          'Debtor 2 only',
+          'Debtor 1 and Debtor 2 only',
+          'At least one of the debtors and another'])
   - Does this claim relate to community debt?: prop.creditors[i].community_debt
     datatype: yesnoradio
     # default: False

@@ -48,18 +48,14 @@ fields:
   - note: Details about debt
   - Who incurred the debt?: prop.priority_claims[i].who
     choices:
-      - Debtor 1 only
-      - Debtor 2 only
-      - Debtor 1 and Debtor 2 only
-      - At least one of the debtors and another
-    show if: len(debtor) > 1 and financial_affairs.lived_elsewhere
-    # default: Debtor 1 only
-  - Who incurred the debt?: prop.priority_claims[i].who
-    choices:
-      - Debtor 1 only
-      - At least one of the debtors and another
-    show if: not financial_affairs.lived_elsewhere
-    # default: Debtor 1 only
+      code: |
+        (['Debtor 1 only',
+          'At least one of the debtors and another']
+         if (not defined('debtor')) or len(debtor) != 2 else
+         ['Debtor 1 only',
+          'Debtor 2 only',
+          'Debtor 1 and Debtor 2 only',
+          'At least one of the debtors and another'])
   - Last 4 digits of account number: prop.priority_claims[i].account_number
     # default: 9999
     datatype: number
@@ -260,18 +256,14 @@ fields:
   - note: Details about debt
   - Who incurred the debt?: prop.nonpriority_claims[i].who
     choices:
-      - Debtor 1 only
-      - Debtor 2 only
-      - Debtor 1 and Debtor 2 only
-      - At least one of the debtors and another
-    show if: len(debtor) > 1 and financial_affairs.lived_elsewhere
-    # default: Debtor 1 only
-  - Who incurred the debt?: prop.nonpriority_claims[i].who
-    choices:
-      - Debtor 1 only
-      - At least one of the debtors and another
-    show if: not financial_affairs.lived_elsewhere
-    # default: Debtor 1 only
+      code: |
+        (['Debtor 1 only',
+          'At least one of the debtors and another']
+         if (not defined('debtor')) or len(debtor) != 2 else
+         ['Debtor 1 only',
+          'Debtor 2 only',
+          'Debtor 1 and Debtor 2 only',
+          'At least one of the debtors and another'])
   - Last 4 digits of account number: prop.nonpriority_claims[i].account_number
     # default: 9999
     datatype: number

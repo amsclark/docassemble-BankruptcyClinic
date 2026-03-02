@@ -155,9 +155,9 @@ async function fillRealProperty(page: Page, rp: RealPropertyData, index: number)
   await page.locator(`#${b64(`prop.interests[${index}].zip`)}`).fill(rp.zip);
   await page.locator(`#${b64(`prop.interests[${index}].county`)}`).fill(rp.county);
   await page.locator(`label[for="${b64(`prop.interests[${index}].type`)}_${rp.typeIndex}"]`).click();
-  // 'who' radio only appears for joint filings
-  const propWhoLabel = page.locator(`label[for="${b64(`prop.interests[${index}].who`)}_0"]`);
-  if (await propWhoLabel.count() > 0) await propWhoLabel.click();
+  // 'who' dropdown — always visible (code-generated choices)
+  const propWhoSelect = page.locator(`select#${b64(`prop.interests[${index}].who`)}`);
+  if (await propWhoSelect.count() > 0) await propWhoSelect.selectOption('Debtor 1 only');
   await page.locator(`#${b64(`prop.interests[${index}].current_value`)}`).fill(rp.value);
   await page.locator(`#${b64(`prop.interests[${index}].ownership_interest`)}`).fill(rp.ownershipInterest);
   await fillYesNoRadio(page, `prop.interests[${index}].is_community_property`, false);
@@ -170,42 +170,15 @@ async function fillVehicle(page: Page, v: VehicleData, index: number) {
   await page.locator(`#${b64(`prop.ab_vehicles[${index}].model`)}`).fill(v.model);
   await page.locator(`#${b64(`prop.ab_vehicles[${index}].year`)}`).fill(v.year);
   await page.locator(`#${b64(`prop.ab_vehicles[${index}].milage`)}`).fill(v.mileage);
-  // 'who' radio — on list-collect pages, the show-if condition (len(debtor)==1)
-  // may fail in JavaScript, hiding the field. Force-select via JS if needed.
-  const vehWhoLabel = page.locator(`label[for="${b64(`prop.ab_vehicles[${index}].who`)}_0"]`);
-  if (await vehWhoLabel.count() > 0) {
-    if (await vehWhoLabel.isVisible()) {
-      await vehWhoLabel.click();
-    } else {
-      // Field exists but hidden by JS showif — force-select "Debtor 1 only"
-      await page.evaluate((idx: number) => {
-        const $ = (window as any).jQuery;
-        if (!$) return;
-        const form = document.getElementById('daform');
-        if (!form) return;
-        // Find the first non-disabled radio that maps to .who via _varnames
-        const decode = (window as any).atou || atob;
-        const varnamesInput = $(form).find('input[name="_varnames"]');
-        if (varnamesInput.length === 0) return;
-        try {
-          const raw = JSON.parse(decode(varnamesInput.val()));
-          for (const [encodedKey, encodedVal] of Object.entries(raw)) {
-            const varName = decode(encodedVal as string);
-            if (varName === `prop.ab_vehicles[${idx}].who`) {
-              const fieldName = decode(encodedKey as string);
-              const encode = (window as any).utoa || btoa;
-              const encodedFieldName = encode(fieldName).replace(/[\n=]/g, '');
-              const radios = $(form).find(`input[name="${encodedFieldName}"]`);
-              if (radios.length > 0) {
-                (radios[0] as HTMLInputElement).checked = true;
-                $(radios[0]).trigger('change');
-              }
-              break;
-            }
-          }
-        } catch { /* ignore */ }
-      }, index);
-    }
+  // 'who' field — select "Debtor 1 only" (code-generated choices, always visible now)
+  // On list-collect pages, field IDs use _field_X_Y format, so find by label text
+  const vehWhoSelect = page.locator(`select#${b64(`prop.ab_vehicles[${index}].who`)}`);
+  if (await vehWhoSelect.count() > 0) {
+    await vehWhoSelect.selectOption('Debtor 1 only');
+  } else {
+    // List-collect: field is a radio rendered with encoded names — click first option by text
+    const debtorOnlyLabel = page.locator('label').filter({ hasText: 'Debtor 1 only' }).first();
+    if (await debtorOnlyLabel.count() > 0) await debtorOnlyLabel.click();
   }
   await page.locator(`#${b64(`prop.ab_vehicles[${index}].current_value`)}`).fill(v.value);
   await page.locator(`#${b64(`prop.ab_vehicles[${index}].state`)}`).fill(v.state);
@@ -348,12 +321,65 @@ export async function navigateExemptionSection(page: Page) {
 //  FINANCIAL AFFAIRS (Form 107)
 // ════════════════════════════════════════════════════════════════════
 
-export async function navigateFinancialAffairs(page: Page) {
-  // Marital + residence
+export async function navigateFinancialAffairs(page: Page, scenario: TestScenario) {
+  const isJoint = scenario.jointFiling;
+
+  // Marital + residence — massive single page with all address history.
+  // For joint filing (debtor_count > 1), many extra debtor-2 fields appear.
+  //
+  // IMPORTANT: Do NOT use fillAllVisibleRadiosAsNo here — it resets marital_status
+  // back to "No" after we set it. Instead, explicitly set each radio field.
   await waitForDaPageLoad(page);
-  await fillYesNoRadio(page, 'financial_affairs.marital_status', false);
-  await fillYesNoRadio(page, 'financial_affairs.lived_elsewhere', false);
-  await fillYesNoRadio(page, 'financial_affairs.lived_with_spouse', false);
+
+  // 1. Set lived_elsewhere FIRST (hides address blocks and their sub-fields)
+  await selectYesNoRadio(page, 'financial_affairs.lived_elsewhere', false);
+  await page.waitForTimeout(1000); // Let show-if JS hide address fields
+
+  // 2. Set marital_status (Yes for joint, No otherwise)
+  await selectYesNoRadio(page, 'financial_affairs.marital_status', isJoint);
+  await page.waitForTimeout(500);
+
+  // 3. Set lived_with_spouse to No
+  const livedWithSpouseLabel = page.locator(`label[for="${b64('financial_affairs.lived_with_spouse')}_1"]`);
+  if (await livedWithSpouseLabel.count() > 0 && await livedWithSpouseLabel.isVisible()) {
+    await livedWithSpouseLabel.click();
+    await page.waitForTimeout(200);
+  }
+
+  // 4. For joint filing, handle any visible "Same time period?" / "Same address?" fields
+  //    Set them to "Yes" so debtor-2 sub-address fields stay hidden.
+  if (isJoint) {
+    for (let addr = 1; addr <= 6; addr++) {
+      for (const prefix of ['financial_affairs.address_same_dates_', 'financial_affairs.address_same_']) {
+        const varName = `${prefix}${addr}`;
+        const yesLabel = page.locator(`label[for="${b64(varName)}_0"]`);
+        if (await yesLabel.count() > 0 && await yesLabel.isVisible()) {
+          await yesLabel.click();
+          await page.waitForTimeout(200);
+        }
+      }
+    }
+  }
+
+  // 5. Fill any remaining visible empty text/number/date inputs with dummy values
+  //    (handles edge cases where show-if didn't fully hide some fields)
+  await page.evaluate(() => {
+    document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"]').forEach(el => {
+      const input = el as HTMLInputElement;
+      if (input.offsetParent === null) return; // hidden input
+      if (input.value) return; // already has value
+      if (input.type === 'date') {
+        input.value = '2024-01-01';
+      } else if (input.type === 'number' || input.inputMode === 'numeric') {
+        input.value = '00000';
+      } else {
+        input.value = 'N/A';
+      }
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  });
+
   await clickContinue(page);
 
   // Employment → Not employed
@@ -533,9 +559,9 @@ export async function navigateSecuredCreditors(page: Page, scenario: TestScenari
     await page.locator(`#${b64('prop.creditors[0].city')}`).fill(sc.city);
     await page.locator(`#${b64('prop.creditors[0].state')}`).fill(sc.state);
     await page.locator(`#${b64('prop.creditors[0].zip')}`).fill(sc.zip);
-    // 'who' radio only appears for joint filings
-    const secWhoLabel = page.locator(`label[for="${b64('prop.creditors[0].who')}_0"]`);
-    if (await secWhoLabel.count() > 0) await secWhoLabel.click();
+    // 'who' dropdown — always visible (code-generated choices)
+    const secWhoSelect = page.locator(`select#${b64('prop.creditors[0].who')}`);
+    if (await secWhoSelect.count() > 0) await secWhoSelect.selectOption('Debtor 1 only');
     await fillYesNoRadio(page, 'prop.creditors[0].community_debt', false);
 
     const dateField = page.locator(`#${b64('prop.creditors[0].incurred_date')}`);
@@ -595,9 +621,9 @@ export async function navigateUnsecuredCreditors(page: Page, scenario: TestScena
     await page.locator(`#${b64('prop.priority_claims[0].city')}`).fill(pc.city);
     await page.locator(`#${b64('prop.priority_claims[0].state')}`).fill(pc.state);
     await page.locator(`#${b64('prop.priority_claims[0].zip')}`).fill(pc.zip);
-    // 'who' radio only appears for joint filings
-    const prWhoLabel = page.locator(`label[for="${b64('prop.priority_claims[0].who')}_0"]`);
-    if (await prWhoLabel.count() > 0) await prWhoLabel.click();
+    // 'who' dropdown — always visible (code-generated choices)
+    const prWhoSelect = page.locator(`select#${b64('prop.priority_claims[0].who')}`);
+    if (await prWhoSelect.count() > 0) await prWhoSelect.selectOption('Debtor 1 only');
 
     const typeSelect = page.locator(`select#${b64('prop.priority_claims[0].type')}`);
     if (await typeSelect.count() > 0) await typeSelect.selectOption(pc.type);
@@ -625,9 +651,9 @@ export async function navigateUnsecuredCreditors(page: Page, scenario: TestScena
     await page.locator(`#${b64('prop.nonpriority_claims[0].city')}`).fill(np.city);
     await page.locator(`#${b64('prop.nonpriority_claims[0].state')}`).fill(np.state);
     await page.locator(`#${b64('prop.nonpriority_claims[0].zip')}`).fill(np.zip);
-    // 'who' radio only appears for joint filings
-    const npWhoLabel = page.locator(`label[for="${b64('prop.nonpriority_claims[0].who')}_0"]`);
-    if (await npWhoLabel.count() > 0) await npWhoLabel.click();
+    // 'who' dropdown — always visible (code-generated choices)
+    const npWhoSelect = page.locator(`select#${b64('prop.nonpriority_claims[0].who')}`);
+    if (await npWhoSelect.count() > 0) await npWhoSelect.selectOption('Debtor 1 only');
 
     // Claim type dropdown (required)
     const npTypeSelect = page.locator(`select#${b64('prop.nonpriority_claims[0].type')}`);
@@ -676,7 +702,8 @@ export async function navigateCommunityProperty(page: Page) {
 //  INCOME (Schedule I)
 // ════════════════════════════════════════════════════════════════════
 
-export async function navigateIncome(page: Page) {
+export async function navigateIncome(page: Page, scenario: TestScenario) {
+  // Debtor 1 employment
   await waitForDaPageLoad(page);
   await selectByName(page, b64('debtor[0].income.employment'), 'Not employed');
   await clickContinue(page);
@@ -711,6 +738,14 @@ export async function navigateIncome(page: Page) {
   await selectYesNoRadio(page, 'debtor[0].income.expect_year_delta', false);
   await page.waitForTimeout(300);
   await clickContinue(page);
+
+  // Debtor 2 income (joint filing with married couple)
+  // The interview asks for debtor[1].income when len(debtor) > 1 and marital_status is True
+  if (scenario.jointFiling) {
+    await waitForDaPageLoad(page);
+    await selectByName(page, b64('debtor[1].income.employment'), 'Not employed');
+    await clickContinue(page);
+  }
 
   await waitForDaPageLoad(page);
 }
@@ -808,10 +843,14 @@ export async function navigateHazardousProperty(page: Page) {
 //  CREDIT COUNSELING
 // ════════════════════════════════════════════════════════════════════
 
-export async function navigateCreditCounseling(page: Page) {
-  await waitForDaPageLoad(page);
-  await selectByName(page, b64('debtor[i].counseling.counseling_type'), '1');
-  await clickContinue(page);
+export async function navigateCreditCounseling(page: Page, scenario: TestScenario) {
+  // Counseling question uses debtor[i] — loops for each debtor
+  const debtorCount = scenario.jointFiling ? 2 : 1;
+  for (let d = 0; d < debtorCount; d++) {
+    await waitForDaPageLoad(page);
+    await selectByName(page, b64('debtor[i].counseling.counseling_type'), '1');
+    await clickContinue(page);
+  }
 
   await waitForDaPageLoad(page);
   await clickNthByName(page, b64('counseling_final'), 0);
@@ -1059,19 +1098,19 @@ export async function runFullInterview(page: Page, scenario: TestScenario) {
   await passDebtorFinal(page);
   await navigatePropertySection(page, scenario);
   await navigateExemptionSection(page);
-  await navigateFinancialAffairs(page);
+  await navigateFinancialAffairs(page, scenario);
   await navigateCreditorLibraryPicker(page);
   await navigateSecuredCreditors(page, scenario);
   await navigateUnsecuredCreditors(page, scenario);
   await navigateContractsLeases(page);
   await navigateCommunityProperty(page);
-  await navigateIncome(page);
+  await navigateIncome(page, scenario);
   await navigateExpenses(page, scenario.rentExpense);
   await navigateMeansTest(page);
   await navigateCaseDetails(page);
   await navigateBusiness(page);
   await navigateHazardousProperty(page);
-  await navigateCreditCounseling(page);
+  await navigateCreditCounseling(page, scenario);
   await navigateReporting(page);
   await navigateDynamicPhase(page, scenario);
 }

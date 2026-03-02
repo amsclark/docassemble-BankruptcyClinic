@@ -124,20 +124,31 @@ export async function screenshot(page: Page, name: string) {
 // ──────────────────────────────────────────────
 
 /**
- * Click Continue with jQuery Validate fix for hidden required fields.
+ * Click Continue with validator workaround for AJAX-rendered pages.
  *
- * Docassemble's show-if fields can leave hidden inputs marked as required,
- * which causes jQuery Validate to reject the form. This sets the validator's
- * ignore selector to skip hidden fields before clicking Continue.
+ * On AJAX-rendered pages (including list-collect), jQuery Validate may not
+ * have `daValidationHandler` as its submit handler. Without it, the form
+ * submit doesn't do the AJAX POST that docassemble expects. Also sets the
+ * ignore selector to skip hidden fields that may be left by show-if logic.
  */
 export async function clickContinue(page: Page) {
   await waitForDaPageLoad(page);
 
-  // Fix jQuery Validate to ignore hidden/disabled required fields
   await page.evaluate(() => {
     const $ = (window as any).jQuery;
-    if (!$) return;
-    const validator = $('#daform').data('validator');
+    if (!$ || !$.fn.validate) return;
+    const form = document.getElementById('daform');
+    if (!form) return;
+
+    let validator = $(form).data('validator');
+    if (!validator) {
+      validator = $(form).validate();
+    }
+
+    const daVH = (window as any).daValidationHandler;
+    if (validator && daVH) {
+      validator.settings.submitHandler = daVH;
+    }
     if (validator) {
       validator.settings.ignore = ':hidden';
     }

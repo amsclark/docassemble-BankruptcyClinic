@@ -998,7 +998,8 @@ code: |
   prop.creditors[i].city
   prop.creditors[i].state
   prop.creditors[i].zip
-  prop.creditors[i].who
+  if not hasattr(prop.creditors[i], 'who'):
+    prop.creditors[i].who = 'Debtor 1 only'
   prop.creditors[i].community_debt
   prop.creditors[i].incurred_date
   prop.creditors[i].prop_description
@@ -1029,7 +1030,8 @@ code: |
   prop.priority_claims[i].city
   prop.priority_claims[i].state
   prop.priority_claims[i].zip
-  prop.priority_claims[i].who
+  if not hasattr(prop.priority_claims[i], 'who'):
+    prop.priority_claims[i].who = 'Debtor 1 only'
   prop.priority_claims[i].account_number
   prop.priority_claims[i].date_incurred
   prop.priority_claims[i].contingent
@@ -1047,7 +1049,8 @@ code: |
   prop.nonpriority_claims[i].city
   prop.nonpriority_claims[i].state
   prop.nonpriority_claims[i].zip
-  prop.nonpriority_claims[i].who
+  if not hasattr(prop.nonpriority_claims[i], 'who'):
+    prop.nonpriority_claims[i].who = 'Debtor 1 only'
   prop.nonpriority_claims[i].account_number
   prop.nonpriority_claims[i].date_incurred
   prop.nonpriority_claims[i].contingent
