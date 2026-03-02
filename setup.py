@@ -1,15 +1,13 @@
 import os
-import sys
 from setuptools import setup, find_namespace_packages
 from fnmatch import fnmatchcase
-from distutils.util import convert_path
 
 standard_exclude = ('*.pyc', '*~', '.*', '*.bak', '*.swp*')
 standard_exclude_directories = ('.*', 'CVS', '_darcs', './build', './dist', 'EGG-INFO', '*.egg-info')
 
 def find_package_data(where='.', package='', exclude=standard_exclude, exclude_directories=standard_exclude_directories):
     out = {}
-    stack = [(convert_path(where), '', package)]
+    stack = [(os.path.normpath(where), '', package)]
     while stack:
         where, prefix, package = stack.pop(0)
         for name in os.listdir(where):

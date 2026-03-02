@@ -31,6 +31,7 @@ include:
 metadata:
   title: Voluntary Petition for Individuals Filing for Bankruptcy
   short title: Petition for Chapter 7 Bankruptcy
+  debug: True
 ---
 sections:
   - Introduction
@@ -572,7 +573,17 @@ code: |
         debtor[1].income.other_monthly_amount = 0
     else:
       debtor[1].income.income_amount_1 = 0
+      debtor[1].income.income_amount_2 = 0
+      debtor[1].income.income_amount_3 = 0
+      debtor[1].income.income_amount_4 = 0
+      debtor[1].income.income_amount_5 = 0
+      debtor[1].income.income_amount_6 = 0
       debtor[1].income.overtime_pay_1 = 0
+      debtor[1].income.overtime_pay_2 = 0
+      debtor[1].income.overtime_pay_3 = 0
+      debtor[1].income.overtime_pay_4 = 0
+      debtor[1].income.overtime_pay_5 = 0
+      debtor[1].income.overtime_pay_6 = 0
       debtor[1].income.tax_deduction = 0
       debtor[1].income.mandatory_contributions = 0
       debtor[1].income.voluntary_contributions = 0

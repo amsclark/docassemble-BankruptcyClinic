@@ -368,9 +368,19 @@ export async function navigateFinancialAffairs(page: Page, scenario: TestScenari
       const input = el as HTMLInputElement;
       if (input.offsetParent === null) return; // hidden input
       if (input.value) return; // already has value
+
+      // Detect numeric fields: type="number", inputMode="numeric", or label contains "Zip"
+      const label = input.id
+        ? document.querySelector(`label[for="${input.id}"]`)
+        : null;
+      const labelText = (label?.textContent || '').toLowerCase();
+      const isNumeric = input.type === 'number'
+        || input.inputMode === 'numeric'
+        || labelText.includes('zip');
+
       if (input.type === 'date') {
         input.value = '2024-01-01';
-      } else if (input.type === 'number' || input.inputMode === 'numeric') {
+      } else if (isNumeric) {
         input.value = '00000';
       } else {
         input.value = 'N/A';
@@ -745,6 +755,49 @@ export async function navigateIncome(page: Page, scenario: TestScenario) {
     await waitForDaPageLoad(page);
     await selectByName(page, b64('debtor[1].income.employment'), 'Not employed');
     await clickContinue(page);
+
+    // If the debtor[1] income details page appears (Check 1-6), fill and continue.
+    // This handles the case where the YAML "Not employed" path doesn't fully skip this page.
+    await waitForDaPageLoad(page);
+    const heading = await page.locator('h1').first().textContent().catch(() => '');
+    console.log(`  [navigateIncome] After debtor[1] employment, heading: "${heading}"`);
+    if (heading?.toLowerCase().includes('monthly income')) {
+      console.log('  [navigateIncome] Detected debtor[1] income details page — filling...');
+      // Fill Check 1 required fields with 0 (Checks 2-6 are optional)
+      await fillById(page, b64('debtor[1].income.income_amount_1'), '0');
+      await fillById(page, b64('debtor[1].income.overtime_pay_1'), '0');
+      await clickContinue(page);
+
+      // Tax deduction page
+      await waitForDaPageLoad(page);
+      await fillById(page, b64('debtor[1].income.tax_deduction'), '0');
+      await clickContinue(page);
+
+      // Other deduction → No
+      await waitForDaPageLoad(page);
+      await fillYesNoRadio(page, 'debtor[1].income.other_deduction', false);
+      await clickContinue(page);
+
+      // Other income fields → all 0
+      await waitForDaPageLoad(page);
+      await fillById(page, b64('debtor[1].income.net_rental_business'), '0');
+      await fillById(page, b64('debtor[1].income.interest_and_dividends'), '0');
+      await fillById(page, b64('debtor[1].income.family_support'), '0');
+      await fillById(page, b64('debtor[1].income.unemployment'), '0');
+      await fillById(page, b64('debtor[1].income.social_security'), '0');
+      await fillById(page, b64('debtor[1].income.other_govt_assist'), '0');
+      await fillById(page, b64('debtor[1].income.pension'), '0');
+      await fillYesNoRadio(page, 'debtor[1].income.other_monthly_income', false);
+      await clickContinue(page);
+
+      // Contributions + expected changes → No
+      await waitForDaPageLoad(page);
+      await selectYesNoRadio(page, 'debtor[1].income.other_regular_contributions', false);
+      await page.waitForTimeout(300);
+      await selectYesNoRadio(page, 'debtor[1].income.expect_year_delta', false);
+      await page.waitForTimeout(300);
+      await clickContinue(page);
+    }
   }
 
   await waitForDaPageLoad(page);
@@ -798,6 +851,38 @@ export async function navigateMeansTest(page: Page) {
 
 export async function navigateCaseDetails(page: Page) {
   await waitForDaPageLoad(page);
+
+  // Handle unexpected debtor[1] income page that sometimes appears here
+  // (triggered by code blocks needing income_amount/overtime_pay variables)
+  let caseH = await page.locator('h1').first().textContent().catch(() => '');
+  console.log(`  [navigateCaseDetails] Heading: "${caseH}"`);
+  const isIncomePage = (h: string | null | undefined) =>
+    h?.toLowerCase().includes('monthly income') ||
+    h?.toLowerCase().includes('payroll deductions') ||
+    h?.toLowerCase().includes('other deductions') ||
+    h?.toLowerCase().includes('other income') ||
+    h?.toLowerCase().includes('regular contributions');
+  while (isIncomePage(caseH)) {
+    console.log(`  [navigateCaseDetails] Handling unexpected income page: "${caseH}"`);
+    // Fill all visible currency/number inputs with 0
+    await page.evaluate(() => {
+      document.querySelectorAll('input[type="text"], input[type="number"]').forEach(el => {
+        const input = el as HTMLInputElement;
+        if (input.offsetParent === null) return;
+        if (input.value && input.value !== '') return;
+        input.value = '0';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    });
+    // Click any unchecked "No" radios
+    await fillAllVisibleRadiosAsNo(page);
+    await clickContinue(page);
+    await waitForDaPageLoad(page);
+    caseH = await page.locator('h1').first().textContent().catch(() => '');
+    console.log(`  [navigateCaseDetails] Next heading: "${caseH}"`);
+  }
+
   const payLabel = page.locator('label').filter({ hasText: 'I will pay the entire fee when I file my petition' });
   await payLabel.click();
   await clickContinue(page);
@@ -1087,30 +1172,33 @@ export async function runFullInterview(page: Page, scenario: TestScenario) {
   console.log(`  Creditors: secured=${!!scenario.creditors.secured} priority=${!!scenario.creditors.priority} nonpriority=${!!scenario.creditors.nonpriority}`);
   console.log(`${'═'.repeat(60)}`);
 
-  await navigateToDebtorPage(page, scenario);
-  await fillDebtorAndAdvance(page, scenario.debtor);
+  const log = (step: string) => console.log(`  [${step}] starting...`);
+
+  log('debtorPage'); await navigateToDebtorPage(page, scenario);
+  log('fillDebtor1'); await fillDebtorAndAdvance(page, scenario.debtor);
 
   if (scenario.jointFiling && scenario.spouse) {
+    log('fillDebtor2');
     await waitForDaPageLoad(page);
     await fillDebtorAndAdvance(page, scenario.spouse);
   }
 
-  await passDebtorFinal(page);
-  await navigatePropertySection(page, scenario);
-  await navigateExemptionSection(page);
-  await navigateFinancialAffairs(page, scenario);
-  await navigateCreditorLibraryPicker(page);
-  await navigateSecuredCreditors(page, scenario);
-  await navigateUnsecuredCreditors(page, scenario);
-  await navigateContractsLeases(page);
-  await navigateCommunityProperty(page);
-  await navigateIncome(page, scenario);
-  await navigateExpenses(page, scenario.rentExpense);
-  await navigateMeansTest(page);
-  await navigateCaseDetails(page);
-  await navigateBusiness(page);
-  await navigateHazardousProperty(page);
-  await navigateCreditCounseling(page, scenario);
-  await navigateReporting(page);
-  await navigateDynamicPhase(page, scenario);
+  log('debtorFinal'); await passDebtorFinal(page);
+  log('property'); await navigatePropertySection(page, scenario);
+  log('exemptions'); await navigateExemptionSection(page);
+  log('financialAffairs'); await navigateFinancialAffairs(page, scenario);
+  log('creditorLibrary'); await navigateCreditorLibraryPicker(page);
+  log('securedCreditors'); await navigateSecuredCreditors(page, scenario);
+  log('unsecuredCreditors'); await navigateUnsecuredCreditors(page, scenario);
+  log('contractsLeases'); await navigateContractsLeases(page);
+  log('communityProperty'); await navigateCommunityProperty(page);
+  log('income'); await navigateIncome(page, scenario);
+  log('expenses'); await navigateExpenses(page, scenario.rentExpense);
+  log('meansTest'); await navigateMeansTest(page);
+  log('caseDetails'); await navigateCaseDetails(page);
+  log('business'); await navigateBusiness(page);
+  log('hazardousProperty'); await navigateHazardousProperty(page);
+  log('creditCounseling'); await navigateCreditCounseling(page, scenario);
+  log('reporting'); await navigateReporting(page);
+  log('dynamicPhase'); await navigateDynamicPhase(page, scenario);
 }
