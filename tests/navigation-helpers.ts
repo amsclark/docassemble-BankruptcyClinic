@@ -568,7 +568,9 @@ export async function navigateSecuredCreditors(page: Page, scenario: TestScenari
     await waitForDaPageLoad(page);
     const notifyText = await page.locator('body').innerText();
     if (notifyText.toLowerCase().includes('notif')) {
-      await clickYesNoButton(page, 'prop.creditors[0].notify.there_are_any', false);
+      // yesno: buttons — click "No" directly by role
+      await page.getByRole('button', { name: 'No', exact: true }).click();
+      await page.waitForLoadState('networkidle');
     }
 
     await handleAnotherPage(page, 'prop.creditors.there_is_another');

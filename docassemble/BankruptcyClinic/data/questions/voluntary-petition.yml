@@ -239,7 +239,7 @@ objects:
       DAList.using(
         object_type=DAObject,
         complete_attribute='complete')
-  - prop.creditors[i].other_notify: |
+  - prop.creditors[i].notify: |
       DAList.using(
         object_type=DAObject,
         complete_attribute='complete')
@@ -941,34 +941,6 @@ code: |
   prop.owers[i].amount
   prop.owers[i].complete = True
 
----
-code: |
-  prop.ab_vehicles[i].make
-  prop.ab_vehicles[i].model
-  prop.ab_vehicles[i].year
-  prop.ab_vehicles[i].milage
-  prop.ab_vehicles[i].who
-  prop.ab_vehicles[i].current_value
-  if prop.ab_vehicles[i].has_loan:
-    prop.ab_vehicles[i].current_owned_value = prop.ab_vehicles[i].current_value - prop.ab_vehicles[i].current_owed_amount
-  else:
-    prop.ab_vehicles[i].current_owned_value = prop.ab_vehicles[i].current_value
-  prop.ab_vehicles[i].is_community_property
-  prop.ab_vehicles[i].complete = True
----
-code: |
-  prop.ab_other_vehicles[i].make
-  prop.ab_other_vehicles[i].model
-  prop.ab_other_vehicles[i].year
-  prop.ab_other_vehicles[i].who
-  prop.ab_other_vehicles[i].other_info
-  prop.ab_other_vehicles[i].current_value
-  if prop.ab_other_vehicles[i].has_loan:
-    prop.ab_other_vehicles[i].current_owned_value = prop.ab_other_vehicles[i].current_value - prop.ab_other_vehicles[i].current_owed_amount
-  else:
-    prop.ab_other_vehicles[i].current_owned_value = prop.ab_other_vehicles[i].current_value
-  prop.ab_other_vehicles[i].is_community_property
-  prop.ab_other_vehicles[i].complete = True
 ---
 code: |
   prop.financial_assets.deposits[i].type

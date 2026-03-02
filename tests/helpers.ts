@@ -123,62 +123,28 @@ export async function screenshot(page: Page, name: string) {
 //  Click helpers
 // ──────────────────────────────────────────────
 
-/** Click the standard docassemble Continue button (simple version, no list-collect workaround). */
-export async function clickContinueSimple(page: Page) {
-  await waitForDaPageLoad(page);
-  await page.locator('#da-continue-button').click();
-  await page.waitForLoadState('networkidle');
-}
-
 /**
- * Click Continue with list-collect workaround.
+ * Click Continue with jQuery Validate fix for hidden required fields.
  *
- * On list-collect pages, docassemble may not send jQuery Validate rules,
- * and (critically) may not render the `_list_collect_list` hidden input.
- * Without `_list_collect_list`, the server doesn't call `._allow_appending()`
- * or mark list items as `.complete`, so the same question is re-shown.
- *
- * Fix: detect missing validator, manually build `_visible`, inject
- * `_list_collect_list` if missing, clear the checkin interval (to avoid
- * tracker mismatch), then do a native form POST.
+ * Docassemble's show-if fields can leave hidden inputs marked as required,
+ * which causes jQuery Validate to reject the form. This sets the validator's
+ * ignore selector to skip hidden fields before clicking Continue.
  */
 export async function clickContinue(page: Page) {
   await waitForDaPageLoad(page);
 
-  // Ensure the form has a validator with daValidationHandler as the submit
-  // handler. On AJAX-rendered pages (including list-collect), daSetupValidation
-  // may create a validator that jQuery Validate doesn't properly attach to the
-  // new form element. We fix this by ensuring the validator exists and has the
-  // correct submit handler.
+  // Fix jQuery Validate to ignore hidden/disabled required fields
   await page.evaluate(() => {
     const $ = (window as any).jQuery;
-    if (!$ || !$.fn.validate) return;
-    const form = document.getElementById('daform');
-    if (!form) return;
-
-    // Get or create the validator
-    let validator = $(form).data('validator');
-    if (!validator) {
-      // Create the validator — this may also retrieve one that daSetupValidation
-      // already created but wasn't properly linked via $.data
-      validator = $(form).validate();
-    }
-
-    // Ensure the submit handler is daValidationHandler (handles _visible,
-    // AJAX POST, daProcessAjax for page transitions)
-    const daVH = (window as any).daValidationHandler;
-    if (validator && daVH) {
-      validator.settings.submitHandler = daVH;
-    }
-
-    // Set ignore for hidden/disabled fields — prevents jQuery Validate from
-    // rejecting hidden required fields on list-collect pages
+    if (!$) return;
+    const validator = $('#daform').data('validator');
     if (validator) {
-      validator.settings.ignore = ':hidden:not(.da-active-invisible), :disabled';
+      validator.settings.ignore = ':hidden';
     }
   });
 
-  await clickContinueSimple(page);
+  await page.locator('#da-continue-button').click();
+  await page.waitForLoadState('networkidle');
 }
 
 /** Click an element by its DOM id. */
