@@ -35,14 +35,14 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: process.env.BASE_URL || 'http://localhost:8080',
 
-    /* Collect trace always for comprehensive debugging */
-    trace: 'on',
-    
-    /* Screenshot always for progress tracking */
-    screenshot: 'on',
-    
-    /* Video always for live monitoring and analysis */
-    video: 'on',
+    /* Collect trace on first retry only (reduces artifact overhead + ENOENT race) */
+    trace: 'on-first-retry',
+
+    /* Screenshot on failure only */
+    screenshot: 'only-on-failure',
+
+    /* Video on first retry only (heavy artifacts, not needed on every run) */
+    video: 'on-first-retry',
     
     /* Slow down for live watching when enabled */
     launchOptions: {

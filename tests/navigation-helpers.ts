@@ -965,6 +965,7 @@ export async function navigateDynamicPhase(page: Page, scenario: TestScenario) {
   while (maxSteps-- > 0) {
     await page.waitForTimeout(300);
     const heading = await page.locator('h1, h2').first().textContent().catch(() => '');
+    console.log(`  [dynamicPhase step ${60 - maxSteps}] heading: "${heading}"`);
 
     // Check for conclusion
     const bodyText = await page.locator('body').innerText();
@@ -976,9 +977,136 @@ export async function navigateDynamicPhase(page: Page, scenario: TestScenario) {
 
     // Check for error
     if (heading?.toLowerCase().includes('error')) {
-      const tracebackEl = await page.locator('pre, code, .daerror, .alert-danger').first().textContent().catch(() => '');
+      const tracebackEl = await page.locator('pre, code, .daerror, .alert-danger, blockquote').first().textContent().catch(() => '');
+      const fullPageText = bodyText.substring(0, 3000);
       await screenshot(page, `${scenario.name}-error`);
-      throw new Error(`Docassemble error during dynamic phase:\n${tracebackEl || bodyText.substring(0, 1500)}`);
+      console.log(`\n${'!'.repeat(60)}\nDOCASSEMBLE ERROR PAGE CONTENT:\n${fullPageText}\n${'!'.repeat(60)}\n`);
+      throw new Error(`Docassemble error during dynamic phase:\n${tracebackEl || fullPageText}`);
+    }
+
+    // ── Re-presented financial affairs page (docassemble re-seeks a variable) ──
+    // Only handle the single marital/residence page — do NOT call full navigateFinancialAffairs
+    // which would try to advance through employment/income sub-pages.
+    if (heading?.toLowerCase().includes('marital status') || heading?.toLowerCase().includes('where you lived')) {
+      console.log(`  [dynamicPhase] Handling re-presented financial affairs page`);
+      const isJoint = scenario.jointFiling;
+
+      // Use JavaScript to set all radio values directly, avoiding DOM detach
+      // issues that happen when docassemble rebuilds the page after lived_elsewhere changes.
+      await page.evaluate((opts) => {
+        const { isJoint, b64Map } = opts;
+
+        // Helper to click a radio label by for="id"
+        function clickRadioLabel(forId: string) {
+          const label = document.querySelector(`label[for="${forId}"]`) as HTMLElement;
+          if (label) label.click();
+        }
+
+        // 1. Set lived_elsewhere = No
+        clickRadioLabel(b64Map.lived_elsewhere_no);
+
+        // 2. Set marital_status = Yes/No
+        clickRadioLabel(isJoint ? b64Map.marital_status_yes : b64Map.marital_status_no);
+
+        // 3. Set lived_with_spouse = No (if visible)
+        const lwsLabel = document.querySelector(`label[for="${b64Map.lived_with_spouse_no}"]`) as HTMLElement;
+        if (lwsLabel && lwsLabel.offsetParent !== null) lwsLabel.click();
+
+        // 4. For joint: set all "Same address/dates" radios to Yes
+        if (isJoint) {
+          for (const id of b64Map.sameAddressYesIds) {
+            const el = document.querySelector(`label[for="${id}"]`) as HTMLElement;
+            if (el && el.offsetParent !== null) el.click();
+          }
+        }
+      }, {
+        isJoint,
+        b64Map: {
+          lived_elsewhere_no: `${b64('financial_affairs.lived_elsewhere')}_1`,
+          marital_status_yes: `${b64('financial_affairs.marital_status')}_0`,
+          marital_status_no: `${b64('financial_affairs.marital_status')}_1`,
+          lived_with_spouse_no: `${b64('financial_affairs.lived_with_spouse')}_1`,
+          sameAddressYesIds: Array.from({ length: 6 }, (_, i) => [
+            `${b64(`financial_affairs.address_same_dates_${i + 1}`)}_0`,
+            `${b64(`financial_affairs.address_same_${i + 1}`)}_0`,
+          ]).flat(),
+        },
+      });
+
+      // Wait for docassemble JS to process all the radio changes
+      await page.waitForTimeout(2000);
+
+      // Fill visible empty inputs (handle Zip needing 5 chars)
+      await page.evaluate(() => {
+        document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"]').forEach(el => {
+          const input = el as HTMLInputElement;
+          if (input.offsetParent === null) return;
+          if (input.value && input.value !== '0') return;
+          const label = input.id ? document.querySelector(`label[for="${input.id}"]`) : null;
+          const labelText = (label?.textContent || '').toLowerCase();
+          const isNumeric = input.type === 'number' || input.inputMode === 'numeric' || labelText.includes('zip');
+          if (input.type === 'date') {
+            input.value = '2024-01-01';
+          } else if (isNumeric) {
+            input.value = '00000';
+          } else if (!input.value) {
+            input.value = 'N/A';
+          }
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+      });
+
+      await clickContinue(page);
+      await waitForDaPageLoad(page);
+      continue;
+    }
+
+    // ── Household/dependents page (means test variable needed for PDF) ──
+    if (heading?.toLowerCase().includes('household and dependents') || heading?.toLowerCase().includes('calulate median')) {
+      console.log(`  [dynamicPhase] Handling household/dependents page`);
+      const filingStatusField = page.locator(`select[name="${b64('monthly_income.filing_status')}"]`);
+      if (await filingStatusField.count() > 0) {
+        const filingValue = scenario.jointFiling
+          ? 'Married and your spouse is filing with you.'
+          : 'Not married';
+        await filingStatusField.selectOption(filingValue);
+      }
+      const dependentsField = page.locator(`#${b64('monthly_income.dependents')}`);
+      if (await dependentsField.count() > 0) {
+        await dependentsField.fill(String(scenario.dependents ?? 0));
+      }
+      await clickContinue(page);
+      await waitForDaPageLoad(page);
+      continue;
+    }
+
+    // ── Re-presented income pages ──
+    if (heading?.toLowerCase().includes('monthly income') ||
+        heading?.toLowerCase().includes('payroll deductions') ||
+        heading?.toLowerCase().includes('other deductions') ||
+        heading?.toLowerCase().includes('other income') ||
+        heading?.toLowerCase().includes('regular contributions') ||
+        heading?.toLowerCase().includes('employment information')) {
+      console.log(`  [dynamicPhase] Handling unexpected income page: "${heading}"`);
+      // Fill all visible inputs with 0, click No radios, Continue
+      await page.evaluate(() => {
+        document.querySelectorAll('input[type="text"]:not([disabled]), input[type="number"]:not([disabled]), input.dacurrency:not([disabled])').forEach(inp => {
+          const input = inp as HTMLInputElement;
+          if (!input.value && input.offsetParent !== null) input.value = '0';
+        });
+        document.querySelectorAll('input[type="radio"][value="False"]').forEach(radio => {
+          const r = radio as HTMLInputElement;
+          if (!r.checked && r.offsetParent !== null) {
+            const label = document.querySelector(`label[for="${r.id}"]`) as HTMLElement;
+            if (label) label.click();
+          }
+        });
+      });
+      await page.waitForTimeout(300);
+      await clickContinue(page);
+      await waitForDaPageLoad(page);
+      continue;
     }
 
     // ── Known question handlers ──

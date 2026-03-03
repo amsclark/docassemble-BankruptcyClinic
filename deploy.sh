@@ -1,12 +1,16 @@
 #!/bin/bash
 # Deploy the docassemble package to the local server.
 # Usage: ./deploy.sh
+#
+# The Docker container has no DNS/internet, so we install directly
+# with --no-build-isolation to use the already-installed setuptools.
 
 set -e
 
 API_KEY="${DA_API_KEY:-M1L356QF6eplHGeaNNkF8QxDic126Wtv}"
 API_URL="${DA_API_URL:-http://localhost:8080}"
 PACKAGE_DIR="$(cd "$(dirname "$0")" && pwd)"
+DOCKER_CONTAINER="${DA_CONTAINER:-docassemble}"
 
 echo "Building package zip..."
 cd "$(dirname "$PACKAGE_DIR")"
@@ -22,37 +26,29 @@ zip -r /tmp/da-package.zip \
 SIZE=$(ls -lh /tmp/da-package.zip | awk '{print $5}')
 echo "Package zip: $SIZE"
 
-echo "Uploading to $API_URL..."
-TASK_ID=$(curl -s -X POST \
-  -H "X-API-Key: $API_KEY" \
-  -F "zip=@/tmp/da-package.zip" \
-  "$API_URL/api/package" | python3 -c "import sys,json; print(json.load(sys.stdin)['task_id'])")
-echo "Task ID: $TASK_ID"
+# Copy zip into container and install directly with --no-build-isolation
+# (the container has no internet access for pip build isolation)
+echo "Copying zip to container..."
+sg docker -c "docker cp /tmp/da-package.zip $DOCKER_CONTAINER:/tmp/da-package.zip"
 
-echo "Waiting for install..."
-for i in $(seq 1 60); do
-  RESULT=$(curl -s -H "X-API-Key: $API_KEY" \
-    "$API_URL/api/package_update_status?task_id=$TASK_ID" 2>/dev/null)
-  STATUS=$(echo "$RESULT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('status','?'))" 2>/dev/null)
+echo "Installing package..."
+sg docker -c "docker exec $DOCKER_CONTAINER /usr/share/docassemble/local3.12/bin/pip install \
+  --no-build-isolation --no-cache-dir \
+  --prefix=/usr/share/docassemble/local3.12 \
+  --upgrade /tmp/da-package.zip 2>&1" | tail -5
 
-  if [ "$STATUS" = "completed" ] || [ "$STATUS" = "unknown" ]; then
-    echo "Install completed (status: $STATUS). Server may restart..."
-    break
-  fi
-  printf "."
-  sleep 5
-done
-echo
+echo "Restarting uwsgi..."
+sg docker -c "docker exec $DOCKER_CONTAINER supervisorctl restart uwsgi 2>&1"
 
 # Wait for server to come back
 echo "Waiting for server..."
 for i in $(seq 1 30); do
+  sleep 2
   HTTP=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL/" 2>/dev/null)
   if [ "$HTTP" = "200" ]; then
     echo "Server is ready!"
     exit 0
   fi
-  sleep 3
 done
 echo "Warning: server did not come back within timeout"
 exit 1

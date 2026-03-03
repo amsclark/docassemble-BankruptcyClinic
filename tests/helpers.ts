@@ -307,8 +307,12 @@ export async function fillDebtorIdentity(
     taxId?: string;
   },
 ) {
+  // Wait for the first name field to be attached and visible
+  const firstNameId = b64('debtor[i].name.first');
+  await page.locator(`#${firstNameId}`).waitFor({ state: 'visible', timeout: 15000 });
+
   // Name fields
-  await fillById(page, b64('debtor[i].name.first'), opts.first);
+  await fillById(page, firstNameId, opts.first);
   await fillById(page, b64('debtor[i].name.middle'), opts.middle);
   await fillById(page, b64('debtor[i].name.last'), opts.last);
   if (opts.suffix) await fillById(page, b64('debtor[i].name.suffix'), opts.suffix);
