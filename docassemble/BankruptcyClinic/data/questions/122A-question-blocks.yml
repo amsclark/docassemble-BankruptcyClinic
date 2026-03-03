@@ -57,7 +57,12 @@ question: |
 subquestion: |
   Be as complete and accurate as possible. If two married people are filing together, both are equally responsible for being accurate.
 fields:
-  - note: Income calculation Debtor 1
+  - note: |
+      % if len(debtor) > 1:
+      Income calculation Debtor 1
+      % else:
+      Income calculation
+      % endif
   - Your gross wages, salary tips, bonuses, overtime, and comissions: monthly_income.gross_wages1
     datatype: currency
     # default: 2500

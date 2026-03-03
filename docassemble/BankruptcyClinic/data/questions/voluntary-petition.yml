@@ -465,9 +465,15 @@ code: |
   financial_affairs.has_deposit_box
   financial_affairs.has_storage_unit
   financial_affairs.has_held_property
-  financial_affairs.environment.has_liability
-  financial_affairs.environment.has_release
-  financial_affairs.environment.has_proceeding
+  financial_affairs.environment.has_any
+  if financial_affairs.environment.has_any:
+    financial_affairs.environment.has_liability
+    financial_affairs.environment.has_release
+    financial_affairs.environment.has_proceeding
+  else:
+    financial_affairs.environment.has_liability = False
+    financial_affairs.environment.has_release = False
+    financial_affairs.environment.has_proceeding = False
   financial_affairs.business_types
   if financial_affairs.business_types['A sole proprietor or self-employed in a trade, profession, or other activity, either full-time or part-time'] or financial_affairs.business_types['A member of a limited liability company (LLC) or limited liability partnership (LLP)'] or financial_affairs.business_types['A partner in a partnership'] or financial_affairs.business_types['An officer, director, or managing executive of a corporation'] or financial_affairs.business_types['An owner of at least 5% of the voting or equity securities of a corporation']:
     financial_affairs.businesses.there_are_any = True

@@ -1045,12 +1045,20 @@ edit:
 ---
 id: consumer_debts_classification
 question: |
+  % if len(debtor) > 1:
   Are either Debtor 1's or Debtor 2's debts primarily consumer debts?
+  % else:
+  Are your debts primarily consumer debts?
+  % endif
 yesno: financial_affairs.primarily_consumer_debts
 ---
 id: consumer_creditor_payments
 question: |
+  % if len(debtor) > 1:
   Did either Debtor 1 or Debtor 2 pay a consumer creditor a total of $600 or a non-consumer creditor a total of $7,575 in the last 90 days?
+  % else:
+  Did you pay a consumer creditor a total of $600 or a non-consumer creditor a total of $7,575 in the last 90 days?
+  % endif
 yesno: financial_affairs.consumer_debt_payments.there_are_any
 ---
 id: consumer_debt_additional_creditors
@@ -1129,7 +1137,11 @@ under: |
 ---
 id: insider_payments_to_debt
 question: |
+  % if len(debtor) > 1:
   Did either debtor 1 or debtor 2 make any payment on debt you owed anyone who was an insider?
+  % else:
+  Did you make any payment on debt you owed anyone who was an insider?
+  % endif
 subquestion: |
   Insiders include your relatives; any general partners; relatives of any general partners; partnerships of which you are a general partner; corporations of which you are an officer, director, person in control, or owner of 20% or more of their voting securities; and any managing agent, including one for a business you operate as a sole propietor. Include payments for domestic support obligations, such as child support and alimony.
 yesno: financial_affairs.insider_payments.there_are_any
@@ -1999,6 +2011,13 @@ fields:
     # default: 2000
     show if: financial_affairs.has_held_property
 ---
+id: environmental_hazardous_gateway
+question: |
+  Environmental Law and Hazardous Material
+subquestion: |
+  Do you have any environmental law or hazardous material concerns to report? This includes any government notifications about environmental liability, any hazardous material releases you have reported, or any judicial or administrative proceedings under environmental law.
+yesno: financial_affairs.environment.has_any
+---
 id: environmental_law_liability
 question: |
   Environmental Law Liability
@@ -2009,7 +2028,7 @@ subquestion: |
 
   Site means any location, facility, or property as defined under any environmental law, whether you now own, operate, or utilize it or used to own, operate, or utilize it, including disposal sites.
 
-  Hazaradous material means anything an environmental law defines as a hazardous waste, hazardous substance, toxic substance, hazardous material, pollutant, containmant, or similar term.
+  Hazardous material means anything an environmental law defines as a hazardous waste, hazardous substance, toxic substance, hazardous material, pollutant, contaminant, or similar term.
 
   Report all notices, releases, and proceedings that you know about, regardless of when they occurred.
 
@@ -2073,7 +2092,7 @@ id: hazardous_material_release
 question: |
   Hazardous Material
 subquestion: |
-  Have you notified any governmental unit of any realease of hazardous material?
+  Have you notified any governmental unit of any release of hazardous material?
 fields:
   - no label: financial_affairs.environment.has_release
     datatype: yesnoradio

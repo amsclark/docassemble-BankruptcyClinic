@@ -504,12 +504,9 @@ export async function navigateFinancialAffairs(page: Page, scenario: TestScenari
     await waitForDaPageLoad(page);
   }
 
-  // Environment — 3 pages
-  for (let i = 0; i < 3; i++) {
-    await waitForDaPageLoad(page);
-    await fillAllVisibleRadiosAsNo(page);
-    await clickContinue(page);
-  }
+  // Environment — gateway question (has_any), then 3 detail pages if yes
+  await waitForDaPageLoad(page);
+  await clickYesNoButton(page, 'financial_affairs.environment.has_any', false);
 
   // Business types / businesses
   let businessCheckboxDone = false;
@@ -673,10 +670,7 @@ export async function navigateUnsecuredCreditors(page: Page, scenario: TestScena
     await fillYesNoRadio(page, 'prop.nonpriority_claims[0].has_codebtor', false);
 
     // "Do others need to be notified about debt?" radio
-    const npNotifyRadio = page.locator(`[name="${b64('prop.nonpriority_claims[0].notify.there_are_any')}"]`);
-    if (await npNotifyRadio.count() > 0) {
-      await fillYesNoRadio(page, 'prop.nonpriority_claims[0].notify.there_are_any', false);
-    }
+    await fillYesNoRadio(page, 'prop.nonpriority_claims[0].has_notify', false);
 
     await clickContinue(page);
 
@@ -1063,7 +1057,7 @@ export async function navigateDynamicPhase(page: Page, scenario: TestScenario) {
     }
 
     // ── Household/dependents page (means test variable needed for PDF) ──
-    if (heading?.toLowerCase().includes('household and dependents') || heading?.toLowerCase().includes('calulate median')) {
+    if (heading?.toLowerCase().includes('household and dependents') || heading?.toLowerCase().includes('calculate median') || heading?.toLowerCase().includes('calulate median')) {
       console.log(`  [dynamicPhase] Handling household/dependents page`);
       const filingStatusField = page.locator(`select[name="${b64('monthly_income.filing_status')}"]`);
       if (await filingStatusField.count() > 0) {

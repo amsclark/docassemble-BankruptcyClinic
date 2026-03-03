@@ -762,7 +762,7 @@ id: hazardous_property
 question: |
   Hazardous property?
 subquestion: |
-  Do you own or have any property that poses or is alleged to pose a thread of imminent and identifiable hazard to public health or safety? Or do you won any property that needs immediate attention?
+  Do you own or have any property that poses or is alleged to pose a threat of imminent and identifiable hazard to public health or safety? Or do you own any property that needs immediate attention?
 yesno: hazardous_property.has_property
 section: haz_prop
 ---
