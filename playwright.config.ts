@@ -41,7 +41,7 @@ export default defineConfig({
     /* Screenshot on failure only */
     screenshot: 'only-on-failure',
 
-    /* Video on first retry only (heavy artifacts, not needed on every run) */
+    /* Video recording — set to 'on' for customer demo recordings */
     video: 'on-first-retry',
     
     /* Slow down for live watching when enabled */

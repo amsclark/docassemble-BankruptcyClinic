@@ -155,9 +155,15 @@ async function fillRealProperty(page: Page, rp: RealPropertyData, index: number)
   await page.locator(`#${b64(`prop.interests[${index}].zip`)}`).fill(rp.zip);
   await page.locator(`#${b64(`prop.interests[${index}].county`)}`).fill(rp.county);
   await page.locator(`label[for="${b64(`prop.interests[${index}].type`)}_${rp.typeIndex}"]`).click();
-  // 'who' dropdown — always visible (code-generated choices)
+  // 'who' field — may be a select (dropdown) or radio buttons depending on docassemble rendering
   const propWhoSelect = page.locator(`select#${b64(`prop.interests[${index}].who`)}`);
-  if (await propWhoSelect.count() > 0) await propWhoSelect.selectOption('Debtor 1 only');
+  if (await propWhoSelect.count() > 0) {
+    await propWhoSelect.selectOption('Debtor 1 only');
+  } else {
+    // Radio button rendering: click the "Debtor 1 only" label
+    const whoRadioLabel = page.locator(`label`).filter({ hasText: 'Debtor 1 only' }).first();
+    if (await whoRadioLabel.count() > 0) await whoRadioLabel.click();
+  }
   await page.locator(`#${b64(`prop.interests[${index}].current_value`)}`).fill(rp.value);
   await page.locator(`#${b64(`prop.interests[${index}].ownership_interest`)}`).fill(rp.ownershipInterest);
   await fillYesNoRadio(page, `prop.interests[${index}].is_community_property`, false);

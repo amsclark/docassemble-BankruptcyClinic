@@ -1003,6 +1003,11 @@ code: |
     else:
       main['debtor_tax_id'+str(i)] = debt.tax_id.tax_id[-4:]
 
+    main['debtor_street'+str(i)] = debt.address.address
+    main['debtor_city'+str(i)] = debt.address.city
+    main['debtor_state'+str(i)] = debt.address.state
+    _zip = debt.address.zip
+    main['debtor_zip'+str(i)] = str(int(_zip)) if isinstance(_zip, float) else str(_zip)
     main['debtor_county'+str(i)] = debt.address.county
     if debt.has_other_mailing_address:
       main['debtor_mail_street'+str(i)] = debt.mailing_street

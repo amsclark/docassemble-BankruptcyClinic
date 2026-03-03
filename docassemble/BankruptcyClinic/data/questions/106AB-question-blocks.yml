@@ -5135,6 +5135,13 @@ code: |
   else:
     debtor2_name = ''
   ab = {}
+  # Default personal property values to 0 so summary calculations don't fail
+  # when user answers "No" to owning that category (show if: hides the value field)
+  for _attr in ['household_goods_value', 'electronics_value', 'collectibles_value',
+                'hobby_equipment_value', 'firearms_value', 'clothes_value',
+                'jewelry_value', 'animal_value', 'other_household_items_value']:
+    if not hasattr(prop, _attr):
+      setattr(prop, _attr, 0)
   #Start exemptions logic
   sc = {}
   sc['debtor1_name_1'] = debtor_name
@@ -5187,7 +5194,8 @@ code: |
       ab['prop'+str(i)+'Street'] = interest.street
       ab['prop'+str(i)+'City'] = interest.city
       ab['prop'+str(i)+'State'] = interest.state
-      ab['prop'+str(i)+'Zip'] = interest.zip
+      _zip = interest.zip
+      ab['prop'+str(i)+'Zip'] = str(int(_zip)) if isinstance(_zip, float) else str(_zip)
       ab['prop'+str(i)+'County'] = interest.county
       ab['prop'+str(i)+'SingleFam'] = interest.type['Single-family home']
       ab['prop'+str(i)+'Duplex'] = interest.type['Duplex or Multi-unit building']

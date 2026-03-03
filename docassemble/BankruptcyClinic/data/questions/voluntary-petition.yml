@@ -898,6 +898,7 @@ code: |
   form_107_ext1
   form_107_ext2
   form_107_ext3
+  statement_of_intention_auto_populated
   attach_108
   summary_attach
   declaration_attach
@@ -2340,3 +2341,31 @@ review:
   - Revisit: reporting.liabilities_estimate
     button: |
       **Estimated liability amount:** ${ reporting.liabilities_estimate }
+---
+# Auto-populate Statement of Intention (Form 108) from Schedule D secured creditors
+# so users don't re-enter the same data (GitHub issue #15)
+code: |
+  if len(prop.creditors) > 0:
+    secured_claims.clear()
+    secured_claims.there_are_any = True
+    for _cred in prop.creditors:
+      _claim = secured_claims.appendObject()
+      _claim.creditor_name = _cred.name
+      _desc_parts = []
+      if hasattr(_cred, 'collateral_description') and _cred.collateral_description:
+        _desc_parts.append(_cred.collateral_description)
+      if hasattr(_cred, 'prop_options') and _cred.prop_options:
+        _desc_parts.append(str(_cred.prop_options))
+      _claim.property_description = '; '.join(_desc_parts) if _desc_parts else 'See Schedule D'
+      _claim.property_action = _cred.property_action
+      if hasattr(_cred, 'property_action_other'):
+        _claim.property_action_other = _cred.property_action_other
+      else:
+        _claim.property_action_other = ''
+      _claim.exempt = getattr(_cred, 'exempt', False)
+      _claim.complete = True
+    secured_claims.there_is_another = False
+    secured_claims.gathered = True
+  else:
+    secured_claims.there_are_any = False
+  statement_of_intention_auto_populated = True

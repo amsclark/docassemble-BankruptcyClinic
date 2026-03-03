@@ -91,7 +91,7 @@ fields:
   - note: <br>
   - Interest, dividends, and royalties: monthly_income.interest1
     datatype: currency
-    default: ${ debtor[0].income.interest_dividends }
+    default: ${ debtor[0].income.interest_and_dividends }
   - Unemployment compensation: monthly_income.unemployment1
     datatype: currency
     default: ${ debtor[0].income.unemployment }
@@ -155,7 +155,7 @@ fields:
   - note: <br>
   - Interest, dividends, and royalties: monthly_income.interest2
     datatype: currency
-    default: ${ debtor[1].income.interest_dividends if len(debtor) > 1 else 0 }
+    default: ${ debtor[1].income.interest_and_dividends if len(debtor) > 1 else 0 }
   - Unemployment compensation: monthly_income.unemployment2
     datatype: currency
     default: ${ debtor[1].income.unemployment if len(debtor) > 1 else 0 }

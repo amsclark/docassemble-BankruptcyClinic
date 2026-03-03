@@ -40,18 +40,17 @@ test.describe('Scenario 3: Joint Filing Couple — Robert & Sarah Johnson', () =
       expect(getField(form101.fields, 'debtor_last_name1')).toBe('Johnson');
       expect(getField(form101.fields, 'bankruptcy_district')).toContain('South Dakota');
       expect(form101.fields['isCh7']).toBe(true);
-      // Check for second debtor
-      const f = form101.fields;
-      const debtor2FirstKey = Object.keys(f).find(k => k.includes('debtor') && k.includes('2') && k.includes('first'));
-      if (debtor2FirstKey) {
-        const debtor2First = getField(f, debtor2FirstKey).toLowerCase();
-        if (debtor2First) {
-          expect(debtor2First).toContain('sarah');
-          console.log('  ✓ Form 101: both debtor names verified');
-        } else {
-          console.log('  ⚠ Form 101: debtor 2 first name field is empty (known issue)');
-        }
-      }
+      // Verify second debtor name
+      expect(getField(form101.fields, 'debtor_first_name2')).toBe('Sarah');
+      expect(getField(form101.fields, 'debtor_middle_name2')).toBe('K');
+      expect(getField(form101.fields, 'debtor_last_name2')).toBe('Johnson');
+      // Verify debtor addresses
+      expect(getField(form101.fields, 'debtor_street1')).toBe('321 Pine Ln');
+      expect(getField(form101.fields, 'debtor_city1')).toBe('Sioux Falls');
+      expect(getField(form101.fields, 'debtor_state1')).toContain('South Dakota');
+      expect(getField(form101.fields, 'debtor_zip1')).toBe('57101');
+      expect(getField(form101.fields, 'debtor_street2')).toBe('321 Pine Ln');
+      console.log('  ✓ Form 101: both debtor names and addresses verified');
     }
 
     // ── Form 2030 ──
