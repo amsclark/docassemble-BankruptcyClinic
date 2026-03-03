@@ -56,9 +56,8 @@ fields:
           'Debtor 2 only',
           'Debtor 1 and Debtor 2 only',
           'At least one of the debtors and another'])
-  - Last 4 digits of account number: prop.priority_claims[i].account_number
+  - Account number: prop.priority_claims[i].account_number
     # default: 9999
-    datatype: number
     required: False
   - When was the debt incurred?: prop.priority_claims[i].date_incurred
     datatype: date
@@ -74,7 +73,7 @@ fields:
   - Disputed: prop.priority_claims[i].disputed
     datatype: yesno
     # default: False
-  - Type of PRIORITY unsecured claim: prop.priority_claims[i].type
+  - Type of priority claim: prop.priority_claims[i].type
     choices:
       - Domestic support obligations
       - Taxes and certain other debts you owe the government
@@ -264,9 +263,8 @@ fields:
           'Debtor 2 only',
           'Debtor 1 and Debtor 2 only',
           'At least one of the debtors and another'])
-  - Last 4 digits of account number: prop.nonpriority_claims[i].account_number
+  - Account number: prop.nonpriority_claims[i].account_number
     # default: 9999
-    datatype: number
     required: False
   - When was the debt incurred?: prop.nonpriority_claims[i].date_incurred
     datatype: date
@@ -282,7 +280,7 @@ fields:
   - Disputed: prop.nonpriority_claims[i].disputed
     datatype: yesno
     # default: False
-  - Type of NONPRIORITY unsecured claim: prop.nonpriority_claims[i].type
+  - Type of claim: prop.nonpriority_claims[i].type
     choices:
       - Student loans
       - Obligations arising out of a separation agreement or divorce that you did not report as priority claims

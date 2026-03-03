@@ -31,7 +31,7 @@ fields:
 id: household_and_dependents_info
 section: form_122a
 question: |
-  Tell the court about your household and dependents so we can calulate median income.
+  Tell the court about your household and dependents so we can calculate median income.
 fields:
   - What is your marital and filing status?: monthly_income.filing_status
     choices:
