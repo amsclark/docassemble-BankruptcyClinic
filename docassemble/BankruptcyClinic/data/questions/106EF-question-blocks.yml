@@ -130,7 +130,7 @@ fields:
       variable: prop.priority_claims[i].has_codebtor
       is: True
 
-  - Do others need to be notifed about debt?: prop.priority_claims[i].has_notify
+  - Do others need to be notified about this debt?: prop.priority_claims[i].has_notify
     # default: True
     datatype: yesnoradio
 
@@ -201,6 +201,69 @@ fields:
     minlength: 5
     maxlength: 5
     # default: 33593
+    show if: prop.priority_claims[i].has_notify
+    required: False
+
+  - note: Party 4
+    show if: prop.priority_claims[i].has_notify
+  - Name: prop.priority_claims[i].other_name_4
+    show if: prop.priority_claims[i].has_notify
+    required: False
+  - Address/PO Box: prop.priority_claims[i].other_street_4
+    show if: prop.priority_claims[i].has_notify
+    required: False
+  - City: prop.priority_claims[i].other_city_4
+    show if: prop.priority_claims[i].has_notify
+    required: False
+  - State: prop.priority_claims[i].other_state_4
+    show if: prop.priority_claims[i].has_notify
+    required: False
+  - Zip: prop.priority_claims[i].other_zip_4
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    show if: prop.priority_claims[i].has_notify
+    required: False
+
+  - note: Party 5
+    show if: prop.priority_claims[i].has_notify
+  - Name: prop.priority_claims[i].other_name_5
+    show if: prop.priority_claims[i].has_notify
+    required: False
+  - Address/PO Box: prop.priority_claims[i].other_street_5
+    show if: prop.priority_claims[i].has_notify
+    required: False
+  - City: prop.priority_claims[i].other_city_5
+    show if: prop.priority_claims[i].has_notify
+    required: False
+  - State: prop.priority_claims[i].other_state_5
+    show if: prop.priority_claims[i].has_notify
+    required: False
+  - Zip: prop.priority_claims[i].other_zip_5
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    show if: prop.priority_claims[i].has_notify
+    required: False
+
+  - note: Party 6
+    show if: prop.priority_claims[i].has_notify
+  - Name: prop.priority_claims[i].other_name_6
+    show if: prop.priority_claims[i].has_notify
+    required: False
+  - Address/PO Box: prop.priority_claims[i].other_street_6
+    show if: prop.priority_claims[i].has_notify
+    required: False
+  - City: prop.priority_claims[i].other_city_6
+    show if: prop.priority_claims[i].has_notify
+    required: False
+  - State: prop.priority_claims[i].other_state_6
+    show if: prop.priority_claims[i].has_notify
+    required: False
+  - Zip: prop.priority_claims[i].other_zip_6
+    datatype: number
+    minlength: 5
+    maxlength: 5
     show if: prop.priority_claims[i].has_notify
     required: False
 list collect: True
@@ -334,7 +397,7 @@ fields:
       variable: prop.nonpriority_claims[i].has_codebtor
       is: True
 
-  - Do others need to be notifed about debt?: prop.nonpriority_claims[i].has_notify
+  - Do others need to be notified about this debt?: prop.nonpriority_claims[i].has_notify
     # default: True
     datatype: yesnoradio
 
@@ -405,6 +468,69 @@ fields:
     minlength: 5
     maxlength: 5
     # default: 33593
+    show if: prop.nonpriority_claims[i].has_notify
+    required: False
+
+  - note: Party 4
+    show if: prop.nonpriority_claims[i].has_notify
+  - Name: prop.nonpriority_claims[i].other_name_4
+    show if: prop.nonpriority_claims[i].has_notify
+    required: False
+  - Address/PO Box: prop.nonpriority_claims[i].other_street_4
+    show if: prop.nonpriority_claims[i].has_notify
+    required: False
+  - City: prop.nonpriority_claims[i].other_city_4
+    show if: prop.nonpriority_claims[i].has_notify
+    required: False
+  - State: prop.nonpriority_claims[i].other_state_4
+    show if: prop.nonpriority_claims[i].has_notify
+    required: False
+  - Zip: prop.nonpriority_claims[i].other_zip_4
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    show if: prop.nonpriority_claims[i].has_notify
+    required: False
+
+  - note: Party 5
+    show if: prop.nonpriority_claims[i].has_notify
+  - Name: prop.nonpriority_claims[i].other_name_5
+    show if: prop.nonpriority_claims[i].has_notify
+    required: False
+  - Address/PO Box: prop.nonpriority_claims[i].other_street_5
+    show if: prop.nonpriority_claims[i].has_notify
+    required: False
+  - City: prop.nonpriority_claims[i].other_city_5
+    show if: prop.nonpriority_claims[i].has_notify
+    required: False
+  - State: prop.nonpriority_claims[i].other_state_5
+    show if: prop.nonpriority_claims[i].has_notify
+    required: False
+  - Zip: prop.nonpriority_claims[i].other_zip_5
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    show if: prop.nonpriority_claims[i].has_notify
+    required: False
+
+  - note: Party 6
+    show if: prop.nonpriority_claims[i].has_notify
+  - Name: prop.nonpriority_claims[i].other_name_6
+    show if: prop.nonpriority_claims[i].has_notify
+    required: False
+  - Address/PO Box: prop.nonpriority_claims[i].other_street_6
+    show if: prop.nonpriority_claims[i].has_notify
+    required: False
+  - City: prop.nonpriority_claims[i].other_city_6
+    show if: prop.nonpriority_claims[i].has_notify
+    required: False
+  - State: prop.nonpriority_claims[i].other_state_6
+    show if: prop.nonpriority_claims[i].has_notify
+    required: False
+  - Zip: prop.nonpriority_claims[i].other_zip_6
+    datatype: number
+    minlength: 5
+    maxlength: 5
     show if: prop.nonpriority_claims[i].has_notify
     required: False
 list collect: True
@@ -531,78 +657,41 @@ code: |
 
   clm = 1
   ref = 1
+  _noti_suffixes = ['', '_2', '_3', '_4', '_5', '_6']
   for claim in prop.priority_claims:
     if claim.has_notify:
-      unsecured_claims['notiName'+str(clm)] = claim.other_name
-      unsecured_claims['notiStreet'+str(clm)] = claim.other_street
-      unsecured_claims['notiRefLine'+str(clm)] = str(ref)
-      unsecured_claims['notiIsPriority'+str(clm)] = True
-      unsecured_claims['notiIsNonpriority'+str(clm)] = False
-      unsecured_claims['notiCity'+str(clm)] = claim.other_city
-      unsecured_claims['notiState'+str(clm)] = claim.other_state
-      unsecured_claims['notiZip'+str(clm)] = claim.other_zip
-      unsecured_claims['notiAcct'+str(clm)] = claim.account_number
-      clm += 1
-      if claim.other_name_2:
-        unsecured_claims['notiName'+str(clm)] = claim.other_name_2
-        unsecured_claims['notiStreet'+str(clm)] = claim.other_street_2
-        unsecured_claims['notiRefLine'+str(clm)] = str(ref)
-        unsecured_claims['notiIsPriority'+str(clm)] = True
-        unsecured_claims['notiIsNonpriority'+str(clm)] = False
-        unsecured_claims['notiCity'+str(clm)] = claim.other_city_2
-        unsecured_claims['notiState'+str(clm)] = claim.other_state_2
-        unsecured_claims['notiZip'+str(clm)] = claim.other_zip_2
-        unsecured_claims['notiAcct'+str(clm)] = claim.account_number
-        clm += 1
-      if claim.other_name_3:
-        unsecured_claims['notiName'+str(clm)] = claim.other_name_3
-        unsecured_claims['notiStreet'+str(clm)] = claim.other_street_3
-        unsecured_claims['notiRefLine'+str(clm)] = str(ref)
-        unsecured_claims['notiIsPriority'+str(clm)] = True
-        unsecured_claims['notiIsNonpriority'+str(clm)] = False
-        unsecured_claims['notiCity'+str(clm)] = claim.other_city_3
-        unsecured_claims['notiState'+str(clm)] = claim.other_state_3
-        unsecured_claims['notiZip'+str(clm)] = claim.other_zip_3
-        unsecured_claims['notiAcct'+str(clm)] = claim.account_number
-        clm += 1
+      for _sfx in _noti_suffixes:
+        _nname = getattr(claim, 'other_name' + _sfx, '')
+        if _nname:
+          unsecured_claims['notiName'+str(clm)] = _nname
+          unsecured_claims['notiStreet'+str(clm)] = getattr(claim, 'other_street' + _sfx, '')
+          unsecured_claims['notiRefLine'+str(clm)] = str(ref)
+          unsecured_claims['notiIsPriority'+str(clm)] = True
+          unsecured_claims['notiIsNonpriority'+str(clm)] = False
+          unsecured_claims['notiCity'+str(clm)] = getattr(claim, 'other_city' + _sfx, '')
+          unsecured_claims['notiState'+str(clm)] = getattr(claim, 'other_state' + _sfx, '')
+          unsecured_claims['notiZip'+str(clm)] = getattr(claim, 'other_zip' + _sfx, '')
+          unsecured_claims['notiAcct'+str(clm)] = claim.account_number
+          clm += 1
     ref += 1
 
   # Nonpriority notification loop
   ref = 1
   for claim in prop.nonpriority_claims:
     if claim.has_notify:
-      unsecured_claims['notiName'+str(clm)] = claim.other_name
-      unsecured_claims['notiStreet'+str(clm)] = claim.other_street
-      unsecured_claims['notiRefLine'+str(clm)] = str(ref)
-      unsecured_claims['notiIsPriority'+str(clm)] = False
-      unsecured_claims['notiIsNonpriority'+str(clm)] = True
-      unsecured_claims['notiCity'+str(clm)] = claim.other_city
-      unsecured_claims['notiState'+str(clm)] = claim.other_state
-      unsecured_claims['notiZip'+str(clm)] = claim.other_zip
-      unsecured_claims['notiAcct'+str(clm)] = claim.account_number
-      clm += 1
-      if claim.other_name_2:
-        unsecured_claims['notiName'+str(clm)] = claim.other_name_2
-        unsecured_claims['notiStreet'+str(clm)] = claim.other_street_2
-        unsecured_claims['notiRefLine'+str(clm)] = str(ref)
-        unsecured_claims['notiIsPriority'+str(clm)] = False
-        unsecured_claims['notiIsNonpriority'+str(clm)] = True
-        unsecured_claims['notiCity'+str(clm)] = claim.other_city_2
-        unsecured_claims['notiState'+str(clm)] = claim.other_state_2
-        unsecured_claims['notiZip'+str(clm)] = claim.other_zip_2
-        unsecured_claims['notiAcct'+str(clm)] = claim.account_number
-        clm += 1
-      if claim.other_name_3:
-        unsecured_claims['notiName'+str(clm)] = claim.other_name_3
-        unsecured_claims['notiStreet'+str(clm)] = claim.other_street_3
-        unsecured_claims['notiRefLine'+str(clm)] = str(ref)
-        unsecured_claims['notiIsPriority'+str(clm)] = False
-        unsecured_claims['notiIsNonpriority'+str(clm)] = True
-        unsecured_claims['notiCity'+str(clm)] = claim.other_city_3
-        unsecured_claims['notiState'+str(clm)] = claim.other_state_3
-        unsecured_claims['notiZip'+str(clm)] = claim.other_zip_3
-        unsecured_claims['notiAcct'+str(clm)] = claim.account_number
-        clm += 1
+      for _sfx in _noti_suffixes:
+        _nname = getattr(claim, 'other_name' + _sfx, '')
+        if _nname:
+          unsecured_claims['notiName'+str(clm)] = _nname
+          unsecured_claims['notiStreet'+str(clm)] = getattr(claim, 'other_street' + _sfx, '')
+          unsecured_claims['notiRefLine'+str(clm)] = str(ref)
+          unsecured_claims['notiIsPriority'+str(clm)] = False
+          unsecured_claims['notiIsNonpriority'+str(clm)] = True
+          unsecured_claims['notiCity'+str(clm)] = getattr(claim, 'other_city' + _sfx, '')
+          unsecured_claims['notiState'+str(clm)] = getattr(claim, 'other_state' + _sfx, '')
+          unsecured_claims['notiZip'+str(clm)] = getattr(claim, 'other_zip' + _sfx, '')
+          unsecured_claims['notiAcct'+str(clm)] = claim.account_number
+          clm += 1
     ref += 1
 
   _domesticTotal = sum(claim.total_claim for claim in list(filter(lambda x: x.type == 'Domestic support obligations', prop.priority_claims)))

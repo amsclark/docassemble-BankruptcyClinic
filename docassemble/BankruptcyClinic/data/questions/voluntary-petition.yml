@@ -421,6 +421,187 @@ code: |
   prop.exempt_property.properties.gather()
   prop.exempt_property.claim_homestead_exemption = False
 
+  #106I - Income (moved earlier in flow for better UX)
+  debtor[0].income.employment
+  debtor[0].income.income_amount_1
+  debtor[0].income.overtime_pay_1
+  debtor[0].income.tax_deduction
+  debtor[0].income.mandatory_contributions
+  debtor[0].income.voluntary_contributions
+  debtor[0].income.fund_loans
+  debtor[0].income.insurance
+  debtor[0].income.domestic_support
+  debtor[0].income.union_dues
+  debtor[0].income.other_deduction
+  if not debtor[0].income.other_deduction:
+    debtor[0].income.other_deduction_amount = 0
+    debtor[0].income.specify_other_deduction = ''
+    debtor[0].income.other_deduction_amount_2 = 0
+    debtor[0].income.specify_other_deduction_2 = ''
+    debtor[0].income.other_deduction_amount_3 = 0
+    debtor[0].income.specify_other_deduction_3 = ''
+    debtor[0].income.other_deduction_amount_4 = 0
+    debtor[0].income.specify_other_deduction_4 = ''
+    debtor[0].income.other_deduction_amount_5 = 0
+    debtor[0].income.specify_other_deduction_5 = ''
+    debtor[0].income.other_deduction_amount_6 = 0
+    debtor[0].income.specify_other_deduction_6 = ''
+    debtor[0].income.other_deduction_amount_7 = 0
+    debtor[0].income.specify_other_deduction_7 = ''
+    debtor[0].income.other_deduction_amount_8 = 0
+    debtor[0].income.specify_other_deduction_8 = ''
+    debtor[0].income.other_deduction_amount_9 = 0
+    debtor[0].income.specify_other_deduction_9 = ''
+    debtor[0].income.other_deduction_amount_10 = 0
+    debtor[0].income.specify_other_deduction_10 = ''
+  debtor[0].income.net_rental_business
+  debtor[0].income.interest_and_dividends
+  debtor[0].income.family_support
+  debtor[0].income.unemployment
+  debtor[0].income.social_security
+  debtor[0].income.other_govt_assist
+  debtor[0].income.pension
+  debtor[0].income.other_monthly_income
+  if not debtor[0].income.other_monthly_income:
+    debtor[0].income.specify_monthly_income = ''
+    debtor[0].income.other_monthly_amount = 0
+  debtor[0].income.other_regular_contributions
+  if not debtor[0].income.other_regular_contributions:
+    debtor[0].income.specify_other_regular_contributions = ''
+    debtor[0].income.other_regular_contributions_amount = 0
+  debtor[0].income.expect_year_delta
+  if len(debtor) > 1:
+    debtor[1].income.employment
+    if debtor[1].income.employment == 'Employed':
+      debtor[1].income.income_amount_1
+      debtor[1].income.overtime_pay_1
+      debtor[1].income.tax_deduction
+      debtor[1].income.mandatory_contributions
+      debtor[1].income.voluntary_contributions
+      debtor[1].income.fund_loans
+      debtor[1].income.insurance
+      debtor[1].income.domestic_support
+      debtor[1].income.union_dues
+      debtor[1].income.other_deduction
+      if not debtor[1].income.other_deduction:
+        debtor[1].income.other_deduction_amount = 0
+        debtor[1].income.specify_other_deduction = ''
+        debtor[1].income.other_deduction_amount_2 = 0
+        debtor[1].income.specify_other_deduction_2 = ''
+        debtor[1].income.other_deduction_amount_3 = 0
+        debtor[1].income.specify_other_deduction_3 = ''
+        debtor[1].income.other_deduction_amount_4 = 0
+        debtor[1].income.specify_other_deduction_4 = ''
+        debtor[1].income.other_deduction_amount_5 = 0
+        debtor[1].income.specify_other_deduction_5 = ''
+        debtor[1].income.other_deduction_amount_6 = 0
+        debtor[1].income.specify_other_deduction_6 = ''
+        debtor[1].income.other_deduction_amount_7 = 0
+        debtor[1].income.specify_other_deduction_7 = ''
+        debtor[1].income.other_deduction_amount_8 = 0
+        debtor[1].income.specify_other_deduction_8 = ''
+        debtor[1].income.other_deduction_amount_9 = 0
+        debtor[1].income.specify_other_deduction_9 = ''
+        debtor[1].income.other_deduction_amount_10 = 0
+        debtor[1].income.specify_other_deduction_10 = ''
+      debtor[1].income.net_rental_business
+      debtor[1].income.interest_and_dividends
+      debtor[1].income.family_support
+      debtor[1].income.unemployment
+      debtor[1].income.social_security
+      debtor[1].income.other_govt_assist
+      debtor[1].income.pension
+      debtor[1].income.other_monthly_income
+      if not debtor[1].income.other_monthly_income:
+        debtor[1].income.specify_monthly_income = ''
+        debtor[1].income.other_monthly_amount = 0
+    else:
+      debtor[1].income.income_amount_1 = 0
+      debtor[1].income.income_amount_2 = 0
+      debtor[1].income.income_amount_3 = 0
+      debtor[1].income.income_amount_4 = 0
+      debtor[1].income.income_amount_5 = 0
+      debtor[1].income.income_amount_6 = 0
+      debtor[1].income.overtime_pay_1 = 0
+      debtor[1].income.overtime_pay_2 = 0
+      debtor[1].income.overtime_pay_3 = 0
+      debtor[1].income.overtime_pay_4 = 0
+      debtor[1].income.overtime_pay_5 = 0
+      debtor[1].income.overtime_pay_6 = 0
+      debtor[1].income.tax_deduction = 0
+      debtor[1].income.mandatory_contributions = 0
+      debtor[1].income.voluntary_contributions = 0
+      debtor[1].income.fund_loans = 0
+      debtor[1].income.insurance = 0
+      debtor[1].income.domestic_support = 0
+      debtor[1].income.union_dues = 0
+      debtor[1].income.other_deduction = 0
+      debtor[1].income.other_deduction_amount = 0
+      debtor[1].income.specify_other_deduction = ''
+      debtor[1].income.other_deduction_amount_2 = 0
+      debtor[1].income.specify_other_deduction_2 = ''
+      debtor[1].income.other_deduction_amount_3 = 0
+      debtor[1].income.specify_other_deduction_3 = ''
+      debtor[1].income.other_deduction_amount_4 = 0
+      debtor[1].income.specify_other_deduction_4 = ''
+      debtor[1].income.other_deduction_amount_5 = 0
+      debtor[1].income.specify_other_deduction_5 = ''
+      debtor[1].income.other_deduction_amount_6 = 0
+      debtor[1].income.specify_other_deduction_6 = ''
+      debtor[1].income.other_deduction_amount_7 = 0
+      debtor[1].income.specify_other_deduction_7 = ''
+      debtor[1].income.other_deduction_amount_8 = 0
+      debtor[1].income.specify_other_deduction_8 = ''
+      debtor[1].income.other_deduction_amount_9 = 0
+      debtor[1].income.specify_other_deduction_9 = ''
+      debtor[1].income.other_deduction_amount_10 = 0
+      debtor[1].income.specify_other_deduction_10 = ''
+      debtor[1].income.net_rental_business = 0
+      debtor[1].income.interest_and_dividends = 0
+      debtor[1].income.family_support = 0
+      debtor[1].income.unemployment = 0
+      debtor[1].income.social_security = 0
+      debtor[1].income.other_govt_assist = 0
+      debtor[1].income.pension = 0
+      debtor[1].income.other_monthly_income = 0
+      debtor[1].income.specify_monthly_income = ''
+      debtor[1].income.other_monthly_amount = 0
+
+  #106J - Expenses
+  debtor[0].expenses.rent_expense
+  debtor[0].expenses.real_estate_taxes
+  debtor[0].expenses.renters_insurance
+  debtor[0].expenses.upkeep_expenses
+  debtor[0].expenses.owners_dues
+  debtor[0].expenses.additional_mortgage_payments
+  debtor[0].expenses.util_electric
+  debtor[0].expenses.util_garbage
+  debtor[0].expenses.util_other
+  debtor[0].expenses.house_supplies
+  debtor[0].expenses.childcare
+  debtor[0].expenses.clothing
+  debtor[0].expenses.personal_care
+  debtor[0].expenses.medical
+  debtor[0].expenses.transportation
+  debtor[0].expenses.entertainment
+  debtor[0].expenses.charity
+  debtor[0].expenses.life_insurance
+  debtor[0].expenses.health_insurance
+  debtor[0].expenses.vehicle_insurance
+  debtor[0].expenses.other_insurance
+  debtor[0].expenses.other_tax_specify
+  debtor[0].expenses.other_tax_amount
+  debtor[0].expenses.vehicle1_payments
+  debtor[0].expenses.vehicle2_payments
+  debtor[0].expenses.other_payment1_specify
+  debtor[0].expenses.other_payment1_amount
+  debtor[0].expenses.other_payment2_specify
+  debtor[0].expenses.other_payment2_amount
+  debtor[0].expenses.alimony
+  debtor[0].expenses.other_support_specify
+  debtor[0].expenses.other_support_amount
+  debtor[0].expenses.change_in_expense
+
   #107
   # Defensive default to prevent circular seeks when other sections reference this
   if not defined('financial_affairs._defaults_applied'):
@@ -434,15 +615,18 @@ code: |
     financial_affairs.has_second_address = False
     financial_affairs._defaults_applied = True
 
+  if not defined('financial_affairs.has_more_addresses'):
+    financial_affairs.has_more_addresses = False
+
   financial_affairs.debtor_count = len(debtor)
   financial_affairs.marital_status
 
   financial_affairs.lived_with_spouse
   financial_affairs.employed
-  if len(debtor) > 1 and financial_affairs.marital_status == False:
+  if len(debtor) > 1:
     financial_affairs.debtor2_employed
   financial_affairs.had_other_income
-  if len(debtor) > 1 and financial_affairs.marital_status == False:
+  if len(debtor) > 1:
     financial_affairs.debtor2_had_other_income
   financial_affairs.primarily_consumer_debts
 
@@ -491,6 +675,33 @@ code: |
   prop.priority_claims.gather()
   prop.nonpriority_claims.gather()
 
+  # Reporting — moved here so estimates auto-populate from entered data
+  reporting.reporting_type
+  reporting.funds_for_creditors
+  # Auto-calculate estimates from already-entered data
+  reporting.creditor_estimate = len(prop.creditors) + len(prop.priority_claims) + len(prop.nonpriority_claims)
+  _assets_total = 0
+  _assets_total += sum(interest.current_owned_value for interest in prop.interests)
+  _assets_total += sum(vehicle.current_owned_value for vehicle in prop.ab_vehicles)
+  _assets_total += sum(vehicle.current_owned_value for vehicle in prop.ab_other_vehicles)
+  _assets_total += getattr(prop, 'household_goods_value', 0)
+  _assets_total += getattr(prop, 'electronics_value', 0)
+  _assets_total += getattr(prop, 'collectibles_value', 0)
+  _assets_total += getattr(prop, 'hobby_equipment_value', 0)
+  _assets_total += getattr(prop, 'firearms_value', 0)
+  _assets_total += getattr(prop, 'clothes_value', 0)
+  _assets_total += getattr(prop, 'jewelry_value', 0)
+  _assets_total += getattr(prop, 'animal_value', 0)
+  _assets_total += getattr(prop, 'other_household_items_value', 0)
+  if defined('prop.financial_assets'):
+    _assets_total += getattr(prop.financial_assets, 'cash_value', 0)
+    _assets_total += sum(deposit.amount for deposit in getattr(prop.financial_assets, 'deposits', []))
+    _assets_total += sum(deposit.amount for deposit in getattr(prop.financial_assets, 'other_deposits', []))
+    _assets_total += sum(investment.amount for investment in getattr(prop.financial_assets, 'investments', []))
+    _assets_total += getattr(prop.financial_assets, 'other_value', 0)
+  reporting.assets_estimate = _assets_total
+  reporting.liabilities_estimate = sum(claim.total_claim for claim in prop.priority_claims) + sum(claim.total_claim for claim in prop.nonpriority_claims)
+
   #106G
   prop.contracts_and_leases.gather()
   personal_leases.gather()
@@ -498,165 +709,7 @@ code: |
   #106H
   debtors.community_property
 
-  #106I - Income
-  debtor[0].income.employment
-  debtor[0].income.income_amount_1
-  debtor[0].income.overtime_pay_1
-  debtor[0].income.tax_deduction
-  debtor[0].income.mandatory_contributions
-  debtor[0].income.voluntary_contributions
-  debtor[0].income.fund_loans
-  debtor[0].income.insurance
-  debtor[0].income.domestic_support
-  debtor[0].income.union_dues
-  debtor[0].income.other_deduction
-  if not debtor[0].income.other_deduction:
-    debtor[0].income.other_deduction_amount = 0
-    debtor[0].income.specify_other_deduction = ''
-    debtor[0].income.other_deduction_amount_2 = 0
-    debtor[0].income.specify_other_deduction_2 = ''
-    debtor[0].income.other_deduction_amount_3 = 0
-    debtor[0].income.specify_other_deduction_3 = ''
-    debtor[0].income.other_deduction_amount_4 = 0
-    debtor[0].income.specify_other_deduction_4 = ''
-    debtor[0].income.other_deduction_amount_5 = 0
-    debtor[0].income.specify_other_deduction_5 = ''
-    debtor[0].income.other_deduction_amount_6 = 0
-    debtor[0].income.specify_other_deduction_6 = ''
-  debtor[0].income.net_rental_business
-  debtor[0].income.interest_and_dividends
-  debtor[0].income.family_support
-  debtor[0].income.unemployment
-  debtor[0].income.social_security
-  debtor[0].income.other_govt_assist
-  debtor[0].income.pension
-  debtor[0].income.other_monthly_income
-  if not debtor[0].income.other_monthly_income:
-    debtor[0].income.specify_monthly_income = ''
-    debtor[0].income.other_monthly_amount = 0
-  # Other contributions and income change expectations
-  debtor[0].income.other_regular_contributions
-  if not debtor[0].income.other_regular_contributions:
-    debtor[0].income.specify_other_regular_contributions = ''
-    debtor[0].income.other_regular_contributions_amount = 0
-  debtor[0].income.expect_year_delta
-  if len(debtor) > 1 and financial_affairs.marital_status:
-    debtor[1].income.employment
-    if debtor[1].income.employment == 'Employed':
-      debtor[1].income.income_amount_1
-      debtor[1].income.overtime_pay_1
-      debtor[1].income.tax_deduction
-      debtor[1].income.mandatory_contributions
-      debtor[1].income.voluntary_contributions
-      debtor[1].income.fund_loans
-      debtor[1].income.insurance
-      debtor[1].income.domestic_support
-      debtor[1].income.union_dues
-      debtor[1].income.other_deduction
-      if not debtor[1].income.other_deduction:
-        debtor[1].income.other_deduction_amount = 0
-        debtor[1].income.specify_other_deduction = ''
-        debtor[1].income.other_deduction_amount_2 = 0
-        debtor[1].income.specify_other_deduction_2 = ''
-        debtor[1].income.other_deduction_amount_3 = 0
-        debtor[1].income.specify_other_deduction_3 = ''
-        debtor[1].income.other_deduction_amount_4 = 0
-        debtor[1].income.specify_other_deduction_4 = ''
-        debtor[1].income.other_deduction_amount_5 = 0
-        debtor[1].income.specify_other_deduction_5 = ''
-        debtor[1].income.other_deduction_amount_6 = 0
-        debtor[1].income.specify_other_deduction_6 = ''
-      debtor[1].income.net_rental_business
-      debtor[1].income.interest_and_dividends
-      debtor[1].income.family_support
-      debtor[1].income.unemployment
-      debtor[1].income.social_security
-      debtor[1].income.other_govt_assist
-      debtor[1].income.pension
-      debtor[1].income.other_monthly_income
-      if not debtor[1].income.other_monthly_income:
-        debtor[1].income.specify_monthly_income = ''
-        debtor[1].income.other_monthly_amount = 0
-    else:
-      debtor[1].income.income_amount_1 = 0
-      debtor[1].income.income_amount_2 = 0
-      debtor[1].income.income_amount_3 = 0
-      debtor[1].income.income_amount_4 = 0
-      debtor[1].income.income_amount_5 = 0
-      debtor[1].income.income_amount_6 = 0
-      debtor[1].income.overtime_pay_1 = 0
-      debtor[1].income.overtime_pay_2 = 0
-      debtor[1].income.overtime_pay_3 = 0
-      debtor[1].income.overtime_pay_4 = 0
-      debtor[1].income.overtime_pay_5 = 0
-      debtor[1].income.overtime_pay_6 = 0
-      debtor[1].income.tax_deduction = 0
-      debtor[1].income.mandatory_contributions = 0
-      debtor[1].income.voluntary_contributions = 0
-      debtor[1].income.fund_loans = 0
-      debtor[1].income.insurance = 0
-      debtor[1].income.domestic_support = 0
-      debtor[1].income.union_dues = 0
-      debtor[1].income.other_deduction = 0
-      debtor[1].income.other_deduction_amount = 0
-      debtor[1].income.specify_other_deduction = ''
-      debtor[1].income.other_deduction_amount_2 = 0
-      debtor[1].income.specify_other_deduction_2 = ''
-      debtor[1].income.other_deduction_amount_3 = 0
-      debtor[1].income.specify_other_deduction_3 = ''
-      debtor[1].income.other_deduction_amount_4 = 0
-      debtor[1].income.specify_other_deduction_4 = ''
-      debtor[1].income.other_deduction_amount_5 = 0
-      debtor[1].income.specify_other_deduction_5 = ''
-      debtor[1].income.other_deduction_amount_6 = 0
-      debtor[1].income.specify_other_deduction_6 = ''
-      debtor[1].income.net_rental_business = 0
-      debtor[1].income.interest_and_dividends = 0
-      debtor[1].income.family_support = 0
-      debtor[1].income.unemployment = 0
-      debtor[1].income.social_security = 0
-      debtor[1].income.other_govt_assist = 0
-      debtor[1].income.pension = 0
-      debtor[1].income.other_monthly_income = 0
-      debtor[1].income.specify_monthly_income = ''
-      debtor[1].income.other_monthly_amount = 0
-
-
-  #106j - Expenses
-  debtor[0].expenses.rent_expense
-  debtor[0].expenses.real_estate_taxes
-  debtor[0].expenses.renters_insurance
-  debtor[0].expenses.upkeep_expenses
-  debtor[0].expenses.owners_dues
-  debtor[0].expenses.additional_mortgage_payments
-  debtor[0].expenses.util_electric
-  debtor[0].expenses.util_garbage
-  debtor[0].expenses.util_other
-  debtor[0].expenses.house_supplies
-  debtor[0].expenses.childcare
-  debtor[0].expenses.clothing
-  debtor[0].expenses.personal_care
-  debtor[0].expenses.medical
-  debtor[0].expenses.transportation
-  debtor[0].expenses.entertainment
-  debtor[0].expenses.charity
-  debtor[0].expenses.life_insurance
-  debtor[0].expenses.health_insurance
-  debtor[0].expenses.vehicle_insurance
-  debtor[0].expenses.other_insurance
-  debtor[0].expenses.other_tax_specify
-  debtor[0].expenses.other_tax_amount
-  debtor[0].expenses.vehicle1_payments
-  debtor[0].expenses.vehicle2_payments
-  debtor[0].expenses.other_payment1_specify
-  debtor[0].expenses.other_payment1_amount
-  debtor[0].expenses.other_payment2_specify
-  debtor[0].expenses.other_payment2_amount
-  debtor[0].expenses.alimony
-  debtor[0].expenses.other_support_specify
-  debtor[0].expenses.other_support_amount
-  debtor[0].expenses.change_in_expense
-
+  # 106I and 106J moved earlier in flow (after exemptions, before financial affairs)
 
   #122a - Income and means test
   monthly_income.means_type
@@ -803,11 +856,7 @@ code: |
       debt.counseling.counseling_type_name = 'Exigent circumstances'
       debt.counseling.not_required_reason = 'NA'
   counseling_final
-  reporting.reporting_type
-  reporting.funds_for_creditors
-  #reporting.creditor_estimate
-  #reporting.assets_estimate
-  #reporting.liabilities_estimate
+  # Reporting section moved to after creditors (see below)
   reporting.complete = True
 
 

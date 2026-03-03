@@ -848,24 +848,28 @@ edit:
 ---
 id: counseling
 question: |
-  Have ${ debtor[i].name } recieved any credit counseling?
+  Has ${ debtor[i].name } received credit counseling?
 subquestion: |
   The law requires that you receive a briefing about credit counseling before you file for bankruptcy.
 fields:
 
- - Have recieved a credit briefing?: debtor[i].counseling.counseling_type
+ - Credit counseling status: debtor[i].counseling.counseling_type
    choices:
      - I received a briefing from an approved credit counseling agency within the 180 days before I filed this bankruptcy petition, and I received a certificate of completion.: 1
      - I received a briefing from an approved credit counseling agency within the 180 days before I filed this bankruptcy petition, but I do not have a certificate of completion.: 2
+     - I was unable to receive a briefing due to exigent circumstances that merit a temporary waiver of the requirement.: 3
+     - I am not required to receive a briefing because of incapacity, disability, or active military duty.: 4
  - What date did you take the class?: debtor[i].counseling.counseling_date
    datatype: date
    required: False
-# default: 1
+   show if:
+     variable: debtor[i].counseling.counseling_type
+     is: '1'
 section: credit_counsel
 ---
 id: counseling_not_required
 question: |
-  Reason credit breifing is not required?
+  Reason credit briefing is not required
 field: debtor[i].counseling.not_required_reason
 choices:
   - Incapacity: 1

@@ -515,6 +515,6 @@ code: |
   expenses['netTotal'] = currency(incomeTotal - debtor1Total)
   expenses['noDelta'] = True if debtor[0].expenses.change_in_expense == False else False
   expenses['yesDelta'] = True if debtor[0].expenses.change_in_expense == True else False
-  expenses['deltaExplain'] = debtor[0].expenses.change_explainer if debtor[0].expenses.change_in_expense == True else None
+  expenses['deltaExplain'] = debtor[0].expenses.change_explainer
 
 

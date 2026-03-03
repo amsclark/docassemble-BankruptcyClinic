@@ -229,6 +229,46 @@ fields:
     # default: 0
     show if: debtor[0].income.other_deduction
     required: false
+
+  - note: Deduction 7
+    show if: debtor[0].income.other_deduction
+  - Specify deduction: debtor[0].income.specify_other_deduction_7
+    show if: debtor[0].income.other_deduction
+    required: false
+  - Deduction amount: debtor[0].income.other_deduction_amount_7
+    datatype: currency
+    show if: debtor[0].income.other_deduction
+    required: false
+
+  - note: Deduction 8
+    show if: debtor[0].income.other_deduction
+  - Specify deduction: debtor[0].income.specify_other_deduction_8
+    show if: debtor[0].income.other_deduction
+    required: false
+  - Deduction amount: debtor[0].income.other_deduction_amount_8
+    datatype: currency
+    show if: debtor[0].income.other_deduction
+    required: false
+
+  - note: Deduction 9
+    show if: debtor[0].income.other_deduction
+  - Specify deduction: debtor[0].income.specify_other_deduction_9
+    show if: debtor[0].income.other_deduction
+    required: false
+  - Deduction amount: debtor[0].income.other_deduction_amount_9
+    datatype: currency
+    show if: debtor[0].income.other_deduction
+    required: false
+
+  - note: Deduction 10
+    show if: debtor[0].income.other_deduction
+  - Specify deduction: debtor[0].income.specify_other_deduction_10
+    show if: debtor[0].income.other_deduction
+    required: false
+  - Deduction amount: debtor[0].income.other_deduction_amount_10
+    datatype: currency
+    show if: debtor[0].income.other_deduction
+    required: false
 ---
 id: debtor1_other_income_sources
 section: schedule_i
@@ -473,6 +513,38 @@ fields:
     datatype: currency
     # default: 0
     show if: debtor[1].income.other_deduction
+  - note: Deduction 7
+  - Specify deduction: debtor[1].income.specify_other_deduction_7
+    show if: debtor[1].income.other_deduction
+    required: false
+  - Deduction amount: debtor[1].income.other_deduction_amount_7
+    datatype: currency
+    show if: debtor[1].income.other_deduction
+    required: false
+  - note: Deduction 8
+  - Specify deduction: debtor[1].income.specify_other_deduction_8
+    show if: debtor[1].income.other_deduction
+    required: false
+  - Deduction amount: debtor[1].income.other_deduction_amount_8
+    datatype: currency
+    show if: debtor[1].income.other_deduction
+    required: false
+  - note: Deduction 9
+  - Specify deduction: debtor[1].income.specify_other_deduction_9
+    show if: debtor[1].income.other_deduction
+    required: false
+  - Deduction amount: debtor[1].income.other_deduction_amount_9
+    datatype: currency
+    show if: debtor[1].income.other_deduction
+    required: false
+  - note: Deduction 10
+  - Specify deduction: debtor[1].income.specify_other_deduction_10
+    show if: debtor[1].income.other_deduction
+    required: false
+  - Deduction amount: debtor[1].income.other_deduction_amount_10
+    datatype: currency
+    show if: debtor[1].income.other_deduction
+    required: false
 ---
 id: debtor2_other_income_sources
 section: schedule_i
@@ -712,20 +784,16 @@ code: |
     income1['insurance'+str(i)] = currency(debt.income.insurance)
     income1['domestic'+str(i)] = currency(debt.income.domestic_support)
     income1['union'+str(i)] = currency(debt.income.union_dues)
-    income1['otherDesc'] = debt.income.specify_other_deduction if debt.income.other_deduction else None
+    _deduction_descs = []
     total_other_deduction = 0
-    if debt.income.other_deduction_amount:
-      total_other_deduction += debt.income.other_deduction_amount
-    if debt.income.other_deduction_amount_2:
-      total_other_deduction += debt.income.other_deduction_amount_2
-    if debt.income.other_deduction_amount_3:
-      total_other_deduction += debt.income.other_deduction_amount_3
-    if debt.income.other_deduction_amount_4:
-      total_other_deduction += debt.income.other_deduction_amount_4
-    if debt.income.other_deduction_amount_5:
-      total_other_deduction += debt.income.other_deduction_amount_5
-    if debt.income.other_deduction_amount_6:
-      total_other_deduction += debt.income.other_deduction_amount_6
+    for _n in ['', '_2', '_3', '_4', '_5', '_6', '_7', '_8', '_9', '_10']:
+      _desc = getattr(debt.income, 'specify_other_deduction' + _n, '')
+      _amt = getattr(debt.income, 'other_deduction_amount' + _n, 0)
+      if _desc:
+        _deduction_descs.append(_desc)
+      if _amt:
+        total_other_deduction += _amt
+    income1['otherDesc'] = '; '.join(_deduction_descs) if _deduction_descs else None
     income1['other'+str(i)] = currency(total_other_deduction)
     income1['totalPayrollDeductions'+str(i)] = currency(debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + total_other_deduction)
     income1['takeHome'+str(i)] = currency((income_amount + overtime_pay) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount))

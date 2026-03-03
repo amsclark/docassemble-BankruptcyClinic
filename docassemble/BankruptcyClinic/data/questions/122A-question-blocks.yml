@@ -55,7 +55,7 @@ section: form_122a
 question: |
   Calculate your current monthly income
 subquestion: |
-  Be as complete and accurate as possible. If two married people are filing together, both are equally responsible for being accurate.
+  Be as complete and accurate as possible. If two married people are filing together, both are equally responsible for being accurate. These values have been pre-filled from your Schedule I income data. Please review and adjust if needed.
 fields:
   - note: |
       % if len(debtor) > 1:
@@ -65,58 +65,59 @@ fields:
       % endif
   - Your gross wages, salary tips, bonuses, overtime, and comissions: monthly_income.gross_wages1
     datatype: currency
-    # default: 2500
+    default: ${ debtor[0].income.income_amount_1 + debtor[0].income.overtime_pay_1 }
   - Alimony and maintenance payments: monthly_income.alimony1
     datatype: currency
-    # default: 300
+    default: ${ debtor[0].income.family_support }
   - All amounts from any source which are regularly paid for household expenses of you or your dependents, including child support.: monthly_income.other_income1
     datatype: currency
-    # default: 200
+    default: ${ debtor[0].income.other_regular_contributions }
   - note: |
       Net income from operating a business, profession, or farm.
   - Gross receipts (before all deductions): monthly_income.business_gross_receipts1
     datatype: currency
-    # default: 0
+    default: ${ debtor[0].income.net_rental_business if debtor[0].income.net_rental_business > 0 else 0 }
   - Ordinary and necessary operating expenses: monthly_income.business_operating_expenses1
     datatype: currency
-    # default: 0
+    default: 0
   - note: |
       Net income from rental and other real property
   - Gross receipts (before all deductions): monthly_income.rental_gross_receipts1
     datatype: currency
-    # default: 0
+    default: 0
   - Ordinary and necessary operating expenses: monthly_income.rental_operating_expenses1
     datatype: currency
-    # default: 0
+    default: 0
   - note: <br>
   - Interest, dividends, and royalties: monthly_income.interest1
     datatype: currency
-    # default: 0
+    default: ${ debtor[0].income.interest_dividends }
   - Unemployment compensation: monthly_income.unemployment1
     datatype: currency
-    # default: 0
+    default: ${ debtor[0].income.unemployment }
   - Your Social Security Act compensation: monthly_income.social1
     datatype: currency
-    # default: 0
+    default: ${ debtor[0].income.social_security }
   - Spouse Social Security Act compensation: monthly_income.spouse_social1
     datatype: currency
-    # default: 0
+    default: 0
   - note: |
       Pension or retirement. Do not include any amount received that was a benefit under the Social Security Act. Also, except as stated in the next sentence, do not include any compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with disability, combat-related injury or disability, or death of a member of the uniformed services. If you recieved any retired pay paid under chapter 61 of title 10, then include that pay only to the extent that it does not exceed the amount of retired pay to which you would otherwise be entitled if retired under any provision of title 10 other than chapter 61 of that title.
   - Pension or retirement: monthly_income.pension1
     datatype: currency
-    # default: 400
+    default: ${ debtor[0].income.pension }
   - note: |
       Income from all other sources not listed. Specify the source and amount. Do not include any benefits received under the Social Security Act; payments received as a victim of a war crime, a crime against humanity, or international or domestic terrorism; or compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with a disability, combat-related injury or disability, or death of a member of the uniformed servies.
   - Source 1: monthly_income.source1_1
-    # default: first source
+    default: " "
   - Amount: monthly_income.source1_amount_1
     datatype: currency
-    # default: 100
+    default: ${ debtor[0].income.other_monthly_income }
   - Source 2: monthly_income.source2_1
-    # default: second source
+    default: " "
   - Amount: monthly_income.source2_amount_1
-    # default: 100
+    datatype: currency
+    default: 0
 ---
 id: debtor2_current_monthly_income
 section: form_122a
@@ -128,58 +129,59 @@ fields:
   - note: Income calculation Debtor 2
   - Your gross wages, salary tips, bonuses, overtime, and comissions: monthly_income.gross_wages2
     datatype: currency
-    # default: 2500
+    default: ${ debtor[1].income.income_amount_1 + debtor[1].income.overtime_pay_1 if len(debtor) > 1 else 0 }
   - Alimony and maintenance payments: monthly_income.alimony2
     datatype: currency
-    # default: 300
+    default: ${ debtor[1].income.family_support if len(debtor) > 1 else 0 }
   - All amounts from any source which are regularly paid for household expenses of you or your dependents, including child support.: monthly_income.other_income2
     datatype: currency
-    # default: 200
+    default: ${ debtor[1].income.other_regular_contributions if len(debtor) > 1 else 0 }
   - note: |
       Net income from operating a business, profession, or farm.
   - Gross receipts (before all deductions): monthly_income.business_gross_receipts2
     datatype: currency
-    # default: 0
+    default: ${ debtor[1].income.net_rental_business if len(debtor) > 1 and debtor[1].income.net_rental_business > 0 else 0 }
   - Ordinary and necessary operating expenses: monthly_income.business_operating_expenses2
     datatype: currency
-    # default: 0
+    default: 0
   - note: |
       Net income from rental and other real property
   - Gross receipts (before all deductions): monthly_income.rental_gross_receipts2
     datatype: currency
-    # default: 0
+    default: 0
   - Ordinary and necessary operating expenses: monthly_income.rental_operating_expenses2
     datatype: currency
-    # default: 0
+    default: 0
   - note: <br>
   - Interest, dividends, and royalties: monthly_income.interest2
     datatype: currency
-    # default: 0
+    default: ${ debtor[1].income.interest_dividends if len(debtor) > 1 else 0 }
   - Unemployment compensation: monthly_income.unemployment2
     datatype: currency
-    # default: 0
+    default: ${ debtor[1].income.unemployment if len(debtor) > 1 else 0 }
   - Your Social Security Act compensation: monthly_income.social2
     datatype: currency
-    # default: 0
+    default: ${ debtor[1].income.social_security if len(debtor) > 1 else 0 }
   - Spouse Social Security Act compensation: monthly_income.spouse_social2
     datatype: currency
-    # default: 0
+    default: 0
   - note: |
       Pension or retirement. Do not include any amount received that was a benefit under the Social Security Act. Also, except as stated in the next sentence, do not include any compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with disability, combat-related injury or disability, or death of a member of the uniformed services. If you recieved any retired pay paid under chapter 61 of title 10, then include that pay only to the extent that it does not exceed the amount of retired pay to which you would otherwise be entitled if retired under any provision of title 10 other than chapter 61 of that title.
   - Pension or retirement: monthly_income.pension2
     datatype: currency
-    # default: 400
+    default: ${ debtor[1].income.pension if len(debtor) > 1 else 0 }
   - note: |
       Income from all other sources not listed. Specify the source and amount. Do not include any benefits received under the Social Security Act; payments received as a victim of a war crime, a crime against humanity, or international or domestic terrorism; or compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with a disability, combat-related injury or disability, or death of a member of the uniformed servies.
   - Source 1: monthly_income.source1_2
-    # default: first source
+    default: " "
   - Amount: monthly_income.source1_amount_2
     datatype: currency
-    # default: 100
+    default: ${ debtor[1].income.other_monthly_income if len(debtor) > 1 else 0 }
   - Source 2: monthly_income.source2_2
-    # default: second source
+    default: " "
   - Amount: monthly_income.source2_amount_2
-    # default: 100
+    datatype: currency
+    default: 0
 ---
 event: review_122
 question: |

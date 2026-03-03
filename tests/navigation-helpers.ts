@@ -397,10 +397,24 @@ export async function navigateFinancialAffairs(page: Page, scenario: TestScenari
   await fillYesNoRadio(page, 'financial_affairs.employed', false);
   await clickContinue(page);
 
+  // Debtor 2 employment (joint filings only)
+  if (scenario.jointFiling) {
+    await waitForDaPageLoad(page);
+    await fillYesNoRadio(page, 'financial_affairs.debtor2_employed', false);
+    await clickContinue(page);
+  }
+
   // Other income → No
   await waitForDaPageLoad(page);
   await fillYesNoRadio(page, 'financial_affairs.had_other_income', false);
   await clickContinue(page);
+
+  // Debtor 2 other income (joint filings only)
+  if (scenario.jointFiling) {
+    await waitForDaPageLoad(page);
+    await fillYesNoRadio(page, 'financial_affairs.debtor2_had_other_income', false);
+    await clickContinue(page);
+  }
 
   // Consumer debts → Yes
   await waitForDaPageLoad(page);
@@ -1108,6 +1122,7 @@ export async function navigateDynamicPhase(page: Page, scenario: TestScenario) {
       ['secured_claims.there_are_any', async () => { await clickYesNoButton(page, 'secured_claims.there_are_any', false); }],
       ['creditor_library_picker_done', async () => { await clickContinue(page); }],
       ['personal_leases.there_are_any', async () => { await clickYesNoButton(page, 'personal_leases.there_are_any', false); }],
+      ['reporting.funds_for_creditors', async () => { await clickYesNoButton(page, 'reporting.funds_for_creditors', false); }],
     ];
 
     let handled = false;
@@ -1308,19 +1323,19 @@ export async function runFullInterview(page: Page, scenario: TestScenario) {
   log('debtorFinal'); await passDebtorFinal(page);
   log('property'); await navigatePropertySection(page, scenario);
   log('exemptions'); await navigateExemptionSection(page);
+  log('income'); await navigateIncome(page, scenario);
+  log('expenses'); await navigateExpenses(page, scenario.rentExpense);
   log('financialAffairs'); await navigateFinancialAffairs(page, scenario);
   log('creditorLibrary'); await navigateCreditorLibraryPicker(page);
   log('securedCreditors'); await navigateSecuredCreditors(page, scenario);
   log('unsecuredCreditors'); await navigateUnsecuredCreditors(page, scenario);
+  log('reporting'); await navigateReporting(page);
   log('contractsLeases'); await navigateContractsLeases(page);
   log('communityProperty'); await navigateCommunityProperty(page);
-  log('income'); await navigateIncome(page, scenario);
-  log('expenses'); await navigateExpenses(page, scenario.rentExpense);
   log('meansTest'); await navigateMeansTest(page);
   log('caseDetails'); await navigateCaseDetails(page);
   log('business'); await navigateBusiness(page);
   log('hazardousProperty'); await navigateHazardousProperty(page);
   log('creditCounseling'); await navigateCreditCounseling(page, scenario);
-  log('reporting'); await navigateReporting(page);
   log('dynamicPhase'); await navigateDynamicPhase(page, scenario);
 }

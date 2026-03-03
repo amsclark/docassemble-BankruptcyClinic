@@ -4,9 +4,11 @@
 
 | Status | Count | Issues |
 |--------|-------|--------|
-| Resolved | 8 | #2, #3, #6, #7, #11, #14, #19, #23 |
-| Partially Resolved | 7 | #8, #9, #10, #13, #15, #25, #27 |
-| Unresolved | 15 | #4, #5, #12, #16, #17, #18, #20, #21, #22, #24, #26, #28, #29, #30, #33 |
+| Resolved (pre-existing) | 8 | #2, #3, #6, #7, #11, #14, #19, #23 |
+| **Fixed in Sprint 1** | **6** | **#9, #10, #21, #28, #33 + typos** |
+| **Fixed in Sprint 2** | **6** | **#8, #13, #16, #18, #26, #29 + bug fixes** |
+| Partially Resolved | 2 | #15, #25 |
+| Unresolved | 8 | #4, #5, #12, #17, #20, #22, #24, #27, #30 |
 
 ---
 
@@ -51,6 +53,48 @@ File: `107-question-blocks.yml`
 **Status: RESOLVED**
 Rephrased to "Do you owe any taxes or owe anyone child support?" instead of generic "priority debts."
 File: `106EF-question-blocks.yml`
+
+---
+
+## Fixed in Sprint 2
+
+### #26 — Explanation Boxes Without Yes/No Gate
+**Status: FIXED**
+Changed PDF code to always include `change_explainer` text regardless of `change_in_expense` answer.
+File: `106J-question-blocks.yml`
+
+### #29 — Credit Counseling Options
+**Status: FIXED**
+Added all 4 counseling status options (was 2). Fixed typos: "recieved"→"received", "breifing"→"briefing". Date field now only shows for certificate option.
+File: `101-question-blocks.yml`
+
+### #13 — More Income Deductions
+**Status: FIXED**
+Increased from 6 to 10 deduction slots for both debtor 1 and debtor 2. Updated PDF code to use loop with `getattr` and semicolon-separated descriptions.
+Files: `106I-question-blocks.yml`, `voluntary-petition.yml`
+
+### #8 — Unsecured Creditor Notices (6 parties)
+**Status: FIXED**
+Increased from 3 to 6 hardcoded notify parties for both priority and nonpriority claims. Replaced repetitive PDF code with loop using `getattr`. Fixed typo "notifed"→"notified".
+File: `106EF-question-blocks.yml`
+
+### #16 — More Previous Address Slots
+**Status: FIXED**
+Added addresses 7-10 gated by `has_more_addresses` question after address 6. Fixed 5 bugs in existing PDF code for debtor 2 addresses (typos in variable names, wrong indices). PDF overflow addresses concatenated into `additional_addresses` field.
+Files: `107-question-blocks.yml`, `voluntary-petition.yml`
+
+### #18 — More Insider Payment Dates
+**Status: FIXED**
+Added payment dates 4-6 for insider benefit payments (was 3). Updated PDF code to use loop with `getattr` for dates 4-6.
+File: `107-question-blocks.yml`
+
+### Additional Bug Fixes in Sprint 2
+- Fixed `finacial_affairs.address_same_dates2` → `financial_affairs.address_same_dates_2` (line 2470)
+- Fixed `finacial_affairs.address_same_dates4` → `financial_affairs.address_same_dates_4` (line 2495)
+- Fixed `financial_affairs.address_same_3` → `financial_affairs.address_same_5` (line 2506, wrong index)
+- Fixed `financial_affairs.debtor2_address_street_3` → `financial_affairs.debtor2_address_street_5` (line 2513, wrong index)
+- Fixed `finacial_affairs.address_same_dates6` → `financial_affairs.address_same_dates_6` (line 2520)
+- Fixed redundant condition `has_second_address and has_second_address` → `has_second_address` (line 606)
 
 ---
 

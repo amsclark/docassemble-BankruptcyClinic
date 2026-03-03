@@ -603,7 +603,7 @@ fields:
   - note: Dates you lived there
     show if:
       code: |
-        financial_affairs.has_second_address and financial_affairs.has_second_address
+        financial_affairs.has_second_address
   - From: financial_affairs.address_from_6
     datatype: date
     # default: 01/01/23
@@ -692,6 +692,110 @@ fields:
     hide if:
       code: |
         financial_affairs.debtor_count < 2
+    required: False
+  - Do you need more address slots?: financial_affairs.has_more_addresses
+    datatype: yesnoradio
+    show if: financial_affairs.has_second_address
+    required: False
+  - note: Address 7
+    show if: financial_affairs.has_more_addresses
+  - Address/PO Box: financial_affairs.address_street_7
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - City: financial_affairs.address_city_7
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - State: financial_affairs.address_state_7
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - Zip: financial_affairs.address_zip_7
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - From: financial_affairs.address_from_7
+    datatype: date
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - To: financial_affairs.address_to_7
+    datatype: date
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - note: Address 8
+    show if: financial_affairs.has_more_addresses
+  - Address/PO Box: financial_affairs.address_street_8
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - City: financial_affairs.address_city_8
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - State: financial_affairs.address_state_8
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - Zip: financial_affairs.address_zip_8
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - From: financial_affairs.address_from_8
+    datatype: date
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - To: financial_affairs.address_to_8
+    datatype: date
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - note: Address 9
+    show if: financial_affairs.has_more_addresses
+  - Address/PO Box: financial_affairs.address_street_9
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - City: financial_affairs.address_city_9
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - State: financial_affairs.address_state_9
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - Zip: financial_affairs.address_zip_9
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - From: financial_affairs.address_from_9
+    datatype: date
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - To: financial_affairs.address_to_9
+    datatype: date
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - note: Address 10
+    show if: financial_affairs.has_more_addresses
+  - Address/PO Box: financial_affairs.address_street_10
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - City: financial_affairs.address_city_10
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - State: financial_affairs.address_state_10
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - Zip: financial_affairs.address_zip_10
+    datatype: number
+    minlength: 5
+    maxlength: 5
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - From: financial_affairs.address_from_10
+    datatype: date
+    show if: financial_affairs.has_more_addresses
+    required: False
+  - To: financial_affairs.address_to_10
+    datatype: date
+    show if: financial_affairs.has_more_addresses
     required: False
   - note: |
       Within the last 8 years, did you ever live with a spouse or legal equivalent in a community property state or territory? (Community property states and territories include Arizona, California, Idaho, Louisiana, Nevada, New Mexico, Puerto Rico, Texas, Washington, and Wisconsin.
@@ -1237,6 +1341,15 @@ fields:
   - Payment Date 3: financial_affairs.insider_benefits[i].payment_date_3
     datatype: date
     # default: 01/02/23
+    required: False
+  - Payment Date 4: financial_affairs.insider_benefits[i].payment_date_4
+    datatype: date
+    required: False
+  - Payment Date 5: financial_affairs.insider_benefits[i].payment_date_5
+    datatype: date
+    required: False
+  - Payment Date 6: financial_affairs.insider_benefits[i].payment_date_6
+    datatype: date
     required: False
   - Total Amount: financial_affairs.insider_benefits[i].total_amount
     datatype: currency
@@ -2410,6 +2523,29 @@ code: |
   fin['add6_D1_city'] = financial_affairs.address_city_6
   fin['add6_D1_state'] = financial_affairs.address_state_6
   fin['add6_D1_zip'] = financial_affairs.address_zip_6
+  # Addresses 7-10: overflow - concatenate into additional text if present
+  _extra_addresses = []
+  for _n in range(7, 11):
+    _street = getattr(financial_affairs, 'address_street_' + str(_n), '')
+    _city = getattr(financial_affairs, 'address_city_' + str(_n), '')
+    _state = getattr(financial_affairs, 'address_state_' + str(_n), '')
+    _zip = getattr(financial_affairs, 'address_zip_' + str(_n), '')
+    _from = getattr(financial_affairs, 'address_from_' + str(_n), None)
+    _to = getattr(financial_affairs, 'address_to_' + str(_n), None)
+    if _street:
+      _parts = [_street]
+      if _city:
+        _parts.append(_city)
+      if _state:
+        _parts.append(_state)
+      if _zip:
+        _parts.append(str(_zip))
+      _addr_str = ', '.join(_parts)
+      if _from and _to:
+        _addr_str += ' (' + format_date(_from, format='MM/dd/yyyy') + ' - ' + format_date(_to, format='MM/dd/yyyy') + ')'
+      _extra_addresses.append(_addr_str)
+  if _extra_addresses:
+    fin['additional_addresses'] = '; '.join(_extra_addresses)
   fin['noCommunity'] = True if financial_affairs.lived_with_spouse == False else False
   fin['yesCommunity'] = True if financial_affairs.lived_with_spouse == True else False
   fin['noRegularIncome'] = True if financial_affairs.employed == False else False
@@ -2467,7 +2603,7 @@ code: |
     fin['add2_D2_SameAddress'] = True if financial_affairs.address_same_2 == True else False
     if financial_affairs.address_same_2 == True:
       fin['add2_D2_SameTime'] = True if financial_affairs.address_same_dates_2 == True else False
-      if finacial_affairs.address_same_dates2 == False:
+      if financial_affairs.address_same_dates_2 == False:
         fin['add2_D2_from'] = format_date(financial_affairs.debtor2_address_from_2, format='MM/dd/yyyy')
         fin['add2_D2_to'] = format_date(financial_affairs.debtor2_address_to_2, format='MM/dd/yyyy')
     else:
@@ -2492,7 +2628,7 @@ code: |
     fin['add4_D2_SameAddress'] = True if financial_affairs.address_same_4 == True else False
     if financial_affairs.address_same_4 == True:
       fin['add4_D2_SameTime'] = True if financial_affairs.address_same_dates_4 == True else False
-      if finacial_affairs.address_same_dates4 == False:
+      if financial_affairs.address_same_dates_4 == False:
         fin['add4_D2_from'] = format_date(financial_affairs.debtor2_address_from_4, format='MM/dd/yyyy')
         fin['add4_D2_to'] = format_date(financial_affairs.debtor2_address_to_4, format='MM/dd/yyyy')
     else:
@@ -2503,21 +2639,21 @@ code: |
     fin['add4_D1_address'] = financial_affairs.address_street_4
    #end set 2
     fin['add5_D2_SameAddress'] = True if financial_affairs.address_same_5 == True else False
-    if financial_affairs.address_same_3 == True:
+    if financial_affairs.address_same_5 == True:
       fin['add5_D2_SameTime'] = True if financial_affairs.address_same_dates_5 == True else False
       if financial_affairs.address_same_dates_5 == False:
         fin['add5_D2_from'] = format_date(financial_affairs.debtor2_address_from_5, format='MM/dd/yyyy')
         fin['add5_D2_to'] = format_date(financial_affairs.debtor2_address_to_5, format='MM/dd/yyyy')
 
     else:
-      fin['add5_D2_address'] = financial_affairs.debtor2_address_street_3
+      fin['add5_D2_address'] = financial_affairs.debtor2_address_street_5
       fin['add5_D2_city'] = financial_affairs.debtor2_address_city_5
       fin['add5_D2_state'] = financial_affairs.debtor2_address_state_5
       fin['add5_D2_zip'] = financial_affairs.debtor2_address_zip_5
     fin['add6_D2_SameAddress'] = True if financial_affairs.address_same_6 == True else False
     if financial_affairs.address_same_6 == True:
       fin['add6_D2_SameTime'] = True if financial_affairs.address_same_dates_6 == True else False
-      if finacial_affairs.address_same_dates6 == False:
+      if financial_affairs.address_same_dates_6 == False:
         fin['add6_D2_from'] = format_date(financial_affairs.debtor2_address_from_6, format='MM/dd/yyyy')
         fin['add6_D2_to'] = format_date(financial_affairs.debtor2_address_to_6, format='MM/dd/yyyy')
     else:
@@ -2610,8 +2746,12 @@ code: |
     fin['benefit_state'+str(x)] = payment.state
     fin['benefit_zip'+str(x)] = payment.zip
     fin['benefit_payment1_'+str(x)] = format_date(payment.payment_date_1, format='MM/dd/yyyy')
-    fin['benefit_payment2_'+str(x)] = format_date(payment.payment_date_2, format='MM/dd/yyyy')
-    fin['benefit_payment3_'+str(x)] = format_date(payment.payment_date_3, format='MM/dd/yyyy')
+    fin['benefit_payment2_'+str(x)] = format_date(payment.payment_date_2, format='MM/dd/yyyy') if getattr(payment, 'payment_date_2', None) else None
+    fin['benefit_payment3_'+str(x)] = format_date(payment.payment_date_3, format='MM/dd/yyyy') if getattr(payment, 'payment_date_3', None) else None
+    for _dn in [4, 5, 6]:
+      _pd = getattr(payment, 'payment_date_' + str(_dn), None)
+      if _pd:
+        fin['benefit_payment'+str(_dn)+'_'+str(x)] = format_date(_pd, format='MM/dd/yyyy')
     fin['benefit_totalPaid'+str(x)] = currency(payment.total_amount)
     fin['benefit_amountOwed'+str(x)] = currency(payment.amount_owed)
     fin['benefit_reason'+str(x)] = payment.reason
