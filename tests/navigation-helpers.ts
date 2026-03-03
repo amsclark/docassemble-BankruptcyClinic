@@ -608,6 +608,9 @@ export async function navigateSecuredCreditors(page: Page, scenario: TestScenari
       }, b64('prop.creditors[0].property_action'));
     }
 
+    // Save to library → No
+    await fillYesNoRadio(page, 'prop.creditors[0].save_to_library', false);
+
     await clickContinue(page);
 
     // Notify → No
@@ -652,6 +655,7 @@ export async function navigateUnsecuredCreditors(page: Page, scenario: TestScena
     await page.locator(`#${b64('prop.priority_claims[0].total_claim')}`).fill(pc.totalClaim);
     await page.locator(`#${b64('prop.priority_claims[0].priority_amount')}`).fill(pc.priorityAmount);
     await page.locator(`#${b64('prop.priority_claims[0].nonpriority_amount')}`).fill(pc.nonpriorityAmount);
+    await fillYesNoRadio(page, 'prop.priority_claims[0].save_to_library', false);
     await fillYesNoRadio(page, 'prop.priority_claims[0].has_codebtor', false);
     await clickContinue(page);
 
@@ -681,6 +685,7 @@ export async function navigateUnsecuredCreditors(page: Page, scenario: TestScena
     if (await npTypeSelect.count() > 0) await npTypeSelect.selectOption(np.type);
 
     await page.locator(`#${b64('prop.nonpriority_claims[0].total_claim')}`).fill(np.totalClaim);
+    await fillYesNoRadio(page, 'prop.nonpriority_claims[0].save_to_library', false);
     await fillYesNoRadio(page, 'prop.nonpriority_claims[0].has_codebtor', false);
 
     // "Do others need to be notified about debt?" radio
@@ -963,6 +968,20 @@ export async function navigateReporting(page: Page) {
 }
 
 // ════════════════════════════════════════════════════════════════════
+//  FINAL REVIEW PAGE
+// ════════════════════════════════════════════════════════════════════
+
+export async function navigateFinalReview(page: Page) {
+  await waitForDaPageLoad(page);
+  const bodyText = await page.locator('body').innerText();
+  if (bodyText.toLowerCase().includes('review your petition') ||
+      bodyText.toLowerCase().includes('generate documents')) {
+    console.log('  [finalReview] Found final review page, clicking Continue');
+    await clickContinue(page);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
 //  DYNAMIC PHASE (doc gen + attorney disclosure + stragglers)
 // ════════════════════════════════════════════════════════════════════
 
@@ -981,6 +1000,15 @@ export async function navigateDynamicPhase(page: Page, scenario: TestScenario) {
         bodyText.toLowerCase().includes('your documents are ready') ||
         bodyText.toLowerCase().includes('conclusion')) {
       return;
+    }
+
+    // Final review page — click continue to generate documents
+    if (bodyText.toLowerCase().includes('review your petition') ||
+        bodyText.toLowerCase().includes('generate documents')) {
+      console.log('  [dynamicPhase] Found final review page, clicking Continue');
+      await clickContinue(page);
+      await waitForDaPageLoad(page);
+      continue;
     }
 
     // Check for error
@@ -1069,6 +1097,10 @@ export async function navigateDynamicPhase(page: Page, scenario: TestScenario) {
       await waitForDaPageLoad(page);
       continue;
     }
+
+    // ── Re-presented property detail pages ──
+    // These pages have required fields; let them fall through to the generic
+    // handler which fills all radios as "No", populates inputs, and submits.
 
     // ── Household/dependents page (means test variable needed for PDF) ──
     if (heading?.toLowerCase().includes('household and dependents') || heading?.toLowerCase().includes('calculate median') || heading?.toLowerCase().includes('calulate median')) {

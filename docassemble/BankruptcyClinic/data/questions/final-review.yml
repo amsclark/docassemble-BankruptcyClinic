@@ -1,0 +1,142 @@
+---
+id: final_review_page
+section: fin
+question: |
+  Review Your Petition Before Filing
+subquestion: |
+  Please review each section below. Click **Revisit** to make changes. When everything looks correct, click **Continue** to generate your documents.
+
+  ---
+
+  ### District & Filing Information
+
+  **District:** ${ current_district }
+
+  **Case Number:** ${ case_number if case_number else 'Not yet assigned' }
+
+  **Amended Filing:** ${ 'Yes' if amended_filing else 'No' }
+
+  [Revisit district information](${ url_action('district') })
+
+  ---
+
+  ### Debtor Information
+
+  % for d in debtor:
+  **Debtor ${ loop.index + 1 }:** ${ d.name.first } ${ d.name.middle } ${ d.name.last }
+
+  **Address:** ${ d.address.address }, ${ d.address.city }, ${ d.address.state } ${ d.address.zip }
+
+  % endfor
+
+  [Revisit debtor information](${ url_action('identify') })
+
+  ---
+
+  ### Property (Schedule A/B)
+
+  **Real property interests:** ${ len(prop.interests) }
+
+  **Vehicles:** ${ len(prop.ab_vehicles) + len(prop.ab_other_vehicles) }
+
+  [Revisit property](${ url_action('schedule_ab') })
+
+  ---
+
+  ### Exemptions (Schedule C)
+
+  **Exempt properties listed:** ${ len(prop.exempt_property.properties) if defined('prop.exempt_property.properties') and prop.exempt_property.properties.gathered else 0 }
+
+  [Revisit exemptions](${ url_action('schedule_c') })
+
+  ---
+
+  ### Secured Creditors (Schedule D)
+
+  **Number of secured creditors:** ${ len(prop.creditors) }
+
+  % if len(prop.creditors) > 0:
+  **Total secured claims:** ${ currency(sum(c.claim_amount for c in prop.creditors)) }
+  % endif
+
+  [Revisit secured creditors](${ url_action('schedule_d') })
+
+  ---
+
+  ### Unsecured Creditors (Schedules E/F)
+
+  **Priority claims:** ${ len(prop.priority_claims) }
+
+  **Nonpriority claims:** ${ len(prop.nonpriority_claims) }
+
+  % if len(prop.priority_claims) > 0 or len(prop.nonpriority_claims) > 0:
+  **Total unsecured claims:** ${ currency(sum(c.total_claim for c in prop.priority_claims) + sum(c.total_claim for c in prop.nonpriority_claims)) }
+  % endif
+
+  [Revisit unsecured creditors](${ url_action('schedule_ef') })
+
+  ---
+
+  ### Contracts & Leases (Schedule G)
+
+  **Contracts/leases listed:** ${ len(prop.contracts_and_leases) }
+
+  [Revisit contracts and leases](${ url_action('schedule_g') })
+
+  ---
+
+  ### Codebtors (Schedule H)
+
+  [Revisit codebtors](${ url_action('schedule_h') })
+
+  ---
+
+  ### Income (Schedule I)
+
+  % for d in debtor:
+  **Debtor ${ loop.index + 1 } employment:** ${ d.income.employment }
+  % endfor
+
+  [Revisit income](${ url_action('schedule_i') })
+
+  ---
+
+  ### Expenses (Schedule J)
+
+  **Rent/home expenses:** ${ currency(debtor[0].expenses.rent_expense) }
+
+  [Revisit expenses](${ url_action('schedule_j') })
+
+  ---
+
+  ### Statement of Financial Affairs (Form 107)
+
+  [Revisit financial affairs](${ url_action('form_107') if defined('form_107') else url_action('review_answers') })
+
+  ---
+
+  ### Means Test (Form 122A)
+
+  [Revisit means test](${ url_action('form_122a') })
+
+  ---
+
+  ### Case Details
+
+  [Revisit case details](${ url_action('case_det') })
+
+  ---
+
+  % if attorney_disclosure.has_attorney:
+  ### Attorney Disclosure
+
+  **Attorney:** ${ attorney_disclosure.attorney_name }
+
+  [Revisit attorney disclosure](${ url_action('attorney_disclosure_review') })
+
+  ---
+  % endif
+
+  **All sections reviewed? Click Continue to generate your documents.**
+continue button field: final_review_complete
+continue button label: Generate Documents

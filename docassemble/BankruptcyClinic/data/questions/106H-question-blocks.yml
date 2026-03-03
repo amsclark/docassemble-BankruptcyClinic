@@ -1,3 +1,61 @@
+code: |
+  # Auto-populate codebtors from creditors with has_codebtor == True
+  _auto_codebtors = []
+  _line_d = 1
+  for _cred in prop.creditors:
+    if getattr(_cred, 'has_codebtor', False):
+      _auto_codebtors.append({
+        'name': getattr(_cred, 'codebtor_name', ''),
+        'street': getattr(_cred, 'codebtor_street', ''),
+        'city': getattr(_cred, 'codebtor_city', ''),
+        'state': getattr(_cred, 'codebtor_state', ''),
+        'zip': getattr(_cred, 'codebtor_zip', ''),
+        'schedule': 'Schedule D',
+        'schedule_line': str(_line_d),
+      })
+    _line_d += 1
+  _line_ef = 1
+  for _cred in prop.priority_claims:
+    if getattr(_cred, 'has_codebtor', False):
+      _auto_codebtors.append({
+        'name': getattr(_cred, 'codebtor_name', ''),
+        'street': getattr(_cred, 'codebtor_street', ''),
+        'city': getattr(_cred, 'codebtor_city', ''),
+        'state': getattr(_cred, 'codebtor_state', ''),
+        'zip': getattr(_cred, 'codebtor_zip', ''),
+        'schedule': 'Schedule E/F',
+        'schedule_line': str(_line_ef),
+      })
+    _line_ef += 1
+  for _cred in prop.nonpriority_claims:
+    if getattr(_cred, 'has_codebtor', False):
+      _auto_codebtors.append({
+        'name': getattr(_cred, 'codebtor_name', ''),
+        'street': getattr(_cred, 'codebtor_street', ''),
+        'city': getattr(_cred, 'codebtor_city', ''),
+        'state': getattr(_cred, 'codebtor_state', ''),
+        'zip': getattr(_cred, 'codebtor_zip', ''),
+        'schedule': 'Schedule E/F',
+        'schedule_line': str(_line_ef),
+      })
+    _line_ef += 1
+
+  if _auto_codebtors and not debtors.codebtors.gathered:
+    debtors.codebtors.clear()
+    for _entry in _auto_codebtors:
+      _item = debtors.codebtors.appendObject()
+      _item.name = _entry['name']
+      _item.street = _entry['street']
+      _item.city = _entry['city']
+      _item.state = _entry['state']
+      _item.zip = _entry['zip']
+      _item.schedule = _entry['schedule']
+      _item.schedule_line = _entry['schedule_line']
+      _item.complete = True
+    debtors.codebtors.gathered = True
+    debtors.codebtors.there_are_any = True
+  codebtor_auto_populated = True
+---
 table: codebtors_table
 rows: debtors.codebtors
 columns:

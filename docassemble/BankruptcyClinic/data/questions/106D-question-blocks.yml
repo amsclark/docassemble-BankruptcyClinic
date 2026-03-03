@@ -11,6 +11,20 @@ code: |
       prop_options.append(f'Vehicle - {vehicle.make} {vehicle.model} {vehicle.year}')
   if prop.has_secured_household_goods:
     prop_options.append(f'Household Goods')
+  if getattr(prop, 'electronics_value', 0) > 0:
+    prop_options.append('Electronics')
+  if getattr(prop, 'collectibles_value', 0) > 0:
+    prop_options.append('Collectibles')
+  if getattr(prop, 'jewelry_value', 0) > 0:
+    prop_options.append('Jewelry')
+  if getattr(prop, 'firearms_value', 0) > 0:
+    prop_options.append('Firearms')
+  if getattr(prop, 'hobby_equipment_value', 0) > 0:
+    prop_options.append('Hobby Equipment')
+  if getattr(prop, 'animal_value', 0) > 0:
+    prop_options.append('Animals')
+  if getattr(prop, 'other_household_items_value', 0) > 0:
+    prop_options.append('Other Household Items')
   if prop.farming_property.has_property:
     prop_options.append(f'Farming Property')
 
@@ -209,6 +223,11 @@ fields:
   - Did you claim the property as exempt on Schedule C?: prop.creditors[i].exempt
     datatype: yesnoradio
     # default: False
+
+  - Save this creditor to the clinic's shared library?: prop.creditors[i].save_to_library
+    datatype: yesnoradio
+    required: False
+    default: False
 
   - Is there a codebtor for this debt?: prop.creditors[i].has_codebtor
     datatype: yesnoradio

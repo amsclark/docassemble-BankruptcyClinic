@@ -93,10 +93,12 @@ fields:
   - Specify other utility: debtor[0].expenses.util_other_specify
     # default: Other
     show if: debtor[0].expenses.util_other
+    required: False
   - Amount: debtor[0].expenses.util_other_amount
     # default: 100
     datatype: currency
     show if: debtor[0].expenses.util_other
+    required: False
   - note: <br>
   - Food and housekeeping supplies: debtor[0].expenses.house_supplies
     # default: 0
@@ -150,6 +152,7 @@ fields:
   - Specify: debtor[0].expenses.other_insurance_specify
     # default: Other insurance
     show if: debtor[0].expenses.other_insurance
+    required: False
   - Amount: debtor[0].expenses.other_insurance_amount
     datatype: currency
     # default: 0
@@ -198,6 +201,7 @@ fields:
   - Specify: debtor[0].expenses.other_support_specify
     # default: Other payments
     show if: debtor[0].expenses.other_people_expenses
+    required: False
   - Amount: debtor[0].expenses.other_support_amount
     datatype: currency
     # default: 0

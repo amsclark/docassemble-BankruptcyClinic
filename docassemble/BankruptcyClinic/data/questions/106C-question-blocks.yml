@@ -1,3 +1,64 @@
+code: |
+  # Auto-populate Schedule C from property items claiming exemptions
+  # Only runs if properties haven't been gathered yet. Uses hasattr() throughout
+  # to avoid triggering docassemble variable seeking.
+  _auto_entries = []
+  _line = 1
+  # Real property
+  if defined('prop.interests.gathered') and prop.interests.gathered:
+    for _interest in prop.interests.elements:
+      if hasattr(_interest, 'is_claiming_exemption') and _interest.is_claiming_exemption:
+        _desc = str(getattr(_interest, 'street', '')) + ' ' + str(getattr(_interest, 'city', '')) + ', ' + str(getattr(_interest, 'state', ''))
+        _val = getattr(_interest, 'current_owned_value', getattr(_interest, 'current_value', 0))
+        _exemption = getattr(_interest, 'exemption_value', _val) if hasattr(_interest, 'exemption_value') else _val
+        _laws = str(getattr(_interest, 'exemption_laws', '')) if hasattr(_interest, 'exemption_laws') else ''
+        _law2 = str(getattr(_interest, 'exemption_laws_2', '')) if hasattr(_interest, 'exemption_laws_2') else ''
+        if _law2:
+          _laws = _laws + '; ' + _law2
+        _auto_entries.append({'description': _desc.strip(), 'value': _val, 'exemption': _exemption, 'laws': _laws, 'line': _line})
+      _line += 1
+  # Vehicles
+  if defined('prop.ab_vehicles.gathered') and prop.ab_vehicles.gathered:
+    for _v in prop.ab_vehicles.elements:
+      if hasattr(_v, 'is_claiming_exemption') and _v.is_claiming_exemption:
+        _desc = str(getattr(_v, 'year', '')) + ' ' + str(getattr(_v, 'make', '')) + ' ' + str(getattr(_v, 'model', ''))
+        _val = getattr(_v, 'current_owned_value', getattr(_v, 'current_value', 0))
+        _exemption = getattr(_v, 'exemption_value', _val) if hasattr(_v, 'exemption_value') else _val
+        _laws = str(getattr(_v, 'exemption_laws', '')) if hasattr(_v, 'exemption_laws') else ''
+        _auto_entries.append({'description': _desc.strip(), 'value': _val, 'exemption': _exemption, 'laws': _laws, 'line': _line})
+      _line += 1
+  if defined('prop.ab_other_vehicles.gathered') and prop.ab_other_vehicles.gathered:
+    for _v in prop.ab_other_vehicles.elements:
+      if hasattr(_v, 'is_claiming_exemption') and _v.is_claiming_exemption:
+        _desc = str(getattr(_v, 'year', '')) + ' ' + str(getattr(_v, 'make', '')) + ' ' + str(getattr(_v, 'model', ''))
+        _val = getattr(_v, 'current_owned_value', getattr(_v, 'current_value', 0))
+        _exemption = getattr(_v, 'exemption_value', _val) if hasattr(_v, 'exemption_value') else _val
+        _laws = str(getattr(_v, 'exemption_laws', '')) if hasattr(_v, 'exemption_laws') else ''
+        _auto_entries.append({'description': _desc.strip(), 'value': _val, 'exemption': _exemption, 'laws': _laws, 'line': _line})
+      _line += 1
+  # Household goods
+  if hasattr(prop, 'household_goods_is_claiming_exemption') and prop.household_goods_is_claiming_exemption:
+    _val = getattr(prop, 'household_goods_value', 0)
+    _exemption = getattr(prop, 'household_goods_exemption_value', _val) if hasattr(prop, 'household_goods_exemption_value') else _val
+    _laws = str(getattr(prop, 'household_goods_exemption_laws', '')) if hasattr(prop, 'household_goods_exemption_laws') else ''
+    _auto_entries.append({'description': 'Household goods', 'value': _val, 'exemption': _exemption, 'laws': _laws, 'line': _line})
+
+  # Pre-populate if we have entries and the list hasn't been gathered yet
+  if _auto_entries and defined('prop.exempt_property.properties') and not prop.exempt_property.properties.gathered:
+    prop.exempt_property.properties.clear()
+    for _entry in _auto_entries:
+      _item = prop.exempt_property.properties.appendObject()
+      _item.description = _entry['description']
+      _item.value = _entry['value']
+      _item.not_full_exemption = True
+      _item.exemption = _entry['exemption']
+      _item.laws = _entry['laws']
+      _item.line = _entry['line']
+      _item.complete = True
+    prop.exempt_property.properties.gathered = True
+    prop.exempt_property.properties.there_are_any = True
+  schedule_c_auto_populated = True
+---
 table: prop_exempt_table
 rows: prop.exempt_property.properties
 columns:

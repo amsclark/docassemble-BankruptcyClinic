@@ -97,6 +97,11 @@ fields:
     datatype: currency
     # default: 400
 
+  - Save this creditor to the clinic's shared library?: prop.priority_claims[i].save_to_library
+    datatype: yesnoradio
+    required: False
+    default: False
+
   - Is there a codebtor for this debt?: prop.priority_claims[i].has_codebtor
     datatype: yesnoradio
     # default: True
@@ -363,6 +368,11 @@ fields:
   - Total Claim: prop.nonpriority_claims[i].total_claim
     datatype: currency
     # default: 400
+
+  - Save this creditor to the clinic's shared library?: prop.nonpriority_claims[i].save_to_library
+    datatype: yesnoradio
+    required: False
+    default: False
 
   - Is there a codebtor for this debt?: prop.nonpriority_claims[i].has_codebtor
     datatype: yesnoradio

@@ -40,8 +40,12 @@ yesno: prop.interests.there_is_another
 under: |
   ${ prop_interests_table }
 ---
-reconsider: True
 code: |
+  # Compute exemption totals from all property items
+  import json as _json
+  _debtor_state = debtor[0].address.state if defined('debtor[0].address.state') else 'Nebraska'
+  exemption_totals = compute_exemption_totals(prop, _debtor_state)
+  exemption_totals_json = _json.dumps(exemption_totals)
 #
   #exemptions = []
   #def tbl_data():
@@ -1422,7 +1426,9 @@ code: |
 
 ---
 features:
-  javascript: exemptions.js
+  javascript:
+    - exemptions.js
+    - exemption-tracker.js
   css: bootstrap-theme.css
 ---
 id: real_property_interest_details
@@ -1436,23 +1442,23 @@ question: |
 #  % for item in tbl_data():
 #  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
 #  % endfor
-#script: |
-#  <script>
-#    // Safely check for exemptions data
-#    try {
-#      checkQuestionExemptions(
-#        "prop.interests[i].is_claiming_exemption",
-#        "prop.interests[i].claiming_sub_100",
-#        "prop.interests[i].current_owned_value",
-#        "prop.interests[i].exemption_value",
-#        "prop.interests[i].exemption_laws",
-#        "prop.interests[i].exemption_value_2",
-#        "prop.interests[i].exemption_laws_2",
-#        "prop.interests[i].state");
-#    } catch(e) {
-#      console.log("Error in exemption check:", e);
-#    }
-#  </script>
+script: |
+  <script>
+    // Safely check for exemptions data
+    try {
+      checkQuestionExemptions(
+        "prop.interests[i].is_claiming_exemption",
+        "prop.interests[i].claiming_sub_100",
+        "prop.interests[i].current_owned_value",
+        "prop.interests[i].exemption_value",
+        "prop.interests[i].exemption_laws",
+        "prop.interests[i].exemption_value_2",
+        "prop.interests[i].exemption_laws_2",
+        "prop.interests[i].state");
+    } catch(e) {
+      console.log("Error in exemption check:", e);
+    }
+  </script>
 #code: |
 #  # Set complete attribute to true to prevent looping
 #  prop.interests[i].complete = True
@@ -1610,18 +1616,22 @@ subquestion: |
 #  % for item in tbl_data():
 #  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
 #  % endfor
-#script: |
-#  <script>
-#    checkQuestionExemptions(
-#      "prop.ab_vehicles[i].is_claiming_exemption",
-#      "prop.ab_vehicles[i].claiming_sub_100",
-#      "prop.ab_vehicles[i].current_owned_value",
-#      "prop.ab_vehicles[i].exemption_value",
-#      "prop.ab_vehicles[i].exemption_laws",
-#      "prop.ab_vehicles[i].exemption_value_2",
-#      "prop.ab_vehicles[i].exemption_laws_2",
-#      "prop.ab_vehicles[i].state");
-#  </script>
+script: |
+  <script>
+    try {
+      checkQuestionExemptions(
+        "prop.ab_vehicles[i].is_claiming_exemption",
+        "prop.ab_vehicles[i].claiming_sub_100",
+        "prop.ab_vehicles[i].current_owned_value",
+        "prop.ab_vehicles[i].exemption_value",
+        "prop.ab_vehicles[i].exemption_laws",
+        "prop.ab_vehicles[i].exemption_value_2",
+        "prop.ab_vehicles[i].exemption_laws_2",
+        "prop.ab_vehicles[i].state");
+    } catch(e) {
+      console.log("Error in vehicle exemption check:", e);
+    }
+  </script>
 continue button field: prop.ab_vehicles[i].complete
 allowed to set:
   - prop.ab_vehicles[i].complete
@@ -1757,18 +1767,22 @@ subquestion: |
 #  % for item in tbl_data():
 #  ${ item['name'] } | ${ item['limit'] } | ${ item['amount'] }
 #  % endfor
-#script: |
-#  <script>
-#    checkQuestionExemptions(
-#      "prop.ab_other_vehicles[i].is_claiming_exemption",
-#      "prop.ab_other_vehicles[i].claiming_sub_100",
-#      "prop.ab_other_vehicles[i].current_owned_value",
-#      "prop.ab_other_vehicles[i].exemption_value",
-#      "prop.ab_other_vehicles[i].exemption_laws",
-#      "prop.ab_other_vehicles[i].exemption_value_2",
-#      "prop.ab_other_vehicles[i].exemption_laws_2",
-#      "prop.ab_other_vehicles[i].state");
-#  </script>
+script: |
+  <script>
+    try {
+      checkQuestionExemptions(
+        "prop.ab_other_vehicles[i].is_claiming_exemption",
+        "prop.ab_other_vehicles[i].claiming_sub_100",
+        "prop.ab_other_vehicles[i].current_owned_value",
+        "prop.ab_other_vehicles[i].exemption_value",
+        "prop.ab_other_vehicles[i].exemption_laws",
+        "prop.ab_other_vehicles[i].exemption_value_2",
+        "prop.ab_other_vehicles[i].exemption_laws_2",
+        "prop.ab_other_vehicles[i].state");
+    } catch(e) {
+      console.log("Error in other vehicle exemption check:", e);
+    }
+  </script>
 continue button field: prop.ab_other_vehicles[i].complete
 allowed to set:
   - prop.ab_other_vehicles[i].complete

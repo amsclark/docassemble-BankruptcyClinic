@@ -27,6 +27,7 @@ include:
   - 121-question-blocks.yml
   - 2030-question-blocks.yml
   - creditor-library-picker.yml
+  - final-review.yml
 ---
 metadata:
   title: Voluntary Petition for Individuals Filing for Bankruptcy
@@ -417,6 +418,7 @@ code: |
   prop.has_other_prop
 
   #106C
+  schedule_c_auto_populated
   prop.exempt_property.exemption_type
   prop.exempt_property.properties.gather()
   prop.exempt_property.claim_homestead_exemption = False
@@ -675,6 +677,20 @@ code: |
   prop.priority_claims.gather()
   prop.nonpriority_claims.gather()
 
+  # Save creditors to shared library if user opted in
+  for _cred in list(prop.creditors):
+    if getattr(_cred, 'save_to_library', False):
+      add_creditor(_cred.name, _cred.street, _cred.city, _cred.state, _cred.zip, 'Secured')
+      _cred.save_to_library = False
+  for _cred in list(prop.priority_claims):
+    if getattr(_cred, 'save_to_library', False):
+      add_creditor(_cred.name, _cred.street, _cred.city, _cred.state, _cred.zip, getattr(_cred, 'type', 'Priority'))
+      _cred.save_to_library = False
+  for _cred in list(prop.nonpriority_claims):
+    if getattr(_cred, 'save_to_library', False):
+      add_creditor(_cred.name, _cred.street, _cred.city, _cred.state, _cred.zip, getattr(_cred, 'type', 'Nonpriority'))
+      _cred.save_to_library = False
+
   # Reporting — moved here so estimates auto-populate from entered data
   reporting.reporting_type
   reporting.funds_for_creditors
@@ -707,6 +723,7 @@ code: |
   personal_leases.gather()
 
   #106H
+  codebtor_auto_populated
   debtors.community_property
 
   # 106I and 106J moved earlier in flow (after exemptions, before financial affairs)
@@ -899,6 +916,7 @@ code: |
     attorney_disclosure.service_d
     attorney_disclosure_review
     attach_2030
+  final_review_complete
   print_101
   conclusion_screen
 ---
