@@ -7,8 +7,9 @@
 | Resolved (pre-existing) | 8 | #2, #3, #6, #7, #11, #14, #19, #23 |
 | **Fixed in Sprint 1** | **6** | **#9, #10, #21, #28, #33 + typos** |
 | **Fixed in Sprint 2** | **6** | **#8, #13, #16, #18, #26, #29 + bug fixes** |
-| Partially Resolved | 2 | #15, #25 |
-| Unresolved | 8 | #4, #5, #12, #17, #20, #22, #24, #27, #30 |
+| **Fixed in Sprint 3** | **4** | **#17, #20, #25, #30 + flow reorder** |
+| Partially Resolved | 2 | #15, #27 |
+| Unresolved | 4 | #4, #5, #12, #22, #24 |
 
 ---
 
@@ -95,6 +96,31 @@ File: `107-question-blocks.yml`
 - Fixed `financial_affairs.debtor2_address_street_3` → `financial_affairs.debtor2_address_street_5` (line 2513, wrong index)
 - Fixed `finacial_affairs.address_same_dates6` → `financial_affairs.address_same_dates_6` (line 2520)
 - Fixed redundant condition `has_second_address and has_second_address` → `has_second_address` (line 606)
+
+---
+
+## Fixed in Sprint 3
+
+### #30 — Move reporting section + auto-populate estimates
+**Fix**: Moved reporting section from after credit counseling to after unsecured claims. Added auto-calculation of `creditor_estimate`, `assets_estimate`, and `liabilities_estimate` from already-entered data. Used `getattr()` with defaults and `defined()` guards for optional financial assets.
+**Files**: `voluntary-petition.yml`, `tests/navigation-helpers.ts`
+
+### #20 — Auto-populate 122A means test from 106I income data
+**Fix**: Added `default:` values to 122A question block fields that pull from Schedule I (106I) income data. Debtor 1: gross_wages from `income_amount_1 + overtime_pay_1`, alimony from `family_support`, interest from `interest_dividends`, etc. Debtor 2: same mappings with `len(debtor) > 1` guard.
+**Files**: `122A-question-blocks.yml`
+
+### #25 — Move income section earlier in flow
+**Fix**: Moved income (106I) and expenses (106J) from after contracts/codebtors to after exemptions (106C). Changed debtor 2 income dependency from `financial_affairs.marital_status` to `len(debtor) > 1` for correctness.
+**Files**: `voluntary-petition.yml`, `tests/navigation-helpers.ts`
+
+### #17 — Separate 2-year income for married couples
+**Fix**: Changed flow gates for debtor 2 income history (employed and other_income) from `financial_affairs.marital_status == False` to `len(debtor) > 1`. The question blocks already existed but were gated on marital status instead of joint filing.
+**Files**: `voluntary-petition.yml`, `tests/navigation-helpers.ts`
+
+### Additional Changes in Sprint 3
+- Updated `navigateFinancialAffairs()` in tests to handle debtor 2 employment/income pages for joint filings
+- Fixed `reporting.assets_estimate` calculation: used `getattr()` for optional property values and `defined()` guard for financial assets
+- Updated `runFullInterview()` flow order to match new YAML sequence (income → expenses → financial affairs → creditors → reporting → contracts)
 
 ---
 
