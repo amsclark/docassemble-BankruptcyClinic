@@ -100,7 +100,7 @@ fields:
   - State: debtors.codebtors[i].state
     # default: Washington
   - Zip: debtors.codebtors[i].zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -149,7 +149,7 @@ fields:
     show if: debtors.had_spouse
     required: False
   - Zip: debtors.spouse_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593

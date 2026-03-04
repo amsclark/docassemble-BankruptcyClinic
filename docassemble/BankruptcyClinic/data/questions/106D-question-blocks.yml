@@ -103,7 +103,7 @@ fields:
     # default: Florida
     required: False
   - Zip: prop.creditors[i].notify[j].other_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -147,7 +147,7 @@ fields:
   - State: prop.creditors[i].state
     # default: Florida
   - Zip: prop.creditors[i].zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -254,7 +254,7 @@ fields:
       variable: prop.creditors[i].has_codebtor
       is: True
   - Zip: prop.creditors[i].codebtor_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593

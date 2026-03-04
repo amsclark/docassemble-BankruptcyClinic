@@ -38,7 +38,7 @@ fields:
   - State: prop.contracts_and_leases[i].state
     # default: Washington
   - Zip: prop.contracts_and_leases[i].zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -71,7 +71,7 @@ fields:
       variable: prop.contracts_and_leases[i].has_codebtor
       is: True
   - Zip: prop.contracts_and_leases[i].codebtor_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593

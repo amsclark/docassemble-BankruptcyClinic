@@ -39,7 +39,7 @@ fields:
       variable: debtor[0].income.employment
       is: Employed
   - Zip: debtor[0].income.employer_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -355,7 +355,7 @@ fields:
       variable: debtor[1].income.employment
       is: Employed
   - Zip: debtor[1].income.employer_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593

@@ -16,7 +16,7 @@ fields:
   - State: landlord_state
     # default: KY
   - zip: landlord_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593

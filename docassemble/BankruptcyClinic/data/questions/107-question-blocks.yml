@@ -25,7 +25,7 @@ fields:
     # default: Washington
     show if: financial_affairs.lived_elsewhere
   - Zip: financial_affairs.address_zip_1
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -81,7 +81,7 @@ fields:
       variable: financial_affairs.address_same_1
       is: True
   - Zip: financial_affairs.debtor2_address_zip_1
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -134,7 +134,7 @@ fields:
     show if: financial_affairs.has_second_address
     required: False
   - Zip: financial_affairs.address_zip_2
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -196,7 +196,7 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - Zip: financial_affairs.debtor2_address_zip_2
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -249,7 +249,7 @@ fields:
     show if: financial_affairs.has_second_address
     required: False
   - Zip: financial_affairs.address_zip_3
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -311,7 +311,7 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - Zip: financial_affairs.debtor2_address_zip_3
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -364,7 +364,7 @@ fields:
     show if: financial_affairs.has_second_address
     required: False
   - Zip: financial_affairs.address_zip_4
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -426,7 +426,7 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - Zip: financial_affairs.debtor2_address_zip_4
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -479,7 +479,7 @@ fields:
     show if: financial_affairs.has_second_address
     required: False
   - Zip: financial_affairs.address_zip_5
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -541,7 +541,7 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - Zip: financial_affairs.debtor2_address_zip_5
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -594,7 +594,7 @@ fields:
     show if: financial_affairs.has_second_address
     required: False
   - Zip: financial_affairs.address_zip_6
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -656,7 +656,7 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - Zip: financial_affairs.debtor2_address_zip_6
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -709,7 +709,7 @@ fields:
     show if: financial_affairs.has_more_addresses
     required: False
   - Zip: financial_affairs.address_zip_7
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     show if: financial_affairs.has_more_addresses
@@ -734,7 +734,7 @@ fields:
     show if: financial_affairs.has_more_addresses
     required: False
   - Zip: financial_affairs.address_zip_8
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     show if: financial_affairs.has_more_addresses
@@ -759,7 +759,7 @@ fields:
     show if: financial_affairs.has_more_addresses
     required: False
   - Zip: financial_affairs.address_zip_9
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     show if: financial_affairs.has_more_addresses
@@ -784,7 +784,7 @@ fields:
     show if: financial_affairs.has_more_addresses
     required: False
   - Zip: financial_affairs.address_zip_10
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     show if: financial_affairs.has_more_addresses
@@ -1185,7 +1185,7 @@ fields:
   - State: financial_affairs.consumer_debt_payments[i].creditor_state
     # default: Washington
   - Zip: financial_affairs.consumer_debt_payments[i].creditor_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -1263,7 +1263,7 @@ fields:
   - State: financial_affairs.insider_payments[i].state
     # default: Washington
   - Zip: financial_affairs.insider_payments[i].zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -1326,7 +1326,7 @@ fields:
   - State: financial_affairs.insider_benefits[i].state
     # default: Washington
   - Zip: financial_affairs.insider_benefits[i].zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -1411,7 +1411,7 @@ fields:
   - State: financial_affairs.lawsuits[i].court_state
     # default: Washington
   - Zip: financial_affairs.lawsuits[i].court_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -1460,7 +1460,7 @@ fields:
   - State: financial_affairs.levies[i].creditor_state
     # default: Washington
   - Zip: financial_affairs.levies[i].creditor_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -1509,7 +1509,7 @@ fields:
     # default: Washington
     show if: financial_affairs.has_refusal
   - Zip: financial_affairs.refusal_creditor_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -1577,7 +1577,7 @@ fields:
   - State: financial_affairs.gifts[i].state
     # default: Washington
   - Zip: financial_affairs.gifts[i].zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -1621,7 +1621,7 @@ fields:
     # default: Washington
     show if: financial_affairs.has_charity
   - Zip: financial_affairs.charity_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -1717,7 +1717,7 @@ fields:
   - State: financial_affairs.bankruptcy_payments[i].state
     # default: washington
   - Zip: financial_affairs.bankruptcy_payments[i].zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -1767,7 +1767,7 @@ fields:
     # default: Washington
     show if: financial_affairs.has_creditor_help
   - Zip: financial_affairs.creditor_help.zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -1836,7 +1836,7 @@ fields:
   - State: financial_affairs.other_transfers[i].state
     # default: Washington
   - Zip: financial_affairs.other_transfers[i].zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -1914,7 +1914,7 @@ fields:
   - State: financial_affairs.instruments[i].state
     # default: Washington
   - Zip: financial_affairs.instruments[i].zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -1967,7 +1967,7 @@ fields:
     # default: Washington
     show if: financial_affairs.has_deposit_box
   - Zip: financial_affairs.deposit_box.zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -1991,7 +1991,7 @@ fields:
     required: False
     show if: financial_affairs.has_deposit_box
   - Zip: financial_affairs.deposit_box.other_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -2029,7 +2029,7 @@ fields:
     # default: Washington
     show if: financial_affairs.has_storage_unit
   - Zip: financial_affairs.storage_unit.zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -2053,7 +2053,7 @@ fields:
     required: False
     show if: financial_affairs.has_storage_unit
   - Zip: financial_affairs.storage_unit.other_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -2091,7 +2091,7 @@ fields:
     # default: Washington
     show if: financial_affairs.has_held_property
   - Zip: financial_affairs.held_property.zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -2108,7 +2108,7 @@ fields:
     # default: Washington
     show if: financial_affairs.has_held_property
   - Zip: financial_affairs.held_property.prop_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -2163,7 +2163,7 @@ fields:
     # default: Washington
     show if: financial_affairs.environment.has_liability
   - Zip: financial_affairs.environment.liability_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -2183,7 +2183,7 @@ fields:
     # default: Washington
     show if: financial_affairs.environment.has_liability
   - Zip: financial_affairs.environment.liability_unit_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -2223,7 +2223,7 @@ fields:
     # default: Washington
     show if: financial_affairs.environment.has_release
   - Zip: financial_affairs.environment.release_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -2243,7 +2243,7 @@ fields:
     # default: Washington
     show if: financial_affairs.environment.has_release
   - Zip: financial_affairs.environment.release_unit_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -2293,7 +2293,7 @@ fields:
     # default: Washington
     show if: financial_affairs.environment.has_proceeding
   - Zip: financial_affairs.environment.proceeding_court_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -2363,7 +2363,7 @@ fields:
   - State: financial_affairs.businesses[i].state
     # default: Washington
   - Zip: financial_affairs.businesses[i].zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -2410,7 +2410,7 @@ fields:
     # default: Washington
     show if: financial_affairs.has_statement
   - Zip: financial_affairs.statement_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593

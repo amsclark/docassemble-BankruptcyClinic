@@ -191,7 +191,7 @@ fields:
     # default:       Florida
     show if: prop.has_home
   - Zip: prop.mortgage_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -225,7 +225,7 @@ fields:
     # default:       Florida
     show if: prop.has_other_real_estate
   - Zip: prop.other_mortgage_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593

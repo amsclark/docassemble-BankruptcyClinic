@@ -41,7 +41,7 @@ fields:
   - State: prop.priority_claims[i].state
     # default: Florida
   - Zip: prop.priority_claims[i].zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -127,7 +127,7 @@ fields:
       variable: prop.priority_claims[i].has_codebtor
       is: True
   - Zip: prop.priority_claims[i].codebtor_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -158,7 +158,7 @@ fields:
     show if: prop.priority_claims[i].has_notify
     required: False
   - Zip: prop.priority_claims[i].other_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -180,7 +180,7 @@ fields:
     show if: prop.priority_claims[i].has_notify
     required: False
   - Zip: prop.priority_claims[i].other_zip_2
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -202,7 +202,7 @@ fields:
     show if: prop.priority_claims[i].has_notify
     required: False
   - Zip: prop.priority_claims[i].other_zip_3
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -224,7 +224,7 @@ fields:
     show if: prop.priority_claims[i].has_notify
     required: False
   - Zip: prop.priority_claims[i].other_zip_4
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     show if: prop.priority_claims[i].has_notify
@@ -245,7 +245,7 @@ fields:
     show if: prop.priority_claims[i].has_notify
     required: False
   - Zip: prop.priority_claims[i].other_zip_5
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     show if: prop.priority_claims[i].has_notify
@@ -266,7 +266,7 @@ fields:
     show if: prop.priority_claims[i].has_notify
     required: False
   - Zip: prop.priority_claims[i].other_zip_6
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     show if: prop.priority_claims[i].has_notify
@@ -316,7 +316,7 @@ fields:
   - State: prop.nonpriority_claims[i].state
     # default: Florida
   - Zip: prop.nonpriority_claims[i].zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -399,7 +399,7 @@ fields:
       variable: prop.nonpriority_claims[i].has_codebtor
       is: True
   - Zip: prop.nonpriority_claims[i].codebtor_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -430,7 +430,7 @@ fields:
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - Zip: prop.nonpriority_claims[i].other_zip
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -452,7 +452,7 @@ fields:
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - Zip: prop.nonpriority_claims[i].other_zip_2
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -474,7 +474,7 @@ fields:
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - Zip: prop.nonpriority_claims[i].other_zip_3
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
@@ -496,7 +496,7 @@ fields:
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - Zip: prop.nonpriority_claims[i].other_zip_4
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     show if: prop.nonpriority_claims[i].has_notify
@@ -517,7 +517,7 @@ fields:
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - Zip: prop.nonpriority_claims[i].other_zip_5
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     show if: prop.nonpriority_claims[i].has_notify
@@ -538,7 +538,7 @@ fields:
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - Zip: prop.nonpriority_claims[i].other_zip_6
-    datatype: number
+    datatype: text
     minlength: 5
     maxlength: 5
     show if: prop.nonpriority_claims[i].has_notify
