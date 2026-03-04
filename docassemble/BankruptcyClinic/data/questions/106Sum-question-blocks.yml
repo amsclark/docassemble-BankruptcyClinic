@@ -16,7 +16,7 @@ code: |
     """Convert currency string like '$1,234.56' to float."""
     try:
       return float(str(s).replace('$', '').replace(',', '').strip())
-    except:
+    except Exception:
       return 0.0
 
   summary_fields = {}
@@ -49,7 +49,7 @@ code: |
       for _cr in prop.creditors:
         if hasattr(_cr, 'claim_amount'):
           _secured_total += float(_cr.claim_amount)
-  except:
+  except Exception:
     pass
   summary_fields['2'] = currency(_secured_total)
 
@@ -59,7 +59,7 @@ code: |
   try:
     _priority_total = _to_num(unsecured_claims.get('p1Total', '0'))
     _nonpriority_total = _to_num(unsecured_claims.get('p2Total', '0'))
-  except:
+  except Exception:
     pass
   summary_fields['3a'] = currency(_priority_total)
   summary_fields['3b'] = currency(_nonpriority_total)
@@ -75,20 +75,20 @@ code: |
       _num_creditors += len(prop.priority_claims)
     if defined('prop.nonpriority_claims'):
       _num_creditors += len(prop.nonpriority_claims)
-  except:
+  except Exception:
     pass
   summary_fields['4'] = str(_num_creditors)
 
   # Line 5 = Current monthly income (Schedule I combined total)
   try:
     summary_fields['5'] = income1.get('combinedMonthlyTotal', '$0.00')
-  except:
+  except Exception:
     summary_fields['5'] = '$0.00'
 
   # Line 8 = Current monthly expenditures (Schedule J total)
   try:
     summary_fields['8'] = expenses.get('overallTotal', '$0.00')
-  except:
+  except Exception:
     summary_fields['8'] = '$0.00'
 
   # --- Nature of Debts (checkboxes) ---
@@ -104,7 +104,7 @@ code: |
   # 9a = Net monthly income available after expenses
   try:
     summary_fields['9a'] = expenses.get('netTotal', '$0.00')
-  except:
+  except Exception:
     summary_fields['9a'] = '$0.00'
   # 9b = Estimated number of employees (for business debtors)
   summary_fields['9b'] = '0'

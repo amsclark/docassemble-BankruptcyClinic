@@ -21,7 +21,7 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on failure (section tests can be flaky due to timing) */
-  retries: process.env.CI ? 2 : 2,
+  retries: 2,
   /* Limit workers to avoid overloading the single docassemble server */
   workers: process.env.CI ? 1 : (process.env.LIVE_WATCH ? 1 : 2),
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */

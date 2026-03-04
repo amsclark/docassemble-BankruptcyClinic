@@ -25,7 +25,7 @@ code: |
     prop_options.append('Animals')
   if getattr(prop, 'other_household_items_value', 0) > 0:
     prop_options.append('Other Household Items')
-  if prop.farming_property.has_property:
+  if getattr(prop, 'farming_property', None) and getattr(prop.farming_property, 'has_property', False):
     prop_options.append(f'Farming Property')
 
 ---

@@ -16,9 +16,9 @@ def get_exemption_choices(user_state, property_type='all'):
     # Handle case where user_state might be None or undefined
     try:
         state_str = str(user_state).lower() if user_state else ''
-    except:
+    except Exception:
         state_str = ''
-    
+
     # South Dakota exemptions
     south_dakota_exemptions = {
         'homestead': 'Homestead (SDCL 43-31-1 – 43-31-6)',
@@ -77,20 +77,12 @@ def get_exemption_choices(user_state, property_type='all'):
     
     # Filter based on property type
     if property_type == 'real_property':
-        if 'south dakota' in state_str:
-            choices = [
-                exemptions['homestead'],
-                exemptions['homestead_proceeds'],
-                exemptions['wildcard'],
-                exemptions['unknown']
-            ]
-        else:
-            choices = [
-                exemptions['homestead'],
-                exemptions['homestead_proceeds'],
-                exemptions['wildcard'],
-                exemptions['unknown']
-            ]
+        choices = [
+            exemptions['homestead'],
+            exemptions['homestead_proceeds'],
+            exemptions['wildcard'],
+            exemptions['unknown']
+        ]
     elif property_type == 'vehicle':
         if 'south dakota' in state_str:
             choices = [
@@ -122,7 +114,7 @@ def get_exemption_limits(user_state):
     """
     try:
         state_str = str(user_state).lower() if user_state else ''
-    except:
+    except Exception:
         state_str = ''
 
     if 'south dakota' in state_str:
@@ -240,6 +232,13 @@ def compute_exemption_totals(prop, debtor_state):
     # Accumulate claimed amounts per law string
     claimed_by_law = {}
 
+    def _safe_float(val):
+        """Convert to float safely, returning 0.0 on failure."""
+        try:
+            return float(str(val).replace('$', '').replace(',', '').strip())
+        except (ValueError, TypeError):
+            return 0.0
+
     def _add_exemption(item, attr_prefix=''):
         """Extract exemption claims from a property item."""
         is_claiming = getattr(item, attr_prefix + 'is_claiming_exemption', False)
@@ -248,12 +247,12 @@ def compute_exemption_totals(prop, debtor_state):
         law1 = getattr(item, attr_prefix + 'exemption_laws', '')
         val1 = getattr(item, attr_prefix + 'exemption_value', 0)
         if law1 and val1:
-            claimed_by_law[law1] = claimed_by_law.get(law1, 0) + float(val1)
+            claimed_by_law[law1] = claimed_by_law.get(law1, 0) + _safe_float(val1)
 
         law2 = getattr(item, attr_prefix + 'exemption_laws_2', '')
         val2 = getattr(item, attr_prefix + 'exemption_value_2', 0)
         if law2 and val2:
-            claimed_by_law[law2] = claimed_by_law.get(law2, 0) + float(val2)
+            claimed_by_law[law2] = claimed_by_law.get(law2, 0) + _safe_float(val2)
 
     # Real property
     for interest in getattr(prop, 'interests', []):
@@ -270,13 +269,13 @@ def compute_exemption_totals(prop, debtor_state):
         law1 = getattr(prop, 'household_goods_exemption_laws', '')
         val1 = getattr(prop, 'household_goods_exemption_value', 0)
         if law1 and val1:
-            claimed_by_law[law1] = claimed_by_law.get(law1, 0) + float(val1)
+            claimed_by_law[law1] = claimed_by_law.get(law1, 0) + _safe_float(val1)
 
     if getattr(prop, 'secured_household_goods_is_claiming_exemption', False):
         law1 = getattr(prop, 'secured_household_goods_exemption_laws', '')
         val1 = getattr(prop, 'secured_household_goods_exemption_value', 0)
         if law1 and val1:
-            claimed_by_law[law1] = claimed_by_law.get(law1, 0) + float(val1)
+            claimed_by_law[law1] = claimed_by_law.get(law1, 0) + _safe_float(val1)
 
     # Build result
     result = {}
@@ -295,8 +294,8 @@ def compute_exemption_totals(prop, debtor_state):
 
 
 class Debtor(Individual):
-  aliases = []
   def init(self, *pargs, **kwargs):
+    self.aliases = []
     self.initializeAttribute('tax_id', DebtorTaxId)
     self.initializeAttribute('district_info', DebtorDistrictInfo)
     super().init(*pargs, **kwargs)
@@ -305,9 +304,7 @@ class DebtorAlias(Individual):
   business = None
   
 class DebtorTaxId(DAObject):
-  def init(self, *pargs, **kwargs):
-    super().init(*pargs, **kwargs)
-  
+  pass
+
 class DebtorDistrictInfo(DAObject):
-  def init(self, *pargs, **kwargs):
-    super().init(*pargs, **kwargs)
+  pass
