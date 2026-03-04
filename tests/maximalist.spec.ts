@@ -119,7 +119,7 @@ const MAXIMALIST: TestScenario = {
         type: 'Taxes and certain other debts you owe the government',
         totalClaim: '4500', priorityAmount: '4500', nonpriorityAmount: '0' },
       { name: 'US Dept of Education', street: '400 Maryland Ave SW', city: 'Washington', state: 'DC', zip: '20202',
-        type: 'Claims for death or personal injury',
+        type: 'Claims for death or personal injury while you were intoxicated',
         totalClaim: '8000', priorityAmount: '8000', nonpriorityAmount: '0' },
     ],
     nonpriority: {
@@ -927,20 +927,37 @@ async function navigateSecuredCreditorsMulti(page: Page) {
     await waitForDaPageLoad(page);
     console.log(`  [secured] Filling creditor ${i + 1}: ${securedList[i].name}`);
     await fillSecuredCreditor(page, securedList[i], i);
-    await clickContinue(page);
 
-    // Notify page always appears after each creditor with list collect
-    // Use role-based click because docassemble may render [i] vs [0] in button names
-    await waitForDaPageLoad(page);
-    console.log(`  [secured] Notify for creditor ${i + 1}: No`);
-    await page.getByRole('button', { name: 'No' }).click();
-    await page.waitForLoadState('networkidle');
-
-    // there_is_another question
+    // With list collect: True, the form has both "Add another" and "Continue" buttons.
+    // Click "Add another" for non-last creditors, "Continue" for the last.
     const isLast = i === securedList.length - 1;
-    await waitForDaPageLoad(page);
-    console.log(`  [secured] Another creditor? ${!isLast}`);
-    await clickYesNoButton(page, 'prop.creditors.there_is_another', !isLast);
+    if (!isLast) {
+      console.log(`  [secured] Clicking "Add another" for creditor ${i + 1}`);
+      await clickListCollectAddAnother(page);
+    } else {
+      // Click "Continue" to save last creditor and finish gather
+      console.log(`  [secured] Clicking "Continue" for last creditor ${i + 1}`);
+      await clickContinue(page);
+    }
+
+    // After "Continue" on last creditor: notify questions appear for ALL creditors
+    if (isLast) {
+      for (let n = 0; n < securedList.length; n++) {
+        await waitForDaPageLoad(page);
+        const h = await page.locator('h1').first().textContent().catch(() => '');
+        if (h?.toLowerCase().includes('notif') || h?.toLowerCase().includes('others to be notified')) {
+          console.log(`  [secured] Notify question ${n + 1}: No`);
+          await page.getByRole('button', { name: 'No' }).click();
+          await page.waitForLoadState('networkidle');
+        } else {
+          console.log(`  [secured] No more notify questions at ${n + 1} (heading: "${h?.trim()}")`);
+          break;
+        }
+      }
+    } else {
+      // After "Add another", the next form appears directly (no notify in between)
+      await waitForDaPageLoad(page);
+    }
   }
 }
 
@@ -963,6 +980,7 @@ async function fillPriorityCreditor(page: Page, pc: any, index: number) {
   await page.locator(`#${b64(`prop.priority_claims[${index}].nonpriority_amount`)}`).fill(pc.nonpriorityAmount);
   await fillYesNoRadio(page, `prop.priority_claims[${index}].save_to_library`, false);
   await fillYesNoRadio(page, `prop.priority_claims[${index}].has_codebtor`, false);
+  await fillYesNoRadio(page, `prop.priority_claims[${index}].has_notify`, false);
 }
 
 async function fillNonpriorityCreditor(page: Page, np: any, index: number) {
@@ -981,6 +999,18 @@ async function fillNonpriorityCreditor(page: Page, np: any, index: number) {
   await fillYesNoRadio(page, `prop.nonpriority_claims[${index}].has_notify`, false);
 }
 
+/** Click the last visible "Add another" button on a list collect form. */
+async function clickListCollectAddAnother(page: Page) {
+  await page.evaluate(() => {
+    const buttons = Array.from(document.querySelectorAll('button'));
+    const addAnother = buttons.filter(b =>
+      b.textContent?.includes('Add another') && b.offsetParent !== null
+    );
+    if (addAnother.length > 0) addAnother[addAnother.length - 1].click();
+  });
+  await page.waitForLoadState('networkidle');
+}
+
 async function navigateUnsecuredCreditorsMulti(page: Page) {
   const priorityList = MAXIMALIST.creditors.priorityList || [];
   const nonpriorityList = MAXIMALIST.creditors.nonpriorityList || [];
@@ -994,12 +1024,14 @@ async function navigateUnsecuredCreditorsMulti(page: Page) {
     await waitForDaPageLoad(page);
     console.log(`  [unsecured] Filling priority creditor ${i + 1}: ${priorityList[i].name}`);
     await fillPriorityCreditor(page, priorityList[i], i);
-    await clickContinue(page);
-
     const isLast = i === priorityList.length - 1;
-    await waitForDaPageLoad(page);
-    console.log(`  [unsecured] Another priority? ${!isLast}`);
-    await clickYesNoButton(page, 'prop.priority_claims.there_is_another', !isLast);
+    if (!isLast) {
+      console.log(`  [unsecured] Add another priority`);
+      await clickListCollectAddAnother(page);
+    } else {
+      console.log(`  [unsecured] Continue (last priority)`);
+      await clickContinue(page);
+    }
   }
 
   // Nonpriority claims
@@ -1011,12 +1043,14 @@ async function navigateUnsecuredCreditorsMulti(page: Page) {
     await waitForDaPageLoad(page);
     console.log(`  [unsecured] Filling nonpriority creditor ${i + 1}: ${nonpriorityList[i].name}`);
     await fillNonpriorityCreditor(page, nonpriorityList[i], i);
-    await clickContinue(page);
-
     const isLast = i === nonpriorityList.length - 1;
-    await waitForDaPageLoad(page);
-    console.log(`  [unsecured] Another nonpriority? ${!isLast}`);
-    await clickYesNoButton(page, 'prop.nonpriority_claims.there_is_another', !isLast);
+    if (!isLast) {
+      console.log(`  [unsecured] Add another nonpriority`);
+      await clickListCollectAddAnother(page);
+    } else {
+      console.log(`  [unsecured] Continue (last nonpriority)`);
+      await clickContinue(page);
+    }
   }
 }
 
@@ -1039,22 +1073,30 @@ async function fillContract(page: Page, contract: any, index: number) {
   await fillById(page, b64(`prop.contracts_and_leases[${index}].city`), contract.city);
   await fillById(page, b64(`prop.contracts_and_leases[${index}].state`), contract.state);
   await fillById(page, b64(`prop.contracts_and_leases[${index}].zip`), contract.zip);
-  // Description textarea
-  const descField = page.locator(`#${b64(`prop.contracts_and_leases[${index}].description`)}`);
-  if (await descField.count() > 0) {
-    await descField.fill(contract.description);
-  } else {
-    const ta = page.locator(`textarea[name="${b64(`prop.contracts_and_leases[${index}].description`)}"]`);
-    if (await ta.count() > 0) await ta.fill(contract.description);
-  }
+  // Description — use evaluate to handle both textarea and input, visible or not
+  await page.evaluate(({ id, value }) => {
+    const el = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement | null;
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.value = value;
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  }, { id: b64(`prop.contracts_and_leases[${index}].description`), value: contract.description });
   await fillYesNoRadio(page, `prop.contracts_and_leases[${index}].has_codebtor`, false);
   await fillYesNoRadio(page, `prop.contracts_and_leases[${index}].unexpired_lease`, index < 2);
   if (index < 2) {
-    await page.waitForTimeout(500);
-    const leaseAssumedLabel = page.locator(`label[for="${b64(`prop.contracts_and_leases[${index}].lease_assumed`)}_1"]`);
-    if (await leaseAssumedLabel.count() > 0 && await leaseAssumedLabel.isVisible()) {
-      await leaseAssumedLabel.click(); // No
+    await page.waitForTimeout(1000);
+    // Use ARIA locator to find the lease_assumed radiogroup and click No
+    // list collect may render field IDs differently, so use label text matching
+    const leaseGroup = page.getByRole('radiogroup', { name: /Will the lease be assumed/ });
+    const groupCount = await leaseGroup.count();
+    if (groupCount > 0) {
+      // Click "No" in the last visible lease_assumed group (current item's group)
+      const targetGroup = groupCount > 1 ? leaseGroup.nth(index) : leaseGroup.first();
+      await targetGroup.getByRole('radio', { name: 'No' }).click();
     }
+    await page.waitForTimeout(300);
   }
 }
 
@@ -1067,12 +1109,14 @@ async function navigateContractsLeasesMaximalist(page: Page) {
     await waitForDaPageLoad(page);
     console.log(`  [contracts] Filling contract ${i + 1}: ${CONTRACTS[i].name}`);
     await fillContract(page, CONTRACTS[i], i);
-    await clickContinue(page);
-
     const isLast = i === CONTRACTS.length - 1;
-    await waitForDaPageLoad(page);
-    console.log(`  [contracts] Another contract? ${!isLast}`);
-    await clickYesNoButton(page, 'prop.contracts_and_leases.there_is_another', !isLast);
+    if (!isLast) {
+      console.log(`  [contracts] Add another contract`);
+      await clickListCollectAddAnother(page);
+    } else {
+      console.log(`  [contracts] Continue (last contract)`);
+      await clickContinue(page);
+    }
   }
 
   // Personal leases -> No
@@ -1089,22 +1133,37 @@ async function navigateCommunityPropertyMaximalist(page: Page) {
   await waitForDaPageLoad(page);
   console.log('  [communityProperty] community_property = Yes');
 
-  // The auto-population code block may run first; check heading
   await logHeading(page, 'community property');
 
-  await fillYesNoRadio(page, 'debtors.community_property', true);
-  await page.waitForTimeout(500);
+  // Use ARIA locators since show-if fields may have non-standard IDs
+  const cpGroup = page.getByRole('radiogroup', { name: /community property state/i });
+  await cpGroup.getByRole('radio', { name: 'Yes' }).click();
+  await page.waitForTimeout(1000);
 
-  // had_spouse = Yes
-  await fillYesNoRadio(page, 'debtors.had_spouse', true);
-  await page.waitForTimeout(500);
+  // had_spouse = Yes (shown via show-if)
+  const spouseGroup = page.getByRole('radiogroup', { name: /spouse live with you/i });
+  if (await spouseGroup.count() > 0) {
+    await spouseGroup.getByRole('radio', { name: 'Yes' }).click();
+    await page.waitForTimeout(1000);
 
-  // Fill spouse details
-  await fillById(page, b64('debtors.spouse_state'), 'Texas');
-  await fillById(page, b64('debtors.spouse_name'), 'Former Spouse Testworth');
-  await fillById(page, b64('debtors.spouse_street'), '1000 Community Dr');
-  await fillById(page, b64('debtors.spouse_city'), 'Houston');
-  await fillById(page, b64('debtors.spouse_zip'), '77001');
+    // Fill spouse details using getByLabel (show-if fields may use _field_N IDs)
+    const stateField = page.getByLabel(/community property state.*territory/i).or(page.getByLabel(/state/i).last());
+    // Spouse details are behind a second show-if — fill via evaluate to handle any ID format
+    await page.evaluate(() => {
+      const inputs = Array.from(document.querySelectorAll('input[type="text"]')) as HTMLInputElement[];
+      const visible = inputs.filter(i => i.offsetParent !== null && !i.value);
+      // Fill visible empty text fields in order: state, name, street, city, zip
+      const values = ['Texas', 'Former Spouse Testworth', '1000 Community Dr', 'Houston', '77001'];
+      visible.forEach((el, idx) => {
+        if (idx < values.length) {
+          el.value = values[idx];
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+          el.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      });
+    });
+    await page.waitForTimeout(300);
+  }
 
   await clickContinue(page);
 }
@@ -1181,13 +1240,16 @@ async function navigateCaseDetailsMaximalist(page: Page) {
   // Handle unexpected income pages (same as standard navigateCaseDetails)
   let caseH = await page.locator('h1').first().textContent().catch(() => '');
   console.log(`  [caseDetails] Heading: "${caseH}"`);
-  const isIncomePage = (h: string | null | undefined) =>
+  const isSkippablePage = (h: string | null | undefined) =>
     h?.toLowerCase().includes('monthly income') ||
     h?.toLowerCase().includes('payroll deductions') ||
     h?.toLowerCase().includes('other deductions') ||
     h?.toLowerCase().includes('other income') ||
-    h?.toLowerCase().includes('regular contributions');
-  while (isIncomePage(caseH)) {
+    h?.toLowerCase().includes('regular contributions') ||
+    h?.toLowerCase().includes('overall income') ||
+    h?.toLowerCase().includes('means test') ||
+    h?.toLowerCase().includes('note:');
+  while (isSkippablePage(caseH)) {
     console.log(`  [caseDetails] Handling unexpected income page: "${caseH}"`);
     await page.evaluate(() => {
       document.querySelectorAll('input[type="text"], input[type="number"]').forEach(el => {
