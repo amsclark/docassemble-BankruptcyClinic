@@ -67,7 +67,7 @@ fields:
   - Contingent: prop.priority_claims[i].contingent
     datatype: yesno
     # default: False
-  - Unliquidated: prop.priority_claims[i].unliquified
+  - Unliquidated: prop.priority_claims[i].unliquidated
     datatype: yesno
     # default: False
   - Disputed: prop.priority_claims[i].disputed
@@ -342,7 +342,7 @@ fields:
   - Contingent: prop.nonpriority_claims[i].contingent
     datatype: yesno
     # default: False
-  - Unliquidated: prop.nonpriority_claims[i].unliquified
+  - Unliquidated: prop.nonpriority_claims[i].unliquidated
     datatype: yesno
     # default: False
   - Disputed: prop.nonpriority_claims[i].disputed
@@ -617,7 +617,7 @@ code: |
     unsecured_claims['state'+str(clm)] = claim.state
     unsecured_claims['zip'+str(clm)] = claim.zip
     unsecured_claims['isContingent'+str(clm)] = claim.contingent
-    unsecured_claims['isUnliquidated'+str(clm)] = claim.unliquified
+    unsecured_claims['isUnliquidated'+str(clm)] = claim.unliquidated
     unsecured_claims['isDebtor1Only'+str(clm)] = True if claim.who == 'Debtor 1 only' or len(debtor) == 1 else False
     unsecured_claims['isDebtor2Only'+str(clm)] = True if claim.who == 'Debtor 2 only' else False
     unsecured_claims['isDisputed'+str(clm)] = claim.disputed
@@ -647,7 +647,7 @@ code: |
     unsecured_claims['nonState'+str(clm)] = claim.state
     unsecured_claims['nonZip'+str(clm)] = claim.zip
     unsecured_claims['nonIsContingent'+str(clm)] = claim.contingent
-    unsecured_claims['nonIsUnliquidated'+str(clm)] = claim.unliquified
+    unsecured_claims['nonIsUnliquidated'+str(clm)] = claim.unliquidated
     unsecured_claims['nonIsDisputed'+str(clm)] = claim.disputed
     unsecured_claims['nonIsDebtor1Only'+str(clm)] = True if claim.who == 'Debtor 1 only' or len(debtor) == 1 else False
     unsecured_claims['nonIsDebtor2Only'+str(clm)] = True if claim.who == 'Debtor 2 only' else False

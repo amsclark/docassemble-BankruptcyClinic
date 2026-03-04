@@ -370,9 +370,11 @@ review:
 
       Payments of alimony: ${ debtor[0].expenses.alimony }
 
+      % if debtor[0].expenses.other_people_expenses:
       Other types of support payments:
       ${ debtor[0].expenses.other_support_specify }
       Amount: ${ debtor[0].expenses.other_support_amount }
+      % endif
 
   - Revisit: debtor[0].expenses.change_in_expense
     button: |
@@ -408,8 +410,8 @@ code: |
   expenses['isAmended'] = amended_filing
   expenses['notJoint'] = True if debtor[0].expenses.joint_case == False else False
   expenses['isJoint'] = True if debtor[0].expenses.joint_case == True else False
-  expenses['notSameHouse'] = True if debtor[0].expenses.other_household == False else False
-  expenses['isSameHouse'] = True if debtor[0].expenses.other_household == True else False
+  expenses['notSameHouse'] = True if getattr(debtor[0].expenses, 'other_household', False) == False else False
+  expenses['isSameHouse'] = True if getattr(debtor[0].expenses, 'other_household', False) == True else False
   expenses['noDependents'] = True if len(debtor[0].expenses.dependents) == 0 else False
   expenses['hasDependents'] = True if len(debtor[0].expenses.dependents) > 0 else False
 
@@ -455,8 +457,8 @@ code: |
   expenses['otherLeaseDesc2'] = debtor[0].expenses.other_payment2_specify
   expenses['otherLeaseAmount2'] = currency(debtor[0].expenses.other_payment2_amount)
   expenses['alimony'] = currency(debtor[0].expenses.alimony)
-  expenses['otherOutsiderPayDesc'] = debtor[0].expenses.other_support_specify
-  expenses['otherOutsiderPayAmount'] = currency(debtor[0].expenses.other_support_amount)
+  expenses['otherOutsiderPayDesc'] = getattr(debtor[0].expenses, 'other_support_specify', '')
+  expenses['otherOutsiderPayAmount'] = currency(getattr(debtor[0].expenses, 'other_support_amount', 0))
   overall_other_description = ";".join(filter(None, [
     getattr(debtor[0].expenses, 'overall_other_description_1', ''),
     getattr(debtor[0].expenses, 'overall_other_description_2', ''),
@@ -482,7 +484,7 @@ code: |
                   debtor[0].expenses.util_electric +
                   debtor[0].expenses.util_garbage +
                   debtor[0].expenses.telephone +
-                  debtor[0].expenses.util_other_amount +
+                  getattr(debtor[0].expenses, 'util_other_amount', 0) +
                   debtor[0].expenses.house_supplies +
                   debtor[0].expenses.childcare +
                   debtor[0].expenses.clothing +
@@ -494,14 +496,14 @@ code: |
                   debtor[0].expenses.life_insurance +
                   debtor[0].expenses.health_insurance +
                   debtor[0].expenses.vehicle_insurance +
-                  debtor[0].expenses.other_insurance_amount +
+                  getattr(debtor[0].expenses, 'other_insurance_amount', 0) +
                   debtor[0].expenses.other_tax_amount +
                   debtor[0].expenses.vehicle1_payments +
                   debtor[0].expenses.vehicle2_payments +
                   debtor[0].expenses.other_payment1_amount +
                   debtor[0].expenses.other_payment2_amount +
                   debtor[0].expenses.alimony +
-                  debtor[0].expenses.other_support_amount +
+                  getattr(debtor[0].expenses, 'other_support_amount', 0) +
                   debtor[0].expenses.other_mortgage +
                   debtor[0].expenses.other_real_estate_taxes +
                   debtor[0].expenses.other_property_insurance +
@@ -519,6 +521,6 @@ code: |
   expenses['netTotal'] = currency(incomeTotal - debtor1Total)
   expenses['noDelta'] = True if debtor[0].expenses.change_in_expense == False else False
   expenses['yesDelta'] = True if debtor[0].expenses.change_in_expense == True else False
-  expenses['deltaExplain'] = debtor[0].expenses.change_explainer
+  expenses['deltaExplain'] = getattr(debtor[0].expenses, 'change_explainer', '')
 
 

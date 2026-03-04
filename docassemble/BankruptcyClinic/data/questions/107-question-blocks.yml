@@ -2496,33 +2496,38 @@ code: |
   fin['add1_D1_city'] = financial_affairs.address_city_1
   fin['add1_D1_state'] = financial_affairs.address_state_1
   fin['add1_D1_zip'] = financial_affairs.address_zip_1
-  fin['add2_D1_from'] = format_date(financial_affairs.address_from_2, format='MM/dd/yyyy')
-  fin['add2_D1_to'] = format_date(financial_affairs.address_to_2, format='MM/dd/yyyy')
-  fin['add2_D1_city'] = financial_affairs.address_city_2
-  fin['add2_D1_state'] = financial_affairs.address_state_2
-  fin['add2_D1_zip'] = financial_affairs.address_zip_2
-  fin['add3_D1_address'] = financial_affairs.address_street_3
-  fin['add3_D1_from'] = format_date(financial_affairs.address_from_3, format='MM/dd/yyyy')
-  fin['add3_D1_to'] = format_date(financial_affairs.address_to_3, format='MM/dd/yyyy')
-  fin['add3_D1_city'] = financial_affairs.address_city_3
-  fin['add3_D1_state'] = financial_affairs.address_state_3
-  fin['add3_D1_zip'] = financial_affairs.address_zip_3
-  fin['add4_D1_from'] = format_date(financial_affairs.address_from_4, format='MM/dd/yyyy')
-  fin['add4_D1_to'] = format_date(financial_affairs.address_to_4, format='MM/dd/yyyy')
-  fin['add4_D1_city'] = financial_affairs.address_city_4
-  fin['add4_D1_state'] = financial_affairs.address_state_4
-  fin['add4_D1_zip'] = financial_affairs.address_zip_4
-  fin['add5_D1_address'] = financial_affairs.address_street_5
-  fin['add5_D1_from'] = format_date(financial_affairs.address_from_5, format='MM/dd/yyyy')
-  fin['add5_D1_to'] = format_date(financial_affairs.address_to_5, format='MM/dd/yyyy')
-  fin['add5_D1_city'] = financial_affairs.address_city_5
-  fin['add5_D1_state'] = financial_affairs.address_state_5
-  fin['add5_D1_zip'] = financial_affairs.address_zip_5
-  fin['add6_D1_from'] = format_date(financial_affairs.address_from_6, format='MM/dd/yyyy')
-  fin['add6_D1_to'] = format_date(financial_affairs.address_to_6, format='MM/dd/yyyy')
-  fin['add6_D1_city'] = financial_affairs.address_city_6
-  fin['add6_D1_state'] = financial_affairs.address_state_6
-  fin['add6_D1_zip'] = financial_affairs.address_zip_6
+  if defined('financial_affairs.address_street_2'):
+    fin['add2_D1_from'] = format_date(financial_affairs.address_from_2, format='MM/dd/yyyy')
+    fin['add2_D1_to'] = format_date(financial_affairs.address_to_2, format='MM/dd/yyyy')
+    fin['add2_D1_city'] = financial_affairs.address_city_2
+    fin['add2_D1_state'] = financial_affairs.address_state_2
+    fin['add2_D1_zip'] = financial_affairs.address_zip_2
+  if defined('financial_affairs.address_street_3'):
+    fin['add3_D1_address'] = financial_affairs.address_street_3
+    fin['add3_D1_from'] = format_date(financial_affairs.address_from_3, format='MM/dd/yyyy')
+    fin['add3_D1_to'] = format_date(financial_affairs.address_to_3, format='MM/dd/yyyy')
+    fin['add3_D1_city'] = financial_affairs.address_city_3
+    fin['add3_D1_state'] = financial_affairs.address_state_3
+    fin['add3_D1_zip'] = financial_affairs.address_zip_3
+  if defined('financial_affairs.address_street_4'):
+    fin['add4_D1_from'] = format_date(financial_affairs.address_from_4, format='MM/dd/yyyy')
+    fin['add4_D1_to'] = format_date(financial_affairs.address_to_4, format='MM/dd/yyyy')
+    fin['add4_D1_city'] = financial_affairs.address_city_4
+    fin['add4_D1_state'] = financial_affairs.address_state_4
+    fin['add4_D1_zip'] = financial_affairs.address_zip_4
+  if defined('financial_affairs.address_street_5'):
+    fin['add5_D1_address'] = financial_affairs.address_street_5
+    fin['add5_D1_from'] = format_date(financial_affairs.address_from_5, format='MM/dd/yyyy')
+    fin['add5_D1_to'] = format_date(financial_affairs.address_to_5, format='MM/dd/yyyy')
+    fin['add5_D1_city'] = financial_affairs.address_city_5
+    fin['add5_D1_state'] = financial_affairs.address_state_5
+    fin['add5_D1_zip'] = financial_affairs.address_zip_5
+  if defined('financial_affairs.address_street_6'):
+    fin['add6_D1_from'] = format_date(financial_affairs.address_from_6, format='MM/dd/yyyy')
+    fin['add6_D1_to'] = format_date(financial_affairs.address_to_6, format='MM/dd/yyyy')
+    fin['add6_D1_city'] = financial_affairs.address_city_6
+    fin['add6_D1_state'] = financial_affairs.address_state_6
+    fin['add6_D1_zip'] = financial_affairs.address_zip_6
   # Addresses 7-10: overflow - concatenate into additional text if present
   _extra_addresses = []
   for _n in range(7, 11):
@@ -2799,15 +2804,16 @@ code: |
 
   fin['noBankAction'] = True if financial_affairs.has_refusal == False else False
   fin['yesBankAction'] = True if financial_affairs.has_refusal == True else False
-  fin['bank_name1'] = financial_affairs.refusal_creditor_name
-  fin['bank_address1'] = financial_affairs.refusal_creditor_street
-  fin['bank_city1'] = financial_affairs.refusal_creditor_city
-  fin['bank_state1'] = financial_affairs.refusal_creditor_state
-  fin['bank_zip1'] = financial_affairs.refusal_creditor_zip
-  fin['bank_action1'] = financial_affairs.refusal_description
-  fin['bank_date1'] = format_date(financial_affairs.refusal_date, format='MM/dd/yyyy')
-  fin['bank_amount1'] = currency(financial_affairs.refusal_amount)
-  fin['bank_acct1'] = financial_affairs.refusal_account_number
+  if financial_affairs.has_refusal:
+    fin['bank_name1'] = financial_affairs.refusal_creditor_name
+    fin['bank_address1'] = financial_affairs.refusal_creditor_street
+    fin['bank_city1'] = financial_affairs.refusal_creditor_city
+    fin['bank_state1'] = financial_affairs.refusal_creditor_state
+    fin['bank_zip1'] = financial_affairs.refusal_creditor_zip
+    fin['bank_action1'] = financial_affairs.refusal_description
+    fin['bank_date1'] = format_date(financial_affairs.refusal_date, format='MM/dd/yyyy')
+    fin['bank_amount1'] = currency(financial_affairs.refusal_amount)
+    fin['bank_acct1'] = financial_affairs.refusal_account_number
 
   fin['noAssignee'] = True if financial_affairs.other_assignee == False else False
   fin['yesAssignee'] = True if financial_affairs.other_assignee == True else False
@@ -2831,22 +2837,24 @@ code: |
 
   fin['noCharity'] = True if financial_affairs.has_charity == False else False
   fin['yesCharity'] = True if financial_affairs.has_charity == True else False
-  fin['charity_desc1'] = financial_affairs.charity_description
-  fin['charity1'] = financial_affairs.charity_name
-  fin['charity_date1-1'] = financial_affairs.charity_date_1
-  fin['charity_amt1-1'] = currency(financial_affairs.charity_value_1)
-  fin['charity_amt2-1'] = currency(financial_affairs.charity_value_2)
-  fin['charity_address1'] = financial_affairs.charity_street
-  fin['charity_city1'] = financial_affairs.charity_city
-  fin['charity_state1'] = financial_affairs.charity_state
-  fin['charity_zip1'] = financial_affairs.charity_zip
+  if financial_affairs.has_charity:
+    fin['charity_desc1'] = financial_affairs.charity_description
+    fin['charity1'] = financial_affairs.charity_name
+    fin['charity_date1-1'] = financial_affairs.charity_date_1
+    fin['charity_amt1-1'] = currency(financial_affairs.charity_value_1)
+    fin['charity_amt2-1'] = currency(financial_affairs.charity_value_2)
+    fin['charity_address1'] = financial_affairs.charity_street
+    fin['charity_city1'] = financial_affairs.charity_city
+    fin['charity_state1'] = financial_affairs.charity_state
+    fin['charity_zip1'] = financial_affairs.charity_zip
 
   fin['noLoss'] = True if financial_affairs.has_disaster == False else False
   fin['yesLoss'] = True if financial_affairs.has_disaster == True else False
-  fin['loss_prop_desc'] = financial_affairs.disaster_description
-  fin['loss_insurance_desc'] = financial_affairs.disaster_insurance
-  fin['loss_date'] = financial_affairs.disaster_date
-  fin['loss_amount'] = currency(financial_affairs.disaster_value)
+  if financial_affairs.has_disaster:
+    fin['loss_prop_desc'] = financial_affairs.disaster_description
+    fin['loss_insurance_desc'] = financial_affairs.disaster_insurance
+    fin['loss_date'] = financial_affairs.disaster_date
+    fin['loss_amount'] = currency(financial_affairs.disaster_value)
 
   fin['noConsulting'] = True if financial_affairs.bankruptcy_payments.there_are_any == False else False
   fin['yesConsulting'] = True if financial_affairs.bankruptcy_payments.there_are_any == True else False
@@ -2870,17 +2878,18 @@ code: |
 
   fin['noAid'] = True if financial_affairs.has_creditor_help == False else False
   fin['yesAid'] = True if financial_affairs.has_creditor_help == True else False
-  fin['aid_name1'] = financial_affairs.creditor_help.name
-  fin['aid_describe1'] = financial_affairs.creditor_help.property_description
-  fin['aid_address1'] = financial_affairs.creditor_help.street
-  fin['aid_city1'] = financial_affairs.creditor_help.city
-  fin['aid_state1'] = financial_affairs.creditor_help.state
-  fin['aid_zip1'] = financial_affairs.creditor_help.zip
-  fin['aid_date1-1'] = format_date(financial_affairs.creditor_help.date_1, format='MM/dd/yyyy')
-  fin['aid_amt1-1'] = currency(financial_affairs.creditor_help.value_1)
-  if financial_affairs.creditor_help.value_2 > 0:
-    fin['aid_date2-1'] = format_date(financial_affairs.creditor_help.date_2, format='MM/dd/yyyy')
-    fin['aid_amt2-1'] = currency(financial_affairs.creditor_help.value_2)
+  if financial_affairs.has_creditor_help:
+    fin['aid_name1'] = financial_affairs.creditor_help.name
+    fin['aid_describe1'] = financial_affairs.creditor_help.property_description
+    fin['aid_address1'] = financial_affairs.creditor_help.street
+    fin['aid_city1'] = financial_affairs.creditor_help.city
+    fin['aid_state1'] = financial_affairs.creditor_help.state
+    fin['aid_zip1'] = financial_affairs.creditor_help.zip
+    fin['aid_date1-1'] = format_date(financial_affairs.creditor_help.date_1, format='MM/dd/yyyy')
+    fin['aid_amt1-1'] = currency(financial_affairs.creditor_help.value_1)
+    if financial_affairs.creditor_help.value_2 > 0:
+      fin['aid_date2-1'] = format_date(financial_affairs.creditor_help.date_2, format='MM/dd/yyyy')
+      fin['aid_amt2-1'] = currency(financial_affairs.creditor_help.value_2)
 
   fin['noOrdinary'] = True if financial_affairs.other_transfers.there_are_any == False else False
   fin['yesOrdinary'] = True if financial_affairs.other_transfers.there_are_any == True else False
@@ -2900,9 +2909,10 @@ code: |
 
   fin['noTrust'] = True if financial_affairs.has_self_settled_trust == False else False
   fin['yesTrust'] = True if financial_affairs.has_self_settled_trust == True else False
-  fin['trust_describe'] = financial_affairs.self_settled_trust.description
-  fin['trust_name'] = financial_affairs.self_settled_trust.name
-  fin['trust_date'] = format_date(financial_affairs.self_settled_trust.date, format='MM/dd/yyyy')
+  if financial_affairs.has_self_settled_trust:
+    fin['trust_describe'] = financial_affairs.self_settled_trust.description
+    fin['trust_name'] = financial_affairs.self_settled_trust.name
+    fin['trust_date'] = format_date(financial_affairs.self_settled_trust.date, format='MM/dd/yyyy')
 
   fin['noAccounts'] = True if financial_affairs.instruments.there_are_any == False else False
   fin['yesAccounts'] = True if financial_affairs.instruments.there_are_any == True else False
@@ -2927,95 +2937,101 @@ code: |
 
   fin['noSafe'] = True if financial_affairs.has_deposit_box == False else False
   fin['yesSafe'] = True if financial_affairs.has_deposit_box == True else False
-  fin['safe_bank_name1'] = financial_affairs.deposit_box.name
-  fin['safe_bank_address1'] = financial_affairs.deposit_box.street
-  fin['safe_bank_city1'] = financial_affairs.deposit_box.city
-  fin['safe_bank_state1'] = financial_affairs.deposit_box.state
-  fin['safe_bank_zip1'] = financial_affairs.deposit_box.zip
-  fin['safe_who_name1'] = financial_affairs.deposit_box.other_name
-  fin['safe_who_address1'] = financial_affairs.deposit_box.other_street
-  fin['safe_who_city1'] = financial_affairs.deposit_box.other_city
-  fin['safe_who_state1'] = financial_affairs.deposit_box.other_state
-  fin['safe_who_zip1'] = financial_affairs.deposit_box.other_zip
-  fin['safe_describe1'] = financial_affairs.deposit_box.contents
-  if financial_affairs.deposit_box.still_owns == True:
-    fin['safe_yesHave1'] = True
-  else:
-    fin['save_noHave1'] = True
+  if financial_affairs.has_deposit_box:
+    fin['safe_bank_name1'] = financial_affairs.deposit_box.name
+    fin['safe_bank_address1'] = financial_affairs.deposit_box.street
+    fin['safe_bank_city1'] = financial_affairs.deposit_box.city
+    fin['safe_bank_state1'] = financial_affairs.deposit_box.state
+    fin['safe_bank_zip1'] = financial_affairs.deposit_box.zip
+    fin['safe_who_name1'] = financial_affairs.deposit_box.other_name
+    fin['safe_who_address1'] = financial_affairs.deposit_box.other_street
+    fin['safe_who_city1'] = financial_affairs.deposit_box.other_city
+    fin['safe_who_state1'] = financial_affairs.deposit_box.other_state
+    fin['safe_who_zip1'] = financial_affairs.deposit_box.other_zip
+    fin['safe_describe1'] = financial_affairs.deposit_box.contents
+    if financial_affairs.deposit_box.still_owns == True:
+      fin['safe_yesHave1'] = True
+    else:
+      fin['save_noHave1'] = True
 
   fin['noStorage'] = True if financial_affairs.has_storage_unit == False else False
   fin['yesStorage'] = True if financial_affairs.has_storage_unit == True else False
-  fin['storage_bank_name1'] = financial_affairs.storage_unit.name
-  fin['storage_bank_address1'] = financial_affairs.storage_unit.street
-  fin['storage_bank_city1'] = financial_affairs.storage_unit.city
-  fin['storage_bank_state1'] = financial_affairs.storage_unit.state
-  fin['storage_bank_zip1'] = financial_affairs.storage_unit.zip
-  fin['storage_who_name1'] = financial_affairs.storage_unit.other_name
-  fin['storage_who_address1'] = financial_affairs.storage_unit.other_street
-  fin['storage_who_city1'] = financial_affairs.storage_unit.other_city
-  fin['storage_who_state1'] = financial_affairs.storage_unit.other_state
-  fin['storage_who_zip1'] = financial_affairs.storage_unit.other_zip
-  fin['storage_describe1'] = financial_affairs.storage_unit.contents
-  fin['storage_noHave1'] = True if financial_affairs.storage_unit.still_owns == False else False
-  fin['storage_yesHave1'] = True if financial_affairs.storage_unit.still_owns == True else False
+  if financial_affairs.has_storage_unit:
+    fin['storage_bank_name1'] = financial_affairs.storage_unit.name
+    fin['storage_bank_address1'] = financial_affairs.storage_unit.street
+    fin['storage_bank_city1'] = financial_affairs.storage_unit.city
+    fin['storage_bank_state1'] = financial_affairs.storage_unit.state
+    fin['storage_bank_zip1'] = financial_affairs.storage_unit.zip
+    fin['storage_who_name1'] = financial_affairs.storage_unit.other_name
+    fin['storage_who_address1'] = financial_affairs.storage_unit.other_street
+    fin['storage_who_city1'] = financial_affairs.storage_unit.other_city
+    fin['storage_who_state1'] = financial_affairs.storage_unit.other_state
+    fin['storage_who_zip1'] = financial_affairs.storage_unit.other_zip
+    fin['storage_describe1'] = financial_affairs.storage_unit.contents
+    fin['storage_noHave1'] = True if financial_affairs.storage_unit.still_owns == False else False
+    fin['storage_yesHave1'] = True if financial_affairs.storage_unit.still_owns == True else False
 
   fin['noControl'] = True if financial_affairs.has_held_property == False else False
   fin['yesControl'] = True if financial_affairs.has_held_property == True else False
-  fin['control_owner'] = financial_affairs.held_property.name
-  fin['control_owner_address'] = financial_affairs.held_property.street
-  fin['control_owner_city'] = financial_affairs.held_property.city
-  fin['control_owner_state'] = financial_affairs.held_property.state
-  fin['control_owner_zip'] = financial_affairs.held_property.zip
-  fin['control_prop_address'] = financial_affairs.held_property.prop_street
-  fin['control_prop_city'] = financial_affairs.held_property.prop_city
-  fin['control_prop_state'] = financial_affairs.held_property.prop_state
-  fin['control_prop_zip'] = financial_affairs.held_property.prop_zip
-  fin['control_describe'] = financial_affairs.held_property.property_description
-  fin['control_value'] = currency(financial_affairs.held_property.value)
+  if financial_affairs.has_held_property:
+    fin['control_owner'] = financial_affairs.held_property.name
+    fin['control_owner_address'] = financial_affairs.held_property.street
+    fin['control_owner_city'] = financial_affairs.held_property.city
+    fin['control_owner_state'] = financial_affairs.held_property.state
+    fin['control_owner_zip'] = financial_affairs.held_property.zip
+    fin['control_prop_address'] = financial_affairs.held_property.prop_street
+    fin['control_prop_city'] = financial_affairs.held_property.prop_city
+    fin['control_prop_state'] = financial_affairs.held_property.prop_state
+    fin['control_prop_zip'] = financial_affairs.held_property.prop_zip
+    fin['control_describe'] = financial_affairs.held_property.property_description
+    fin['control_value'] = currency(financial_affairs.held_property.value)
 
   fin['noLiability'] = True if financial_affairs.environment.has_liability == False else False
   fin['yesLiability'] = True if financial_affairs.environment.has_liability == True else False
-  fin['liability_describe'] = financial_affairs.environment.liability_law
-  fin['liability_date'] = format_date(financial_affairs.environment.liability_date, format='MM/dd/yyyy')
-  fin['liability_site'] = financial_affairs.environment.liability_name
-  fin['liability_site_address'] = financial_affairs.environment.liability_street
-  fin['liability_site_city'] = financial_affairs.environment.liability_city
-  fin['liability_site_state'] = financial_affairs.environment.liability_state
-  fin['liability_site_zip'] = financial_affairs.environment.liability_zip
-  fin['liability_unit'] = financial_affairs.environment.liability_unit_name
-  fin['liability_unit_address'] = financial_affairs.environment.liability_unit_street
-  fin['liability_unit_city'] = financial_affairs.environment.liability_unit_city
-  fin['liability_unit_state'] = financial_affairs.environment.liability_unit_state
-  fin['liability_unit_zip'] = financial_affairs.environment.liability_unit_zip
+  if financial_affairs.environment.has_liability:
+    fin['liability_describe'] = financial_affairs.environment.liability_law
+    fin['liability_date'] = format_date(financial_affairs.environment.liability_date, format='MM/dd/yyyy')
+    fin['liability_site'] = financial_affairs.environment.liability_name
+    fin['liability_site_address'] = financial_affairs.environment.liability_street
+    fin['liability_site_city'] = financial_affairs.environment.liability_city
+    fin['liability_site_state'] = financial_affairs.environment.liability_state
+    fin['liability_site_zip'] = financial_affairs.environment.liability_zip
+    fin['liability_unit'] = financial_affairs.environment.liability_unit_name
+    fin['liability_unit_address'] = financial_affairs.environment.liability_unit_street
+    fin['liability_unit_city'] = financial_affairs.environment.liability_unit_city
+    fin['liability_unit_state'] = financial_affairs.environment.liability_unit_state
+    fin['liability_unit_zip'] = financial_affairs.environment.liability_unit_zip
 
   fin['noHazard'] = True if financial_affairs.environment.has_release == False else False
   fin['yesHazard'] = True if financial_affairs.environment.has_release == True else False
-  fin['hazard_site'] = financial_affairs.environment.release_name
-  fin['hazard_unit'] = financial_affairs.environment.release_unit_name
-  fin['hazard_describe'] = financial_affairs.environment.release_law
-  fin['hazard_date'] = format_date(financial_affairs.environment.release_date, format='MM/dd/yyyy')
-  fin['hazard_address'] = financial_affairs.environment.release_street
-  fin['hazard_city'] = financial_affairs.environment.release_city
-  fin['hazard_state'] = financial_affairs.environment.release_state
-  fin['hazard_zip'] = financial_affairs.environment.release_zip
-  fin['hazard_unit_address'] = financial_affairs.environment.release_unit_street
-  fin['hazard_unit_city'] = financial_affairs.environment.release_unit_city
-  fin['hazard_unit_state'] = financial_affairs.environment.release_unit_state
-  fin['hazard_unit_zip'] = financial_affairs.environment.release_unit_zip
+  if financial_affairs.environment.has_release:
+    fin['hazard_site'] = financial_affairs.environment.release_name
+    fin['hazard_unit'] = financial_affairs.environment.release_unit_name
+    fin['hazard_describe'] = financial_affairs.environment.release_law
+    fin['hazard_date'] = format_date(financial_affairs.environment.release_date, format='MM/dd/yyyy')
+    fin['hazard_address'] = financial_affairs.environment.release_street
+    fin['hazard_city'] = financial_affairs.environment.release_city
+    fin['hazard_state'] = financial_affairs.environment.release_state
+    fin['hazard_zip'] = financial_affairs.environment.release_zip
+    fin['hazard_unit_address'] = financial_affairs.environment.release_unit_street
+    fin['hazard_unit_city'] = financial_affairs.environment.release_unit_city
+    fin['hazard_unit_state'] = financial_affairs.environment.release_unit_state
+    fin['hazard_unit_zip'] = financial_affairs.environment.release_unit_zip
 
   fin['noEnvLaw'] = True if financial_affairs.environment.has_proceeding == False else False
   fin['yesEnvLaw'] = True if financial_affairs.environment.has_proceeding == True else False
-  fin['env_title'] = financial_affairs.environment.proceeding_case_title
-  fin['env_caseNumber'] = financial_affairs.environment.proceeding_case_number
-  fin['env_court'] = financial_affairs.environment.proceeding_court_name
-  fin['env_court_address'] = financial_affairs.environment.proceeding_court_street
-  fin['env_court_city'] = financial_affairs.environment.proceeding_court_city
-  fin['env_court_state'] = financial_affairs.environment.proceeding_court_state
-  fin['env_court_zip'] = financial_affairs.environment.proceeding_court_zip
-  fin['env_nature'] = financial_affairs.environment.proceeding_description
-  fin['env_isPending'] = True if financial_affairs.environment.proceeding_status == 'Pending' else False
-  fin['env_isAppeal'] = True if financial_affairs.environment.proceeding_status == 'On appeal' else False
-  fin['env_isConcluded'] = True if financial_affairs.environment.proceeding_status == 'Concluded' else False
+  if financial_affairs.environment.has_proceeding:
+    fin['env_title'] = financial_affairs.environment.proceeding_case_title
+    fin['env_caseNumber'] = financial_affairs.environment.proceeding_case_number
+    fin['env_court'] = financial_affairs.environment.proceeding_court_name
+    fin['env_court_address'] = financial_affairs.environment.proceeding_court_street
+    fin['env_court_city'] = financial_affairs.environment.proceeding_court_city
+    fin['env_court_state'] = financial_affairs.environment.proceeding_court_state
+    fin['env_court_zip'] = financial_affairs.environment.proceeding_court_zip
+    fin['env_nature'] = financial_affairs.environment.proceeding_description
+    fin['env_isPending'] = True if financial_affairs.environment.proceeding_status == 'Pending' else False
+    fin['env_isAppeal'] = True if financial_affairs.environment.proceeding_status == 'On appeal' else False
+    fin['env_isConcluded'] = True if financial_affairs.environment.proceeding_status == 'Concluded' else False
 
   fin['yesSole'] = financial_affairs.business_types['A sole proprietor or self-employed in a trade, profession, or other activity, either full-time or part-time']
   fin['yesLLC'] = financial_affairs.business_types['A member of a limited liability company (LLC) or limited liability partnership (LLP)']
@@ -3045,10 +3061,11 @@ code: |
 
   fin['noFinancials'] = True if financial_affairs.has_statement == False else False
   fin['yesFinancials'] = True if financial_affairs.has_statement == True else False
-  fin['financials_name'] = financial_affairs.statement_name
-  fin['financials_date'] = format_date(financial_affairs.statement_date, format='MM/dd/yyyy')
-  fin['financials_address'] = financial_affairs.statement_street
-  fin['financials_state'] = financial_affairs.statement_state
-  fin['financials_city'] = financial_affairs.statement_city
-  fin['financials_zip'] = financial_affairs.statement_zip
+  if financial_affairs.has_statement:
+    fin['financials_name'] = financial_affairs.statement_name
+    fin['financials_date'] = format_date(financial_affairs.statement_date, format='MM/dd/yyyy')
+    fin['financials_address'] = financial_affairs.statement_street
+    fin['financials_state'] = financial_affairs.statement_state
+    fin['financials_city'] = financial_affairs.statement_city
+    fin['financials_zip'] = financial_affairs.statement_zip
 

@@ -206,13 +206,12 @@ code: |
   
   if prop.exempt_property.claim_homestead_exemption == True:
     sc['hasHomestead'] = True
+    if prop.exempt_property.homestead_within_timeframe == True:
+      sc['isWithinTime'] = True
+    else:
+      sc['notWithinTime'] = True
   else:
     sc['noHomestead'] = True
-  
-  if prop.exempt_property.homestead_within_timeframe == True:
-    sc['isWithinTime'] = True
-  else:
-    sc['notWithinTime'] = True
 ---
 attachment:
   - name: Form 106C

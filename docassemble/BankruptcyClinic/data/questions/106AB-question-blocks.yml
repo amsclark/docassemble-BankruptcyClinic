@@ -6263,7 +6263,7 @@ code: |
       sc['line'+str(sc_i)] = "31.3"
       sc_i += 1
       ol_i += 1
-    if prop.owed_property.third_insurance_interest_has_claim and prop.owed_property.third_insuarance_interest_exemption_value_2:
+    if prop.owed_property.third_insurance_interest_has_claim and prop.owed_property.third_insurance_interest_exemption_value_2:
       sc['desc'+str(sc_i)] = "Owed insurance"
       sc['currOwnedVal'+str(sc_i)] = prop.owed_property.third_insurance_interest_amount
       sc['isCustExempt'+str(sc_i)] = prop.owed_property.third_insurance_interest_sub_100

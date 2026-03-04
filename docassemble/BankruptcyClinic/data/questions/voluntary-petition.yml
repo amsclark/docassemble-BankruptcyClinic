@@ -579,6 +579,9 @@ code: |
   debtor[0].expenses.util_electric
   debtor[0].expenses.util_garbage
   debtor[0].expenses.util_other
+  if not debtor[0].expenses.util_other:
+    debtor[0].expenses.util_other_amount = 0
+    debtor[0].expenses.util_other_specify = ''
   debtor[0].expenses.house_supplies
   debtor[0].expenses.childcare
   debtor[0].expenses.clothing
@@ -591,6 +594,9 @@ code: |
   debtor[0].expenses.health_insurance
   debtor[0].expenses.vehicle_insurance
   debtor[0].expenses.other_insurance
+  if not debtor[0].expenses.other_insurance:
+    debtor[0].expenses.other_insurance_amount = 0
+    debtor[0].expenses.other_insurance_specify = ''
   debtor[0].expenses.other_tax_specify
   debtor[0].expenses.other_tax_amount
   debtor[0].expenses.vehicle1_payments
@@ -600,6 +606,9 @@ code: |
   debtor[0].expenses.other_payment2_specify
   debtor[0].expenses.other_payment2_amount
   debtor[0].expenses.alimony
+  if not debtor[0].expenses.other_people_expenses:
+    debtor[0].expenses.other_support_specify = ''
+    debtor[0].expenses.other_support_amount = 0
   debtor[0].expenses.other_support_specify
   debtor[0].expenses.other_support_amount
   debtor[0].expenses.change_in_expense
@@ -1120,7 +1129,7 @@ code: |
   prop.priority_claims[i].account_number
   prop.priority_claims[i].date_incurred
   prop.priority_claims[i].contingent
-  prop.priority_claims[i].unliquified
+  prop.priority_claims[i].unliquidated
   prop.priority_claims[i].disputed
   prop.priority_claims[i].type
   prop.priority_claims[i].total_claim
@@ -1139,7 +1148,7 @@ code: |
   prop.nonpriority_claims[i].account_number
   prop.nonpriority_claims[i].date_incurred
   prop.nonpriority_claims[i].contingent
-  prop.nonpriority_claims[i].unliquified
+  prop.nonpriority_claims[i].unliquidated
   prop.nonpriority_claims[i].disputed
   prop.nonpriority_claims[i].type
   prop.nonpriority_claims[i].total_claim
