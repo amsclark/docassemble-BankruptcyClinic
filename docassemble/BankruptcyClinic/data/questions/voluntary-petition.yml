@@ -606,11 +606,6 @@ code: |
   debtor[0].expenses.other_payment2_specify
   debtor[0].expenses.other_payment2_amount
   debtor[0].expenses.alimony
-  if not debtor[0].expenses.other_people_expenses:
-    debtor[0].expenses.other_support_specify = ''
-    debtor[0].expenses.other_support_amount = 0
-  debtor[0].expenses.other_support_specify
-  debtor[0].expenses.other_support_amount
   debtor[0].expenses.change_in_expense
 
   #107

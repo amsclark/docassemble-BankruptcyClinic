@@ -412,17 +412,19 @@ code: |
   expenses['isJoint'] = True if debtor[0].expenses.joint_case == True else False
   expenses['notSameHouse'] = True if getattr(debtor[0].expenses, 'other_household', False) == False else False
   expenses['isSameHouse'] = True if getattr(debtor[0].expenses, 'other_household', False) == True else False
-  expenses['noDependents'] = True if len(debtor[0].expenses.dependents) == 0 else False
-  expenses['hasDependents'] = True if len(debtor[0].expenses.dependents) > 0 else False
+  _has_deps = defined('debtor[0].expenses.dependents.there_are_any') and debtor[0].expenses.dependents.there_are_any
+  expenses['noDependents'] = not _has_deps
+  expenses['hasDependents'] = _has_deps
 
-  i = 1
-  for dep in debtor[0].expenses.dependents:
-    expenses['relation'+str(i)] = dep.relationship
-    expenses['age'+str(i)] = dep.age
-    expenses['noLivesWith'+str(i)] = True if dep.same_residence == False else False
-    expenses['yesLivesWith'+str(i)] = True if dep.same_residence == True else False
+  if _has_deps:
+    i = 1
+    for dep in debtor[0].expenses.dependents:
+      expenses['relation'+str(i)] = dep.relationship
+      expenses['age'+str(i)] = dep.age
+      expenses['noLivesWith'+str(i)] = True if dep.same_residence == False else False
+      expenses['yesLivesWith'+str(i)] = True if dep.same_residence == True else False
 
-    i += 1
+      i += 1
 
   expenses['rentExpense'] = currency(debtor[0].expenses.rent_expense)
   expenses['taxes'] = currency(debtor[0].expenses.real_estate_taxes)
