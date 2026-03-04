@@ -41,7 +41,7 @@ const MAXIMALIST: TestScenario = {
     street: '1234 Max Test Ave', city: 'Omaha', state: 'Nebraska', zip: '68102',
     countyIndex: 3, taxIdType: 'ssn', taxId: '111-22-3333',
     hasMailing: true,
-    mailStreet: 'PO Box 5555', mailCity: 'Omaha', mailState: 'NE', mailZip: '68101',
+    mailStreet: 'PO Box 5555', mailCity: 'Omaha', mailState: 'Nebraska', mailZip: '68101',
     aliases: [{ first: 'Maxi', last: 'Test' }, { first: 'M.Q.', last: 'Testworth' }],
   },
   spouse: {
@@ -49,7 +49,7 @@ const MAXIMALIST: TestScenario = {
     street: '1234 Max Test Ave', city: 'Omaha', state: 'Nebraska', zip: '68102',
     countyIndex: 3, taxIdType: 'ssn', taxId: '444-55-6666',
     hasMailing: true,
-    mailStreet: 'PO Box 5555', mailCity: 'Omaha', mailState: 'NE', mailZip: '68101',
+    mailStreet: 'PO Box 5555', mailCity: 'Omaha', mailState: 'Nebraska', mailZip: '68101',
     aliases: [{ first: 'Max', last: 'Testy' }],
   },
   jointFiling: true,

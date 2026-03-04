@@ -111,7 +111,7 @@ subquestion: |
 
   ### Statement of Financial Affairs (Form 107)
 
-  [Revisit financial affairs](${ url_action('form_107') if defined('form_107') else url_action('review_answers') })
+  [Revisit financial affairs](${ url_action('form_107') })
 
   ---
 

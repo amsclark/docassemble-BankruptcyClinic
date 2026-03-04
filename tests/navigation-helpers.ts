@@ -737,19 +737,7 @@ export async function navigateIncome(page: Page, scenario: TestScenario) {
   await selectByName(page, b64('debtor[0].income.employment'), 'Not employed');
   await clickContinue(page);
 
-  await waitForDaPageLoad(page);
-  await fillById(page, b64('debtor[0].income.income_amount_1'), '0');
-  await fillById(page, b64('debtor[0].income.overtime_pay_1'), '0');
-  await clickContinue(page);
-
-  await waitForDaPageLoad(page);
-  await fillById(page, b64('debtor[0].income.tax_deduction'), '0');
-  await clickContinue(page);
-
-  await waitForDaPageLoad(page);
-  await fillYesNoRadio(page, 'debtor[0].income.other_deduction', false);
-  await clickContinue(page);
-
+  // 'Not employed' skips payroll pages (wages, deductions) — go straight to non-employment income
   await waitForDaPageLoad(page);
   await fillById(page, b64('debtor[0].income.net_rental_business'), '0');
   await fillById(page, b64('debtor[0].income.interest_and_dividends'), '0');
@@ -768,55 +756,30 @@ export async function navigateIncome(page: Page, scenario: TestScenario) {
   await page.waitForTimeout(300);
   await clickContinue(page);
 
-  // Debtor 2 income (joint filing with married couple)
-  // The interview asks for debtor[1].income when len(debtor) > 1 and marital_status is True
+  // Debtor 2 income (joint filing)
   if (scenario.jointFiling) {
     await waitForDaPageLoad(page);
     await selectByName(page, b64('debtor[1].income.employment'), 'Not employed');
     await clickContinue(page);
 
-    // If the debtor[1] income details page appears (Check 1-6), fill and continue.
-    // This handles the case where the YAML "Not employed" path doesn't fully skip this page.
+    // 'Not employed' skips payroll pages — go straight to non-employment income
     await waitForDaPageLoad(page);
-    const heading = await page.locator('h1').first().textContent().catch(() => '');
-    console.log(`  [navigateIncome] After debtor[1] employment, heading: "${heading}"`);
-    if (heading?.toLowerCase().includes('monthly income')) {
-      console.log('  [navigateIncome] Detected debtor[1] income details page — filling...');
-      // Fill Check 1 required fields with 0 (Checks 2-6 are optional)
-      await fillById(page, b64('debtor[1].income.income_amount_1'), '0');
-      await fillById(page, b64('debtor[1].income.overtime_pay_1'), '0');
-      await clickContinue(page);
+    await fillById(page, b64('debtor[1].income.net_rental_business'), '0');
+    await fillById(page, b64('debtor[1].income.interest_and_dividends'), '0');
+    await fillById(page, b64('debtor[1].income.family_support'), '0');
+    await fillById(page, b64('debtor[1].income.unemployment'), '0');
+    await fillById(page, b64('debtor[1].income.social_security'), '0');
+    await fillById(page, b64('debtor[1].income.other_govt_assist'), '0');
+    await fillById(page, b64('debtor[1].income.pension'), '0');
+    await fillYesNoRadio(page, 'debtor[1].income.other_monthly_income', false);
+    await clickContinue(page);
 
-      // Tax deduction page
-      await waitForDaPageLoad(page);
-      await fillById(page, b64('debtor[1].income.tax_deduction'), '0');
-      await clickContinue(page);
-
-      // Other deduction → No
-      await waitForDaPageLoad(page);
-      await fillYesNoRadio(page, 'debtor[1].income.other_deduction', false);
-      await clickContinue(page);
-
-      // Other income fields → all 0
-      await waitForDaPageLoad(page);
-      await fillById(page, b64('debtor[1].income.net_rental_business'), '0');
-      await fillById(page, b64('debtor[1].income.interest_and_dividends'), '0');
-      await fillById(page, b64('debtor[1].income.family_support'), '0');
-      await fillById(page, b64('debtor[1].income.unemployment'), '0');
-      await fillById(page, b64('debtor[1].income.social_security'), '0');
-      await fillById(page, b64('debtor[1].income.other_govt_assist'), '0');
-      await fillById(page, b64('debtor[1].income.pension'), '0');
-      await fillYesNoRadio(page, 'debtor[1].income.other_monthly_income', false);
-      await clickContinue(page);
-
-      // Contributions + expected changes → No
-      await waitForDaPageLoad(page);
-      await selectYesNoRadio(page, 'debtor[1].income.other_regular_contributions', false);
-      await page.waitForTimeout(300);
-      await selectYesNoRadio(page, 'debtor[1].income.expect_year_delta', false);
-      await page.waitForTimeout(300);
-      await clickContinue(page);
-    }
+    await waitForDaPageLoad(page);
+    await selectYesNoRadio(page, 'debtor[1].income.other_regular_contributions', false);
+    await page.waitForTimeout(300);
+    await selectYesNoRadio(page, 'debtor[1].income.expect_year_delta', false);
+    await page.waitForTimeout(300);
+    await clickContinue(page);
   }
 
   await waitForDaPageLoad(page);

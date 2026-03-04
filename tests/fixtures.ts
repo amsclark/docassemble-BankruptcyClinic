@@ -364,7 +364,7 @@ export const COMPLEX_CASE: TestScenario = {
     hasMailing: true,
     mailStreet: 'PO Box 999',
     mailCity: 'Omaha',
-    mailState: 'NE',
+    mailState: 'Nebraska',
     mailZip: '68101',
     aliases: [{ first: 'Patty', last: "O'Brien" }],
   },

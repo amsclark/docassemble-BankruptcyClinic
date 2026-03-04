@@ -335,7 +335,7 @@ export async function fillDebtorIdentity(
     await page.waitForTimeout(500);
     await fillById(page, b64('_field_13'), opts.mailStreet ?? '');
     await fillById(page, b64('_field_14'), opts.mailCity ?? '');
-    await fillById(page, b64('_field_15'), opts.mailState ?? '');
+    await selectById(page, b64('debtor[i].mailing_state'), opts.mailState ?? '');
     await fillById(page, b64('_field_16'), opts.mailZip ?? '');
   }
 
