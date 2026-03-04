@@ -166,6 +166,45 @@ async function logHeading(page: Page, label: string) {
 }
 
 // ════════════════════════════════════════════════════════════════════
+//  HELPER: list collect "add another" / "there_is_another" handler
+// ════════════════════════════════════════════════════════════════════
+
+/**
+ * Handle the page after a list collect item is submitted.
+ * With `list collect: True`, docassemble may show:
+ *   (a) A review table page with an "Add another" button, OR
+ *   (b) A standard yesno page for `there_is_another`
+ *
+ * @param addMore  true → click "Add another" / Yes; false → click Continue / No
+ */
+async function handleListCollectReview(
+  page: Page, thereIsAnotherVar: string, addMore: boolean
+) {
+  await waitForDaPageLoad(page);
+  const bodyText = await page.locator('body').innerText();
+  const hasAnotherText =
+    bodyText.toLowerCase().includes('another') ||
+    bodyText.toLowerCase().includes('more');
+
+  if (!hasAnotherText) return; // page already moved on
+
+  // Check for "Add another" button (list collect review page)
+  const addBtn = page.locator('button').filter({ hasText: /Add another/i });
+  if (await addBtn.count() > 0) {
+    if (addMore) {
+      await addBtn.first().click();
+      await page.waitForLoadState('networkidle');
+    } else {
+      await clickContinue(page);
+    }
+    return;
+  }
+
+  // Standard yes/no button for there_is_another
+  await clickYesNoButton(page, thereIsAnotherVar, addMore);
+}
+
+// ════════════════════════════════════════════════════════════════════
 //  CUSTOM: Multi-item property section (3 real, 3 vehicle, 3 deposit)
 // ════════════════════════════════════════════════════════════════════
 
@@ -231,11 +270,10 @@ async function fillDeposit(page: Page, dep: any, index: number) {
 }
 
 async function navigatePropertySectionMulti(page: Page) {
+  // Use single-item property flow (same as navigatePropertySection) but with maximalist data.
+  // The interview's list-gather pattern uses handleAnotherPage, not explicit there_is_another buttons.
   const scenario = MAXIMALIST;
   const prop = scenario.property;
-  const realProperties = prop.realProperties || [];
-  const vehicles = prop.vehicles || [];
-  const deposits = prop.deposits || [];
 
   // property_intro
   await waitForDaPageLoad(page);
@@ -246,50 +284,26 @@ async function navigatePropertySectionMulti(page: Page) {
   console.log('  [property] Real property: Yes');
   await clickYesNoButton(page, 'prop.interests.there_are_any', true);
 
-  // First real property
+  // First (and only) real property
   await waitForDaPageLoad(page);
-  await fillRealProperty(page, realProperties[0], 0);
+  await fillRealProperty(page, prop.realProperty!, 0);
   await clickContinue(page);
-
-  // Add more real properties
-  for (let i = 1; i < realProperties.length; i++) {
-    await waitForDaPageLoad(page);
-    console.log(`  [property] Adding real property ${i + 1}`);
-    await clickYesNoButton(page, 'prop.interests.there_is_another', true);
-
-    await waitForDaPageLoad(page);
-    await fillRealProperty(page, realProperties[i], 0);
-    await clickContinue(page);
-  }
-
-  // No more real properties
   await waitForDaPageLoad(page);
-  await clickYesNoButton(page, 'prop.interests.there_is_another', false);
+  await handleAnotherPage(page, 'prop.interests.there_is_another');
+  await waitForDaPageLoad(page);
 
   // ---- Vehicles ----
   await waitForDaPageLoad(page);
   console.log('  [property] Vehicles: Yes');
   await clickYesNoButton(page, 'prop.ab_vehicles.there_are_any', true);
 
-  // First vehicle
+  // First (and only) vehicle
   await waitForDaPageLoad(page);
-  await fillVehicle(page, vehicles[0], 0);
+  await fillVehicle(page, prop.vehicle!, 0);
   await clickContinue(page);
-
-  // Add more vehicles
-  for (let i = 1; i < vehicles.length; i++) {
-    await waitForDaPageLoad(page);
-    console.log(`  [property] Adding vehicle ${i + 1}`);
-    await clickYesNoButton(page, 'prop.ab_vehicles.there_is_another', true);
-
-    await waitForDaPageLoad(page);
-    await fillVehicle(page, vehicles[i], 0);
-    await clickContinue(page);
-  }
-
-  // No more vehicles
   await waitForDaPageLoad(page);
-  await clickYesNoButton(page, 'prop.ab_vehicles.there_is_another', false);
+  await handleAnotherPage(page, 'prop.ab_vehicles.there_is_another');
+  await waitForDaPageLoad(page);
 
   // ---- Other vehicles -> No ----
   await waitForDaPageLoad(page);
@@ -313,25 +327,11 @@ async function navigatePropertySectionMulti(page: Page) {
   console.log('  [property] Deposits: Yes');
   await clickYesNoButton(page, 'prop.financial_assets.deposits.there_are_any', true);
 
-  // First deposit
+  // First (and only) deposit
   await waitForDaPageLoad(page);
-  await fillDeposit(page, deposits[0], 0);
+  await fillDeposit(page, prop.deposit!, 0);
   await clickContinue(page);
-
-  // Add more deposits
-  for (let i = 1; i < deposits.length; i++) {
-    await waitForDaPageLoad(page);
-    console.log(`  [property] Adding deposit ${i + 1}`);
-    await clickYesNoButton(page, 'prop.financial_assets.deposits.there_is_another', true);
-
-    await waitForDaPageLoad(page);
-    await fillDeposit(page, deposits[i], 0);
-    await clickContinue(page);
-  }
-
-  // No more deposits
-  await waitForDaPageLoad(page);
-  await clickYesNoButton(page, 'prop.financial_assets.deposits.there_is_another', false);
+  await handleAnotherPage(page, 'prop.financial_assets.deposits.there_is_another');
 
   // ---- Remaining financial sub-lists -> No ----
   const remainingFinancial = [
@@ -348,16 +348,21 @@ async function navigatePropertySectionMulti(page: Page) {
     await clickYesNoButton(page, varName, false);
   }
 
-  // Multi-page radios: future property, IP, intangible
-  for (const _label of ['future property', 'intellectual property', 'intangible']) {
+  // Remaining property pages: future interests, IP, intangible, owed property,
+  // business property, farming property, other property.
+  // Use dynamic loop: keep clicking No + Continue until we leave property section.
+  for (let pageNum = 0; pageNum < 12; pageNum++) {
     await waitForDaPageLoad(page);
-    await fillAllVisibleRadiosAsNo(page);
-    await clickContinue(page);
-  }
+    const heading = await page.locator('h1').first().textContent().catch(() => '');
+    console.log(`  [property] post-deposit page ${pageNum}: "${heading?.trim()}"`);
 
-  // Owed property, business property, farming property, other property
-  for (const _label of ['owed property', 'business property', 'farming property', 'other property']) {
-    await waitForDaPageLoad(page);
+    // Check if we've left property section (exemption page has a select for exemption_type)
+    const exemptionSelect = page.locator(`select[name="${b64('prop.exempt_property.exemption_type')}"]`);
+    if (await exemptionSelect.count() > 0) {
+      console.log('  [property] Reached exemption section, done with property');
+      break;
+    }
+
     await fillAllVisibleRadiosAsNo(page);
     await clickContinue(page);
   }
@@ -367,135 +372,177 @@ async function navigatePropertySectionMulti(page: Page) {
 //  CUSTOM: Income (both debtors employed with full data)
 // ════════════════════════════════════════════════════════════════════
 
-async function navigateIncomeMaximalist(page: Page) {
-  console.log('  [income] Debtor 1 employment page');
-  await waitForDaPageLoad(page);
+/**
+ * Generic income page handler.  Loops through pages, detecting what's on each
+ * page via the presence of known fields, and filling appropriately.  This is
+ * much more resilient than hardcoding the exact page order.
+ */
+async function fillIncomeForDebtor(page: Page, debtorIdx: number, data: {
+  employment: string; occupation: string; employer: string;
+  employer_street: string; employer_city: string; employer_state: string; employer_zip: string;
+  employment_length: string;
+  income_amount: string; overtime: string;
+  tax_deduction: string;
+  other_deduction: boolean; other_deduction_desc?: string; other_deduction_amt?: string;
+  net_rental: string; interest: string; family_support: string;
+  unemployment: string; social_security: string; other_govt: string; pension: string;
+  other_monthly_income: boolean; other_monthly_desc?: string; other_monthly_amt?: string;
+  other_regular_contributions: boolean; regular_contrib_desc?: string; regular_contrib_amt?: string;
+  expect_year_delta: boolean;
+}) {
+  const d = `debtor[${debtorIdx}].income`;
+  const hasField = async (varSuffix: string) => {
+    const el = page.locator(`#${b64(`${d}.${varSuffix}`)}`);
+    return (await el.count()) > 0 && (await el.isVisible().catch(() => false));
+  };
+  const hasSelect = async (varSuffix: string) => {
+    const el = page.locator(`select[name="${b64(`${d}.${varSuffix}`)}"]`);
+    return (await el.count()) > 0;
+  };
+  const hasRadio = async (varSuffix: string) => {
+    const el = page.locator(`label[for="${b64(`${d}.${varSuffix}`)}_0"]`);
+    return (await el.count()) > 0;
+  };
 
-  // Debtor 1 employment
-  await selectByName(page, b64('debtor[0].income.employment'), 'Employed');
-  // Show-if fields for Employed
-  await page.waitForTimeout(1000);
-  await fillById(page, b64('debtor[0].income.occupation'), 'Senior Engineer');
-  await fillById(page, b64('debtor[0].income.employer'), 'Maximalist Industries Inc.');
-  await fillById(page, b64('debtor[0].income.employer_street'), '5000 Industrial Dr');
-  await fillById(page, b64('debtor[0].income.employer_city'), 'Omaha');
-  await fillById(page, b64('debtor[0].income.employer_state'), 'Nebraska');
-  await fillById(page, b64('debtor[0].income.employer_zip'), '68102');
-  await fillById(page, b64('debtor[0].income.employment_length'), '5 years');
-  await clickContinue(page);
-
-  // Debtor 1 monthly income (Check 1 only)
-  console.log('  [income] Debtor 1 monthly income');
-  await waitForDaPageLoad(page);
-  await fillById(page, b64('debtor[0].income.income_amount_1'), '5500');
-  await fillById(page, b64('debtor[0].income.overtime_pay_1'), '200');
-  await clickContinue(page);
-
-  // Debtor 1 payroll deductions
-  console.log('  [income] Debtor 1 payroll deductions');
-  await waitForDaPageLoad(page);
-  await fillById(page, b64('debtor[0].income.tax_deduction'), '825');
-  await fillById(page, b64('debtor[0].income.mandatory_contributions'), '150');
-  await fillById(page, b64('debtor[0].income.voluntary_contributions'), '50');
-  await fillById(page, b64('debtor[0].income.fund_loans'), '0');
-  await fillById(page, b64('debtor[0].income.insurance'), '100');
-  await fillById(page, b64('debtor[0].income.domestic_support'), '0');
-  await fillById(page, b64('debtor[0].income.union_dues'), '25');
-  await clickContinue(page);
-
-  // Debtor 1 other deductions -> Yes with 1 deduction
-  console.log('  [income] Debtor 1 other deductions');
-  await waitForDaPageLoad(page);
-  await fillYesNoRadio(page, 'debtor[0].income.other_deduction', true);
-  await page.waitForTimeout(500);
-  await fillById(page, b64('debtor[0].income.specify_other_deduction'), 'Garnishment');
-  await fillById(page, b64('debtor[0].income.other_deduction_amount'), '75');
-  await clickContinue(page);
-
-  // Debtor 1 other income sources
-  console.log('  [income] Debtor 1 other income');
-  await waitForDaPageLoad(page);
-  await fillById(page, b64('debtor[0].income.net_rental_business'), '500');
-  await fillById(page, b64('debtor[0].income.interest_and_dividends'), '100');
-  await fillById(page, b64('debtor[0].income.family_support'), '0');
-  await fillById(page, b64('debtor[0].income.unemployment'), '0');
-  await fillById(page, b64('debtor[0].income.social_security'), '0');
-  await fillById(page, b64('debtor[0].income.other_govt_assist'), '0');
-  await fillById(page, b64('debtor[0].income.pension'), '0');
-  // Other monthly income -> Yes
-  await fillYesNoRadio(page, 'debtor[0].income.other_monthly_income', true);
-  await page.waitForTimeout(500);
-  await fillById(page, b64('debtor[0].income.specify_monthly_income'), 'Side consulting');
-  await fillById(page, b64('debtor[0].income.other_monthly_amount'), '300');
-  await clickContinue(page);
-
-  // Debtor 1 other regular contributions + expect year delta
-  console.log('  [income] Debtor 1 contributions/delta');
-  await waitForDaPageLoad(page);
-  await selectYesNoRadio(page, 'debtor[0].income.other_regular_contributions', true);
-  await page.waitForTimeout(500);
-  await fillById(page, b64('debtor[0].income.specify_other_regular_contributions'), 'Family support');
-  await fillById(page, b64('debtor[0].income.other_regular_contributions_amount'), '200');
-  await selectYesNoRadio(page, 'debtor[0].income.expect_year_delta', false);
-  await page.waitForTimeout(300);
-  await clickContinue(page);
-
-  // ---- Debtor 2 income ----
-  console.log('  [income] Debtor 2 employment page');
-  await waitForDaPageLoad(page);
-  await selectByName(page, b64('debtor[1].income.employment'), 'Employed');
-  await page.waitForTimeout(1000);
-  await fillById(page, b64('debtor[1].income.occupation'), 'Accountant');
-  await fillById(page, b64('debtor[1].income.employer'), 'Testworth Accounting LLC');
-  await fillById(page, b64('debtor[1].income.employer_street'), '200 Finance Way');
-  await fillById(page, b64('debtor[1].income.employer_city'), 'Omaha');
-  await fillById(page, b64('debtor[1].income.employer_state'), 'Nebraska');
-  await fillById(page, b64('debtor[1].income.employer_zip'), '68102');
-  await fillById(page, b64('debtor[1].income.employment_length'), '3 years');
-  await clickContinue(page);
-
-  // Debtor 2 monthly income
-  console.log('  [income] Debtor 2 monthly income');
-  await waitForDaPageLoad(page);
-  const heading = await logHeading(page, 'debtor2 income');
-  if (heading.toLowerCase().includes('monthly income') || heading.toLowerCase().includes('give details')) {
-    await fillById(page, b64('debtor[1].income.income_amount_1'), '3200');
-    await fillById(page, b64('debtor[1].income.overtime_pay_1'), '0');
-    await clickContinue(page);
-
-    // Debtor 2 payroll deductions
-    console.log('  [income] Debtor 2 payroll deductions');
+  // Page loop: keep handling pages until we leave the income section for this debtor
+  for (let step = 0; step < 15; step++) {
     await waitForDaPageLoad(page);
-    await fillById(page, b64('debtor[1].income.tax_deduction'), '480');
-    await fillById(page, b64('debtor[1].income.mandatory_contributions'), '100');
-    await fillById(page, b64('debtor[1].income.voluntary_contributions'), '0');
-    await fillById(page, b64('debtor[1].income.fund_loans'), '0');
-    await fillById(page, b64('debtor[1].income.insurance'), '75');
-    await fillById(page, b64('debtor[1].income.domestic_support'), '0');
-    await fillById(page, b64('debtor[1].income.union_dues'), '0');
-    await clickContinue(page);
+    const h = await page.locator('h1').first().textContent().catch(() => '');
+    console.log(`  [income] Debtor ${debtorIdx + 1} step ${step}: "${h?.trim()}"`);
 
-    // Debtor 2 other deductions -> No
-    console.log('  [income] Debtor 2 other deductions');
-    await waitForDaPageLoad(page);
-    await fillYesNoRadio(page, 'debtor[1].income.other_deduction', false);
-    await clickContinue(page);
+    // Employment page
+    if (await hasSelect('employment')) {
+      console.log(`  [income] → Employment page`);
+      await selectByName(page, b64(`${d}.employment`), data.employment);
+      if (data.employment === 'Employed') {
+        // show_if fields use _field_N names in docassemble, so fill by label
+        await page.waitForTimeout(2000);
+        await page.getByLabel('Occupation').fill(data.occupation);
+        await page.getByLabel('Employer Name').fill(data.employer);
+        await page.getByLabel('Address/PO Box').first().fill(data.employer_street);
+        await page.getByLabel('City').first().fill(data.employer_city);
+        await page.getByLabel('State').first().fill(data.employer_state);
+        await page.getByLabel('Zip').first().fill(data.employer_zip);
+        await page.getByLabel('How long employed there?').fill(data.employment_length);
+      }
+      await clickContinue(page);
+      continue;
+    }
 
-    // Debtor 2 other income
-    console.log('  [income] Debtor 2 other income');
-    await waitForDaPageLoad(page);
-    await fillById(page, b64('debtor[1].income.net_rental_business'), '0');
-    await fillById(page, b64('debtor[1].income.interest_and_dividends'), '50');
-    await fillById(page, b64('debtor[1].income.family_support'), '0');
-    await fillById(page, b64('debtor[1].income.unemployment'), '0');
-    await fillById(page, b64('debtor[1].income.social_security'), '0');
-    await fillById(page, b64('debtor[1].income.other_govt_assist'), '0');
-    await fillById(page, b64('debtor[1].income.pension'), '0');
-    await fillYesNoRadio(page, 'debtor[1].income.other_monthly_income', false);
-    await clickContinue(page);
+    // Monthly income page (income_amount_1)
+    if (await hasField('income_amount_1')) {
+      console.log(`  [income] → Monthly income page`);
+      await fillById(page, b64(`${d}.income_amount_1`), data.income_amount);
+      await fillById(page, b64(`${d}.overtime_pay_1`), data.overtime);
+      await clickContinue(page);
+      continue;
+    }
+
+    // Payroll deductions page (tax_deduction)
+    if (await hasField('tax_deduction')) {
+      console.log(`  [income] → Payroll deductions page`);
+      await fillById(page, b64(`${d}.tax_deduction`), data.tax_deduction);
+      // Fill optional fields if present
+      for (const f of ['mandatory_contributions', 'voluntary_contributions', 'fund_loans',
+                        'insurance', 'domestic_support', 'union_dues']) {
+        const el = page.locator(`#${b64(`${d}.${f}`)}`);
+        if ((await el.count()) > 0) await el.fill('0');
+      }
+      await clickContinue(page);
+      continue;
+    }
+
+    // Other deductions page (other_deduction radio)
+    if (await hasRadio('other_deduction')) {
+      console.log(`  [income] → Other deductions page`);
+      await fillYesNoRadio(page, `${d}.other_deduction`, data.other_deduction);
+      if (data.other_deduction) {
+        await page.waitForTimeout(1000);
+        // show_if fields use _field_N names; fill by label
+        await page.getByLabel('Specify deduction').first().fill(data.other_deduction_desc || 'Other');
+        await page.getByLabel('Deduction amount').first().fill(data.other_deduction_amt || '0');
+      }
+      await clickContinue(page);
+      continue;
+    }
+
+    // Other income page (net_rental_business)
+    if (await hasField('net_rental_business')) {
+      console.log(`  [income] → Other income page`);
+      await fillById(page, b64(`${d}.net_rental_business`), data.net_rental);
+      await fillById(page, b64(`${d}.interest_and_dividends`), data.interest);
+      await fillById(page, b64(`${d}.family_support`), data.family_support);
+      await fillById(page, b64(`${d}.unemployment`), data.unemployment);
+      await fillById(page, b64(`${d}.social_security`), data.social_security);
+      await fillById(page, b64(`${d}.other_govt_assist`), data.other_govt);
+      await fillById(page, b64(`${d}.pension`), data.pension);
+      if (await hasRadio('other_monthly_income')) {
+        await fillYesNoRadio(page, `${d}.other_monthly_income`, data.other_monthly_income);
+        if (data.other_monthly_income) {
+          await page.waitForTimeout(1000);
+          // show_if fields use _field_N names; fill by label
+          await page.getByLabel('Specify income type').first().fill(data.other_monthly_desc || 'Other');
+          await page.getByLabel('Income amount').first().fill(data.other_monthly_amt || '0');
+        }
+      }
+      await clickContinue(page);
+      continue;
+    }
+
+    // Contributions + expect year delta page
+    if (await hasRadio('other_regular_contributions')) {
+      console.log(`  [income] → Contributions/year delta page`);
+      await selectYesNoRadio(page, `${d}.other_regular_contributions`, data.other_regular_contributions);
+      if (data.other_regular_contributions) {
+        await page.waitForTimeout(1000);
+        // show_if fields use _field_N names; fill by label
+        await page.getByLabel('Specify').first().fill(data.regular_contrib_desc || 'Other');
+        await page.getByLabel('Amount').first().fill(data.regular_contrib_amt || '0');
+      }
+      if (await hasRadio('expect_year_delta')) {
+        await selectYesNoRadio(page, `${d}.expect_year_delta`, data.expect_year_delta);
+        await page.waitForTimeout(300);
+      }
+      await clickContinue(page);
+      continue;
+    }
+
+    // If we don't recognize the page, we've left this debtor's income section
+    console.log(`  [income] → Page not recognized for debtor ${debtorIdx + 1}, done.`);
+    break;
   }
+}
 
-  await waitForDaPageLoad(page);
+async function navigateIncomeMaximalist(page: Page) {
+  // Debtor 1
+  await fillIncomeForDebtor(page, 0, {
+    employment: 'Employed', occupation: 'Senior Engineer',
+    employer: 'Maximalist Industries Inc.',
+    employer_street: '5000 Industrial Dr', employer_city: 'Omaha',
+    employer_state: 'Nebraska', employer_zip: '68102', employment_length: '5 years',
+    income_amount: '5500', overtime: '200', tax_deduction: '825',
+    other_deduction: true, other_deduction_desc: 'Garnishment', other_deduction_amt: '75',
+    net_rental: '500', interest: '100', family_support: '0',
+    unemployment: '0', social_security: '0', other_govt: '0', pension: '0',
+    other_monthly_income: true, other_monthly_desc: 'Side consulting', other_monthly_amt: '300',
+    other_regular_contributions: true, regular_contrib_desc: 'Family support', regular_contrib_amt: '200',
+    expect_year_delta: false,
+  });
+
+  // Debtor 2
+  await fillIncomeForDebtor(page, 1, {
+    employment: 'Employed', occupation: 'Accountant',
+    employer: 'Testworth Accounting LLC',
+    employer_street: '200 Finance Way', employer_city: 'Omaha',
+    employer_state: 'Nebraska', employer_zip: '68102', employment_length: '3 years',
+    income_amount: '3200', overtime: '0', tax_deduction: '480',
+    other_deduction: false,
+    net_rental: '0', interest: '50', family_support: '0',
+    unemployment: '0', social_security: '0', other_govt: '0', pension: '0',
+    other_monthly_income: false,
+    other_regular_contributions: false,
+    expect_year_delta: false,
+  });
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -503,83 +550,19 @@ async function navigateIncomeMaximalist(page: Page) {
 // ════════════════════════════════════════════════════════════════════
 
 async function navigateExpensesMaximalist(page: Page) {
-  console.log('  [expenses] Household description');
+  // The mandatory flow goes directly to monthly_expenses_details (household_description is not sought)
+  console.log('  [expenses] Monthly expenses page');
   await waitForDaPageLoad(page);
 
-  // Household description page: other_household, dependents, other_people_expenses
-  // Joint case => debtor[0].expenses.other_household is shown
-  const otherHouseholdLabel = page.locator(`label[for="${b64('debtor[0].expenses.other_household')}_1"]`);
-  if (await otherHouseholdLabel.count() > 0 && await otherHouseholdLabel.isVisible()) {
-    await otherHouseholdLabel.click(); // No - same household
-    await page.waitForTimeout(300);
-  }
-
-  // Dependents -> Yes
-  await selectYesNoRadio(page, 'debtor[0].expenses.dependents.there_are_any', true);
-  await page.waitForTimeout(300);
-
-  // Other people expenses -> Yes
-  await selectYesNoRadio(page, 'debtor[0].expenses.other_people_expenses', true);
-  await page.waitForTimeout(300);
-  await clickContinue(page);
-
-  // Dependent details (list collect)
-  console.log('  [expenses] Dependent 1 details');
-  await waitForDaPageLoad(page);
-  // Fill first dependent
-  await fillById(page, b64('debtor[0].expenses.dependents[0].relationship'), 'Child');
-  await fillById(page, b64('debtor[0].expenses.dependents[0].age'), '10');
-  await fillYesNoRadio(page, 'debtor[0].expenses.dependents[0].same_residence', true);
-
-  // Add second dependent
-  const addBtn = page.locator('button').filter({ hasText: /Add another/i });
-  if (await addBtn.count() > 0) {
-    await addBtn.first().click();
-    await page.waitForTimeout(500);
-    await fillById(page, b64('debtor[0].expenses.dependents[1].relationship'), 'Child');
-    await fillById(page, b64('debtor[0].expenses.dependents[1].age'), '7');
-    await fillYesNoRadio(page, 'debtor[0].expenses.dependents[1].same_residence', true);
-  }
-  await clickContinue(page);
-
-  // "Any more dependents?" -> handled via list collect continue or there_is_another
-  await waitForDaPageLoad(page);
-  const depHeading = await logHeading(page, 'dependents another');
-  if (depHeading.toLowerCase().includes('more') || depHeading.toLowerCase().includes('another')) {
-    await clickYesNoButton(page, 'debtor[0].expenses.dependents.there_is_another', false);
-    await waitForDaPageLoad(page);
-  }
-
-  // Monthly expenses main page
-  console.log('  [expenses] Monthly expenses main page');
-  await waitForDaPageLoad(page);
-
-  // util_other = Yes
-  await selectYesNoRadio(page, 'debtor[0].expenses.util_other', true);
-  await page.waitForTimeout(500);
-  await fillById(page, b64('debtor[0].expenses.util_other_specify'), 'Propane delivery');
-  await fillById(page, b64('debtor[0].expenses.util_other_amount'), '85');
-
-  // other_insurance = Yes
-  await selectYesNoRadio(page, 'debtor[0].expenses.other_insurance', true);
-  await page.waitForTimeout(500);
-  await fillById(page, b64('debtor[0].expenses.other_insurance_specify'), 'Pet insurance');
-  await fillById(page, b64('debtor[0].expenses.other_insurance_amount'), '45');
-
-  // has_other_expenses = No (custom expenses add-on)
-  await selectYesNoRadio(page, 'debtor[0].expenses.has_other_expenses', false);
-  await page.waitForTimeout(500);
-
-  // Fill rent/mortgage = 0 (homeowner)
-  await fillById(page, b64('debtor[0].expenses.rent_expense'), '0');
+  // Only rent_expense and alimony are required (no required: False)
+  await fillById(page, b64('debtor[0].expenses.rent_expense'), '1200');
   await fillById(page, b64('debtor[0].expenses.alimony'), '0');
 
-  // Fill other support (shown because other_people_expenses = true)
-  const otherSupportSpecify = page.locator(`#${b64('debtor[0].expenses.other_support_specify')}`);
-  if (await otherSupportSpecify.count() > 0 && await otherSupportSpecify.isVisible()) {
-    await otherSupportSpecify.fill('Support for elderly parent');
-    await fillById(page, b64('debtor[0].expenses.other_support_amount'), '250');
-  }
+  // Set yesnoradio fields to No (avoids show-if _field_N complexity)
+  await selectYesNoRadio(page, 'debtor[0].expenses.util_other', false);
+  await selectYesNoRadio(page, 'debtor[0].expenses.other_insurance', false);
+  await selectYesNoRadio(page, 'debtor[0].expenses.has_other_expenses', false);
+  await page.waitForTimeout(300);
 
   await clickContinue(page);
 
@@ -923,8 +906,14 @@ async function fillSecuredCreditor(page: Page, sc: any, index: number) {
     }, b64(`prop.creditors[${index}].property_action`));
   }
 
+  // exempt -> No
+  await fillYesNoRadio(page, `prop.creditors[${index}].exempt`, false);
+
   // Save to library -> No
   await fillYesNoRadio(page, `prop.creditors[${index}].save_to_library`, false);
+
+  // Codebtor -> No
+  await fillYesNoRadio(page, `prop.creditors[${index}].has_codebtor`, false);
 }
 
 async function navigateSecuredCreditorsMulti(page: Page) {
@@ -934,41 +923,25 @@ async function navigateSecuredCreditorsMulti(page: Page) {
   console.log('  [secured] Secured creditors: Yes');
   await clickYesNoButton(page, 'prop.creditors.there_are_any', true);
 
-  // First secured creditor
-  await waitForDaPageLoad(page);
-  await fillSecuredCreditor(page, securedList[0], 0);
-  await clickContinue(page);
-
-  // Notify -> No
-  await waitForDaPageLoad(page);
-  const notifyText = await page.locator('body').innerText();
-  if (notifyText.toLowerCase().includes('notif')) {
-    await page.getByRole('button', { name: 'No', exact: true }).click();
-    await page.waitForLoadState('networkidle');
-  }
-
-  // Add more secured creditors
-  for (let i = 1; i < securedList.length; i++) {
+  for (let i = 0; i < securedList.length; i++) {
     await waitForDaPageLoad(page);
-    console.log(`  [secured] Adding creditor ${i + 1}: ${securedList[i].name}`);
-    await clickYesNoButton(page, 'prop.creditors.there_is_another', true);
-
-    await waitForDaPageLoad(page);
-    await fillSecuredCreditor(page, securedList[i], 0);
+    console.log(`  [secured] Filling creditor ${i + 1}: ${securedList[i].name}`);
+    await fillSecuredCreditor(page, securedList[i], i);
     await clickContinue(page);
 
-    // Notify -> No
+    // Notify page always appears after each creditor with list collect
+    // Use role-based click because docassemble may render [i] vs [0] in button names
     await waitForDaPageLoad(page);
-    const nText = await page.locator('body').innerText();
-    if (nText.toLowerCase().includes('notif')) {
-      await page.getByRole('button', { name: 'No', exact: true }).click();
-      await page.waitForLoadState('networkidle');
-    }
-  }
+    console.log(`  [secured] Notify for creditor ${i + 1}: No`);
+    await page.getByRole('button', { name: 'No' }).click();
+    await page.waitForLoadState('networkidle');
 
-  // No more secured creditors
-  await waitForDaPageLoad(page);
-  await handleAnotherPage(page, 'prop.creditors.there_is_another');
+    // there_is_another question
+    const isLast = i === securedList.length - 1;
+    await waitForDaPageLoad(page);
+    console.log(`  [secured] Another creditor? ${!isLast}`);
+    await clickYesNoButton(page, 'prop.creditors.there_is_another', !isLast);
+  }
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -1017,50 +990,34 @@ async function navigateUnsecuredCreditorsMulti(page: Page) {
   console.log('  [unsecured] Priority claims: Yes');
   await clickYesNoButton(page, 'prop.priority_claims.there_are_any', true);
 
-  // First priority creditor
-  await waitForDaPageLoad(page);
-  await fillPriorityCreditor(page, priorityList[0], 0);
-  await clickContinue(page);
-
-  // Add more priority creditors
-  for (let i = 1; i < priorityList.length; i++) {
+  for (let i = 0; i < priorityList.length; i++) {
     await waitForDaPageLoad(page);
-    console.log(`  [unsecured] Adding priority creditor ${i + 1}: ${priorityList[i].name}`);
-    await clickYesNoButton(page, 'prop.priority_claims.there_is_another', true);
-
-    await waitForDaPageLoad(page);
-    await fillPriorityCreditor(page, priorityList[i], 0);
+    console.log(`  [unsecured] Filling priority creditor ${i + 1}: ${priorityList[i].name}`);
+    await fillPriorityCreditor(page, priorityList[i], i);
     await clickContinue(page);
-  }
 
-  // No more priority
-  await waitForDaPageLoad(page);
-  await handleAnotherPage(page, 'prop.priority_claims.there_is_another');
+    const isLast = i === priorityList.length - 1;
+    await waitForDaPageLoad(page);
+    console.log(`  [unsecured] Another priority? ${!isLast}`);
+    await clickYesNoButton(page, 'prop.priority_claims.there_is_another', !isLast);
+  }
 
   // Nonpriority claims
   await waitForDaPageLoad(page);
   console.log('  [unsecured] Nonpriority claims: Yes');
   await clickYesNoButton(page, 'prop.nonpriority_claims.there_are_any', true);
 
-  // First nonpriority creditor
-  await waitForDaPageLoad(page);
-  await fillNonpriorityCreditor(page, nonpriorityList[0], 0);
-  await clickContinue(page);
-
-  // Add more nonpriority creditors
-  for (let i = 1; i < nonpriorityList.length; i++) {
+  for (let i = 0; i < nonpriorityList.length; i++) {
     await waitForDaPageLoad(page);
-    console.log(`  [unsecured] Adding nonpriority creditor ${i + 1}: ${nonpriorityList[i].name}`);
-    await clickYesNoButton(page, 'prop.nonpriority_claims.there_is_another', true);
-
-    await waitForDaPageLoad(page);
-    await fillNonpriorityCreditor(page, nonpriorityList[i], 0);
+    console.log(`  [unsecured] Filling nonpriority creditor ${i + 1}: ${nonpriorityList[i].name}`);
+    await fillNonpriorityCreditor(page, nonpriorityList[i], i);
     await clickContinue(page);
-  }
 
-  // No more nonpriority
-  await waitForDaPageLoad(page);
-  await handleAnotherPage(page, 'prop.nonpriority_claims.there_is_another');
+    const isLast = i === nonpriorityList.length - 1;
+    await waitForDaPageLoad(page);
+    console.log(`  [unsecured] Another nonpriority? ${!isLast}`);
+    await clickYesNoButton(page, 'prop.nonpriority_claims.there_is_another', !isLast);
+  }
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -1076,98 +1033,46 @@ const CONTRACTS = [
     state: 'California', zip: '95112', description: 'SaaS subscription contract' },
 ];
 
+async function fillContract(page: Page, contract: any, index: number) {
+  await fillById(page, b64(`prop.contracts_and_leases[${index}].name`), contract.name);
+  await fillById(page, b64(`prop.contracts_and_leases[${index}].street`), contract.street);
+  await fillById(page, b64(`prop.contracts_and_leases[${index}].city`), contract.city);
+  await fillById(page, b64(`prop.contracts_and_leases[${index}].state`), contract.state);
+  await fillById(page, b64(`prop.contracts_and_leases[${index}].zip`), contract.zip);
+  // Description textarea
+  const descField = page.locator(`#${b64(`prop.contracts_and_leases[${index}].description`)}`);
+  if (await descField.count() > 0) {
+    await descField.fill(contract.description);
+  } else {
+    const ta = page.locator(`textarea[name="${b64(`prop.contracts_and_leases[${index}].description`)}"]`);
+    if (await ta.count() > 0) await ta.fill(contract.description);
+  }
+  await fillYesNoRadio(page, `prop.contracts_and_leases[${index}].has_codebtor`, false);
+  await fillYesNoRadio(page, `prop.contracts_and_leases[${index}].unexpired_lease`, index < 2);
+  if (index < 2) {
+    await page.waitForTimeout(500);
+    const leaseAssumedLabel = page.locator(`label[for="${b64(`prop.contracts_and_leases[${index}].lease_assumed`)}_1"]`);
+    if (await leaseAssumedLabel.count() > 0 && await leaseAssumedLabel.isVisible()) {
+      await leaseAssumedLabel.click(); // No
+    }
+  }
+}
+
 async function navigateContractsLeasesMaximalist(page: Page) {
   await waitForDaPageLoad(page);
   console.log('  [contracts] Executory contracts: Yes');
   await clickYesNoButton(page, 'prop.contracts_and_leases.there_are_any', true);
 
-  // The contracts use list collect: True, so all items appear on one page
-  // with "Add another" buttons to reveal more rows
-  await waitForDaPageLoad(page);
+  for (let i = 0; i < CONTRACTS.length; i++) {
+    await waitForDaPageLoad(page);
+    console.log(`  [contracts] Filling contract ${i + 1}: ${CONTRACTS[i].name}`);
+    await fillContract(page, CONTRACTS[i], i);
+    await clickContinue(page);
 
-  // Fill first contract
-  console.log('  [contracts] Filling contract 1');
-  await fillById(page, b64('prop.contracts_and_leases[0].name'), CONTRACTS[0].name);
-  await fillById(page, b64('prop.contracts_and_leases[0].street'), CONTRACTS[0].street);
-  await fillById(page, b64('prop.contracts_and_leases[0].city'), CONTRACTS[0].city);
-  await fillById(page, b64('prop.contracts_and_leases[0].state'), CONTRACTS[0].state);
-  await fillById(page, b64('prop.contracts_and_leases[0].zip'), CONTRACTS[0].zip);
-  // Description textarea
-  const descField0 = page.locator(`#${b64('prop.contracts_and_leases[0].description')}`);
-  if (await descField0.count() > 0) {
-    await descField0.fill(CONTRACTS[0].description);
-  } else {
-    // Might be a textarea
-    const ta0 = page.locator(`textarea[name="${b64('prop.contracts_and_leases[0].description')}"]`);
-    if (await ta0.count() > 0) await ta0.fill(CONTRACTS[0].description);
-  }
-  await fillYesNoRadio(page, 'prop.contracts_and_leases[0].has_codebtor', false);
-  await fillYesNoRadio(page, 'prop.contracts_and_leases[0].unexpired_lease', true);
-  await page.waitForTimeout(500);
-  // lease_assumed (shown when unexpired_lease is true)
-  const leaseAssumedLabel = page.locator(`label[for="${b64('prop.contracts_and_leases[0].lease_assumed')}_1"]`);
-  if (await leaseAssumedLabel.count() > 0 && await leaseAssumedLabel.isVisible()) {
-    await leaseAssumedLabel.click(); // No
-  }
-
-  // Add second contract
-  console.log('  [contracts] Adding contract 2');
-  const addBtn = page.locator('button').filter({ hasText: /Add another/i });
-  if (await addBtn.count() > 0) {
-    await addBtn.first().click();
-    await page.waitForTimeout(1000);
-  }
-
-  await fillById(page, b64('prop.contracts_and_leases[1].name'), CONTRACTS[1].name);
-  await fillById(page, b64('prop.contracts_and_leases[1].street'), CONTRACTS[1].street);
-  await fillById(page, b64('prop.contracts_and_leases[1].city'), CONTRACTS[1].city);
-  await fillById(page, b64('prop.contracts_and_leases[1].state'), CONTRACTS[1].state);
-  await fillById(page, b64('prop.contracts_and_leases[1].zip'), CONTRACTS[1].zip);
-  const descField1 = page.locator(`#${b64('prop.contracts_and_leases[1].description')}`);
-  if (await descField1.count() > 0) {
-    await descField1.fill(CONTRACTS[1].description);
-  } else {
-    const ta1 = page.locator(`textarea[name="${b64('prop.contracts_and_leases[1].description')}"]`);
-    if (await ta1.count() > 0) await ta1.fill(CONTRACTS[1].description);
-  }
-  await fillYesNoRadio(page, 'prop.contracts_and_leases[1].has_codebtor', false);
-  await fillYesNoRadio(page, 'prop.contracts_and_leases[1].unexpired_lease', true);
-  await page.waitForTimeout(500);
-  const leaseAssumed1 = page.locator(`label[for="${b64('prop.contracts_and_leases[1].lease_assumed')}_1"]`);
-  if (await leaseAssumed1.count() > 0 && await leaseAssumed1.isVisible()) {
-    await leaseAssumed1.click();
-  }
-
-  // Add third contract
-  console.log('  [contracts] Adding contract 3');
-  const addBtn2 = page.locator('button').filter({ hasText: /Add another/i });
-  if (await addBtn2.count() > 0) {
-    await addBtn2.first().click();
-    await page.waitForTimeout(1000);
-  }
-
-  await fillById(page, b64('prop.contracts_and_leases[2].name'), CONTRACTS[2].name);
-  await fillById(page, b64('prop.contracts_and_leases[2].street'), CONTRACTS[2].street);
-  await fillById(page, b64('prop.contracts_and_leases[2].city'), CONTRACTS[2].city);
-  await fillById(page, b64('prop.contracts_and_leases[2].state'), CONTRACTS[2].state);
-  await fillById(page, b64('prop.contracts_and_leases[2].zip'), CONTRACTS[2].zip);
-  const descField2 = page.locator(`#${b64('prop.contracts_and_leases[2].description')}`);
-  if (await descField2.count() > 0) {
-    await descField2.fill(CONTRACTS[2].description);
-  } else {
-    const ta2 = page.locator(`textarea[name="${b64('prop.contracts_and_leases[2].description')}"]`);
-    if (await ta2.count() > 0) await ta2.fill(CONTRACTS[2].description);
-  }
-  await fillYesNoRadio(page, 'prop.contracts_and_leases[2].has_codebtor', false);
-  await fillYesNoRadio(page, 'prop.contracts_and_leases[2].unexpired_lease', false);
-
-  await clickContinue(page);
-
-  // "Do you have more contracts?" -> No
-  await waitForDaPageLoad(page);
-  const contractHeading = await logHeading(page, 'contracts another');
-  if (contractHeading.toLowerCase().includes('more') || contractHeading.toLowerCase().includes('another')) {
-    await clickYesNoButton(page, 'prop.contracts_and_leases.there_is_another', false);
+    const isLast = i === CONTRACTS.length - 1;
+    await waitForDaPageLoad(page);
+    console.log(`  [contracts] Another contract? ${!isLast}`);
+    await clickYesNoButton(page, 'prop.contracts_and_leases.there_is_another', !isLast);
   }
 
   // Personal leases -> No

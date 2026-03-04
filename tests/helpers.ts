@@ -388,21 +388,18 @@ export const fillYesNoRadio = selectYesNoRadio;
 
 /** Click the "No" label on every visible radio that has value="False". */
 export async function fillAllVisibleRadiosAsNo(page: Page) {
-  const noRadioIds = await page.evaluate(() => {
-    const ids: string[] = [];
+  await page.evaluate(() => {
     document.querySelectorAll('input[type="radio"][value="False"]').forEach(radio => {
       const id = radio.getAttribute('id');
       if (!id) return;
       const label = document.querySelector(`label[for="${id}"]`) as HTMLElement;
       if (label && label.offsetParent !== null && !(radio as HTMLInputElement).checked) {
-        ids.push(id);
+        label.click();
       }
     });
-    return ids;
   });
-  for (const id of noRadioIds) {
-    await page.locator(`label[for="${id}"]`).click();
-  }
+  // Small delay for show-if JS to process the clicks
+  await page.waitForTimeout(500);
 }
 
 /** If a case_number field is visible on the current page, click Continue past it. */

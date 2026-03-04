@@ -467,53 +467,73 @@ fields:
     datatype: yesnoradio
     # default: True
   - note: Deduction 1
+    show if: debtor[1].income.other_deduction
   - Specify deduction: debtor[1].income.specify_other_deduction
     # default: Other
     show if: debtor[1].income.other_deduction
+    required: false
   - Deduction amount: debtor[1].income.other_deduction_amount
     datatype: currency
     # default: 0
     show if: debtor[1].income.other_deduction
+    required: false
   - note: Deduction 2
+    show if: debtor[1].income.other_deduction
   - Specify deduction: debtor[1].income.specify_other_deduction_2
     # default: Other
     show if: debtor[1].income.other_deduction
+    required: false
   - Deduction amount: debtor[1].income.other_deduction_amount_2
     datatype: currency
     # default: 0
+    show if: debtor[1].income.other_deduction
+    required: false
   - note: Deduction 3
+    show if: debtor[1].income.other_deduction
   - Specify deduction: debtor[1].income.specify_other_deduction_3
     # default: Other
     show if: debtor[1].income.other_deduction
+    required: false
   - Deduction amount: debtor[1].income.other_deduction_amount_3
     datatype: currency
     # default: 0
     show if: debtor[1].income.other_deduction
+    required: false
   - note: Deduction 4
+    show if: debtor[1].income.other_deduction
   - Specify deduction: debtor[1].income.specify_other_deduction_4
     # default: Other
     show if: debtor[1].income.other_deduction
+    required: false
   - Deduction amount: debtor[1].income.other_deduction_amount_4
     datatype: currency
     # default: 0
     show if: debtor[1].income.other_deduction
+    required: false
   - note: Deduction 5
+    show if: debtor[1].income.other_deduction
   - Specify deduction: debtor[1].income.specify_other_deduction_5
     # default: Other
     show if: debtor[1].income.other_deduction
+    required: false
   - Deduction amount: debtor[1].income.other_deduction_amount_5
     datatype: currency
     # default: 0
     show if: debtor[1].income.other_deduction
+    required: false
   - note: Deduction 6
+    show if: debtor[1].income.other_deduction
   - Specify deduction: debtor[1].income.specify_other_deduction_6
     # default: Other
     show if: debtor[1].income.other_deduction
+    required: false
   - Deduction amount: debtor[1].income.other_deduction_amount_6
     datatype: currency
     # default: 0
     show if: debtor[1].income.other_deduction
+    required: false
   - note: Deduction 7
+    show if: debtor[1].income.other_deduction
   - Specify deduction: debtor[1].income.specify_other_deduction_7
     show if: debtor[1].income.other_deduction
     required: false
@@ -522,6 +542,7 @@ fields:
     show if: debtor[1].income.other_deduction
     required: false
   - note: Deduction 8
+    show if: debtor[1].income.other_deduction
   - Specify deduction: debtor[1].income.specify_other_deduction_8
     show if: debtor[1].income.other_deduction
     required: false
@@ -530,6 +551,7 @@ fields:
     show if: debtor[1].income.other_deduction
     required: false
   - note: Deduction 9
+    show if: debtor[1].income.other_deduction
   - Specify deduction: debtor[1].income.specify_other_deduction_9
     show if: debtor[1].income.other_deduction
     required: false
@@ -538,6 +560,7 @@ fields:
     show if: debtor[1].income.other_deduction
     required: false
   - note: Deduction 10
+    show if: debtor[1].income.other_deduction
   - Specify deduction: debtor[1].income.specify_other_deduction_10
     show if: debtor[1].income.other_deduction
     required: false
