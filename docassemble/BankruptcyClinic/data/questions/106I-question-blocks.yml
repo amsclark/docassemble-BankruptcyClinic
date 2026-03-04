@@ -752,6 +752,7 @@ code: |
   income_amount_debtor2 = 0
   overtime_pay_debtor1 = 0
   overtime_pay_debtor2 = 0
+  _per_debtor_income_totals = []
   i=1
   for id, debt in enumerate(debtor):
     income1['isEmployed'+str(i)] = True if debt.income.employment == 'Employed' else False
@@ -793,10 +794,10 @@ code: |
         _deduction_descs.append(_desc)
       if _amt:
         total_other_deduction += _amt
-    income1['otherDesc'] = '; '.join(_deduction_descs) if _deduction_descs else None
+    income1['otherDesc'+str(i)] = '; '.join(_deduction_descs) if _deduction_descs else None
     income1['other'+str(i)] = currency(total_other_deduction)
     income1['totalPayrollDeductions'+str(i)] = currency(debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + total_other_deduction)
-    income1['takeHome'+str(i)] = currency((income_amount + overtime_pay) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount))
+    income1['takeHome'+str(i)] = currency((income_amount + overtime_pay) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + total_other_deduction))
     income1['rental'+str(i)] = currency(debt.income.net_rental_business)
     income1['interest'+str(i)] = currency(debt.income.interest_and_dividends)
     income1['family'+str(i)] = currency(debt.income.family_support)
@@ -806,10 +807,12 @@ code: |
     income1['pension'+str(i)] = currency(debt.income.pension)
     income1['otherIncomeDesc'+str(i)] = getattr(debt.income, 'specify_monthly_income', '')
     income1['totalOtherIncome'+str(i)] = currency(getattr(debt.income, 'other_monthly_amount', 0))
-    income1['totalIncome'+str(i)] = currency((debt.income.net_rental_business + debt.income.family_support + debt.income.interest_and_dividends + debt.income.unemployment + debt.income.social_security + debt.income.other_govt_assist + debt.income.pension + debt.income.other_monthly_amount) + (income_amount + overtime_pay) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + debt.income.other_deduction_amount))
+    _debtor_total_income = (debt.income.net_rental_business + debt.income.family_support + debt.income.interest_and_dividends + debt.income.unemployment + debt.income.social_security + debt.income.other_govt_assist + debt.income.pension + getattr(debt.income, 'other_monthly_amount', 0)) + (income_amount + overtime_pay) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + total_other_deduction)
+    income1['totalIncome'+str(i)] = currency(_debtor_total_income)
+    _per_debtor_income_totals.append(_debtor_total_income)
 
     i += 1
-  overallIncome = sum((debt.income.net_rental_business + debt.income.family_support + debt.income.interest_and_dividends + debt.income.unemployment + debt.income.social_security + debt.income.other_govt_assist + debt.income.pension + debt.income.other_monthly_amount) + (income_amount_debtor1 + overtime_pay_debtor1) - (debt.income.tax_deduction + debt.income.mandatory_contributions + debt.income.voluntary_contributions + debt.income.fund_loans + debt.income.insurance + debt.income.domestic_support + debt.income.union_dues + total_other_deduction) for debt in debtor)
+  overallIncome = sum(_per_debtor_income_totals)
   income1['overallIncome'] = currency(overallIncome)
   income1['otherAssistanceDesc'] = ""
   income1['otherAssistanceTotal'] = 0

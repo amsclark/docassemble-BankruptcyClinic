@@ -67,13 +67,17 @@ code: |
 
   # --- Part 3: Related Information ---
   # Line 4 = Total number of creditors (D + E/F)
-  _num_secured = 0
+  _num_creditors = 0
   try:
     if defined('prop.creditors'):
-      _num_secured = len(prop.creditors)
+      _num_creditors += len(prop.creditors)
+    if defined('prop.priority_claims'):
+      _num_creditors += len(prop.priority_claims)
+    if defined('prop.nonpriority_claims'):
+      _num_creditors += len(prop.nonpriority_claims)
   except:
     pass
-  summary_fields['4'] = str(_num_secured)
+  summary_fields['4'] = str(_num_creditors)
 
   # Line 5 = Current monthly income (Schedule I combined total)
   try:

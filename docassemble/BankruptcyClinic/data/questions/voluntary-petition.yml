@@ -27,6 +27,7 @@ include:
   - 121-question-blocks.yml
   - 2030-question-blocks.yml
   - creditor-library-picker.yml
+  - mailing-matrix.yml
   - final-review.yml
 ---
 metadata:
@@ -729,6 +730,8 @@ code: |
   #106H
   codebtor_auto_populated
   debtors.community_property
+  if not debtors.community_property:
+    debtors.had_spouse = False
 
   # 106I and 106J moved earlier in flow (after exemptions, before financial affairs)
 
@@ -1874,10 +1877,12 @@ review:
       % else:
         Claiming Homestead Exemption: No
       % endif
-      % if prop.exempt_property.homestead_within_timeframe:
-        Acquired within 1,215 days: Yes
-      % else:
-        Acquired within 1,215 days: No
+      % if prop.exempt_property.claim_homestead_exemption:
+        % if prop.exempt_property.homestead_within_timeframe:
+          Acquired within 1,215 days: Yes
+        % else:
+          Acquired within 1,215 days: No
+        % endif
       % endif
 #Secured Claims
   - note: |
@@ -1943,15 +1948,17 @@ review:
         Lived in community property state: No
       % endif
 
-      % if debtors.had_spouse:
-        Had spouse: Yes
-        Spouse Name: ${ debtors.spouse_name }
-        State: ${ debtors.spouse_state }
-        Street: ${ debtors.spouse_street }
-        City: ${ debtors.spouse_city }
-        Zip: ${ debtors.spouse_zip }
-      % else:
-        Had spouse: No
+      % if debtors.community_property:
+        % if debtors.had_spouse:
+          Had spouse: Yes
+          Spouse Name: ${ debtors.spouse_name }
+          State: ${ debtors.spouse_state }
+          Street: ${ debtors.spouse_street }
+          City: ${ debtors.spouse_city }
+          Zip: ${ debtors.spouse_zip }
+        % else:
+          Had spouse: No
+        % endif
       % endif
 
 #employment info
@@ -2011,6 +2018,7 @@ review:
       % endif
   - note: |
       <br>
+      % if defined('debtor[1].income.employment'):
       ### Other Debtor
       Employment Status: ${ debtor[1].income.employment }
       % if debtor[1].income.employment:
@@ -2062,6 +2070,7 @@ review:
         Income Amount: ${ debtor[1].income.other_monthly_amount }
       % else:
         Has other monthly income: No
+      % endif
       % endif
 
     show if: debtor[1]
@@ -2145,9 +2154,11 @@ review:
 
       Payments of alimony: ${ debtor[0].expenses.alimony }
 
+      % if defined('debtor[0].expenses.other_people_expenses') and debtor[0].expenses.other_people_expenses:
       Other types of support payments:
       ${ debtor[0].expenses.other_support_specify }
       Amount: ${ debtor[0].expenses.other_support_amount }
+      % endif
 
   - Revisit: debtor[0].expenses.change_in_expense
     button: |

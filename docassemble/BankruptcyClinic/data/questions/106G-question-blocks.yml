@@ -155,14 +155,15 @@ code: |
   codebtors_106g['isAmended'] = amended_filing
   codebtors_106g['noCommunityProperty'] = True if debtors.community_property == False else False
   codebtors_106g['hasCommunityProperty'] = True if debtors.community_property == True else False
-  codebtors_106g['noSpouse'] = True if debtors.had_spouse == False else False
-  codebtors_106g['hasspouse'] = True if debtors.had_spouse == True else False
-  codebtors_106g['primaryState'] = debtors.spouse_state if debtors.had_spouse == True else None
-  codebtors_106g['spousename'] = debtors.spouse_name if debtors.had_spouse == True else None
-  codebtors_106g['spouseAddress'] = debtors.spouse_street if debtors.had_spouse == True else None
-  codebtors_106g['spouseCity'] = debtors.spouse_city if debtors.had_spouse == True else None
-  codebtors_106g['spouseState'] = debtors.spouse_state if debtors.had_spouse == True else None
-  codebtors_106g['spouseZip'] = debtors.spouse_zip if debtors.had_spouse == True else None
+  _had_spouse = getattr(debtors, 'had_spouse', False)
+  codebtors_106g['noSpouse'] = True if _had_spouse == False else False
+  codebtors_106g['hasspouse'] = True if _had_spouse == True else False
+  codebtors_106g['primaryState'] = debtors.spouse_state if _had_spouse == True else None
+  codebtors_106g['spousename'] = debtors.spouse_name if _had_spouse == True else None
+  codebtors_106g['spouseAddress'] = debtors.spouse_street if _had_spouse == True else None
+  codebtors_106g['spouseCity'] = debtors.spouse_city if _had_spouse == True else None
+  codebtors_106g['spouseState'] = debtors.spouse_state if _had_spouse == True else None
+  codebtors_106g['spouseZip'] = debtors.spouse_zip if _had_spouse == True else None
 
   i=1
 

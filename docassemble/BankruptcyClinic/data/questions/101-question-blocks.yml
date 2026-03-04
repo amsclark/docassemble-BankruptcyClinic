@@ -1270,6 +1270,9 @@ question: |
 subquestion: |
   Your Chapter 7 bankruptcy petition documents are ready for download.
   Please review all documents with your attorney before filing.
+
+  **Creditor Mailing Matrix (plain text for CM/ECF upload):**
+  ${ mailing_matrix_file }
 allow downloading: True
 attachment code: |
   conclusion_attachments

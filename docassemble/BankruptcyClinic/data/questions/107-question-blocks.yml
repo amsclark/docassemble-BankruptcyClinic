@@ -2490,13 +2490,14 @@ code: |
   fin['noMarried'] = True if financial_affairs.marital_status == False else False
   fin['noLivedElsewhere'] = True if financial_affairs.lived_elsewhere == False else False
   fin['yesLivedElsewhere'] = True if financial_affairs.lived_elsewhere == True else False
-  fin['add1_D1_address'] = financial_affairs.address_street_1
-  fin['add1_D1_from'] = format_date(financial_affairs.address_from_1, format='MM/dd/yyyy')
-  fin['add1_D1_to'] = format_date(financial_affairs.address_to_1, format='MM/dd/yyyy')
-  fin['add1_D1_city'] = financial_affairs.address_city_1
-  fin['add1_D1_state'] = financial_affairs.address_state_1
-  fin['add1_D1_zip'] = financial_affairs.address_zip_1
-  if defined('financial_affairs.address_street_2'):
+  if financial_affairs.lived_elsewhere:
+    fin['add1_D1_address'] = financial_affairs.address_street_1
+    fin['add1_D1_from'] = format_date(financial_affairs.address_from_1, format='MM/dd/yyyy')
+    fin['add1_D1_to'] = format_date(financial_affairs.address_to_1, format='MM/dd/yyyy')
+    fin['add1_D1_city'] = financial_affairs.address_city_1
+    fin['add1_D1_state'] = financial_affairs.address_state_1
+    fin['add1_D1_zip'] = financial_affairs.address_zip_1
+  if financial_affairs.lived_elsewhere and defined('financial_affairs.address_street_2'):
     fin['add2_D1_from'] = format_date(financial_affairs.address_from_2, format='MM/dd/yyyy')
     fin['add2_D1_to'] = format_date(financial_affairs.address_to_2, format='MM/dd/yyyy')
     fin['add2_D1_city'] = financial_affairs.address_city_2
@@ -2555,44 +2556,46 @@ code: |
   fin['yesCommunity'] = True if financial_affairs.lived_with_spouse == True else False
   fin['noRegularIncome'] = True if financial_affairs.employed == False else False
   fin['yesRegularIncome'] = True if financial_affairs.employed == True else False
-  fin['curr_D1_HasWages'] = True if financial_affairs.current_income_sources == 'Wages, commissions, bonuses, tips' else False
-  fin['curr_D1_GrossIncome'] = currency(financial_affairs.current_gross_income)
-  fin['curr_D1_HasBus'] = True if financial_affairs.current_income_sources == 'Operating a business' else False
-  fin['lastYear'] = financial_affairs.last_year
-  fin['last_D1_HasWages'] = True if financial_affairs.last_income_sources == 'Wages, commissions, bonuses, tips' else False
-  fin['last_D1_GrossIncome'] = currency(financial_affairs.last_gross_income)
-  fin['last_D1_HasBus'] = True if financial_affairs.last_income_sources == 'Operating a business' else False
-  fin['beforeYear'] = financial_affairs.before_year
-  fin['before_D1_HasWages'] = True if financial_affairs.before_income_sources == 'Wages, commissions, bonuses, tips' else False
-  fin['before_D1_GrossIncome'] = currency(financial_affairs.before_gross_income)
-  fin['before_D1_HasBus'] = True if financial_affairs.before_income_sources == 'Operating a business' else False
+  if financial_affairs.employed:
+    fin['curr_D1_HasWages'] = True if financial_affairs.current_income_sources == 'Wages, commissions, bonuses, tips' else False
+    fin['curr_D1_GrossIncome'] = currency(financial_affairs.current_gross_income)
+    fin['curr_D1_HasBus'] = True if financial_affairs.current_income_sources == 'Operating a business' else False
+    fin['lastYear'] = financial_affairs.last_year
+    fin['last_D1_HasWages'] = True if financial_affairs.last_income_sources == 'Wages, commissions, bonuses, tips' else False
+    fin['last_D1_GrossIncome'] = currency(financial_affairs.last_gross_income)
+    fin['last_D1_HasBus'] = True if financial_affairs.last_income_sources == 'Operating a business' else False
+    fin['beforeYear'] = financial_affairs.before_year
+    fin['before_D1_HasWages'] = True if financial_affairs.before_income_sources == 'Wages, commissions, bonuses, tips' else False
+    fin['before_D1_GrossIncome'] = currency(financial_affairs.before_gross_income)
+    fin['before_D1_HasBus'] = True if financial_affairs.before_income_sources == 'Operating a business' else False
 
   fin['noOtherIncome'] = True if financial_affairs.had_other_income == False else False
   fin['yesOtherIncome'] = True if financial_affairs.had_other_income == True else False
-  fin['curr_D1_Source1'] = financial_affairs.current_other_source_1
-  fin['curr_D1_Amt1'] = currency(financial_affairs.current_other_source_amount_1)
-  fin['curr_D1_Source2'] = financial_affairs.current_other_source_2
-  fin['curr_D1_Amt2'] = currency(financial_affairs.current_other_source_amount_2)
-  fin['curr_D1_Source3'] = financial_affairs.current_other_source_3
-  fin['curr_D1_Amt3'] = currency(financial_affairs.current_other_source_amount_3)
+  if financial_affairs.had_other_income:
+    fin['curr_D1_Source1'] = financial_affairs.current_other_source_1
+    fin['curr_D1_Amt1'] = currency(financial_affairs.current_other_source_amount_1)
+    fin['curr_D1_Source2'] = financial_affairs.current_other_source_2
+    fin['curr_D1_Amt2'] = currency(financial_affairs.current_other_source_amount_2)
+    fin['curr_D1_Source3'] = financial_affairs.current_other_source_3
+    fin['curr_D1_Amt3'] = currency(financial_affairs.current_other_source_amount_3)
 
-  fin['lastYear-1'] = fin['lastYear']
-  fin['last_D1_Source1'] = financial_affairs.last_other_source_1
-  fin['last_D1_Amt1'] = currency(financial_affairs.last_other_source_amount_1)
-  fin['last_D1_Source2'] = financial_affairs.last_other_source_2
-  fin['last_D1_Amt2'] = currency(financial_affairs.last_other_source_amount_2)
-  fin['last_D1_Source3'] = financial_affairs.last_other_source_3
-  fin['last_D1_Amt3'] = currency(financial_affairs.last_other_source_amount_3)
+    fin['lastYear-1'] = fin.get('lastYear', '')
+    fin['last_D1_Source1'] = financial_affairs.last_other_source_1
+    fin['last_D1_Amt1'] = currency(financial_affairs.last_other_source_amount_1)
+    fin['last_D1_Source2'] = financial_affairs.last_other_source_2
+    fin['last_D1_Amt2'] = currency(financial_affairs.last_other_source_amount_2)
+    fin['last_D1_Source3'] = financial_affairs.last_other_source_3
+    fin['last_D1_Amt3'] = currency(financial_affairs.last_other_source_amount_3)
 
-  fin['beforeYear-1'] = fin['beforeYear']
-  fin['before_D1_Source1'] = financial_affairs.before_other_source_1
-  fin['before_D1_Amt1'] = currency(financial_affairs.before_other_source_amount_1)
-  fin['before_D1_Source2'] = financial_affairs.before_other_source_2
-  fin['before_D1_Amt2'] = currency(financial_affairs.before_other_source_amount_2)
-  fin['before_D1_Source3'] = financial_affairs.before_other_source_3
-  fin['before_D1_Amt3'] = currency(financial_affairs.before_other_source_amount_3)
+    fin['beforeYear-1'] = fin.get('beforeYear', '')
+    fin['before_D1_Source1'] = financial_affairs.before_other_source_1
+    fin['before_D1_Amt1'] = currency(financial_affairs.before_other_source_amount_1)
+    fin['before_D1_Source2'] = financial_affairs.before_other_source_2
+    fin['before_D1_Amt2'] = currency(financial_affairs.before_other_source_amount_2)
+    fin['before_D1_Source3'] = financial_affairs.before_other_source_3
+    fin['before_D1_Amt3'] = currency(financial_affairs.before_other_source_amount_3)
 
-  if len(debtor) > 1:
+  if len(debtor) > 1 and financial_affairs.lived_elsewhere:
     fin['add1_D2_SameAddress'] = True if financial_affairs.address_same_1 == True else False
     if financial_affairs.address_same_1 == True:
       fin['add1_D2_SameTime'] = True if financial_affairs.address_same_dates_1 == True else False

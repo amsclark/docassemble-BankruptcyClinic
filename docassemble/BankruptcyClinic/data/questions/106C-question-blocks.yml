@@ -167,10 +167,12 @@ review:
       % else:
         Claiming Homestead Exemption: No
       % endif
-      % if prop.exempt_property.homestead_within_timeframe:
-        Acquired within 1,215 days: Yes
-      % else:
-        Acquired within 1,215 days: No
+      % if prop.exempt_property.claim_homestead_exemption:
+        % if prop.exempt_property.homestead_within_timeframe:
+          Acquired within 1,215 days: Yes
+        % else:
+          Acquired within 1,215 days: No
+        % endif
       % endif
 ---
 code: |

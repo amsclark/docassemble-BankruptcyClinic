@@ -1,0 +1,91 @@
+code: |
+  # Build creditor mailing matrix as plain text file for CM/ECF upload.
+  # Format: left-aligned, max 4 lines per entry, max 40 chars per line,
+  # blank line between entries, no account numbers, no headers/footers.
+  # Compliant with D.Neb. local rules and D.S.D. Local Rule 1007-2.
+  # Includes all parties from Schedules D, E/F, G, and H (codebtors).
+
+  _seen = set()
+  _entries = []
+
+  def _trunc(s, n=40):
+    s = str(s).strip()
+    return s[:n] if len(s) > n else s
+
+  def _add(name, street, city, state, zipcode):
+    name = str(name).strip()
+    street = str(street).strip()
+    city = str(city).strip()
+    state = str(state).strip()
+    zipcode = str(zipcode).strip()
+    key = (name.upper(), street.upper(), city.upper(), state.upper(), zipcode)
+    if key[0] and key not in _seen:
+      _seen.add(key)
+      city_line = city + ', ' + state + ' ' + zipcode
+      _entries.append(_trunc(name) + '\n' + _trunc(street) + '\n' + _trunc(city_line))
+
+  def _add_notify_parties(cred):
+    """Add notification parties 1-6 from an E/F creditor."""
+    if getattr(cred, 'has_notify', False):
+      _n = getattr(cred, 'other_name', '')
+      if _n:
+        _add(_n, getattr(cred, 'other_street', ''),
+             getattr(cred, 'other_city', ''),
+             getattr(cred, 'other_state', ''),
+             getattr(cred, 'other_zip', ''))
+      for _sfx in ['_2', '_3', '_4', '_5', '_6']:
+        _n = getattr(cred, 'other_name' + _sfx, '')
+        if _n:
+          _add(_n, getattr(cred, 'other_street' + _sfx, ''),
+               getattr(cred, 'other_city' + _sfx, ''),
+               getattr(cred, 'other_state' + _sfx, ''),
+               getattr(cred, 'other_zip' + _sfx, ''))
+
+  def _add_codebtor(cred):
+    """Add codebtor if present."""
+    if getattr(cred, 'has_codebtor', False):
+      _add(getattr(cred, 'codebtor_name', ''),
+           getattr(cred, 'codebtor_street', ''),
+           getattr(cred, 'codebtor_city', ''),
+           getattr(cred, 'codebtor_state', ''),
+           getattr(cred, 'codebtor_zip', ''))
+
+  # Schedule D: Secured creditors
+  if defined('prop.creditors.gathered') and prop.creditors.gathered:
+    for _c in prop.creditors:
+      _add(_c.name, _c.street, _c.city, _c.state, _c.zip)
+      _add_codebtor(_c)
+      for _np in _c.notify:
+        _add(getattr(_np, 'other_name', ''),
+             getattr(_np, 'other_street', ''),
+             getattr(_np, 'other_city', ''),
+             getattr(_np, 'other_state', ''),
+             getattr(_np, 'other_zip', ''))
+
+  # Schedule E/F Part 1: Priority unsecured creditors
+  if defined('prop.priority_claims.gathered') and prop.priority_claims.gathered:
+    for _c in prop.priority_claims:
+      _add(_c.name, _c.street, _c.city, _c.state, _c.zip)
+      _add_codebtor(_c)
+      _add_notify_parties(_c)
+
+  # Schedule E/F Part 2: Nonpriority unsecured creditors
+  if defined('prop.nonpriority_claims.gathered') and prop.nonpriority_claims.gathered:
+    for _c in prop.nonpriority_claims:
+      _add(_c.name, _c.street, _c.city, _c.state, _c.zip)
+      _add_codebtor(_c)
+      _add_notify_parties(_c)
+
+  # Schedule G: Executory contracts and unexpired leases
+  if defined('prop.contracts_and_leases.gathered') and prop.contracts_and_leases.gathered:
+    for _c in prop.contracts_and_leases:
+      _add(_c.name, _c.street, _c.city, _c.state, _c.zip)
+      _add_codebtor(_c)
+
+  _matrix_text = '\n\n'.join(_entries)
+
+  mailing_matrix_file = DAFile('mailing_matrix_file')
+  mailing_matrix_file.initialize(filename='creditor_matrix.txt')
+  with open(mailing_matrix_file.path(), 'w') as f:
+    f.write(_matrix_text)
+  mailing_matrix_file.commit()

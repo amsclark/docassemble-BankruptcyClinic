@@ -71,7 +71,7 @@ fields:
     default: ${ debtor[0].income.family_support }
   - All amounts from any source which are regularly paid for household expenses of you or your dependents, including child support.: monthly_income.other_income1
     datatype: currency
-    default: ${ debtor[0].income.other_regular_contributions }
+    default: ${ getattr(debtor[0].income, 'other_regular_contributions_amount', 0) }
   - note: |
       Net income from operating a business, profession, or farm.
   - Gross receipts (before all deductions): monthly_income.business_gross_receipts1
@@ -112,7 +112,7 @@ fields:
     default: " "
   - Amount: monthly_income.source1_amount_1
     datatype: currency
-    default: ${ debtor[0].income.other_monthly_income }
+    default: ${ getattr(debtor[0].income, 'other_monthly_amount', 0) }
   - Source 2: monthly_income.source2_1
     default: " "
   - Amount: monthly_income.source2_amount_1
@@ -135,7 +135,7 @@ fields:
     default: ${ debtor[1].income.family_support if len(debtor) > 1 else 0 }
   - All amounts from any source which are regularly paid for household expenses of you or your dependents, including child support.: monthly_income.other_income2
     datatype: currency
-    default: ${ debtor[1].income.other_regular_contributions if len(debtor) > 1 else 0 }
+    default: ${ getattr(debtor[1].income, 'other_regular_contributions_amount', 0) if len(debtor) > 1 else 0 }
   - note: |
       Net income from operating a business, profession, or farm.
   - Gross receipts (before all deductions): monthly_income.business_gross_receipts2
@@ -176,7 +176,7 @@ fields:
     default: " "
   - Amount: monthly_income.source1_amount_2
     datatype: currency
-    default: ${ debtor[1].income.other_monthly_income if len(debtor) > 1 else 0 }
+    default: ${ getattr(debtor[1].income, 'other_monthly_amount', 0) if len(debtor) > 1 else 0 }
   - Source 2: monthly_income.source2_2
     default: " "
   - Amount: monthly_income.source2_amount_2

@@ -180,15 +180,17 @@ review:
         Lived in community property state: No
       % endif
 
-      % if debtors.had_spouse:
-        Had spouse: Yes
-        Spouse Name: ${ debtors.spouse_name }
-        State: ${ debtors.spouse_state }
-        Street: ${ debtors.spouse_street }
-        City: ${ debtors.spouse_city }
-        Zip: ${ debtors.spouse_zip }
-      % else:
-        Had spouse: No
+      % if debtors.community_property:
+        % if debtors.had_spouse:
+          Had spouse: Yes
+          Spouse Name: ${ debtors.spouse_name }
+          State: ${ debtors.spouse_state }
+          Street: ${ debtors.spouse_street }
+          City: ${ debtors.spouse_city }
+          Zip: ${ debtors.spouse_zip }
+        % else:
+          Had spouse: No
+        % endif
       % endif
 ---
 attachment:
@@ -216,14 +218,15 @@ code: |
   codebtors['hasCodebtors'] = True if len(debtors.codebtors) > 0 else False
   codebtors['noCommunityProperty'] = True if debtors.community_property == False else False
   codebtors['hasCommunityProperty'] = True if debtors.community_property == True else False
-  codebtors['noSpouse'] = True if debtors.had_spouse == False else False
-  codebtors['hasspouse'] = True if debtors.had_spouse == True else False
-  codebtors['primaryState'] = debtors.spouse_state if debtors.had_spouse == True else None
-  codebtors['spousename'] = debtors.spouse_name if debtors.had_spouse == True else None
-  codebtors['spouseAddress'] = debtors.spouse_street if debtors.had_spouse == True else None
-  codebtors['spouseCity'] = debtors.spouse_city if debtors.had_spouse == True else None
-  codebtors['spouseState'] = debtors.spouse_state if debtors.had_spouse == True else None
-  codebtors['spouseZip'] = debtors.spouse_zip if debtors.had_spouse == True else None
+  _had_spouse = getattr(debtors, 'had_spouse', False)
+  codebtors['noSpouse'] = True if _had_spouse == False else False
+  codebtors['hasspouse'] = True if _had_spouse == True else False
+  codebtors['primaryState'] = debtors.spouse_state if _had_spouse == True else None
+  codebtors['spousename'] = debtors.spouse_name if _had_spouse == True else None
+  codebtors['spouseAddress'] = debtors.spouse_street if _had_spouse == True else None
+  codebtors['spouseCity'] = debtors.spouse_city if _had_spouse == True else None
+  codebtors['spouseState'] = debtors.spouse_state if _had_spouse == True else None
+  codebtors['spouseZip'] = debtors.spouse_zip if _had_spouse == True else None
 
   i=1
   for codebtor in debtors.codebtors:
