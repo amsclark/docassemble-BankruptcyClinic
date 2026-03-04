@@ -3071,4 +3071,34 @@ code: |
     fin['financials_state'] = financial_affairs.statement_state
     fin['financials_city'] = financial_affairs.statement_city
     fin['financials_zip'] = financial_affairs.statement_zip
+---
+id: form_107_review
+event: form_107
+section: form_107
+question: |
+  Review Statement of Financial Affairs
+review:
+  - Revisit: financial_affairs.marital_status
+    button: |
+      **Marital status and residence**
+
+      Currently married: ${ "Yes" if financial_affairs.marital_status else "No" }
+
+      Lived elsewhere in last 3 years: ${ "Yes" if financial_affairs.lived_elsewhere else "No" }
+  - Revisit: financial_affairs.income_amount
+    button: |
+      **Income**
+
+      Employment income (this year): $${ financial_affairs.income_amount }
+
+      Employment income (last year): $${ financial_affairs.income_amount_2 }
+  - Revisit: financial_affairs.has_garnishment
+    button: |
+      **Garnishments and legal actions**
+
+      Had garnishments: ${ "Yes" if financial_affairs.has_garnishment else "No" }
+
+      Had lawsuits: ${ "Yes" if financial_affairs.has_lawsuit else "No" }
+
+      Had repossessions: ${ "Yes" if financial_affairs.has_repossession else "No" }
 
