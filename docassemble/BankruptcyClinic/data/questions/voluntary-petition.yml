@@ -601,11 +601,6 @@ code: |
     if not debtor[1].income.other_monthly_income:
       debtor[1].income.specify_monthly_income = ''
       debtor[1].income.other_monthly_amount = 0
-    debtor[1].income.other_regular_contributions
-    if not debtor[1].income.other_regular_contributions:
-      debtor[1].income.specify_other_regular_contributions = ''
-      debtor[1].income.other_regular_contributions_amount = 0
-    debtor[1].income.expect_year_delta
 
   #106J - Expenses
   debtor[0].expenses.rent_expense

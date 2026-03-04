@@ -773,13 +773,8 @@ export async function navigateIncome(page: Page, scenario: TestScenario) {
     await fillById(page, b64('debtor[1].income.pension'), '0');
     await fillYesNoRadio(page, 'debtor[1].income.other_monthly_income', false);
     await clickContinue(page);
-
-    await waitForDaPageLoad(page);
-    await selectYesNoRadio(page, 'debtor[1].income.other_regular_contributions', false);
-    await page.waitForTimeout(300);
-    await selectYesNoRadio(page, 'debtor[1].income.expect_year_delta', false);
-    await page.waitForTimeout(300);
-    await clickContinue(page);
+    // Note: debtor[1] has no question blocks for other_regular_contributions or
+    // expect_year_delta, so those pages are not presented.
   }
 
   await waitForDaPageLoad(page);
