@@ -28,7 +28,7 @@ question: |
 allowed to set:
   - prop.contracts_and_leases[i].complete
 fields:
-  - note: Person or company with whom you have contract or lease
+  - note: Person or company with whom you have a contract or lease
   - Name: prop.contracts_and_leases[i].name
     # default: Contract Holder
   - Address/PO Box: prop.contracts_and_leases[i].street
@@ -91,7 +91,7 @@ id: schedule_g_review
 event: schedule_g
 section: schedule_g
 question: |
-  Review executory contracts or unexpired leases
+  Review Executory Contracts or Unexpired Leases
 review:
   - note: |
       <br>

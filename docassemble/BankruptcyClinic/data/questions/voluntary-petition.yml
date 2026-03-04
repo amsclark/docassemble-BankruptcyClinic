@@ -37,7 +37,7 @@ metadata:
 sections:
   - Introduction
   - district: District & Case
-  - identify: Indentify Debtor(s)
+  - identify: Identify Debtor(s)
   - schedule_ab: Property
   - schedule_c: Exemptions
   - schedule_d: Secured Creditors
@@ -1443,7 +1443,7 @@ review:
       % endif
   - Revisit: prop.jewelry_description
     button: |
-      jewelry Description:
+      Jewelry Description:
       ${ prop.jewelry_description }
 
       Total Value: ${ prop.jewelry_value }
@@ -1645,7 +1645,7 @@ review:
       % if prop.owed_property.has_other_amounts:
         Has other owed debts: Yes
       % else:
-        Hos other owed debts: No
+        Has other owed debts: No
       % endif
   - Revisit: prop.owed_property.other_amounts_description
     button: |
@@ -1871,9 +1871,9 @@ review:
         Claiming Homestead Exemption: No
       % endif
       % if prop.exempt_property.homestead_within_timeframe:
-        Aquired within 1,215 days: Yes
+        Acquired within 1,215 days: Yes
       % else:
-        Aquired within 1,215 days: No
+        Acquired within 1,215 days: No
       % endif
 #Secured Claims
   - note: |
@@ -1904,7 +1904,7 @@ review:
         ${ prop_nonpriority_claims_table }
         ${ prop.nonpriority_claims.add_action() }
       % else:
-        No priority claims listed
+        No nonpriority claims listed
         ${ prop.nonpriority_claims.add_action() }
       % endif
 
@@ -1953,7 +1953,7 @@ review:
 #employment info
   - note: |
       <br>
-      ### Your employement
+      ### Your Employment
       Employment Status: ${ debtor[0].income.employment }
       % if debtor[0].income.employment:
         Occupation: ${ debtor[0].income.occupation }
@@ -2089,11 +2089,11 @@ review:
       Real estate taxes: ${ debtor[0].expenses.real_estate_taxes }
       Property Insurance: ${ debtor[0].expenses.renters_insurance }
       Home Maintenance: ${ debtor[0].expenses.upkeep_expenses }
-      Homeowns Dues: ${ debtor[0].expenses.owners_dues }
+      Homeowner's Dues: ${ debtor[0].expenses.owners_dues }
       Additional Mortgage Payments: ${ debtor[0].expenses.additional_mortgage_payments }
 
       Utilities
-      Electicity, heat, natural gas: ${ debtor[0].expenses.util_electric }
+      Electricity, heat, natural gas: ${ debtor[0].expenses.util_electric }
       Water, sewer, garbage collection: ${ debtor[0].expenses.util_garbage }
       Telephone, internet, cable: ${ debtor[0].expenses.telephone }
 

@@ -943,7 +943,7 @@ section: form_107
 question: |
   Did you receive any other income during this year or the two previous calendar years?
 subquestion: |
-  Include income regardless of whether that income is taxable. Examples of other income are alimony, child support, Social Security, unemployment, and other public benefit payments, pensions, rental income, interest, dividends, money collected from lawsuits, royalties, and ganbling and lottery winnings.
+  Include income regardless of whether that income is taxable. Examples of other income are alimony, child support, Social Security, unemployment, and other public benefit payments, pensions, rental income, interest, dividends, money collected from lawsuits, royalties, and gambling and lottery winnings.
 fields:
   - no label: financial_affairs.had_other_income
     datatype: yesnoradio
@@ -1041,7 +1041,7 @@ section: form_107
 question: |
   Did Debtor 2 receive any other income during this year or the two previous calendar years?
 subquestion: |
-  Include income regardless of whether that income is taxable. Examples of other income are alimony, child support, Social Security, unemployment, and other public benefit payments, pensions, rental income, interest, dividends, money collected from lawsuits, royalties, and ganbling and lottery winnings.
+  Include income regardless of whether that income is taxable. Examples of other income are alimony, child support, Social Security, unemployment, and other public benefit payments, pensions, rental income, interest, dividends, money collected from lawsuits, royalties, and gambling and lottery winnings.
 fields:
   - no label: financial_affairs.debtor2_had_other_income
     datatype: yesnoradio
@@ -1174,7 +1174,7 @@ under: |
 ---
 id: consumer_debt_payment_details
 question: |
-  Tell the court about a consumer creditor you paid a total of $600 or more to OR about non-consumer creditors you paid over $7,575 to in the last 90 day.
+  Tell the court about a consumer creditor you paid a total of $600 or more to OR about non-consumer creditors you paid over $7,575 to in the last 90 days.
 fields:
   - Creditor Name: financial_affairs.consumer_debt_payments[i].creditor_name
     # default: creditor name
@@ -1210,7 +1210,7 @@ fields:
       - Mortgage
       - Car
       - Credit Card
-      - Load repayment
+      - Loan repayment
       - Suppliers or vendors
       - Other
     # default: Mortgage
@@ -1247,7 +1247,7 @@ question: |
   Did you make any payment on debt you owed anyone who was an insider?
   % endif
 subquestion: |
-  Insiders include your relatives; any general partners; relatives of any general partners; partnerships of which you are a general partner; corporations of which you are an officer, director, person in control, or owner of 20% or more of their voting securities; and any managing agent, including one for a business you operate as a sole propietor. Include payments for domestic support obligations, such as child support and alimony.
+  Insiders include your relatives; any general partners; relatives of any general partners; partnerships of which you are a general partner; corporations of which you are an officer, director, person in control, or owner of 20% or more of their voting securities; and any managing agent, including one for a business you operate as a sole proprietor. Include payments for domestic support obligations, such as child support and alimony.
 yesno: financial_affairs.insider_payments.there_are_any
 ---
 id: insider_payment_details
@@ -1310,7 +1310,7 @@ question: |
 subquestion: |
   Within 1 year before you filed for bankruptcy, did you make any payments or transfer any property on account of a debt that benefited an insider?
 
-  Include payments on debts guaranteed to cosigned by an insider.
+  Include payments on debts guaranteed or cosigned by an insider.
 yesno: financial_affairs.insider_benefits.there_are_any
 ---
 id: insider_benefit_payment_details
@@ -1435,7 +1435,7 @@ edit:
 ---
 id: repossessed_property_seizure
 question: |
-  Repossesed Property
+  Repossessed Property
 subquestion: |
   Within 1 year before you filed for bankruptcy, was any of your property repossessed, foreclosed, garnished, attached, seized, or levied?
 yesno: financial_affairs.levies.there_are_any
@@ -1581,7 +1581,7 @@ fields:
     minlength: 5
     maxlength: 5
     # default: 33593
-  - Persons relationship to you: financial_affairs.gifts[i].relationship
+  - Person's relationship to you: financial_affairs.gifts[i].relationship
     # default: Parent
   - note: Describe the gift
   - no label: financial_affairs.gifts[i].description
@@ -1603,7 +1603,7 @@ id: charitable_contributions
 question: |
   Charitable Contributions Made
 subquestion: |
-  Within 2 years before you filed for bankruptcy, did you give any gifts or contributions with a total value of more than 600 to any charity?
+  Within 2 years before you filed for bankruptcy, did you give any gifts or contributions with a total value of more than $600 to any charity?
 fields:
   - no label: financial_affairs.has_charity
     datatype: yesnoradio
@@ -1696,17 +1696,17 @@ question: |
 subquestion: |
   Within 1 year before you filed for bankruptcy, did you or anyone else acting on your behalf pay or transfer any property to anyone you consulted about seeking bankruptcy or preparing a bankruptcy petition?
 
-  Include any attourneys, bankruptcy petition preparers, or credit counseling agencies for services required in your bankruptcy.
+  Include any attorneys, bankruptcy petition preparers, or credit counseling agencies for services required in your bankruptcy.
 yesno: financial_affairs.bankruptcy_payments.there_are_any
 ---
 question: |
-  Are there any more payments made to anyone you consulted about seeing bankruptcy or preparing a bankruptcy petition?
+  Are there any more payments made to anyone you consulted about seeking bankruptcy or preparing a bankruptcy petition?
 yesno: financial_affairs.bankruptcy_payments.there_is_another
 under: |
   ${ bankruptcy_payments_table }
 ---
 question: |
-  Tell the court about a payment or transfer of property to anyone you consulted about seeing bankruptcy.
+  Tell the court about a payment or transfer of property to anyone you consulted about seeking bankruptcy.
 fields:
   - Person who was paid: financial_affairs.bankruptcy_payments[i].name
     # default: Jimbo
@@ -1729,7 +1729,7 @@ fields:
   - no label: financial_affairs.bankruptcy_payments[i].property_description
     input type: area
     # default: Description
-  - note: Date payment or trasfer was made
+  - note: Date payment or transfer was made
   - no label: financial_affairs.bankruptcy_payments[i].date_1
     datatype: date
     # default: 01/01/23
@@ -1749,7 +1749,7 @@ question: |
 subquestion: |
   Within 1 year before you filed for bankruptcy, did you or anyone else acting on your behalf pay or transfer any property to anyone who promised to help you deal with your creditors or to make payments to your creditors.
 
-  Do not include any payment or transfers you already listed in the last question.
+  Do not include any payments or transfers you already listed in the last question.
 fields:
   - no label: financial_affairs.has_creditor_help
     datatype: yesnoradio
@@ -1840,7 +1840,7 @@ fields:
     minlength: 5
     maxlength: 5
     # default: 33593
-  - Persons realtionship to you: financial_affairs.other_transfers[i].relationship
+  - Person's relationship to you: financial_affairs.other_transfers[i].relationship
     # default: Father
   - note: Description and value of property transferred
   - no label: financial_affairs.other_transfers[i].property_description
@@ -1937,7 +1937,7 @@ fields:
     show if:
       variable: financial_affairs.instruments[i].account_type
       is: Other
-  - note: Date account was closed, sold, moved, or trasferred
+  - note: Date account was closed, sold, moved, or transferred
   - no label: financial_affairs.instruments[i].date
     # default: 01/01/23
     input type: area
@@ -2011,7 +2011,7 @@ fields:
 question: |
   Storage Unit
 subquestion: |
-  Have you stored property in a storage unit or place other than your home within 1 year befor eyou filed for bankruptcy?
+  Have you stored property in a storage unit or place other than your home within 1 year before you filed for bankruptcy?
 fields:
   - no label: financial_affairs.has_storage_unit
     datatype: yesnoradio
@@ -2078,7 +2078,7 @@ fields:
   - no label: financial_affairs.has_held_property
     datatype: yesnoradio
     # default: True
-  - Owners name: financial_affairs.held_property.name
+  - Owner's name: financial_affairs.held_property.name
     # default: Craig
     show if: financial_affairs.has_held_property
   - Address/PO Box: financial_affairs.held_property.street
@@ -2710,7 +2710,7 @@ code: |
     fin['creditor_paymentDates'+str(x)] = payment.paymentDates
     fin['creditor_isCar'+str(x)] = True if payment.payment_for == 'Car' else False
     fin['creditor_isCC'+str(x)] = True if payment.payment_for == 'Credit Card' else False
-    fin['creditor_isLoan'+str(x)] = True if payment.payment_for == 'Load repayment' else False
+    fin['creditor_isLoan'+str(x)] = True if payment.payment_for == 'Loan repayment' else False
     fin['creditor_isVendor'+str(x)] = True if payment.payment_for == 'Suppliers or vendors' else False
     fin['creditor_city'+str(x)] = payment.creditor_city
     fin['creditor_state'+str(x)] = payment.creditor_state

@@ -70,7 +70,7 @@ under: |
 id: secured_debt_notify_others_any_exist
 section: schedule_d
 question: |
-  Are there any others to be notifed for this debt such as collection agencies or other creditors?
+  Are there any others to be notified for this debt such as collection agencies or other creditors?
 subquestion: |
   Only specify others to be notified about your bankruptcy for your most recent debt.
 yesno: prop.creditors[i].notify.there_are_any
@@ -78,7 +78,7 @@ yesno: prop.creditors[i].notify.there_are_any
 id: secured_debt_notify_others_add_another
 section: schedule_d
 question: |
-  Are there any more parties to be notifed?
+  Are there any more parties to be notified?
 yesno: prop.creditors[i].notify.there_is_another
 under: |
   ${ prop_creditors_notify_table }
@@ -86,7 +86,7 @@ under: |
 id: secured_debt_notify_others_details
 section: schedule_d
 question: |
-  Tell the court about other parties to be notifed about this debt.
+  Tell the court about other parties to be notified about this debt.
 allowed to set:
   - prop.creditors[i].complete
 fields:
@@ -152,7 +152,7 @@ fields:
     maxlength: 5
     # default: 33593
   - note: |
-      Decribe the debt
+      Describe the debt
   - Who owes the debt?: prop.creditors[i].who
     choices:
       code: |
@@ -185,7 +185,7 @@ fields:
   - note: Nature of lien
   - An agreement you made (such as a mortgage or secured car loan): prop.creditors[i].agreement
     datatype: yesno
-  - Statutory lien (such as tax lien, mechanic lien): prop.creditors[i].lien
+  - Statutory lien (such as tax lien, mechanic's lien): prop.creditors[i].lien
     datatype: yesno
   - Judgment lien from a lawsuit: prop.creditors[i].lawsuit
     datatype: yesno

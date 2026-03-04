@@ -38,7 +38,7 @@ fields:
   - Your income: family.you_income
     datatype: currency
     # default: 50000
-  - Your spouses income: family.spouse_income
+  - Your spouse's income: family.spouse_income
     datatype: currency
     required: False
     # default: 30000
@@ -137,7 +137,7 @@ section: waive_fee
 question: |
   Do you have bank accounts and other deposits of money?
 subquestion: |
-  Examples: Checking, savings, money market, or other finacial accounts; certificates of deposit; shares in banks, credit unions, brokerage houses, and other similar institutions. If you have more than one account with the same institution, list each when asked.
+  Examples: Checking, savings, money market, or other financial accounts; certificates of deposit; shares in banks, credit unions, brokerage houses, and other similar institutions. If you have more than one account with the same institution, list each when asked.
 
   Do not include 401(k) and IRA accounts.
 yesno: prop.has_bank_accounts
@@ -145,7 +145,7 @@ yesno: prop.has_bank_accounts
 id: f103b_bank_account_details
 section: waive_fee
 question: |
-  Provide details about account.
+  Provide details about your account.
 allowed to set:
   - prop.accounts[i].complete
 fields:
@@ -245,7 +245,7 @@ columns:
   - Make: row_item.make
   - Model: row_item.model
   - Year: row_item.year
-  - Milage: row_item.milage
+  - Mileage: row_item.milage
   - Value: row_item.current_value
   - Owed: row_item.amount_owed
 edit:
@@ -284,11 +284,11 @@ fields:
     # default:       Corolla
   - Year: prop.vehicles[i].year
     # default:       2015
-  - Milage: prop.vehicles[i].milage
+  - Mileage: prop.vehicles[i].milage
     datatype: number
     # default: 200000
   - note: |
-      Tell us about the vehicles value and liens.
+      Tell us about the vehicle's value and liens.
   - Current Value: prop.vehicles[i].current_value
     # default: 8000
     datatype: currency
@@ -342,11 +342,11 @@ under: |
 id: f103b_money_owed_to_you_details
 section: waive_fee
 question: |
-  Tell us about the ower.
+  Tell us about who owes you money.
 allowed to set:
   - prop.owers[i].complete
 fields:
-  - Ower Name: prop.owers[i].name
+  - Name of person who owes you: prop.owers[i].name
     # default:       Cindy
   - How much?: prop.owers[i].amount
     datatype: currency
@@ -456,7 +456,7 @@ edit:
 ---
 id: f103b_previous_bankruptcies_any_exist
 question: |
-  Have you filied for bankruptcy in the last 8 years?
+  Have you filed for bankruptcy in the last 8 years?
 yesno: additional.bankruptcies.there_are_any
 ---
 id: f103b_previous_bankruptcies_add_another

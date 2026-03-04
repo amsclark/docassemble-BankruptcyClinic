@@ -59,10 +59,10 @@ subquestion: |
 
     If you or your non-filing spouse have more than one employer, combine the information for all employers for that person on the lines below.
 
-    Please populate all your paystubs information for the previous month.
+    Please enter all your pay stub information for the previous month.
 fields:
   - note: Check 1
-  - gross wages, salary, and comissions: debtor[0].income.income_amount_1
+  - Gross wages, salary, and commissions: debtor[0].income.income_amount_1
     datatype: currency
     # default: 3000
   - Estimate and list monthly overtime pay: debtor[0].income.overtime_pay_1
@@ -70,7 +70,7 @@ fields:
     # default: 300
 
   - note: Check 2
-  - gross wages, salary, and comissions: debtor[0].income.income_amount_2
+  - Gross wages, salary, and commissions: debtor[0].income.income_amount_2
     datatype: currency
     # default: 0
     required: False
@@ -80,7 +80,7 @@ fields:
     required: False
 
   - note: Check 3
-  - gross wages, salary, and comissions: debtor[0].income.income_amount_3
+  - Gross wages, salary, and commissions: debtor[0].income.income_amount_3
     datatype: currency
     # default: 0
     required: False
@@ -90,7 +90,7 @@ fields:
     required: False
 
   - note: Check 4
-  - gross wages, salary, and comissions: debtor[0].income.income_amount_4
+  - Gross wages, salary, and commissions: debtor[0].income.income_amount_4
     datatype: currency
     # default: 0
     required: False
@@ -99,7 +99,7 @@ fields:
     # default: 0
     required: False
   - note: Check 5
-  - gross wages, salary, and comissions: debtor[0].income.income_amount_5
+  - Gross wages, salary, and commissions: debtor[0].income.income_amount_5
     datatype: currency
     # default: 0
     required: False
@@ -108,7 +108,7 @@ fields:
     # default: 0
     required: False
   - note: Check 6
-  - gross wages, salary, and comissions: debtor[0].income.income_amount_6
+  - Gross wages, salary, and commissions: debtor[0].income.income_amount_6
     datatype: currency
     # default: 0
     required: False
@@ -125,7 +125,7 @@ fields:
     datatype: currency
     # default: 300
     required: false
-  - Mandator contributions for retirement plans: debtor[0].income.mandatory_contributions
+  - Mandatory contributions for retirement plans: debtor[0].income.mandatory_contributions
     datatype: currency
     # default: 500
     required: false
@@ -282,7 +282,7 @@ fields:
     datatype: currency
     # default: 0
     required: false
-  - Family support payments that you, a non-filing spouse, or a dependent regularly recieve: debtor[0].income.family_support
+  - Family support payments that you, a non-filing spouse, or a dependent regularly receive: debtor[0].income.family_support
     datatype: currency
     # default: 0
     required: false
@@ -316,7 +316,7 @@ fields:
 id: debtor2_employment_info
 section: schedule_i
 question: |
-  Fill in employment information for other debtor.
+  Fill in employment information for the other debtor.
 subquestion: |
   Include part-time, seasonal, or self-employed work. Occupation may include student or homemaker, if it applies.
 fields:
@@ -375,10 +375,10 @@ subquestion: |
 
     If you or your non-filing spouse have more than one employer, combine the information for all employers for that person on the lines below.
 
-    Please populate all your paystubs information for the last full month.
+    Please enter all your pay stub information for the last full month.
 fields:
   - note: Check 1
-  - gross wages, slarary, and comissions: debtor[1].income.income_amount_1
+  - Gross wages, salary, and commissions: debtor[1].income.income_amount_1
     datatype: currency
     # default: 3000
   - Estimate and list monthly overtime pay: debtor[1].income.overtime_pay_1
@@ -386,7 +386,7 @@ fields:
     # default: 300
 
   - note: Check 2
-  - gross wages, slarary, and comissions: debtor[1].income.income_amount_2
+  - Gross wages, salary, and commissions: debtor[1].income.income_amount_2
     datatype: currency
     # default: 0
     required: False
@@ -396,7 +396,7 @@ fields:
     required: False
 
   - note: Check 3
-  - gross wages, slarary, and comissions: debtor[1].income.income_amount_3
+  - Gross wages, salary, and commissions: debtor[1].income.income_amount_3
     datatype: currency
     # default: 0
     required: False
@@ -406,7 +406,7 @@ fields:
     required: False
 
   - note: Check 4
-  - gross wages, slarary, and comissions: debtor[1].income.income_amount_4
+  - Gross wages, salary, and commissions: debtor[1].income.income_amount_4
     datatype: currency
     # default: 0
     required: False
@@ -415,7 +415,7 @@ fields:
     # default: 0
     required: False
   - note: Check 5
-  - gross wages, slarary, and comissions: debtor[1].income.income_amount_5
+  - Gross wages, salary, and commissions: debtor[1].income.income_amount_5
     datatype: currency
     # default: 0
     required: False
@@ -424,7 +424,7 @@ fields:
     # default: 0
     required: False
   - note: Check 6
-  - gross wages, slarary, and comissions: debtor[1].income.income_amount_6
+  - Gross wages, salary, and commissions: debtor[1].income.income_amount_6
     datatype: currency
     # default: 0
     required: False
@@ -435,12 +435,12 @@ fields:
 ---
 id: debtor2_payroll_deductions
 section: schedule_i
-question: List all payroll deduction
+question: List all payroll deductions
 fields:
   - Tax, Medicare, and Social Security deductions: debtor[1].income.tax_deduction
     datatype: currency
     # default: 300
-  - Mandator contributions for retirement plans: debtor[1].income.mandatory_contributions
+  - Mandatory contributions for retirement plans: debtor[1].income.mandatory_contributions
     datatype: currency
     # default: 500
   - Voluntary contributions for retirement plans: debtor[1].income.voluntary_contributions
@@ -556,7 +556,7 @@ fields:
   - Interest and dividends: debtor[1].income.interest_and_dividends
     datatype: currency
     # default: 0
-  - Family support payments that you, a non-filing spouse, or a dependent regularly recieve: debtor[1].income.family_support
+  - Family support payments that you, a non-filing spouse, or a dependent regularly receive: debtor[1].income.family_support
     datatype: currency
     # default: 0
   - Unemployment compensation: debtor[1].income.unemployment
@@ -616,7 +616,7 @@ question: |
 review:
   - note: |
       <br>
-      ### Your employement
+      ### Your Employment
       Employment Status: ${ debtor[0].income.employment }
       % if debtor[0].income.employment:
         Occupation: ${ debtor[0].income.occupation }

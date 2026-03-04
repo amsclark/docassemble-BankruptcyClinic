@@ -87,7 +87,7 @@ fields:
     datatype: currency
     # default: 0
     required: False
-  - Do you have other utility expenses: debtor[0].expenses.util_other
+  - Do you have other utility expenses?: debtor[0].expenses.util_other
     datatype: yesnoradio
     # default: True
   - Specify other utility: debtor[0].expenses.util_other_specify
@@ -104,7 +104,7 @@ fields:
     # default: 0
     datatype: currency
     required: False
-  - Childcare and childrens education costs: debtor[0].expenses.childcare
+  - Childcare and children's education costs: debtor[0].expenses.childcare
     datatype: currency
     # default: 0
     required: False
@@ -159,7 +159,7 @@ fields:
     required: False
     show if: debtor[0].expenses.other_insurance
   - note: |
-      Taxes. Do not include taxes deducted from your pay or already included amounts
+      Taxes. Do not include taxes deducted from your pay or amounts already included above.
   - Specify: debtor[0].expenses.other_tax_specify
     # default: Other taxes
     required: False
@@ -318,11 +318,11 @@ review:
       Real estate taxes: ${ debtor[0].expenses.real_estate_taxes }
       Property Insurance: ${ debtor[0].expenses.renters_insurance }
       Home Maintenance: ${ debtor[0].expenses.upkeep_expenses }
-      Homeowns Dues: ${ debtor[0].expenses.owners_dues }
+      Homeowner's Dues: ${ debtor[0].expenses.owners_dues }
       Additional Mortgage Payments: ${ debtor[0].expenses.additional_mortgage_payments }
 
       Utilities
-      Electicity, heat, natural gas: ${ debtor[0].expenses.util_electric }
+      Electricity, heat, natural gas: ${ debtor[0].expenses.util_electric }
       Water, sewer, garbage collection: ${ debtor[0].expenses.util_garbage }
       Telephone, internet, cable: ${ debtor[0].expenses.telephone }
 

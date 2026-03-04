@@ -5,7 +5,7 @@ question: |
 subquestion: |
   Please provide contact information for the landlord that has obtained a judgment for possession in an eviction, unlawful detainer action, or similar proceeding (called eviction judgment) against you to possess your residence.
 fields:
-  - Landlords Name: landlord_name
+  - Landlord's Name: landlord_name
     # default: Jerry Lewis
   - note: |
       Landlord's address:

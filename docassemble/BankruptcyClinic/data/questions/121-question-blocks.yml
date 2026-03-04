@@ -26,7 +26,7 @@ fields:
     show if:
       variable: debtor[i].ssn_info.no_ssn
       is: True
-  - Debtor has a ITIN: debtor[i].ssn_info.no_itin
+  - Debtor has an ITIN: debtor[i].ssn_info.no_itin
     datatype: yesnoradio
     # default: False
   - Debtor ITIN 1: debtor[i].ssn_info.itin_1

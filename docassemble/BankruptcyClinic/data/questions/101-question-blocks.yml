@@ -292,7 +292,7 @@ section: identify
 ---
 id: debtor_alias_any
 question: |
-  Does ${ debtor[i].name.first } ${ debtor[i].name.last } have any           other names they've used in the last 8 years?
+  Does ${ debtor[i].name.first } ${ debtor[i].name.last } have any other names they've used in the last 8 years?
 subquestion: |
   Do not include the names of any separate legal entity such as a corporation, partnership, or LLC that is not filing this petition.
 yesno: debtor[i].alias.there_are_any
@@ -300,7 +300,7 @@ section: identify
 ---
 id: debtor_add_alias
 question: |
-  Add an alias for ${ debtor[i].name.first } ${ debtor[i].name.last } used   in the last 8 years.
+  Add an alias for ${ debtor[i].name.first } ${ debtor[i].name.last } used in the last 8 years.
 subquestion: |
   Include married or maiden names and any assumed, trade names and doing business as names, as well as your name with and without your middle initial and with and without your middle name.
 allowed to set:
@@ -319,7 +319,7 @@ list collect: True
 ---
 id: debtor_alias_another
 question: |
-  Does ${ debtor[i].name.first } ${ debtor[i].name.last } have any           other names they've used in the last 8 years?
+  Does ${ debtor[i].name.first } ${ debtor[i].name.last } have any other names they've used in the last 8 years?
 yesno: debtor[i].alias.there_is_another
 #under: |
 #  <br><br><br>
@@ -414,7 +414,7 @@ under: |
 
   If you choose to pay the entire fee please check with the clerk's office in your local court for more details about how you may pay.
 
-  Be aware, you may only request that your fee be waived if you are filing for Chapter 7. By law, a judge may, but is not required to, waive your fee, and may do so only if your income is less than 15% of the official poverty line that applies to your family size and you are unable to pay the fee in installments.
+  Be aware, you may only request that your fee be waived if you are filing for Chapter 7. By law, a judge may, but is not required to, waive your fee, and may do so only if your income is less than 150% of the official poverty line that applies to your family size and you are unable to pay the fee in installments.
 section: case_det
 ---
 id: poverty_calc
@@ -608,9 +608,9 @@ review:
   - Revisit: case.eviction_judgement
     button: |
       % if case.eviction_judgement:
-        **Eviction Judgement:** Yes
+        **Eviction Judgment:** Yes
       % else:
-        **Eviction Judgement:** No
+        **Eviction Judgment:** No
       % endif
   - Revisit: case.has_previous_bankruptcy
     button: |
@@ -768,7 +768,7 @@ section: haz_prop
 ---
 id: hazardous_property_details
 question: |
-  Please fill in the name and location of your business.
+  Please describe the hazardous property.
 allowed to set:
   - hazardous_property.property[i].complete
 fields:
@@ -891,7 +891,7 @@ id: credit_counsel_review
 event: credit_counsel
 section: credit_counsel
 question: |
-  Review Credit Couseling Choices
+  Review Credit Counseling Choices
 review:
   - note: |
       ${ counseling_table }
@@ -931,7 +931,7 @@ fields:
     datatype: number
   - How much do you estimate your assets to be worth?: reporting.assets_estimate
     datatype: currency
-  - how much do you estimate your liabilities to be?: reporting.liabilities_estimate
+  - How much do you estimate your liabilities to be?: reporting.liabilities_estimate
     datatype: currency
 section: report
 ---
@@ -1298,9 +1298,9 @@ review:
   - Revisit: case.eviction_judgement
     button: |
       % if case.eviction_judgement:
-        **Eviction Judgement:** Yes
+        **Eviction Judgment:** Yes
       % else:
-        **Eviction Judgement:** No
+        **Eviction Judgment:** No
       % endif
   - Revisit: case.has_previous_bankruptcy
     button: |

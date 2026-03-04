@@ -32,7 +32,7 @@ question: |
 allowed to set:
   - prop.priority_claims[i].complete
 fields:
-  - Creditors Name: prop.priority_claims[i].name
+  - Creditor's Name: prop.priority_claims[i].name
     # default: Some creditor
   - Address/PO Box: prop.priority_claims[i].street
     # default: 1111 3rd pl s
@@ -67,7 +67,7 @@ fields:
   - Contingent: prop.priority_claims[i].contingent
     datatype: yesno
     # default: False
-  - Unliquified: prop.priority_claims[i].unliquified
+  - Unliquidated: prop.priority_claims[i].unliquified
     datatype: yesno
     # default: False
   - Disputed: prop.priority_claims[i].disputed
@@ -307,7 +307,7 @@ question: |
 allowed to set:
   - prop.nonpriority_claims[i].complete
 fields:
-  - Creditors Name: prop.nonpriority_claims[i].name
+  - Creditor's Name: prop.nonpriority_claims[i].name
     # default: Some creditor
   - Address/PO Box: prop.nonpriority_claims[i].street
     # default: 1111 3rd pl s
@@ -342,7 +342,7 @@ fields:
   - Contingent: prop.nonpriority_claims[i].contingent
     datatype: yesno
     # default: False
-  - Unliquified: prop.nonpriority_claims[i].unliquified
+  - Unliquidated: prop.nonpriority_claims[i].unliquified
     datatype: yesno
     # default: False
   - Disputed: prop.nonpriority_claims[i].disputed
@@ -562,12 +562,12 @@ review:
         ${ prop.priority_claims.add_action() }
       % endif
       <br>
-      ### Non-priority Unsecured Claims
+      ### Nonpriority Unsecured Claims
       % if len(prop.nonpriority_claims) > 0:
         ${ prop_nonpriority_claims_table }
         ${ prop.nonpriority_claims.add_action() }
       % else:
-        No priority claims listed
+        No nonpriority claims listed
         ${ prop.nonpriority_claims.add_action() }
       % endif
 ---

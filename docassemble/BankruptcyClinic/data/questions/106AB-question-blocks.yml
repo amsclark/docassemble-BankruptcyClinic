@@ -14,7 +14,7 @@ continue button field: property_intro
 table: prop_interests_table
 rows: prop.interests
 columns:
-  - First Name: row_item.street
+  - Street: row_item.street
   - Property Type: row_item.type
   - Who has interest: row_item.who
   - Current Value: row_item.current_value
@@ -1434,7 +1434,7 @@ features:
 id: real_property_interest_details
 section: schedule_ab
 question: |
-  Tell the court about details about the interest in question.
+  Tell the court about the property interest.
 #right: |
 #  Current Exemption Summary.
 ### # Name           |Limit            |Amount
@@ -1650,7 +1650,7 @@ fields:
   - Year: prop.ab_vehicles[i].year
     datatype: number
     # default: 2012
-  - Approximate milage: prop.ab_vehicles[i].milage
+  - Approximate mileage: prop.ab_vehicles[i].milage
     datatype: number
     # default: 200000
   - Who has an interest in the property?: prop.ab_vehicles[i].who
@@ -1756,7 +1756,7 @@ under: |
 id: other_vehicle_details
 section: schedule_ab
 question: |
-  Tell the court about one of your other vehicles
+  Tell the court about one of your other vehicles.
 subquestion: |
   Other vehicles can include boats, trailers, motors, personal watercraft, fishing vessels, snowmobiles, motorcycle accessories.
 #right: |
@@ -1981,7 +1981,7 @@ script: |
   </script>
 fields:
   - note: <h3>Household Goods & Furnishings</h3>
-  - Do you own any household good and furnishings?: prop.has_household_goods
+  - Do you own any household goods and furnishings?: prop.has_household_goods
     datatype: yesnoradio
     # default: True
   - Describe: prop.household_goods_description
@@ -2302,7 +2302,7 @@ fields:
     show if: prop.clothes_is_claiming_exemption
     required: False
 
-  - note: <br><br><h3>jewelry</h3>
+  - note: <br><br><h3>Jewelry</h3>
 
   - Do you own any jewelry?: prop.has_jewelry
     datatype: yesnoradio
@@ -2810,7 +2810,7 @@ section: schedule_ab
 question: |
   Do you have any government and corporate bonds and other negotiable and non-negotiable instruments?
 subquestion: |
-  Negotiable instruments include personal checks, cashiers' checks, promissory notes
+  Negotiable instruments include personal checks, cashiers' checks, and promissory notes
 yesno: prop.financial_assets.corporate_bonds.there_are_any
 ---
 id: corporate_bonds_add_another
@@ -2916,7 +2916,7 @@ under: |
 id: retirement_accounts_details
 section: schedule_ab
 question: |
-  Tell the court about your interests retirement or pension accounts.
+  Tell the court about your interests in retirement or pension accounts.
 #right: |
 #  Current Exemption Summary.
 #
@@ -3205,7 +3205,7 @@ edit:
 id: education_accounts_any_exist
 section: schedule_ab
 question: |
-  Interests in an education IRA, in an account in a qualifed ABLE program, or under a qualified state tuition program.
+  Interests in an education IRA, in an account in a qualified ABLE program, or under a qualified state tuition program.
 subquestion: |
   26 U.S.C. §§ 530(b)(1), 529A(b), and 529(b)(1).
 yesno: prop.financial_assets.edu_accounts.there_are_any
@@ -3425,7 +3425,7 @@ fields:
 ---
 section: schedule_ab
 question: |
-  Do you have any licenses, franchises, or other general intagibles?
+  Do you have any licenses, franchises, or other general intangibles?
 subquestion: |
   Examples: Building permits, exclusive licenses, cooperative association holdings, liquor licenses, professional licenses.
 #right: |
@@ -4164,7 +4164,7 @@ fields:
 ---
 section: schedule_ab
 question: |
-  Do you have any business-related property you own or have an interest in.
+  Do you have any business-related property you own or have an interest in?
 fields:
   - Do you own or have any legal or equitable interest in any business related property?: prop.business_property.has_property
     datatype: yesnoradio
@@ -4256,7 +4256,7 @@ script: |
   </script>
 fields:
   - note: |
-      Accounts receiveable or commissions you already earned.
+      Accounts receivable or commissions you already earned.
   - Has property: prop.business_property.has_ar
     datatype: yesnoradio
     # default: True
@@ -4729,7 +4729,7 @@ fields:
 ---
 section: schedule_ab
 question: |
-  Tell us about your Farm and Commecial Fishing-related property
+  Tell us about your Farm and Commercial Fishing-related property
 #right: |
 #  Current Exemption Summary.
 #

@@ -20,7 +20,7 @@ question: |
   Common Creditors
 subquestion: |
   % if len(get_creditor_choices()) > 0:
-  Your clinic maintains a list of commonly-seen creditors.
+  Your clinic maintains a list of commonly seen creditors.
   Select any that apply to your case and their name and address will
   be pre-filled for you.
 

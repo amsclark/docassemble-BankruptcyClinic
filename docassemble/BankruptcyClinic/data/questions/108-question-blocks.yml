@@ -28,7 +28,7 @@ section: form_108
 question: |
   Identify the creditor and the property that is collateral
 fields: 
-  - Creditors Name: secured_claims[i].creditor_name
+  - Creditor's Name: secured_claims[i].creditor_name
     # default: Jimbo
   - Description of property: secured_claims[i].property_description
     input type: area
@@ -77,7 +77,7 @@ under: |
 id: personal_lease_details
 section: form_108
 question: |
-  Tell the court about an unexpired personal property leases
+  Tell the court about an unexpired personal property lease
 fields:
   - Lessor Name: personal_leases[i].name
     # default: Lenny

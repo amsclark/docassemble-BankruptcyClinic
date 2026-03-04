@@ -63,7 +63,7 @@ fields:
       % else:
       Income calculation
       % endif
-  - Your gross wages, salary tips, bonuses, overtime, and comissions: monthly_income.gross_wages1
+  - Your gross wages, salary, tips, bonuses, overtime, and commissions: monthly_income.gross_wages1
     datatype: currency
     default: ${ debtor[0].income.income_amount_1 + debtor[0].income.overtime_pay_1 }
   - Alimony and maintenance payments: monthly_income.alimony1
@@ -102,12 +102,12 @@ fields:
     datatype: currency
     default: 0
   - note: |
-      Pension or retirement. Do not include any amount received that was a benefit under the Social Security Act. Also, except as stated in the next sentence, do not include any compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with disability, combat-related injury or disability, or death of a member of the uniformed services. If you recieved any retired pay paid under chapter 61 of title 10, then include that pay only to the extent that it does not exceed the amount of retired pay to which you would otherwise be entitled if retired under any provision of title 10 other than chapter 61 of that title.
+      Pension or retirement. Do not include any amount received that was a benefit under the Social Security Act. Also, except as stated in the next sentence, do not include any compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with disability, combat-related injury or disability, or death of a member of the uniformed services. If you received any retired pay paid under chapter 61 of title 10, then include that pay only to the extent that it does not exceed the amount of retired pay to which you would otherwise be entitled if retired under any provision of title 10 other than chapter 61 of that title.
   - Pension or retirement: monthly_income.pension1
     datatype: currency
     default: ${ debtor[0].income.pension }
   - note: |
-      Income from all other sources not listed. Specify the source and amount. Do not include any benefits received under the Social Security Act; payments received as a victim of a war crime, a crime against humanity, or international or domestic terrorism; or compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with a disability, combat-related injury or disability, or death of a member of the uniformed servies.
+      Income from all other sources not listed. Specify the source and amount. Do not include any benefits received under the Social Security Act; payments received as a victim of a war crime, a crime against humanity, or international or domestic terrorism; or compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with a disability, combat-related injury or disability, or death of a member of the uniformed services.
   - Source 1: monthly_income.source1_1
     default: " "
   - Amount: monthly_income.source1_amount_1
@@ -127,7 +127,7 @@ subquestion: |
   Be as complete and accurate as possible. If two married people are filing together, both are equally responsible for being accurate.
 fields:
   - note: Income calculation Debtor 2
-  - Your gross wages, salary tips, bonuses, overtime, and comissions: monthly_income.gross_wages2
+  - Your gross wages, salary, tips, bonuses, overtime, and commissions: monthly_income.gross_wages2
     datatype: currency
     default: ${ debtor[1].income.income_amount_1 + debtor[1].income.overtime_pay_1 if len(debtor) > 1 else 0 }
   - Alimony and maintenance payments: monthly_income.alimony2
@@ -166,12 +166,12 @@ fields:
     datatype: currency
     default: 0
   - note: |
-      Pension or retirement. Do not include any amount received that was a benefit under the Social Security Act. Also, except as stated in the next sentence, do not include any compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with disability, combat-related injury or disability, or death of a member of the uniformed services. If you recieved any retired pay paid under chapter 61 of title 10, then include that pay only to the extent that it does not exceed the amount of retired pay to which you would otherwise be entitled if retired under any provision of title 10 other than chapter 61 of that title.
+      Pension or retirement. Do not include any amount received that was a benefit under the Social Security Act. Also, except as stated in the next sentence, do not include any compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with disability, combat-related injury or disability, or death of a member of the uniformed services. If you received any retired pay paid under chapter 61 of title 10, then include that pay only to the extent that it does not exceed the amount of retired pay to which you would otherwise be entitled if retired under any provision of title 10 other than chapter 61 of that title.
   - Pension or retirement: monthly_income.pension2
     datatype: currency
     default: ${ debtor[1].income.pension if len(debtor) > 1 else 0 }
   - note: |
-      Income from all other sources not listed. Specify the source and amount. Do not include any benefits received under the Social Security Act; payments received as a victim of a war crime, a crime against humanity, or international or domestic terrorism; or compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with a disability, combat-related injury or disability, or death of a member of the uniformed servies.
+      Income from all other sources not listed. Specify the source and amount. Do not include any benefits received under the Social Security Act; payments received as a victim of a war crime, a crime against humanity, or international or domestic terrorism; or compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with a disability, combat-related injury or disability, or death of a member of the uniformed services.
   - Source 1: monthly_income.source1_2
     default: " "
   - Amount: monthly_income.source1_amount_2
@@ -252,7 +252,7 @@ id: monthly_income_review
 event: form_122a
 section: form_122a
 question: |
-  Review Montly Income Answers
+  Review Monthly Income Answers
 review:
   - Revisit: monthly_income.filing_status
     button: |
