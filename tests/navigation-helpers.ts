@@ -958,10 +958,11 @@ export async function navigateDynamicPhase(page: Page, scenario: TestScenario) {
     const heading = await page.locator('h1, h2').first().textContent().catch(() => '');
     console.log(`  [dynamicPhase step ${60 - maxSteps}] heading: "${heading}"`);
 
-    // Check for conclusion — text OR presence of PDF download links
-    const hasPdfLinks = await page.locator('a[href*="/uploadedfile/"]').count() > 0;
+    // Check for conclusion — text OR presence of MANY PDF download links
+    // (The intermediate "Form 101 output" page has ~1 PDF; the final conclusion has 15+)
+    const pdfLinkCount = await page.locator('a[href*="/uploadedfile/"]').count();
     const bodyText = await page.locator('body').innerText();
-    if (hasPdfLinks ||
+    if (pdfLinkCount >= 5 ||
         bodyText.toLowerCase().includes('interview questions complete') ||
         bodyText.toLowerCase().includes('your documents are ready') ||
         bodyText.toLowerCase().includes('conclusion')) {
@@ -1219,6 +1220,8 @@ export async function navigateDynamicPhase(page: Page, scenario: TestScenario) {
     if (await page.locator(`[name="${b64('print_101')}"]`).count() > 0) {
       await clickNthByName(page, b64('print_101'), 0);
       await waitForDaPageLoad(page);
+      // Wait for heading to change (avoid stale "Form 101 output" causing double-click)
+      await page.waitForTimeout(2000);
       continue;
     }
 
