@@ -940,17 +940,30 @@ async function navigateSecuredCreditorsMulti(page: Page) {
       await clickContinue(page);
     }
 
-    // After "Continue" on last creditor: notify questions appear for ALL creditors
+    // After "Continue" on last creditor: notify questions appear for ALL creditors.
+    // Use a resilient loop: the page may still show the stale list-collect heading
+    // briefly after Continue, so retry on that case instead of breaking.
     if (isLast) {
-      for (let n = 0; n < securedList.length; n++) {
+      for (let n = 0; n < securedList.length + 5; n++) {
         await waitForDaPageLoad(page);
-        const h = await page.locator('h1').first().textContent().catch(() => '');
-        if (h?.toLowerCase().includes('notif') || h?.toLowerCase().includes('others to be notified')) {
+        const h = (await page.locator('h1').first().textContent().catch(() => ''))?.trim() || '';
+        const hLower = h.toLowerCase();
+
+        if (hLower.includes('notif') || hLower.includes('others to be notified')) {
           console.log(`  [secured] Notify question ${n + 1}: No`);
           await page.getByRole('button', { name: 'No' }).click();
           await page.waitForLoadState('networkidle');
+        } else if (hLower.includes('tell the court about your secured') || hLower.includes('secured claim')) {
+          // Stale list-collect heading — page hasn't fully transitioned yet
+          console.log(`  [secured] Waiting for page transition (stale heading: "${h}")...`);
+          await page.waitForTimeout(1500);
+        } else if (hLower.includes('other secured claims')) {
+          // there_is_another review page
+          console.log(`  [secured] More secured claims: No`);
+          await page.getByRole('button', { name: 'No' }).click();
+          await page.waitForLoadState('networkidle');
         } else {
-          console.log(`  [secured] No more notify questions at ${n + 1} (heading: "${h?.trim()}")`);
+          console.log(`  [secured] Done with secured creditors (heading: "${h}")`);
           break;
         }
       }

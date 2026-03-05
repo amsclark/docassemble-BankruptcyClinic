@@ -958,9 +958,11 @@ export async function navigateDynamicPhase(page: Page, scenario: TestScenario) {
     const heading = await page.locator('h1, h2').first().textContent().catch(() => '');
     console.log(`  [dynamicPhase step ${60 - maxSteps}] heading: "${heading}"`);
 
-    // Check for conclusion
+    // Check for conclusion — text OR presence of PDF download links
+    const hasPdfLinks = await page.locator('a[href*="/uploadedfile/"]').count() > 0;
     const bodyText = await page.locator('body').innerText();
-    if (bodyText.toLowerCase().includes('interview questions complete') ||
+    if (hasPdfLinks ||
+        bodyText.toLowerCase().includes('interview questions complete') ||
         bodyText.toLowerCase().includes('your documents are ready') ||
         bodyText.toLowerCase().includes('conclusion')) {
       return;
