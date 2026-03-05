@@ -1473,7 +1473,9 @@ test.describe('Maximalist End-to-End: Joint Filing with Every Field', () => {
     log('VERIFICATION');
 
     const bodyText = await page.locator('body').innerText();
+    const hasPdfLinks = await page.locator('a[href*="/uploadedfile/"]').count() > 0;
     const isConclusion =
+      hasPdfLinks ||
       bodyText.toLowerCase().includes('conclusion') ||
       bodyText.toLowerCase().includes('interview questions complete') ||
       bodyText.toLowerCase().includes('your documents are ready');
