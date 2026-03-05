@@ -55,11 +55,11 @@ id: debtor1_monthly_income_details
 section: schedule_i
 question: Give details about monthly income
 subquestion: |
-    Estimate monthly income as of the date you file this form. If you have nothing to report for any line, write 0. Include your non-filing spouse unless you are separated.
+    Estimate your **expected** monthly income at the time of filing, not necessarily what you earned last month. The purpose of Schedule I is to show the court your budget during the bankruptcy. If last month was unusual (e.g., due to job change, seasonal work, or one-time payments), adjust your figures to reflect your typical ongoing income.
 
-    If you or your non-filing spouse have more than one employer, combine the information for all employers for that person on the lines below.
+    If you have nothing to report for any line, write 0. Include your non-filing spouse unless you are separated. If you or your non-filing spouse have more than one employer, combine the information for all employers for that person on the lines below.
 
-    Please enter all your pay stub information for the previous month.
+    Please enter your pay stub information for a typical recent month.
 fields:
   - note: Check 1
   - Gross wages, salary, and commissions: debtor[0].income.income_amount_1
@@ -369,13 +369,13 @@ fields:
 ---
 id: debtor2_monthly_income_details
 section: schedule_i
-question: Give details about monthly income
+question: Give details about Debtor 2 monthly income
 subquestion: |
-    Estimate monthly income as of the date you file this form. If you have nothing to report for any line, write 0. Include your non-filing spouse unless you are separated.
+    Estimate Debtor 2's **expected** monthly income at the time of filing, not necessarily what was earned last month. The purpose of Schedule I is to show the court your budget during the bankruptcy.
 
-    If you or your non-filing spouse have more than one employer, combine the information for all employers for that person on the lines below.
+    If you have nothing to report for any line, write 0. If you or your non-filing spouse have more than one employer, combine the information for all employers for that person on the lines below.
 
-    Please enter all your pay stub information for the last full month.
+    Please enter pay stub information for a typical recent month.
 fields:
   - note: Check 1
   - Gross wages, salary, and commissions: debtor[1].income.income_amount_1

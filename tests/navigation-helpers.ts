@@ -584,7 +584,7 @@ export async function navigateSecuredCreditors(page: Page, scenario: TestScenari
     await page.locator(`#${b64('prop.creditors[0].name')}`).fill(sc.name);
     await page.locator(`#${b64('prop.creditors[0].street')}`).fill(sc.street);
     await page.locator(`#${b64('prop.creditors[0].city')}`).fill(sc.city);
-    await page.locator(`#${b64('prop.creditors[0].state')}`).fill(sc.state);
+    await page.locator(`select#${b64('prop.creditors[0].state')}`).selectOption(sc.state);
     await page.locator(`#${b64('prop.creditors[0].zip')}`).fill(sc.zip);
     // 'who' dropdown — always visible (code-generated choices)
     const secWhoSelect = page.locator(`select#${b64('prop.creditors[0].who')}`);
@@ -649,7 +649,7 @@ export async function navigateUnsecuredCreditors(page: Page, scenario: TestScena
     await page.locator(`#${b64('prop.priority_claims[0].name')}`).fill(pc.name);
     await page.locator(`#${b64('prop.priority_claims[0].street')}`).fill(pc.street);
     await page.locator(`#${b64('prop.priority_claims[0].city')}`).fill(pc.city);
-    await page.locator(`#${b64('prop.priority_claims[0].state')}`).fill(pc.state);
+    await page.locator(`select#${b64('prop.priority_claims[0].state')}`).selectOption(pc.state);
     await page.locator(`#${b64('prop.priority_claims[0].zip')}`).fill(pc.zip);
     // 'who' dropdown — always visible (code-generated choices)
     const prWhoSelect = page.locator(`select#${b64('prop.priority_claims[0].who')}`);
@@ -680,7 +680,7 @@ export async function navigateUnsecuredCreditors(page: Page, scenario: TestScena
     await page.locator(`#${b64('prop.nonpriority_claims[0].name')}`).fill(np.name);
     await page.locator(`#${b64('prop.nonpriority_claims[0].street')}`).fill(np.street);
     await page.locator(`#${b64('prop.nonpriority_claims[0].city')}`).fill(np.city);
-    await page.locator(`#${b64('prop.nonpriority_claims[0].state')}`).fill(np.state);
+    await page.locator(`select#${b64('prop.nonpriority_claims[0].state')}`).selectOption(np.state);
     await page.locator(`#${b64('prop.nonpriority_claims[0].zip')}`).fill(np.zip);
     // 'who' dropdown — always visible (code-generated choices)
     const npWhoSelect = page.locator(`select#${b64('prop.nonpriority_claims[0].who')}`);

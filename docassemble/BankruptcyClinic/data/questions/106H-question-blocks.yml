@@ -120,7 +120,7 @@ section: schedule_h
 question: |
   Within the last 8 years, have you lived in a community property state or territory?
 subquestion: |
-  Community property states and territories include Arizona, California, Idaho, Louisiana, Nevada, New Mexico, Puerto Rico, Texas, Washington, and Wisconsin.
+  This is required for Schedule H even if you previously provided residence history in the Statement of Financial Affairs. Community property states and territories include Arizona, California, Idaho, Louisiana, Nevada, New Mexico, Puerto Rico, Texas, Washington, and Wisconsin.
 fields:
   - In community property state: debtors.community_property
     datatype: yesnoradio

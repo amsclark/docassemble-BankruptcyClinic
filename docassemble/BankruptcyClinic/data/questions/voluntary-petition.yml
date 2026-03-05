@@ -654,8 +654,17 @@ code: |
     financial_affairs.has_second_address = False
     financial_affairs._defaults_applied = True
 
-  if not defined('financial_affairs.has_more_addresses'):
-    financial_affairs.has_more_addresses = False
+  if not defined('financial_affairs.has_third_address'):
+    financial_affairs.has_third_address = False
+
+  if not defined('financial_affairs.has_fourth_address'):
+    financial_affairs.has_fourth_address = False
+
+  if not defined('financial_affairs.has_fifth_address'):
+    financial_affairs.has_fifth_address = False
+
+  if not defined('financial_affairs.has_sixth_address'):
+    financial_affairs.has_sixth_address = False
 
   financial_affairs.debtor_count = len(debtor)
   financial_affairs.marital_status

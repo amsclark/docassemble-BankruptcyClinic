@@ -234,47 +234,50 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
 
-  - note: Address 3
+  - Do you have a third address?: financial_affairs.has_third_address
+    datatype: yesnoradio
     show if: financial_affairs.has_second_address
+  - note: Address 3
+    show if: financial_affairs.has_third_address
   - Address/PO Box: financial_affairs.address_street_3
     # default: 1111 36th pl
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_third_address
     required: False
   - City: financial_affairs.address_city_3
     # default: Seattle
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_third_address
     required: False
   - State: financial_affairs.address_state_3
     # default: Washington
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_third_address
     required: False
   - Zip: financial_affairs.address_zip_3
     datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_third_address
     required: False
   - note: Dates you lived there
     show if:
       code: |
-        financial_affairs.lived_elsewhere and financial_affairs.has_second_address
+        financial_affairs.lived_elsewhere and financial_affairs.has_third_address
   - From: financial_affairs.address_from_3
     datatype: date
     # default: 01/01/23
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_third_address
     required: False
   - To: financial_affairs.address_to_3
     datatype: date
     # default: 04/01/23
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_third_address
     required: False
   - note: Debtor 2 Address
     show if:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
-      variable: financial_affairs.has_second_address
+      variable: financial_affairs.has_third_address
       is: False
   - Same address as you?: financial_affairs.address_same_3
     datatype: yesnoradio
@@ -283,13 +286,13 @@ fields:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
-      variable: financial_affairs.has_second_address
+      variable: financial_affairs.has_third_address
       is: False
     required: False
   - Address/PO Box: financial_affairs.debtor2_address_street_3
     # default: 1111 36th pl
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_3") === false
+      val("financial_affairs.has_third_address") === true && val("financial_affairs.address_same_3") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -297,7 +300,7 @@ fields:
   - City: financial_affairs.debtor2_address_city_3
     # default: Seattle
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_3") === false
+      val("financial_affairs.has_third_address") === true && val("financial_affairs.address_same_3") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -305,7 +308,7 @@ fields:
   - State: financial_affairs.debtor2_address_state_3
     # default: Washington
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_3") === false
+      val("financial_affairs.has_third_address") === true && val("financial_affairs.address_same_3") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -316,7 +319,7 @@ fields:
     maxlength: 5
     # default: 33593
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_3") === false
+      val("financial_affairs.has_third_address") === true && val("financial_affairs.address_same_3") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -325,7 +328,7 @@ fields:
     datatype: yesnoradio
     # default: False
     js show if:
-      val("financial_affairs.has_second_address") === true
+      val("financial_affairs.has_third_address") === true
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -334,7 +337,7 @@ fields:
     datatype: date
     # default: 01/01/23
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_3") === false
+      val("financial_affairs.has_third_address") === true && val("financial_affairs.address_same_dates_3") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -343,53 +346,56 @@ fields:
     datatype: date
     # default: 04/01/23
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_3") === false
+      val("financial_affairs.has_third_address") === true && val("financial_affairs.address_same_dates_3") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
     required: False
 
+  - Do you have a fourth address?: financial_affairs.has_fourth_address
+    datatype: yesnoradio
+    show if: financial_affairs.has_third_address
   - note: Address 4
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_fourth_address
   - Address/PO Box: financial_affairs.address_street_4
     # default: 1111 36th pl
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_fourth_address
     required: False
   - City: financial_affairs.address_city_4
     # default: Seattle
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_fourth_address
     required: False
   - State: financial_affairs.address_state_4
     # default: Washington
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_fourth_address
     required: False
   - Zip: financial_affairs.address_zip_4
     datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_fourth_address
     required: False
   - note: Dates you lived there
     show if:
       code: |
-        financial_affairs.lived_elsewhere and financial_affairs.has_second_address
+        financial_affairs.lived_elsewhere and financial_affairs.has_fourth_address
   - From: financial_affairs.address_from_4
     datatype: date
     # default: 01/01/23
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_fourth_address
     required: False
   - To: financial_affairs.address_to_4
     datatype: date
     # default: 04/01/23
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_fourth_address
     required: False
   - note: Debtor 2 Address
     show if:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
-      variable: financial_affairs.has_second_address
+      variable: financial_affairs.has_fourth_address
       is: False
   - Same address as you?: financial_affairs.address_same_4
     datatype: yesnoradio
@@ -398,13 +404,13 @@ fields:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
-      variable: financial_affairs.has_second_address
+      variable: financial_affairs.has_fourth_address
       is: False
     required: False
   - Address/PO Box: financial_affairs.debtor2_address_street_4
     # default: 1111 36th pl
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_4") === false
+      val("financial_affairs.has_fourth_address") === true && val("financial_affairs.address_same_4") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -412,7 +418,7 @@ fields:
   - City: financial_affairs.debtor2_address_city_4
     # default: Seattle
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_4") === false
+      val("financial_affairs.has_fourth_address") === true && val("financial_affairs.address_same_4") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -420,7 +426,7 @@ fields:
   - State: financial_affairs.debtor2_address_state_4
     # default: Washington
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_4") === false
+      val("financial_affairs.has_fourth_address") === true && val("financial_affairs.address_same_4") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -431,7 +437,7 @@ fields:
     maxlength: 5
     # default: 33593
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_4") === false
+      val("financial_affairs.has_fourth_address") === true && val("financial_affairs.address_same_4") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -440,7 +446,7 @@ fields:
     datatype: yesnoradio
     # default: False
     js show if:
-      val("financial_affairs.has_second_address") === true
+      val("financial_affairs.has_fourth_address") === true
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -449,7 +455,7 @@ fields:
     datatype: date
     # default: 01/01/23
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_4") === false
+      val("financial_affairs.has_fourth_address") === true && val("financial_affairs.address_same_dates_4") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -458,53 +464,56 @@ fields:
     datatype: date
     # default: 04/01/23
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_4") === false
+      val("financial_affairs.has_fourth_address") === true && val("financial_affairs.address_same_dates_4") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
     required: False
 
+  - Do you have a fifth address?: financial_affairs.has_fifth_address
+    datatype: yesnoradio
+    show if: financial_affairs.has_fourth_address
   - note: Address 5
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_fifth_address
   - Address/PO Box: financial_affairs.address_street_5
     # default: 1111 36th pl
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_fifth_address
     required: False
   - City: financial_affairs.address_city_5
     # default: Seattle
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_fifth_address
     required: False
   - State: financial_affairs.address_state_5
     # default: Washington
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_fifth_address
     required: False
   - Zip: financial_affairs.address_zip_5
     datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_fifth_address
     required: False
   - note: Dates you lived there
     show if:
       code: |
-        financial_affairs.lived_elsewhere and financial_affairs.has_second_address
+        financial_affairs.lived_elsewhere and financial_affairs.has_fifth_address
   - From: financial_affairs.address_from_5
     datatype: date
     # default: 01/01/23
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_fifth_address
     required: False
   - To: financial_affairs.address_to_5
     datatype: date
     # default: 04/01/23
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_fifth_address
     required: False
   - note: Debtor 2 Address
     show if:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
-      variable: financial_affairs.has_second_address
+      variable: financial_affairs.has_fifth_address
       is: False
   - Same address as you?: financial_affairs.address_same_5
     datatype: yesnoradio
@@ -513,13 +522,13 @@ fields:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
-      variable: financial_affairs.has_second_address
+      variable: financial_affairs.has_fifth_address
       is: False
     required: False
   - Address/PO Box: financial_affairs.debtor2_address_street_5
     # default: 1111 36th pl
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_5") === false
+      val("financial_affairs.has_fifth_address") === true && val("financial_affairs.address_same_5") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -527,7 +536,7 @@ fields:
   - City: financial_affairs.debtor2_address_city_5
     # default: Seattle
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_5") === false
+      val("financial_affairs.has_fifth_address") === true && val("financial_affairs.address_same_5") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -535,7 +544,7 @@ fields:
   - State: financial_affairs.debtor2_address_state_5
     # default: Washington
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_5") === false
+      val("financial_affairs.has_fifth_address") === true && val("financial_affairs.address_same_5") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -546,7 +555,7 @@ fields:
     maxlength: 5
     # default: 33593
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_5") === false
+      val("financial_affairs.has_fifth_address") === true && val("financial_affairs.address_same_5") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -555,7 +564,7 @@ fields:
     datatype: yesnoradio
     # default: False
     js show if:
-      val("financial_affairs.has_second_address") === true
+      val("financial_affairs.has_fifth_address") === true
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -564,7 +573,7 @@ fields:
     datatype: date
     # default: 01/01/23
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_5") === false
+      val("financial_affairs.has_fifth_address") === true && val("financial_affairs.address_same_dates_5") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -573,53 +582,56 @@ fields:
     datatype: date
     # default: 04/01/23
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_5") === false
+      val("financial_affairs.has_fifth_address") === true && val("financial_affairs.address_same_dates_5") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
     required: False
 
+  - Do you have a sixth address?: financial_affairs.has_sixth_address
+    datatype: yesnoradio
+    show if: financial_affairs.has_fifth_address
   - note: Address 6
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_sixth_address
   - Address/PO Box: financial_affairs.address_street_6
     # default: 1111 36th pl
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_sixth_address
     required: False
   - City: financial_affairs.address_city_6
     # default: Seattle
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_sixth_address
     required: False
   - State: financial_affairs.address_state_6
     # default: Washington
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_sixth_address
     required: False
   - Zip: financial_affairs.address_zip_6
     datatype: text
     minlength: 5
     maxlength: 5
     # default: 33593
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_sixth_address
     required: False
   - note: Dates you lived there
     show if:
       code: |
-        financial_affairs.has_second_address
+        financial_affairs.has_sixth_address
   - From: financial_affairs.address_from_6
     datatype: date
     # default: 01/01/23
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_sixth_address
     required: False
   - To: financial_affairs.address_to_6
     datatype: date
     # default: 04/01/23
-    show if: financial_affairs.has_second_address
+    show if: financial_affairs.has_sixth_address
     required: False
   - note: Debtor 2 Address
     show if:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
-      variable: financial_affairs.has_second_address
+      variable: financial_affairs.has_sixth_address
       is: False
   - Same address as you?: financial_affairs.address_same_6
     datatype: yesnoradio
@@ -628,13 +640,13 @@ fields:
       code: |
         financial_affairs.debtor_count > 1
     hide if:
-      variable: financial_affairs.has_second_address
+      variable: financial_affairs.has_sixth_address
       is: False
     required: False
   - Address/PO Box: financial_affairs.debtor2_address_street_6
     # default: 1111 36th pl
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_6") === false
+      val("financial_affairs.has_sixth_address") === true && val("financial_affairs.address_same_6") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -642,7 +654,7 @@ fields:
   - City: financial_affairs.debtor2_address_city_6
     # default: Seattle
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_6") === false
+      val("financial_affairs.has_sixth_address") === true && val("financial_affairs.address_same_6") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -650,7 +662,7 @@ fields:
   - State: financial_affairs.debtor2_address_state_6
     # default: Washington
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_6") === false
+      val("financial_affairs.has_sixth_address") === true && val("financial_affairs.address_same_6") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -661,7 +673,7 @@ fields:
     maxlength: 5
     # default: 33593
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_6") === false
+      val("financial_affairs.has_sixth_address") === true && val("financial_affairs.address_same_6") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -670,7 +682,7 @@ fields:
     datatype: yesnoradio
     # default: False
     js show if:
-      val("financial_affairs.has_second_address") === true
+      val("financial_affairs.has_sixth_address") === true
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -679,7 +691,7 @@ fields:
     datatype: date
     # default: 01/01/23
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_6") === false
+      val("financial_affairs.has_sixth_address") === true && val("financial_affairs.address_same_dates_6") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
@@ -688,14 +700,10 @@ fields:
     datatype: date
     # default: 04/01/23
     js show if:
-      val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_dates_6") === false
+      val("financial_affairs.has_sixth_address") === true && val("financial_affairs.address_same_dates_6") === false
     hide if:
       code: |
         financial_affairs.debtor_count < 2
-    required: False
-  - Do you need more address slots?: financial_affairs.has_more_addresses
-    datatype: yesnoradio
-    show if: financial_affairs.has_second_address
     required: False
   - note: Address 7
     show if: financial_affairs.has_more_addresses

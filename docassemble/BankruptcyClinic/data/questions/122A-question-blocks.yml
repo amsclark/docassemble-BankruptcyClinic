@@ -48,7 +48,7 @@ fields:
       is: Married and your spouse is NOT filing with you.
   - How many dependents?: monthly_income.dependents
     datatype: number
-    # default: 2
+    default: ${ len(debtor[0].expenses.dependents) if defined('debtor[0].expenses.dependents.gathered') else 0 }
 ---
 id: debtor1_current_monthly_income
 section: form_122a
@@ -189,13 +189,13 @@ question: |
   
   Your current overall income is estimated to be: ${ currency(overall_means_income) }
   <br><br>
-  
-  150% of poverty level based on ${ int(monthly_income.dependents) } dependents is: ${ currency(povertyAmt) }
+
+  DOJ median family income for a household of ${ int(monthly_income.median_dependents) } in ${ debtor[0].address.state } is: ${ currency(medianFamilyIncome) }
   <br><br>
-  % if overall_means_income < povertyAmt:
-   Chapter 7 OK with NO Presumption of Abuse. Means Test Form is Complete. Form 122A-2 is not required.
+  % if overall_means_income < medianFamilyIncome:
+   Your income is below the median. Chapter 7 OK with NO Presumption of Abuse. Means Test Form is Complete. Form 122A-2 is not required.
   % else:
-  Please fill out Form 122A-2 and submit it with your bankruptcy filing.
+  Your income exceeds the median. Please fill out Form 122A-2 and submit it with your bankruptcy filing.
   % endif
 continue button field: monthly_income.reviewed
 ---
@@ -240,10 +240,10 @@ question: |
   Calculate the median family income that applies to you.
 fields:
   - State in which you live: monthly_income.median_state
-    # default: Florida
+    default: ${ debtor[0].address.state if defined('debtor[0].address.state') else '' }
   - Number of people in your household: monthly_income.median_dependents
     datatype: number
-    # default: 2
+    default: ${ len(debtor[0].expenses.dependents) + len(debtor) if defined('debtor[0].expenses.dependents.gathered') else 1 }
   - Median family income for your state and size of household: monthly_income.median_income
     datatype: currency
     # default: 40000

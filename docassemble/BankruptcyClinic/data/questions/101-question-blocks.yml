@@ -411,9 +411,9 @@ under: |
 
   Your current overall income is estimated to be: ${ currency(overallIncome) }
 
-  150% of poverty level based on ${ int(monthly_income.median_dependents) } dependents is: ${ currency(povertyAmt) }
+  DOJ median family income for a household of ${ int(monthly_income.median_dependents) } is: ${ currency(medianFamilyIncome) }
 
-  % if overallIncome < povertyAmt:
+  % if overallIncome < medianFamilyIncome:
   You may qualify for a fee waiver!
   % else:
   Sorry, you do not qualify for the fee waiver.
@@ -445,26 +445,23 @@ code: |
     _deductions = (_num(debt.income.tax_deduction) + _num(debt.income.mandatory_contributions) + _num(debt.income.voluntary_contributions) + _num(debt.income.fund_loans) + _num(debt.income.insurance) + _num(debt.income.domestic_support) + _num(debt.income.union_dues) + _other_ded)
     _overall += _income_total + _paystub_total - _deductions
   overallIncome = _overall
-  _median_dep = _num(value('monthly_income.median_dependents')) if defined('monthly_income.median_dependents') else 1
-  if _median_dep <= 0.0:
-    povertyAmt = 14580 * 1.5
-  elif _median_dep <= 1.0:
-    povertyAmt = 19720 * 1.5
-  elif _median_dep <= 2.0:
-    povertyAmt = 24860 * 1.5
-  elif _median_dep <= 3.0:
-    povertyAmt = 30000 * 1.5
-  elif _median_dep <= 4.0:
-    povertyAmt = 35140 * 1.5
-  elif _median_dep <= 5.0:
-    povertyAmt = 40280 * 1.5
-  elif _median_dep <= 6.0:
-    povertyAmt = 45420 * 1.5
-  elif _median_dep <= 7.0:
-    povertyAmt = 50560 * 1.5
+  # DOJ Median Family Income thresholds for Ch. 7 means test
+  # Source: https://www.justice.gov/ust/eo/bapcpa/20250515/bci_data/median_income_table.htm
+  # These numbers should be updated when new DOJ tables are published (every ~6 months)
+  _household_size = _num(value('monthly_income.median_dependents')) if defined('monthly_income.median_dependents') else 1
+  if _household_size < 1:
+    _household_size = 1
+  _state = str(debtor[0].address.state).lower() if defined('debtor[0].address.state') else 'nebraska'
+  if 'south dakota' in _state:
+    _median_table = {1: 61022, 2: 92469, 3: 96008, 4: 116374}
   else:
-    countAbove = _median_dep - 7
-    povertyAmt = (50560 + (countAbove*5140))*1.5
+    _median_table = {1: 65292, 2: 89130, 3: 103358, 4: 120323}
+  _additional_per_person = 11100
+  _hs = int(_household_size)
+  if _hs <= 4:
+    medianFamilyIncome = _median_table.get(_hs, _median_table[1])
+  else:
+    medianFamilyIncome = _median_table[4] + (_hs - 4) * _additional_per_person
 
 ---
 id: previous_bankruptcy

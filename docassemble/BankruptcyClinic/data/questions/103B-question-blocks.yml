@@ -26,10 +26,10 @@ fields:
     datatype: yesno
   - How many dependents: family.dependent_count
     datatype: number
-    # default: 0
+    default: ${ len(debtor[0].expenses.dependents) if defined('debtor[0].expenses.dependents.gathered') else 0 }
   - Total number of people: family.total_number
     datatype: number
-    # default: 2
+    default: ${ len(debtor) + len(debtor[0].expenses.dependents) if defined('debtor[0].expenses.dependents.gathered') else len(debtor) }
   - note: |
       <br>
       ### Income Information
@@ -37,11 +37,11 @@ fields:
       Make sure to include the value (if known) of any non-cash governmental assistance that you receive, such as food stamps (benefits under the Supplemental Nutrition Assistance Program) or housing subsidies.
   - Your income: family.you_income
     datatype: currency
-    # default: 50000
+    default: ${ debtor[0].income.income_amount_1 + debtor[0].income.overtime_pay_1 + debtor[0].income.net_rental_business + debtor[0].income.social_security + debtor[0].income.pension + debtor[0].income.unemployment + debtor[0].income.family_support + debtor[0].income.interest_and_dividends + debtor[0].income.other_govt_assist if defined('debtor[0].income.income_amount_1') else 0 }
   - Your spouse's income: family.spouse_income
     datatype: currency
     required: False
-    # default: 30000
+    default: ${ debtor[1].income.income_amount_1 + debtor[1].income.overtime_pay_1 + debtor[1].income.net_rental_business + debtor[1].income.social_security + debtor[1].income.pension + debtor[1].income.unemployment + debtor[1].income.family_support + debtor[1].income.interest_and_dividends + debtor[1].income.other_govt_assist if len(debtor) > 1 and defined('debtor[1].income.income_amount_1') else 0 }
   - Non-cash assistance: family.assistance_income
     datatype: currency
     # default: 5000

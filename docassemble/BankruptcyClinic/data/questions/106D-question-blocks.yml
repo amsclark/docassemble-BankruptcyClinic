@@ -100,7 +100,8 @@ fields:
     # default: Tampa
     required: False
   - State: prop.creditors[i].notify[j].other_state
-    # default: Florida
+    input type: dropdown
+    code: get_all_us_states()
     required: False
   - Zip: prop.creditors[i].notify[j].other_zip
     datatype: text
@@ -145,7 +146,8 @@ fields:
   - City: prop.creditors[i].city
     # default: Tampa
   - State: prop.creditors[i].state
-    # default: Florida
+    input type: dropdown
+    code: get_all_us_states()
   - Zip: prop.creditors[i].zip
     datatype: text
     minlength: 5
@@ -249,7 +251,8 @@ fields:
       variable: prop.creditors[i].has_codebtor
       is: True
   - State: prop.creditors[i].codebtor_state
-    # default: Florida
+    input type: dropdown
+    code: get_all_us_states()
     show if:
       variable: prop.creditors[i].has_codebtor
       is: True
@@ -329,7 +332,7 @@ code: |
     claims['isJudgement'+str(i+1)] = True if creditor.lawsuit == True else False
     claims['isOther'+str(i+1)] = True if creditor.has_other_lien_type == True else False
     claims['otherDesc'+str(i+1)] = creditor.other_lien_type if creditor.has_other_lien_type == True else None
-    claims['acct'+str(i+1)] = creditor.account_number[-4:]
+    claims['acct'+str(i+1)] = creditor.account_number[-4:] if getattr(creditor, 'account_number', '') else ''
     claims['claimAmount'+str(i+1)] = currency(creditor.claim_amount)
     claims['collateral'+str(i+1)] = currency(creditor.collateral_value)
     claims['unsecured'+str(i+1)] = currency(creditor.claim_amount - creditor.collateral_value)
@@ -346,7 +349,7 @@ code: |
       claims['notiState'+str(lineNum)] = notify.other_state
       claims['notiZip'+str(lineNum)] = notify.other_zip
       claims['notiCreditorLine'+str(lineNum)] = str(y)
-      claims['notiAcct'+str(lineNum)] = creditor.account_number[-4:]
+      claims['notiAcct'+str(lineNum)] = creditor.account_number[-4:] if getattr(creditor, 'account_number', '') else ''
       lineNum += 1
     y += 1
 reconsider: True

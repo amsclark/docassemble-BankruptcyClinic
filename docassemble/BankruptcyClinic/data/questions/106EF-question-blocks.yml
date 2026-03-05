@@ -39,7 +39,8 @@ fields:
   - City: prop.priority_claims[i].city
     # default: tampa
   - State: prop.priority_claims[i].state
-    # default: Florida
+    input type: dropdown
+    code: get_all_us_states()
   - Zip: prop.priority_claims[i].zip
     datatype: text
     minlength: 5
@@ -314,7 +315,8 @@ fields:
   - City: prop.nonpriority_claims[i].city
     # default: tampa
   - State: prop.nonpriority_claims[i].state
-    # default: Florida
+    input type: dropdown
+    code: get_all_us_states()
   - Zip: prop.nonpriority_claims[i].zip
     datatype: text
     minlength: 5

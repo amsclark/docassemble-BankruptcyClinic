@@ -57,6 +57,8 @@ id: real_property_interest_details
 section: schedule_ab
 question: |
   Tell the court about the property interest.
+subquestion: |
+  <div id="exemption-tracker-data" style="display:none">${ exemption_totals_json }</div>
 #right: |
 #  Current Exemption Summary.
 ### # Name           |Limit            |Amount
@@ -230,6 +232,7 @@ question: |
   Tell the court about one of your vehicles.
 subquestion: |
   Vehicles can include cars, vans, trucks, tractors, sport utility vehicles, motorcycles.
+  <div id="exemption-tracker-data" style="display:none">${ exemption_totals_json }</div>
 #right: |
 #  Current Exemption Summary.
 #

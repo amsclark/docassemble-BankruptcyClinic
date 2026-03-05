@@ -175,16 +175,16 @@ export const SIMPLE_SINGLE: TestScenario = {
   property: {},
   creditors: {
     nonpriority: {
-      name: 'Regional Medical Center', street: '800 Health Dr', city: 'Lincoln', state: 'NE', zip: '68510',
+      name: 'Regional Medical Center', street: '800 Health Dr', city: 'Lincoln', state: 'Nebraska', zip: '68510',
       totalClaim: '3200', type: 'Medical',
     },
     nonpriorityList: [
       {
-        name: 'Regional Medical Center', street: '800 Health Dr', city: 'Lincoln', state: 'NE', zip: '68510',
+        name: 'Regional Medical Center', street: '800 Health Dr', city: 'Lincoln', state: 'Nebraska', zip: '68510',
         totalClaim: '3200', type: 'Medical',
       },
       {
-        name: 'Visa Credit Services', street: 'PO Box 15000', city: 'Wilmington', state: 'DE', zip: '19886',
+        name: 'Visa Credit Services', street: 'PO Box 15000', city: 'Wilmington', state: 'Delaware', zip: '19886',
         totalClaim: '8500', type: 'Credit Card',
       },
     ],
@@ -230,34 +230,34 @@ export const HOMEOWNER_CARLOAN: TestScenario = {
   },
   creditors: {
     secured: {
-      name: 'Wells Fargo Home Mortgage', street: '1 Home Campus', city: 'Des Moines', state: 'IA', zip: '50328',
+      name: 'Wells Fargo Home Mortgage', street: '1 Home Campus', city: 'Des Moines', state: 'Iowa', zip: '50328',
       claimAmount: '165000', collateralValue: '185000',
     },
     securedList: [
       {
-        name: 'Wells Fargo Home Mortgage', street: '1 Home Campus', city: 'Des Moines', state: 'IA', zip: '50328',
+        name: 'Wells Fargo Home Mortgage', street: '1 Home Campus', city: 'Des Moines', state: 'Iowa', zip: '50328',
         claimAmount: '165000', collateralValue: '185000',
       },
       {
-        name: 'Toyota Financial Services', street: 'PO Box 105386', city: 'Atlanta', state: 'GA', zip: '30348',
+        name: 'Toyota Financial Services', street: 'PO Box 105386', city: 'Atlanta', state: 'Georgia', zip: '30348',
         claimAmount: '12000', collateralValue: '18000',
       },
     ],
     nonpriority: {
-      name: 'Chase Credit Card', street: 'PO Box 15298', city: 'Wilmington', state: 'DE', zip: '19850',
+      name: 'Chase Credit Card', street: 'PO Box 15298', city: 'Wilmington', state: 'Delaware', zip: '19850',
       totalClaim: '9500', type: 'Credit Card',
     },
     nonpriorityList: [
       {
-        name: 'Chase Credit Card', street: 'PO Box 15298', city: 'Wilmington', state: 'DE', zip: '19850',
+        name: 'Chase Credit Card', street: 'PO Box 15298', city: 'Wilmington', state: 'Delaware', zip: '19850',
         totalClaim: '9500', type: 'Credit Card',
       },
       {
-        name: 'Capital One', street: 'PO Box 30285', city: 'Salt Lake City', state: 'UT', zip: '84130',
+        name: 'Capital One', street: 'PO Box 30285', city: 'Salt Lake City', state: 'Utah', zip: '84130',
         totalClaim: '7200', type: 'Credit Card',
       },
       {
-        name: 'Discover Financial', street: 'PO Box 6103', city: 'Carol Stream', state: 'IL', zip: '60197',
+        name: 'Discover Financial', street: 'PO Box 6103', city: 'Carol Stream', state: 'Illinois', zip: '60197',
         totalClaim: '5300', type: 'Credit Card',
       },
     ],
@@ -312,33 +312,33 @@ export const JOINT_COUPLE: TestScenario = {
   },
   creditors: {
     priority: {
-      name: 'SD Department of Revenue', street: '445 E Capitol Ave', city: 'Pierre', state: 'SD', zip: '57501',
+      name: 'SD Department of Revenue', street: '445 E Capitol Ave', city: 'Pierre', state: 'South Dakota', zip: '57501',
       type: 'Taxes and certain other debts you owe the government',
       totalClaim: '2400', priorityAmount: '2400', nonpriorityAmount: '0',
     },
     nonpriority: {
-      name: 'Sanford Health', street: '1305 W 18th St', city: 'Sioux Falls', state: 'SD', zip: '57104',
+      name: 'Sanford Health', street: '1305 W 18th St', city: 'Sioux Falls', state: 'South Dakota', zip: '57104',
       totalClaim: '4800', type: 'Medical',
     },
     nonpriorityList: [
       {
-        name: 'Sanford Health', street: '1305 W 18th St', city: 'Sioux Falls', state: 'SD', zip: '57104',
+        name: 'Sanford Health', street: '1305 W 18th St', city: 'Sioux Falls', state: 'South Dakota', zip: '57104',
         totalClaim: '4800', type: 'Medical',
       },
       {
-        name: 'Avera Medical Group', street: '3900 W Avera Dr', city: 'Sioux Falls', state: 'SD', zip: '57108',
+        name: 'Avera Medical Group', street: '3900 W Avera Dr', city: 'Sioux Falls', state: 'South Dakota', zip: '57108',
         totalClaim: '2100', type: 'Medical',
       },
       {
-        name: 'Chase Credit Card', street: 'PO Box 15298', city: 'Wilmington', state: 'DE', zip: '19850',
+        name: 'Chase Credit Card', street: 'PO Box 15298', city: 'Wilmington', state: 'Delaware', zip: '19850',
         totalClaim: '6500', type: 'Credit Card',
       },
       {
-        name: 'Capital One', street: 'PO Box 30285', city: 'Salt Lake City', state: 'UT', zip: '84130',
+        name: 'Capital One', street: 'PO Box 30285', city: 'Salt Lake City', state: 'Utah', zip: '84130',
         totalClaim: '3200', type: 'Credit Card',
       },
       {
-        name: 'Prosper Personal Loan', street: '221 Main St Ste 300', city: 'San Francisco', state: 'CA', zip: '94105',
+        name: 'Prosper Personal Loan', street: '221 Main St Ste 300', city: 'San Francisco', state: 'California', zip: '94105',
         totalClaim: '5500', type: 'Other',
       },
     ],
@@ -390,41 +390,41 @@ export const COMPLEX_CASE: TestScenario = {
   },
   creditors: {
     secured: {
-      name: 'Subaru Motors Finance', street: 'PO Box 5070', city: 'Cherry Hill', state: 'NJ', zip: '08002',
+      name: 'Subaru Motors Finance', street: 'PO Box 5070', city: 'Cherry Hill', state: 'New Jersey', zip: '08002',
       claimAmount: '15000', collateralValue: '25000',
     },
     priority: {
-      name: 'Internal Revenue Service', street: '1111 Constitution Ave', city: 'Washington', state: 'DC', zip: '20224',
+      name: 'Internal Revenue Service', street: '1111 Constitution Ave', city: 'Washington', state: 'District of Columbia', zip: '20224',
       type: 'Taxes and certain other debts you owe the government',
       totalClaim: '5200', priorityAmount: '5200', nonpriorityAmount: '0',
     },
     priorityList: [
       {
-        name: 'Internal Revenue Service', street: '1111 Constitution Ave', city: 'Washington', state: 'DC', zip: '20224',
+        name: 'Internal Revenue Service', street: '1111 Constitution Ave', city: 'Washington', state: 'District of Columbia', zip: '20224',
         type: 'Taxes and certain other debts you owe the government',
         totalClaim: '5200', priorityAmount: '5200', nonpriorityAmount: '0',
       },
       {
-        name: 'NE Dept of Labor', street: '550 S 16th St', city: 'Lincoln', state: 'NE', zip: '68508',
+        name: 'NE Dept of Labor', street: '550 S 16th St', city: 'Lincoln', state: 'Nebraska', zip: '68508',
         type: 'Wages, salaries, or commissions',
         totalClaim: '1800', priorityAmount: '1800', nonpriorityAmount: '0',
       },
     ],
     nonpriority: {
-      name: 'American Express', street: 'PO Box 981535', city: 'El Paso', state: 'TX', zip: '79998',
+      name: 'American Express', street: 'PO Box 981535', city: 'El Paso', state: 'Texas', zip: '79998',
       totalClaim: '11000', type: 'Credit Card',
     },
     nonpriorityList: [
       {
-        name: 'American Express', street: 'PO Box 981535', city: 'El Paso', state: 'TX', zip: '79998',
+        name: 'American Express', street: 'PO Box 981535', city: 'El Paso', state: 'Texas', zip: '79998',
         totalClaim: '11000', type: 'Credit Card',
       },
       {
-        name: 'Discover Card', street: 'PO Box 6103', city: 'Carol Stream', state: 'IL', zip: '60197',
+        name: 'Discover Card', street: 'PO Box 6103', city: 'Carol Stream', state: 'Illinois', zip: '60197',
         totalClaim: '7500', type: 'Credit Card',
       },
       {
-        name: 'Best Buy Credit', street: 'PO Box 9001043', city: 'Louisville', state: 'KY', zip: '40290',
+        name: 'Best Buy Credit', street: 'PO Box 9001043', city: 'Louisville', state: 'Kentucky', zip: '40290',
         totalClaim: '2200', type: 'Credit Card',
       },
     ],
@@ -507,50 +507,50 @@ export const STRESS_TEST: TestScenario = {
   },
   creditors: {
     secured: {
-      name: 'Mortgage Corp of SD', street: '100 Bank St', city: 'Sioux Falls', state: 'SD', zip: '57101',
+      name: 'Mortgage Corp of SD', street: '100 Bank St', city: 'Sioux Falls', state: 'South Dakota', zip: '57101',
       claimAmount: '180000', collateralValue: '200000',
     },
     securedList: [
       {
-        name: 'Mortgage Corp of SD', street: '100 Bank St', city: 'Sioux Falls', state: 'SD', zip: '57101',
+        name: 'Mortgage Corp of SD', street: '100 Bank St', city: 'Sioux Falls', state: 'South Dakota', zip: '57101',
         claimAmount: '180000', collateralValue: '200000',
       },
       {
-        name: 'BMW Financial Services', street: 'PO Box 650574', city: 'Dallas', state: 'TX', zip: '75265',
+        name: 'BMW Financial Services', street: 'PO Box 650574', city: 'Dallas', state: 'Texas', zip: '75265',
         claimAmount: '30000', collateralValue: '45000',
       },
       {
-        name: 'Toyota Motor Credit', street: 'PO Box 105386', city: 'Atlanta', state: 'GA', zip: '30348',
+        name: 'Toyota Motor Credit', street: 'PO Box 105386', city: 'Atlanta', state: 'Georgia', zip: '30348',
         claimAmount: '10000', collateralValue: '25000',
       },
     ],
     priority: {
-      name: 'Internal Revenue Service', street: '1111 Constitution Ave', city: 'Washington', state: 'DC', zip: '20224',
+      name: 'Internal Revenue Service', street: '1111 Constitution Ave', city: 'Washington', state: 'District of Columbia', zip: '20224',
       type: 'Taxes and certain other debts you owe the government',
       totalClaim: '8500', priorityAmount: '8500', nonpriorityAmount: '0',
     },
     priorityList: [
       {
-        name: 'Internal Revenue Service', street: '1111 Constitution Ave', city: 'Washington', state: 'DC', zip: '20224',
+        name: 'Internal Revenue Service', street: '1111 Constitution Ave', city: 'Washington', state: 'District of Columbia', zip: '20224',
         type: 'Taxes and certain other debts you owe the government',
         totalClaim: '8500', priorityAmount: '8500', nonpriorityAmount: '0',
       },
       {
-        name: 'SD Dept of Revenue', street: '445 E Capitol Ave', city: 'Pierre', state: 'SD', zip: '57501',
+        name: 'SD Dept of Revenue', street: '445 E Capitol Ave', city: 'Pierre', state: 'South Dakota', zip: '57501',
         type: 'Taxes and certain other debts you owe the government',
         totalClaim: '3200', priorityAmount: '3200', nonpriorityAmount: '0',
       },
     ],
     nonpriority: {
-      name: 'Chase Bank', street: 'PO Box 15298', city: 'Wilmington', state: 'DE', zip: '19850',
+      name: 'Chase Bank', street: 'PO Box 15298', city: 'Wilmington', state: 'Delaware', zip: '19850',
       totalClaim: '15000', type: 'Credit Card',
     },
     nonpriorityList: [
-      { name: 'Chase Bank', street: 'PO Box 15298', city: 'Wilmington', state: 'DE', zip: '19850', totalClaim: '15000', type: 'Credit Card' },
-      { name: 'Capital One', street: 'PO Box 30285', city: 'Salt Lake City', state: 'UT', zip: '84130', totalClaim: '12000', type: 'Credit Card' },
-      { name: 'American Express', street: 'PO Box 981535', city: 'El Paso', state: 'TX', zip: '79998', totalClaim: '8500', type: 'Credit Card' },
-      { name: 'Discover Financial', street: 'PO Box 6103', city: 'Carol Stream', state: 'IL', zip: '60197', totalClaim: '6000', type: 'Credit Card' },
-      { name: 'Best Buy Credit', street: 'PO Box 9001043', city: 'Louisville', state: 'KY', zip: '40290', totalClaim: '3500', type: 'Credit Card' },
+      { name: 'Chase Bank', street: 'PO Box 15298', city: 'Wilmington', state: 'Delaware', zip: '19850', totalClaim: '15000', type: 'Credit Card' },
+      { name: 'Capital One', street: 'PO Box 30285', city: 'Salt Lake City', state: 'Utah', zip: '84130', totalClaim: '12000', type: 'Credit Card' },
+      { name: 'American Express', street: 'PO Box 981535', city: 'El Paso', state: 'Texas', zip: '79998', totalClaim: '8500', type: 'Credit Card' },
+      { name: 'Discover Financial', street: 'PO Box 6103', city: 'Carol Stream', state: 'Illinois', zip: '60197', totalClaim: '6000', type: 'Credit Card' },
+      { name: 'Best Buy Credit', street: 'PO Box 9001043', city: 'Louisville', state: 'Kentucky', zip: '40290', totalClaim: '3500', type: 'Credit Card' },
     ],
   },
   attorney: { name: 'Quinn Defend, Esq.', firm: 'Sioux Falls Legal Services', agreedCompensation: '3000', priorReceived: '1200' },
@@ -627,7 +627,7 @@ export const LEGACY_NE_MAXIMUM: TestScenario = {
       totalClaim: '3000', priorityAmount: '3000', nonpriorityAmount: '0',
     },
     nonpriority: {
-      name: 'Capital One', street: 'PO Box 30285', city: 'Salt Lake City', state: 'UT', zip: '84130',
+      name: 'Capital One', street: 'PO Box 30285', city: 'Salt Lake City', state: 'Utah', zip: '84130',
       totalClaim: '9500', type: 'Credit Card',
     },
   },

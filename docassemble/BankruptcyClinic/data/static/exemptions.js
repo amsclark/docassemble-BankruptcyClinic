@@ -1,19 +1,38 @@
 
-// Nebraska exemptions (example, fill in as needed)
+// Nebraska exemptions — synced with objects.py get_exemption_limits()
+// Update from: https://www.justice.gov/ust/means-testing
 const nebraskaExemptions = {
-  homestead: { law: 'Homestead (Neb. Rev. Stat. § 40-101)', limit: 60000, amount: 0 },
+  homestead: { law: 'Homestead (Neb. Rev. Stat. §§ 40-101 - 40-118)', limit: 120000, amount: 0 },
   homestead_proceeds: { law: 'Homestead, proceeds of sale (Neb. Rev. Stat. § 40-116)', limit: 60000, amount: 0 },
-  wildcard: { law: 'Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))', limit: 2500, amount: 0 },
-  motor_vehicle: { law: 'Motor vehicle (Neb. Rev. Stat. § 25-1556(1)(e))', limit: 2400, amount: 0 },
+  motor_vehicle: { law: 'Motor vehicle (Neb. Rev. Stat. § 25-1556(1)(e))', limit: 5000, amount: 0 },
+  household_goods: { law: 'Household goods (Neb. Rev. Stat. § 25-1556(1)(c))', limit: 3000, amount: 0 },
+  tools: { law: 'Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))', limit: 5000, amount: 0 },
+  health_savings: { law: 'Health savings (Neb. Rev. Stat. § 8-1,131(2)(b))', limit: 25000, amount: 0 },
+  life_insurance: { law: 'Life insurance proceeds (Neb. Rev. Stat. § 44-371)', limit: 100000, amount: 0 },
+  wildcard: { law: 'Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))', limit: 5000, amount: 0 },
+  clothing: { law: 'Clothing (Neb. Rev. Stat. § 25-1556(1)(b))', limit: 0, amount: 0 },
+  personal_possessions: { law: 'Immediate personal possessions (Neb. Rev. Stat. § 25-1556(1)(a))', limit: 0, amount: 0 },
+  health_aids: { law: 'Health aids (Neb. Rev. Stat. § 25-1556(1)(f))', limit: 0, amount: 0 },
+  retirement: { law: 'Retirement accounts (Neb. Rev. Stat. § 25-1563.01)', limit: 0, amount: 0 },
+  wages: { law: 'Wages (Neb. Rev. Stat. § 25-1558)', limit: 0, amount: 0 },
+  public_benefits: { law: 'Public benefits (Neb. Rev. Stat. § 68-148)', limit: 0, amount: 0 },
+  earned_income: { law: 'Earned Income Tax Credit (Neb Rev Stat 25-1553)', limit: 0, amount: 0 },
+  structured_settlement: { law: 'Structured settlement (Neb. Rev. Stat. § 25-1563.02)', limit: 0, amount: 0 },
+  workers_comp: { law: 'Workers compensation (Neb. Rev. Stat. § 48-149)', limit: 0, amount: 0 },
+  unemployment: { law: 'Unemployment (Neb. Rev. Stat. § 48-647)', limit: 0, amount: 0 },
+  college_savings: { law: 'College Savings Plan (Neb. Rev. Stat. § 85-1809)', limit: 0, amount: 0 },
+  student_loan: { law: 'Student loan (20 U.S.C. § 1095a(d))', limit: 0, amount: 0 },
+  social_security: { law: 'Social Security (42 U.S.C. § 407)', limit: 0, amount: 0 },
+  va: { law: 'VA Benefits (38 U.S.C. § 5301(a))', limit: 0, amount: 0 },
   unknown: { law: 'Unknown law', limit: 0, amount: 0 }
 };
 
-// South Dakota exemptions
+// South Dakota exemptions — synced with objects.py get_exemption_limits()
 const southDakotaExemptions = {
-  homestead: { law: 'Homestead (SDCL 43-31-1 – 43-31-6)', limit: 120000, amount: 0 },
-  homestead_proceeds: { law: 'Homestead, proceeds of sale (SDCL 43-31-4)', limit: 60000, amount: 0 }, // Note: 170000 for 70 and older
-  household_goods: { law: 'Furniture and bedding (SDCL 43-45-5(5))', limit: 200, amount: 0 },
-  wildcard: { law: 'Wildcard (SDCL 43-5-4)', limit: 2000, amount: 0 }, // 2000 not head of household, 5000 head of household, 7000 total max
+  homestead: { law: 'Homestead (SDCL 43-31-1 – 43-31-6)', limit: 0, amount: 0 }, // Unlimited
+  homestead_proceeds: { law: 'Homestead, proceeds of sale (SDCL 43-31-4)', limit: 0, amount: 0 }, // Unlimited
+  household_goods: { law: 'Furniture and bedding (SDCL 43-45-5(5))', limit: 0, amount: 0 }, // Unlimited
+  wildcard: { law: 'Wildcard (SDCL 43-5-4)', limit: 6000, amount: 0 },
   personal_property: { law: 'Bible, books, family pictures, burial plots, all wearing apparel, church pew, food & fuel to last one year, and clothing (SDCL 43-45-2)', limit: 0, amount: 0 },
   domestic_support: { law: 'alimony, maintenance, or support of the debtor (SDCL 43-45-2)', limit: 0, amount: 0 },
   health_aids: { law: 'Health Aids (SDCL 43-45-2)', limit: 0, amount: 0 },
@@ -294,6 +313,19 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
   var stateVal = stateElement ? stateElement.value : null;
   // Set the currentExemptions map used by validations, keyed by law string
   currentExemptions = buildLawIndex(getCurrentExemptions(stateVal));
+  // Merge in running totals from the exemption tracker if available on this page
+  // (computed server-side by compute_exemption_totals in objects.py)
+  try {
+    var trackerEl = document.getElementById('exemption-tracker-data');
+    if (trackerEl) {
+      var totals = JSON.parse(trackerEl.textContent || '{}');
+      for (var lawStr in totals) {
+        if (currentExemptions[lawStr]) {
+          currentExemptions[lawStr].amount = totals[lawStr].claimed || 0;
+        }
+      }
+    }
+  } catch(e) { console.log('Could not read exemption tracker data:', e); }
       // Populate the law selects with the correct choices for this property type
       var propertyType = inferPropertyType();
       var choices = window.getExemptionChoicesForState(stateVal, propertyType);
