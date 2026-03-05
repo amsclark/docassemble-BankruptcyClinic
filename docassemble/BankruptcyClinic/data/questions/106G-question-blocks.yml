@@ -30,43 +30,32 @@ allowed to set:
 fields:
   - note: Person or company with whom you have a contract or lease
   - Name: prop.contracts_and_leases[i].name
-    # default: Contract Holder
   - Address/PO Box: prop.contracts_and_leases[i].street
-    # default: 1111 34th ave NE
   - City: prop.contracts_and_leases[i].city
-    # default: Seattle
   - State: prop.contracts_and_leases[i].state
-    # default: Washington
   - Zip: prop.contracts_and_leases[i].zip
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
   - note: State what the contract or lease is for
   - Description: prop.contracts_and_leases[i].description
     input type: area
-    # default: Some decription
   - Is there a codebtor for this debt?: prop.contracts_and_leases[i].has_codebtor
     datatype: yesnoradio
-    # default: True
   - note: Codebtor Address Information
   - Name: prop.contracts_and_leases[i].codebtor_name
-    # default: Janna
     show if:
       variable: prop.contracts_and_leases[i].has_codebtor
       is: True
   - Address/PO Box: prop.contracts_and_leases[i].codebtor_street
-    # default: 11111 36th Ave ne
     show if:
       variable: prop.contracts_and_leases[i].has_codebtor
       is: True
   - City: prop.contracts_and_leases[i].codebtor_city
-    # default: Tampa
     show if:
       variable: prop.contracts_and_leases[i].has_codebtor
       is: True
   - State: prop.contracts_and_leases[i].codebtor_state
-    # default: Florida
     show if:
       variable: prop.contracts_and_leases[i].has_codebtor
       is: True
@@ -74,16 +63,13 @@ fields:
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
     show if:
       variable: prop.contracts_and_leases[i].has_codebtor
       is: True
   - Is this an unexpired lease?: prop.contracts_and_leases[i].unexpired_lease
-    # default: True
     datatype: yesnoradio
   - Will the lease be assumed?: prop.contracts_and_leases[i].lease_assumed
     datatype: yesnoradio
-    # default: False
     show if: prop.contracts_and_leases[i].unexpired_lease
 list collect: True
 ---

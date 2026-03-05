@@ -92,27 +92,20 @@ allowed to set:
 fields:
   - note: Codebtor Address Information
   - Name: debtors.codebtors[i].name
-    # default: Janna
   - Address/PO Box: debtors.codebtors[i].street
-    # default: 1111 36th ave ne
   - City: debtors.codebtors[i].city
-    # default: Seattle
   - State: debtors.codebtors[i].state
-    # default: Washington
   - Zip: debtors.codebtors[i].zip
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
   - note: The creditor to whom you owe the debt
   - Schedule form: debtors.codebtors[i].schedule
     choices:
       - Schedule D
       - Schedule E/F
       - Schedule G
-    # default: Schedule D
   - Line: debtors.codebtors[i].schedule_line
-    # default: 3
 list collect: True
 ---
 id: community_property_spouse_info
@@ -124,35 +117,28 @@ subquestion: |
 fields:
   - In community property state: debtors.community_property
     datatype: yesnoradio
-    # default: True
   - Did your spouse live with you at the time?: debtors.had_spouse
     datatype: yesnoradio
-    # default: True
     required: False
     show if: debtors.community_property
   - What state or territory did you live in?: debtors.spouse_state
-    # default: Washington
     show if: debtors.had_spouse
     required: False
   - note: Fill in the name and current address of that person
     show if: debtors.had_spouse
   - Name: debtors.spouse_name
-    # default: Brenda Livingston
     show if: debtors.had_spouse
     required: False
   - Address/PO Box: debtors.spouse_street
-    # default: 1111 35th Ave NE
     show if: debtors.had_spouse
     required: False
   - City: debtors.spouse_city
-    # default: Seattle
     show if: debtors.had_spouse
     required: False
   - Zip: debtors.spouse_zip
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
     show if: debtors.had_spouse
     required: False
 ---

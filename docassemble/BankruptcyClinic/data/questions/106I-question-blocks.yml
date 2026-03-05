@@ -10,12 +10,10 @@ fields:
       - Employed
       - Not employed
   - Occupation: debtor[0].income.occupation
-    # default: Hair Stylist
     show if:
       variable: debtor[0].income.employment
       is: Employed
   - Employer Name: debtor[0].income.employer
-    # default: SuperCuts
     show if:
       variable: debtor[0].income.employment
       is: Employed
@@ -24,17 +22,14 @@ fields:
       variable: debtor[0].income.employment
       is: Employed
   - Address/PO Box: debtor[0].income.employer_street
-    # default: 1111 22nd Ave NE
     show if:
       variable: debtor[0].income.employment
       is: Employed
   - City: debtor[0].income.employer_city
-    # default: Tacoma
     show if:
       variable: debtor[0].income.employment
       is: Employed
   - State: debtor[0].income.employer_state
-    # default: Washington
     show if:
       variable: debtor[0].income.employment
       is: Employed
@@ -42,7 +37,6 @@ fields:
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
     show if:
       variable: debtor[0].income.employment
       is: Employed
@@ -64,57 +58,45 @@ fields:
   - note: Check 1
   - Gross wages, salary, and commissions: debtor[0].income.income_amount_1
     datatype: currency
-    # default: 3000
   - Estimate and list monthly overtime pay: debtor[0].income.overtime_pay_1
     datatype: currency
-    # default: 300
 
   - note: Check 2
   - Gross wages, salary, and commissions: debtor[0].income.income_amount_2
     datatype: currency
-    # default: 0
     required: False
   - Estimate and list monthly overtime pay: debtor[0].income.overtime_pay_2
     datatype: currency
-    # default: 0
     required: False
 
   - note: Check 3
   - Gross wages, salary, and commissions: debtor[0].income.income_amount_3
     datatype: currency
-    # default: 0
     required: False
   - Estimate and list monthly overtime pay: debtor[0].income.overtime_pay_3
     datatype: currency
-    # default: 0
     required: False
 
   - note: Check 4
   - Gross wages, salary, and commissions: debtor[0].income.income_amount_4
     datatype: currency
-    # default: 0
     required: False
   - Estimate and list monthly overtime pay: debtor[0].income.overtime_pay_4
     datatype: currency
-    # default: 0
     required: False
   - note: Check 5
   - Gross wages, salary, and commissions: debtor[0].income.income_amount_5
     datatype: currency
-    # default: 0
     required: False
   - Estimate and list monthly overtime pay: debtor[0].income.overtime_pay_5
     datatype: currency
-    # default: 0
     required: False
   - note: Check 6
   - Gross wages, salary, and commissions: debtor[0].income.income_amount_6
     datatype: currency
-    # default: 0
     required: False
   - Estimate and list monthly overtime pay: debtor[0].income.overtime_pay_6
     datatype: currency
-    # default: 0
     required: False
 ---
 id: debtor1_payroll_deductions
@@ -123,31 +105,24 @@ question: List total payroll deductions in the previous month
 fields:
   - Tax, Medicare, and Social Security deductions: debtor[0].income.tax_deduction
     datatype: currency
-    # default: 300
     required: false
   - Mandatory contributions for retirement plans: debtor[0].income.mandatory_contributions
     datatype: currency
-    # default: 500
     required: false
   - Voluntary contributions for retirement plans: debtor[0].income.voluntary_contributions
     datatype: currency
-    # default: 1000
     required: false
   - Required repayment of retirement fund loans: debtor[0].income.fund_loans
     datatype: currency
-    # default: 0
     required: false
   - Insurance: debtor[0].income.insurance
     datatype: currency
-    # default: 0
     required: false
   - Domestic support obligations: debtor[0].income.domestic_support
     datatype: currency
-    # default: 0
     required: false
   - Union dues: debtor[0].income.union_dues
     datatype: currency
-    # default: 300
     required: false
 ---
 id: debtor1_other_deductions
@@ -156,77 +131,64 @@ question: Do you have any deductions to claim?
 fields:
   - Other deduction?: debtor[0].income.other_deduction
     datatype: yesnoradio
-    # default: True
 
   - note: Deduction 1
     show if: debtor[0].income.other_deduction
   - Specify deduction: debtor[0].income.specify_other_deduction
-    # default: Other
     show if: debtor[0].income.other_deduction
     required: false
   - Deduction amount: debtor[0].income.other_deduction_amount
     datatype: currency
-    # default: 0
     show if: debtor[0].income.other_deduction
     required: false
 
   - note: Deduction 2
     show if: debtor[0].income.other_deduction
   - Specify deduction: debtor[0].income.specify_other_deduction_2
-    # default: Other
     show if: debtor[0].income.other_deduction
     required: false
   - Deduction amount: debtor[0].income.other_deduction_amount_2
     datatype: currency
-    # default: 0
     show if: debtor[0].income.other_deduction
     required: false
 
   - note: Deduction 3
     show if: debtor[0].income.other_deduction
   - Specify deduction: debtor[0].income.specify_other_deduction_3
-    # default: Other
     show if: debtor[0].income.other_deduction
     required: false
   - Deduction amount: debtor[0].income.other_deduction_amount_3
     datatype: currency
-    # default: 0
     show if: debtor[0].income.other_deduction
     required: false
 
   - note: Deduction 4
     show if: debtor[0].income.other_deduction
   - Specify deduction: debtor[0].income.specify_other_deduction_4
-    # default: Other
     show if: debtor[0].income.other_deduction
     required: false
   - Deduction amount: debtor[0].income.other_deduction_amount_4
     datatype: currency
-    # default: 0
     show if: debtor[0].income.other_deduction
     required: false
 
   - note: Deduction 5
     show if: debtor[0].income.other_deduction
   - Specify deduction: debtor[0].income.specify_other_deduction_5
-    # default: Other
     show if: debtor[0].income.other_deduction
     required: false
   - Deduction amount: debtor[0].income.other_deduction_amount_5
     datatype: currency
-    # default: 0
     show if: debtor[0].income.other_deduction
     required: false
 
   - note: Deduction 6
     show if: debtor[0].income.other_deduction
   - Specify deduction: debtor[0].income.specify_other_deduction_6
-    # default: Other
     show if: debtor[0].income.other_deduction
     required: false
   - Deduction amount: debtor[0].income.other_deduction_amount_6
     datatype: currency
-    # default: 0
     show if: debtor[0].income.other_deduction
     required: false
 
@@ -276,41 +238,31 @@ question: List all other income regularly received
 fields:
   - Net income from rental property and from operating a business, profession, or farm: debtor[0].income.net_rental_business
     datatype: currency
-    # default: 0
     required: false
   - Interest and dividends: debtor[0].income.interest_and_dividends
     datatype: currency
-    # default: 0
     required: false
   - Family support payments that you, a non-filing spouse, or a dependent regularly receive: debtor[0].income.family_support
     datatype: currency
-    # default: 0
     required: false
   - Unemployment compensation: debtor[0].income.unemployment
     datatype: currency
-    # default: 0
     required: false
   - Social Security: debtor[0].income.social_security
     datatype: currency
-    # default: 0
     required: false
   - Other government assistance that you regularly receive: debtor[0].income.other_govt_assist
     datatype: currency
-    # default: 0
     required: false
   - Pension or retirement income: debtor[0].income.pension
     datatype: currency
-    # default: 0
     required: false
   - Do you have other monthly income?: debtor[0].income.other_monthly_income
     datatype: yesnoradio
-    # default: True
   - Specify income type: debtor[0].income.specify_monthly_income
-    # default: Other
     show if: debtor[0].income.other_monthly_income
   - Income amount: debtor[0].income.other_monthly_amount
     datatype: currency
-    # default: 0
     show if: debtor[0].income.other_monthly_income
 ---
 id: debtor2_employment_info
@@ -324,14 +276,11 @@ fields:
     choices:
       - Employed
       - Not employed
-    # default: Employed
   - Occupation: debtor[1].income.occupation
-    # default: Plumber
     show if:
       variable: debtor[1].income.employment
       is: Employed
   - Employer Name: debtor[1].income.employer
-    # default: RotoRoots
     show if:
       variable: debtor[1].income.employment
       is: Employed
@@ -340,17 +289,14 @@ fields:
       variable: debtor[1].income.employment
       is: Employed
   - Address/PO Box: debtor[1].income.employer_street
-    # default: 1111 22nd Ave NE
     show if:
       variable: debtor[1].income.employment
       is: Employed
   - City: debtor[1].income.employer_city
-    # default: Tacoma
     show if:
       variable: debtor[1].income.employment
       is: Employed
   - State: debtor[1].income.employer_state
-    # default: Washington
     show if:
       variable: debtor[1].income.employment
       is: Employed
@@ -358,7 +304,6 @@ fields:
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
     show if:
       variable: debtor[1].income.employment
       is: Employed
@@ -380,57 +325,45 @@ fields:
   - note: Check 1
   - Gross wages, salary, and commissions: debtor[1].income.income_amount_1
     datatype: currency
-    # default: 3000
   - Estimate and list monthly overtime pay: debtor[1].income.overtime_pay_1
     datatype: currency
-    # default: 300
 
   - note: Check 2
   - Gross wages, salary, and commissions: debtor[1].income.income_amount_2
     datatype: currency
-    # default: 0
     required: False
   - Estimate and list monthly overtime pay: debtor[1].income.overtime_pay_2
     datatype: currency
-    # default: 0
     required: False
 
   - note: Check 3
   - Gross wages, salary, and commissions: debtor[1].income.income_amount_3
     datatype: currency
-    # default: 0
     required: False
   - Estimate and list monthly overtime pay: debtor[1].income.overtime_pay_3
     datatype: currency
-    # default: 0
     required: False
 
   - note: Check 4
   - Gross wages, salary, and commissions: debtor[1].income.income_amount_4
     datatype: currency
-    # default: 0
     required: False
   - Estimate and list monthly overtime pay: debtor[1].income.overtime_pay_4
     datatype: currency
-    # default: 0
     required: False
   - note: Check 5
   - Gross wages, salary, and commissions: debtor[1].income.income_amount_5
     datatype: currency
-    # default: 0
     required: False
   - Estimate and list monthly overtime pay: debtor[1].income.overtime_pay_5
     datatype: currency
-    # default: 0
     required: False
   - note: Check 6
   - Gross wages, salary, and commissions: debtor[1].income.income_amount_6
     datatype: currency
-    # default: 0
     required: False
   - Estimate and list monthly overtime pay: debtor[1].income.overtime_pay_6
     datatype: currency
-    # default: 0
     required: False
 ---
 id: debtor2_payroll_deductions
@@ -439,25 +372,18 @@ question: List all payroll deductions
 fields:
   - Tax, Medicare, and Social Security deductions: debtor[1].income.tax_deduction
     datatype: currency
-    # default: 300
   - Mandatory contributions for retirement plans: debtor[1].income.mandatory_contributions
     datatype: currency
-    # default: 500
   - Voluntary contributions for retirement plans: debtor[1].income.voluntary_contributions
     datatype: currency
-    # default: 1000
   - Required repayment of retirement fund loans: debtor[1].income.fund_loans
     datatype: currency
-    # default: 0
   - Insurance: debtor[1].income.insurance
     datatype: currency
-    # default: 0
   - Domestic support obligations: debtor[1].income.domestic_support
     datatype: currency
-    # default: 0
   - Union dues: debtor[1].income.union_dues
     datatype: currency
-    # default: 300
 ---
 id: debtor2_other_deductions
 section: schedule_i
@@ -465,71 +391,58 @@ question: Please specify any deductions.
 fields:
   - Other deduction?: debtor[1].income.other_deduction
     datatype: yesnoradio
-    # default: True
   - note: Deduction 1
     show if: debtor[1].income.other_deduction
   - Specify deduction: debtor[1].income.specify_other_deduction
-    # default: Other
     show if: debtor[1].income.other_deduction
     required: false
   - Deduction amount: debtor[1].income.other_deduction_amount
     datatype: currency
-    # default: 0
     show if: debtor[1].income.other_deduction
     required: false
   - note: Deduction 2
     show if: debtor[1].income.other_deduction
   - Specify deduction: debtor[1].income.specify_other_deduction_2
-    # default: Other
     show if: debtor[1].income.other_deduction
     required: false
   - Deduction amount: debtor[1].income.other_deduction_amount_2
     datatype: currency
-    # default: 0
     show if: debtor[1].income.other_deduction
     required: false
   - note: Deduction 3
     show if: debtor[1].income.other_deduction
   - Specify deduction: debtor[1].income.specify_other_deduction_3
-    # default: Other
     show if: debtor[1].income.other_deduction
     required: false
   - Deduction amount: debtor[1].income.other_deduction_amount_3
     datatype: currency
-    # default: 0
     show if: debtor[1].income.other_deduction
     required: false
   - note: Deduction 4
     show if: debtor[1].income.other_deduction
   - Specify deduction: debtor[1].income.specify_other_deduction_4
-    # default: Other
     show if: debtor[1].income.other_deduction
     required: false
   - Deduction amount: debtor[1].income.other_deduction_amount_4
     datatype: currency
-    # default: 0
     show if: debtor[1].income.other_deduction
     required: false
   - note: Deduction 5
     show if: debtor[1].income.other_deduction
   - Specify deduction: debtor[1].income.specify_other_deduction_5
-    # default: Other
     show if: debtor[1].income.other_deduction
     required: false
   - Deduction amount: debtor[1].income.other_deduction_amount_5
     datatype: currency
-    # default: 0
     show if: debtor[1].income.other_deduction
     required: false
   - note: Deduction 6
     show if: debtor[1].income.other_deduction
   - Specify deduction: debtor[1].income.specify_other_deduction_6
-    # default: Other
     show if: debtor[1].income.other_deduction
     required: false
   - Deduction amount: debtor[1].income.other_deduction_amount_6
     datatype: currency
-    # default: 0
     show if: debtor[1].income.other_deduction
     required: false
   - note: Deduction 7
@@ -575,34 +488,24 @@ question: List all other income regularly received
 fields:
   - Net income from rental property and from operating a business, profession, or farm: debtor[1].income.net_rental_business
     datatype: currency
-    # default: 0
   - Interest and dividends: debtor[1].income.interest_and_dividends
     datatype: currency
-    # default: 0
   - Family support payments that you, a non-filing spouse, or a dependent regularly receive: debtor[1].income.family_support
     datatype: currency
-    # default: 0
   - Unemployment compensation: debtor[1].income.unemployment
     datatype: currency
-    # default: 0
   - Social Security: debtor[1].income.social_security
     datatype: currency
-    # default: 0
   - Other government assistance that you regularly receive: debtor[1].income.other_govt_assist
     datatype: currency
-    # default: 0
   - Pension or retirement income: debtor[1].income.pension
     datatype: currency
-    # default: 0
   - Do you have other monthly income?: debtor[1].income.other_monthly_income
     datatype: yesnoradio
-    # default: True
   - Specify income type: debtor[1].income.specify_monthly_income
-    # default: Other
     show if: debtor[1].income.other_monthly_income
   - Income amount: debtor[1].income.other_monthly_amount
     datatype: currency
-    # default: 0
     show if: debtor[1].income.other_monthly_income
 ---
 id: other_contributions_income_changes
@@ -616,19 +519,14 @@ subquestion: |
 fields:
   - Do you have other regular contributions?: debtor[0].income.other_regular_contributions
     datatype: yesnoradio
-    # default: True
   - Specify: debtor[0].income.specify_other_regular_contributions
-    # default: Other Type
     show if: debtor[0].income.other_regular_contributions
   - Amount: debtor[0].income.other_regular_contributions_amount
     datatype: currency
-    # default: 0
     show if: debtor[0].income.other_regular_contributions
   - Do you expect an increase or decrease of income within the year after you file this form?: debtor[0].income.expect_year_delta
     datatype: yesnoradio
-    # default: True
   - Explain any changes or other notes: debtor[0].income.year_delta_explain
-    # default: Explanation
     required: False
 ---
 id: schedule_i_review

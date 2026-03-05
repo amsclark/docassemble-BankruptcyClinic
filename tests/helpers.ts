@@ -269,6 +269,7 @@ export async function selectByIndex(page: Page, id: string, index: number) {
 /** Select a dropdown by name attribute. */
 export async function selectByName(page: Page, name: string, value: string) {
   await waitForDaPageLoad(page);
+  await page.locator(`select[name="${name}"]`).waitFor({ state: 'attached', timeout: 15000 });
   await page.locator(`select[name="${name}"]`).selectOption(value);
 }
 

@@ -33,11 +33,8 @@ allowed to set:
   - prop.priority_claims[i].complete
 fields:
   - Creditor's Name: prop.priority_claims[i].name
-    # default: Some creditor
   - Address/PO Box: prop.priority_claims[i].street
-    # default: 1111 3rd pl s
   - City: prop.priority_claims[i].city
-    # default: tampa
   - State: prop.priority_claims[i].state
     input type: dropdown
     code: get_all_us_states()
@@ -45,7 +42,6 @@ fields:
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
   - note: Details about debt
   - Who incurred the debt?: prop.priority_claims[i].who
     choices:
@@ -58,45 +54,35 @@ fields:
           'Debtor 1 and Debtor 2 only',
           'At least one of the debtors and another'])
   - Account number: prop.priority_claims[i].account_number
-    # default: 9999
     required: False
   - When was the debt incurred?: prop.priority_claims[i].date_incurred
     datatype: date
-    # default: 01/01/23
     required: False
   - note: As of the date you file, the claim is
   - Contingent: prop.priority_claims[i].contingent
     datatype: yesno
-    # default: False
   - Unliquidated: prop.priority_claims[i].unliquidated
     datatype: yesno
-    # default: False
   - Disputed: prop.priority_claims[i].disputed
     datatype: yesno
-    # default: False
   - Type of priority claim: prop.priority_claims[i].type
     choices:
       - Domestic support obligations
       - Taxes and certain other debts you owe the government
       - Claims for death or personal injury while you were intoxicated
       - Other
-    # default: Other
   - Specify other unsecured claim type: prop.priority_claims[i].other_type
     required: True
-    # default: Other
     show if:
       variable: prop.priority_claims[i].type
       is: Other
   - note: Claim value
   - Total Claim: prop.priority_claims[i].total_claim
     datatype: currency
-    # default: 400
   - Priority Amount: prop.priority_claims[i].priority_amount
     datatype: currency
-    # default: 100
   - Nonpriority Amount: prop.priority_claims[i].nonpriority_amount
     datatype: currency
-    # default: 400
 
   - Save this creditor to the clinic's shared library?: prop.priority_claims[i].save_to_library
     datatype: yesnoradio
@@ -105,25 +91,20 @@ fields:
 
   - Is there a codebtor for this debt?: prop.priority_claims[i].has_codebtor
     datatype: yesnoradio
-    # default: True
   - note: Codebtor Address Information
   - Name: prop.priority_claims[i].codebtor_name
-    # default: Janna
     show if:
       variable: prop.priority_claims[i].has_codebtor
       is: True
   - Address/PO Box: prop.priority_claims[i].codebtor_street
-    # default: 1111 36th Ave ne
     show if:
       variable: prop.priority_claims[i].has_codebtor
       is: True
   - City: prop.priority_claims[i].codebtor_city
-    # default: Tampa
     show if:
       variable: prop.priority_claims[i].has_codebtor
       is: True
   - State: prop.priority_claims[i].codebtor_state
-    # default: Florida
     show if:
       variable: prop.priority_claims[i].has_codebtor
       is: True
@@ -131,38 +112,31 @@ fields:
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
     show if:
       variable: prop.priority_claims[i].has_codebtor
       is: True
 
   - Do others need to be notified about this debt?: prop.priority_claims[i].has_notify
-    # default: True
     datatype: yesnoradio
 
   - note: Party 1
     show if: prop.priority_claims[i].has_notify
   - Name: prop.priority_claims[i].other_name
-    # default: Other name
     show if: prop.priority_claims[i].has_notify
     required: False
   - Address/PO Box: prop.priority_claims[i].other_street
-    # default: 1111 23rd Ave
     show if: prop.priority_claims[i].has_notify
     required: False
   - City: prop.priority_claims[i].other_city
-    # default: Tampa
     show if: prop.priority_claims[i].has_notify
     required: False
   - State: prop.priority_claims[i].other_state
-    # default: Florida
     show if: prop.priority_claims[i].has_notify
     required: False
   - Zip: prop.priority_claims[i].other_zip
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
     show if: prop.priority_claims[i].has_notify
     required: False
 
@@ -184,7 +158,6 @@ fields:
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
     show if: prop.priority_claims[i].has_notify
     required: False
 
@@ -206,7 +179,6 @@ fields:
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
     show if: prop.priority_claims[i].has_notify
     required: False
 
@@ -309,11 +281,8 @@ allowed to set:
   - prop.nonpriority_claims[i].complete
 fields:
   - Creditor's Name: prop.nonpriority_claims[i].name
-    # default: Some creditor
   - Address/PO Box: prop.nonpriority_claims[i].street
-    # default: 1111 3rd pl s
   - City: prop.nonpriority_claims[i].city
-    # default: tampa
   - State: prop.nonpriority_claims[i].state
     input type: dropdown
     code: get_all_us_states()
@@ -321,7 +290,6 @@ fields:
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
   - note: Details about debt
   - Who incurred the debt?: prop.nonpriority_claims[i].who
     choices:
@@ -334,22 +302,17 @@ fields:
           'Debtor 1 and Debtor 2 only',
           'At least one of the debtors and another'])
   - Account number: prop.nonpriority_claims[i].account_number
-    # default: 9999
     required: False
   - When was the debt incurred?: prop.nonpriority_claims[i].date_incurred
     datatype: date
-    # default: 01/01/23
     required: False
   - note: As of the date you file, the claim is
   - Contingent: prop.nonpriority_claims[i].contingent
     datatype: yesno
-    # default: False
   - Unliquidated: prop.nonpriority_claims[i].unliquidated
     datatype: yesno
-    # default: False
   - Disputed: prop.nonpriority_claims[i].disputed
     datatype: yesno
-    # default: False
   - Type of claim: prop.nonpriority_claims[i].type
     choices:
       - Student loans
@@ -359,17 +322,14 @@ fields:
       - Credit Card
       - Contract
       - Other
-    # default: Other
   - Specify other unsecured claim type: prop.nonpriority_claims[i].other_type
     required: True
-    # default: Other
     show if:
       variable: prop.nonpriority_claims[i].type
       is: Other
   - note: Claim value
   - Total Claim: prop.nonpriority_claims[i].total_claim
     datatype: currency
-    # default: 400
 
   - Save this creditor to the clinic's shared library?: prop.nonpriority_claims[i].save_to_library
     datatype: yesnoradio
@@ -378,25 +338,20 @@ fields:
 
   - Is there a codebtor for this debt?: prop.nonpriority_claims[i].has_codebtor
     datatype: yesnoradio
-    # default: True
   - note: Codebtor Address Information
   - Name: prop.nonpriority_claims[i].codebtor_name
-    # default: Janna
     show if:
       variable: prop.nonpriority_claims[i].has_codebtor
       is: True
   - Address/PO Box: prop.nonpriority_claims[i].codebtor_street
-    # default: 1111 36th Ave ne
     show if:
       variable: prop.nonpriority_claims[i].has_codebtor
       is: True
   - City: prop.nonpriority_claims[i].codebtor_city
-    # default: Tampa
     show if:
       variable: prop.nonpriority_claims[i].has_codebtor
       is: True
   - State: prop.nonpriority_claims[i].codebtor_state
-    # default: Florida
     show if:
       variable: prop.nonpriority_claims[i].has_codebtor
       is: True
@@ -404,38 +359,31 @@ fields:
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
     show if:
       variable: prop.nonpriority_claims[i].has_codebtor
       is: True
 
   - Do others need to be notified about this debt?: prop.nonpriority_claims[i].has_notify
-    # default: True
     datatype: yesnoradio
 
   - note: Party 1
 
   - Name: prop.nonpriority_claims[i].other_name
-    # default: Other name
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - Address/PO Box: prop.nonpriority_claims[i].other_street
-    # default: 1111 23rd Ave
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - City: prop.nonpriority_claims[i].other_city
-    # default: Tampa
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - State: prop.nonpriority_claims[i].other_state
-    # default: Florida
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - Zip: prop.nonpriority_claims[i].other_zip
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
     show if: prop.nonpriority_claims[i].has_notify
     required: False
 
@@ -457,7 +405,6 @@ fields:
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
     show if: prop.nonpriority_claims[i].has_notify
     required: False
 
@@ -479,7 +426,6 @@ fields:
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
     show if: prop.nonpriority_claims[i].has_notify
     required: False
 

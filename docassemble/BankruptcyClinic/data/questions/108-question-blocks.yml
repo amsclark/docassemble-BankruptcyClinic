@@ -29,25 +29,20 @@ question: |
   Identify the creditor and the property that is collateral
 fields: 
   - Creditor's Name: secured_claims[i].creditor_name
-    # default: Jimbo
   - Description of property: secured_claims[i].property_description
     input type: area
-    # default: description
   - What do you intend to do with the property that secures the debt?: secured_claims[i].property_action
     choices:
       - Surrender the property
       - Retain the property and redeem it
       - Retain the property and enter into a Reaffirmation Agreement
       - Retain the property and do something else
-    # default: Retain the property and do something else
   - What will you do with the property?: secured_claims[i].property_action_other
     show if: 
       variable: secured_claims[i].property_action
       is: Retain the property and do something else
-    # default: something
   - Did you claim the property as exempt on Schedule C?: secured_claims[i].exempt
     datatype: yesnoradio
-    # default: False
 ---
 table: personal_leases_table
 rows: personal_leases
@@ -80,12 +75,9 @@ question: |
   Tell the court about an unexpired personal property lease
 fields:
   - Lessor Name: personal_leases[i].name
-    # default: Lenny
   - Description of leased property: personal_leases[i].description
-    # default: NA
   - Will the lease be assumed?: personal_leases[i].lease_assumed
     datatype: yesnoradio
-    # default: False
 ---
 id: form_108_review_statement_of_intention
 event: form_108

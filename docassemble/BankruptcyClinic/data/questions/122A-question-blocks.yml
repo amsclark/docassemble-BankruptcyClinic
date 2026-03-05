@@ -10,7 +10,6 @@ fields:
       - There is no presumption of abuse.
       - The calculation to determine if a presumption of abuse applies will be made under Chapter 7 Means Test Calculation.
       - The Means Test does not apply now because of qualified military service but it could apply later.
-    # default: There is no presumption of abuse.
 ---
 id: means_test_exemptions
 section: form_122a
@@ -19,13 +18,10 @@ question: |
 fields:
   - Are your debts primarily non-consumer?: monthly_income.non_consumer_debts
     datatype: yesnoradio
-    # default: False
   - Are you a disabled veteran?: monthly_income.disabled_veteran
     datatype: yesnoradio
-    # default: False
   - Are you in the Reservists or National Guard?: monthly_income.reservists
     datatype: yesnoradio
-    # default: False
 
 ---
 id: household_and_dependents_info
@@ -38,7 +34,6 @@ fields:
       - Not married
       - Married and your spouse is filing with you.
       - Married and your spouse is NOT filing with you.
-    # default: Married and your spouse is NOT filing with you.
   - You and your spouse are: monthly_income.separated_status
     choices:
       - Living in the same household and not legally separated.
@@ -246,7 +241,6 @@ fields:
     default: ${ len(debtor[0].expenses.dependents) + len(debtor) if defined('debtor[0].expenses.dependents.gathered') else 1 }
   - Median family income for your state and size of household: monthly_income.median_income
     datatype: currency
-    # default: 40000
 ---
 id: monthly_income_review
 event: form_122a

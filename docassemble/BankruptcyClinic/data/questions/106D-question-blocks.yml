@@ -91,13 +91,10 @@ allowed to set:
   - prop.creditors[i].complete
 fields:
   - Name: prop.creditors[i].notify[j].other_name
-    # default: Other org
     required: False
   - Address/PO Box: prop.creditors[i].notify[j].other_street
-    # default: 1111 33rd S
     required: False
   - City: prop.creditors[i].notify[j].other_city
-    # default: Tampa
     required: False
   - State: prop.creditors[i].notify[j].other_state
     input type: dropdown
@@ -107,7 +104,6 @@ fields:
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
     required: False
 list collect: True
 ---
@@ -138,13 +134,10 @@ allowed to set:
   - prop.creditors[i].complete
 fields:
   - Creditor Name: prop.creditors[i].name
-    # default: Some creditor
   - note: |
       Creditor Address
   - Address/PO Box: prop.creditors[i].street
-    # default: 1111 45th pl
   - City: prop.creditors[i].city
-    # default: Tampa
   - State: prop.creditors[i].state
     input type: dropdown
     code: get_all_us_states()
@@ -152,7 +145,6 @@ fields:
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
   - note: |
       Describe the debt
   - Who owes the debt?: prop.creditors[i].who
@@ -167,9 +159,7 @@ fields:
           'At least one of the debtors and another'])
   - Does this claim relate to community debt?: prop.creditors[i].community_debt
     datatype: yesnoradio
-    # default: False
   - Date debt was incurred: prop.creditors[i].incurred_date
-    # default: 03/02/23
     input type: area
     required: False
   - note: |
@@ -194,19 +184,15 @@ fields:
   - Other (including a right to offset): prop.creditors[i].has_other_lien_type
     datatype: yesno
   - Describe other lien type: prop.creditors[i].other_lien_type
-    # default: NA
     required: False
     show if: prop.creditors[i].has_other_lien_type
   - Last 4 digits of account number: prop.creditors[i].account_number
-    # default: testid4389999
     required: False
   - note: Tell the court about the value of this secured claim
   - Amount of claim: prop.creditors[i].claim_amount
     datatype: currency
-    # default: 405
   - Value of collateral that supports this claim: prop.creditors[i].collateral_value
     datatype: currency
-    # default: 300
   - note: |
       Unsecured claim portion -    [TARGET unsecured_claim_text]
 
@@ -216,15 +202,12 @@ fields:
       - Retain the property and redeem it
       - Retain the property and enter into a Reaffirmation Agreement
       - Retain the property and do something else
-    # default: Retain the property and do something else
   - What will you do with the property?: prop.creditors[i].property_action_other
     show if:
       variable: prop.creditors[i].property_action
       is: Retain the property and do something else
-    # default: something
   - Did you claim the property as exempt on Schedule C?: prop.creditors[i].exempt
     datatype: yesnoradio
-    # default: False
 
   - Save this creditor to the clinic's shared library?: prop.creditors[i].save_to_library
     datatype: yesnoradio
@@ -233,20 +216,16 @@ fields:
 
   - Is there a codebtor for this debt?: prop.creditors[i].has_codebtor
     datatype: yesnoradio
-    # default: True
   - note: Codebtor Address Information
   - Name: prop.creditors[i].codebtor_name
-    # default: Janna
     show if:
       variable: prop.creditors[i].has_codebtor
       is: True
   - Address/PO Box: prop.creditors[i].codebtor_street
-    # default: 1111 36th Ave ne
     show if:
       variable: prop.creditors[i].has_codebtor
       is: True
   - City: prop.creditors[i].codebtor_city
-    # default: Tampa
     show if:
       variable: prop.creditors[i].has_codebtor
       is: True
@@ -260,7 +239,6 @@ fields:
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
     show if:
       variable: prop.creditors[i].has_codebtor
       is: True

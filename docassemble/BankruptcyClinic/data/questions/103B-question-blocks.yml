@@ -18,10 +18,8 @@ subquestion: |
 fields:
   - You: family.you
     datatype: yesno
-    # default: True
   - Your spouse: family.has_spouse
     datatype: yesno
-    # default: True
   - Your dependents: family.has_dependents
     datatype: yesno
   - How many dependents: family.dependent_count
@@ -44,7 +42,6 @@ fields:
     default: ${ debtor[1].income.income_amount_1 + debtor[1].income.overtime_pay_1 + debtor[1].income.net_rental_business + debtor[1].income.social_security + debtor[1].income.pension + debtor[1].income.unemployment + debtor[1].income.family_support + debtor[1].income.interest_and_dividends + debtor[1].income.other_govt_assist if len(debtor) > 1 and defined('debtor[1].income.income_amount_1') else 0 }
   - Non-cash assistance: family.assistance_income
     datatype: currency
-    # default: 5000
   - note: |
       <br><br>
       Tell the court about income changes and assistance
@@ -68,7 +65,6 @@ fields:
       Tell the court why you are unable to pay the filing fee in installments within 120 days. If you have some additional circumstances that cause you not to be able to pay your filing fee in installments, explain them.
   - Explain: family.cannot_pay_explain
     input type: area
-    # default: NA
 ---
 #Part 2 - Tell the court about your monthly expenses
 id: f103b_monthly_expenses
@@ -80,7 +76,6 @@ subquestion: |
 fields:
   - Average Monthly Expense: family.average_monthly_expenses
     datatype: currency
-    # default: 3500
   - note: |
       <br><br>
       Do these expenses cover anyone who is not included in your family as reported earlier?
@@ -88,7 +83,6 @@ fields:
     datatype: yesno
   - Explain: family.others_with_expenses_explain
     input type: area
-    # default:       NA
     show if: family.has_others_with_expenses
   - note: |
       <br><br>
@@ -97,7 +91,6 @@ fields:
     datatype: yesno
   - Amount: family.other_expense_payers_amount
     datatype: number
-    # default: 0
     show if: family.has_other_expense_payers
   - note: |
       <br><br>
@@ -106,7 +99,6 @@ fields:
     datatype: yesno
   - Explain: family.expense_changes_explain
     input type: area
-    # default:       NA
     show if: family.expense_changes
 ---
 # Part 3 - Tell the court about your property
@@ -130,7 +122,6 @@ subquestion: |
 fields:
   - Cash on Hand: prop.cash_on_hand
     datatype: currency
-    # default: 2000
 ---
 id: f103b_bank_accounts_exist
 section: waive_fee
@@ -155,9 +146,7 @@ fields:
       - Savings
       - Other
   - Institution Name: prop.accounts[i].institution
-    # default: BECU
   - Amount: prop.accounts[i].amount
-    # default: 1000
     datatype: currency
 under: |
   ${ prop_accounts_table }
@@ -180,29 +169,22 @@ subquestion: |
 fields:
   - Owns home: prop.has_home
     datatype: yesnoradio
-    # default: False
   - Address/PO Box: prop.mortgage_street
-    # default:       11111 56 Pl
     show if: prop.has_home
   - City: prop.mortgage_city
-    # default:       Tampa
     show if: prop.has_home
   - State: prop.mortgage_state
-    # default:       Florida
     show if: prop.has_home
   - Zip: prop.mortgage_zip
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
     show if: prop.has_home
   - Current Value: prop.mortgage_current_value
     datatype: currency
-    # default: 150000
     show if: prop.has_home
   - Amount owed: prop.mortgage_amount_owed
     datatype: currency
-    # default: 90000
     show if: prop.has_home
 ---
 id: f103b_other_real_estate
@@ -214,28 +196,21 @@ subquestion: |
 fields:
   - Has other real estate: prop.has_other_real_estate
     datatype: yesnoradio
-    # default: False
   - Address/PO Box: prop.other_mortgage_street
-    # default:       1111 56th Pl
     show if: prop.has_other_real_estate
   - City: prop.other_mortgage_city
-    # default:       Tampa
     show if: prop.has_other_real_estate
   - State: prop.other_mortgage_state
-    # default:       Florida
     show if: prop.has_other_real_estate
   - Zip: prop.other_mortgage_zip
     datatype: text
     minlength: 5
     maxlength: 5
-    # default: 33593
     show if: prop.has_other_real_estate
   - Current Value: prop.other_mortgage_current_value
-    # default: 300000
     datatype: currency
     show if: prop.has_other_real_estate
   - Amount owed: prop.other_mortgage_amount_owed
-    # default: 250000
     datatype: currency
     show if: prop.has_other_real_estate
 ---
@@ -279,21 +254,15 @@ allowed to set:
   - prop.vehicles[i].complete
 fields:
   - Make: prop.vehicles[i].make
-    # default:       Toyota
   - Model: prop.vehicles[i].model
-    # default:       Corolla
   - Year: prop.vehicles[i].year
-    # default:       2015
   - Mileage: prop.vehicles[i].milage
     datatype: number
-    # default: 200000
   - note: |
       Tell us about the vehicle's value and liens.
   - Current Value: prop.vehicles[i].current_value
-    # default: 8000
     datatype: currency
   - Amount owed: prop.vehicles[i].amount_owed
-    # default: 14000
     datatype: currency
 list collect: True
 ---
@@ -306,13 +275,10 @@ subquestion: |
 fields:
   - Describe other assets: prop.other_asset_description
     input type: area
-    # default:       Something else
   - Current Value: prop.other_asset_value
     datatype: currency
-    # default: 1000
   - Amount owed: prop.other_asset_owed
     datatype: currency
-    # default: 500
 ---
 table: prop_owers_table
 rows: prop.owers
@@ -347,10 +313,8 @@ allowed to set:
   - prop.owers[i].complete
 fields:
   - Name of person who owes you: prop.owers[i].name
-    # default:       Cindy
   - How much?: prop.owers[i].amount
     datatype: currency
-    # default:       500
 under: |
   ${ prop_owers_table }
 list collect: True
@@ -362,7 +326,6 @@ question: |
 fields:
   - Do you believe you will likely receive payment in the next 180 days?: prop.will_receive_ower_payment
     datatype: yesnoradio
-    # default: True
   - Explain: prop.ower_payment_explain
     required: false
     input type: area
@@ -378,7 +341,6 @@ fields:
       Have you paid anyone for services for this case, including filling out this application, the bankruptcy filing package, or the schedules?
   - Paid?: additional.paid_for_services
     datatype: yesnoradio
-    # default: False
   - Whom did you pay?: additional.paid_for_services_who
     datatype: checkboxes
     choices:
@@ -387,10 +349,8 @@ fields:
       - Someone else
     show if: additional.paid_for_services
   - Describe who: additional.paid_for_services_who_describe
-    # default:       Family Friend
     show if: additional.paid_for_services
   - How much?: additional.paid_for_services_amount
-    # default: 1000
     datatype: currency
     show if: additional.paid_for_services
   - note: |
@@ -398,7 +358,6 @@ fields:
       Have you promised to pay or do you expect to pay someone for services for your bankruptcy case?
   - Promised to pay?: additional.promised_for_services
     datatype: yesnoradio
-    # default: False
   - Whom did you pay?: additional.promised_for_services_who
     datatype: checkboxes
     choices:
@@ -407,10 +366,8 @@ fields:
       - Someone else
     show if: additional.promised_for_services
   - Describe who: additional.promised_for_services_who_describe
-    # default:       Family Friend
     show if: additional.promised_for_services
   - How much?: additional.promised_for_services_amount
-    # default: 1000
     datatype: currency
     show if: additional.promised_for_services
   - note: |
@@ -418,7 +375,6 @@ fields:
       Has anyone paid someone on your behalf for services for this case?
   - Has anyone else paid on your behalf?: additional.behalf_for_services
     datatype: yesnoradio
-    # default: False
   - Whom was paid?: additional.behalf_for_services_who
     datatype: checkboxes
     choices:
@@ -436,10 +392,8 @@ fields:
       - Someone else
     show if: additional.behalf_for_services
   - Other payer: additional.behalf_other_payer
-    # default:       Someone else
     show if: additional.behalf_for_services
   - How much was paid?: additional.behalf_for_services_amount
-    # default: 1000
     datatype: currency
     show if: additional.behalf_for_services
 ---
@@ -473,14 +427,11 @@ allowed to set:
   - additional.bankruptcies[i].complete
 fields:
   - District: additional.bankruptcies[i].district
-    # default: 'District of Nebraska'
     code: courts_list
   - When: additional.bankruptcies[i].when
-    # default: 01/01/23
     datatype: date
   - Case Number: additional.bankruptcies[i].case_number
     datatype: number
-    # default: 111111
 list collect: True
 ---
 attachment:
