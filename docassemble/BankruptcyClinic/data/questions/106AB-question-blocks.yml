@@ -158,12 +158,7 @@ fields:
   - Specific laws that allow exemption: prop.interests[i].exemption_laws
     choices:
       code: |
-        # Use a static union of NE and SD real property exemptions to avoid
-        # triggering lookups of undefined variables during page render
-        list(dict.fromkeys(
-          get_exemption_choices('Nebraska', 'real_property') +
-          get_exemption_choices('South Dakota', 'real_property')
-        ))
+        get_exemption_choices_combined('real_property')
     show if: prop.interests[i].is_claiming_exemption
   - note: Second Exemption
     show if: prop.interests[i].is_claiming_exemption
@@ -294,12 +289,7 @@ fields:
   - Specific laws that allow exemption: prop.ab_vehicles[i].exemption_laws
     choices:
       code: |
-        # Use a static union of NE and SD vehicle exemptions to avoid
-        # triggering lookups of undefined variables during page render
-        list(dict.fromkeys(
-          get_exemption_choices('Nebraska', 'vehicle') +
-          get_exemption_choices('South Dakota', 'vehicle')
-        ))
+        get_exemption_choices_combined('vehicle')
     show if: prop.ab_vehicles[i].is_claiming_exemption
   - note: Second Exemption
     show if: prop.ab_vehicles[i].is_claiming_exemption
@@ -310,12 +300,7 @@ fields:
   - Specific laws that allow exemption: prop.ab_vehicles[i].exemption_laws_2
     choices:
       code: |
-        # Use a static union of NE and SD vehicle exemptions to avoid
-        # triggering lookups of undefined variables during page render
-        list(dict.fromkeys(
-          get_exemption_choices('Nebraska', 'vehicle') +
-          get_exemption_choices('South Dakota', 'vehicle')
-        ))
+        get_exemption_choices_combined('vehicle')
     show if: prop.ab_vehicles[i].is_claiming_exemption
     required: False
 list collect: True
@@ -429,12 +414,7 @@ fields:
   - Specific laws that allow exemption: prop.ab_other_vehicles[i].exemption_laws
     choices:
       code: |
-        # Use a static union of NE and SD vehicle exemptions to avoid
-        # triggering lookups of undefined variables during page render
-        list(dict.fromkeys(
-          get_exemption_choices('Nebraska', 'vehicle') +
-          get_exemption_choices('South Dakota', 'vehicle')
-        ))
+        get_exemption_choices_combined('vehicle')
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
   - note: Exemption 2
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
@@ -445,12 +425,7 @@ fields:
   - Specific laws that allow exemption: prop.ab_other_vehicles[i].exemption_laws_2
     choices:
       code: |
-        # Use a static union of NE and SD vehicle exemptions to avoid
-        # triggering lookups of undefined variables during page render
-        list(dict.fromkeys(
-          get_exemption_choices('Nebraska', 'vehicle') +
-          get_exemption_choices('South Dakota', 'vehicle')
-        ))
+        get_exemption_choices_combined('vehicle')
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
     required: False
 list collect: True
@@ -586,7 +561,7 @@ fields:
   - Specific laws that allow exemption: prop.household_goods_exemption_laws
     choices:
       code: |
-        get_exemption_choices(debtor[0].address.state, 'all')
+        get_exemption_choices_combined('household_goods')
     show if: prop.household_goods_is_claiming_exemption
   - note: Exemption 2
     show if: prop.household_goods_is_claiming_exemption
@@ -597,7 +572,7 @@ fields:
   - Specific laws that allow exemption: prop.household_goods_exemption_laws_2
     choices:
       code: |
-        get_exemption_choices(debtor[0].address.state, 'all')
+        get_exemption_choices_combined('household_goods')
     show if: prop.household_goods_is_claiming_exemption
     required: False
 
@@ -623,9 +598,8 @@ fields:
     show if: prop.secured_household_goods_claiming_sub_100
   - Specific laws that allow exemption: prop.secured_household_goods_exemption_laws
     choices:
-      - Household goods (Neb. Rev. Stat. § 25-1556(1)(c))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('household_goods')
     show if: prop.secured_household_goods_is_claiming_exemption
   - note: Exemption 2
     show if: prop.secured_household_goods_is_claiming_exemption
@@ -635,9 +609,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.secured_household_goods_exemption_laws_2
     choices:
-      - Household goods (Neb. Rev. Stat. § 25-1556(1)(c))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('household_goods')
     show if: prop.secured_household_goods_is_claiming_exemption
     required: False
 
@@ -663,10 +636,8 @@ fields:
     show if: prop.electronics_claiming_sub_100
   - Specific laws that allow exemption: prop.electronics_exemption_laws
     choices:
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Household goods (Neb. Rev. Stat. § 25-1556(1)(c))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('electronics')
     show if: prop.electronics_is_claiming_exemption
   - note: Second Exemption
     show if: prop.electronics_is_claiming_exemption
@@ -676,10 +647,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.electronics_exemption_laws_2
     choices:
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Household goods (Neb. Rev. Stat. § 25-1556(1)(c))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('electronics')
     show if: prop.electronics_is_claiming_exemption
     required: False
 
@@ -705,8 +674,8 @@ fields:
     show if: prop.collectibles_claiming_sub_100
   - Specific laws that allow exemption: prop.collectibles_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.collectibles_is_claiming_exemption
   - note: Second Exemption
     show if: prop.collectibles_is_claiming_exemption
@@ -716,8 +685,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.collectibles_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.collectibles_is_claiming_exemption
     required: False
 
@@ -743,8 +712,8 @@ fields:
     show if: prop.hobby_equipment_claiming_sub_100
   - Specific laws that allow exemption: prop.hobby_equipment_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.hobby_equipment_is_claiming_exemption
   - note: Second Exemption
     show if: prop.hobby_equipment_is_claiming_exemption
@@ -754,8 +723,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.hobby_equipment_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.hobby_equipment_is_claiming_exemption
     required: False
 
@@ -781,8 +750,8 @@ fields:
     show if: prop.firearms_claiming_sub_100
   - Specific laws that allow exemption: prop.firearms_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.firearms_is_claiming_exemption
   - note: Second Exemption
     show if: prop.firearms_is_claiming_exemption
@@ -792,8 +761,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.firearms_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.firearms_is_claiming_exemption
     required: False
 
@@ -819,9 +788,8 @@ fields:
     show if: prop.clothes_claiming_sub_100
   - Specific laws that allow exemption: prop.clothes_exemption_laws
     choices:
-      - Clothing (Neb. Rev. Stat. § 25-1556(1)(b))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('clothes')
     show if: prop.clothes_is_claiming_exemption
   - note: Second Exemption
     show if: prop.clothes_is_claiming_exemption
@@ -831,9 +799,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.clothes_exemption_laws_2
     choices:
-      - Clothing (Neb. Rev. Stat. § 25-1556(1)(b))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('clothes')
     show if: prop.clothes_is_claiming_exemption
     required: False
 
@@ -859,10 +826,8 @@ fields:
     show if: prop.jewelry_claiming_sub_100
   - Specific laws that allow exemption: prop.jewelry_exemption_laws
     choices:
-      - Clothing (Neb. Rev. Stat. § 25-1556(1)(b))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
-      - Immediate personal possessions (Neb. Rev. Stat. § 25-1556(1)(a))
+      code: |
+        get_exemption_choices_combined('jewelry')
     show if: prop.jewelry_is_claiming_exemption
   - note: Second Exemption
     show if: prop.jewelry_is_claiming_exemption
@@ -872,10 +837,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.jewelry_exemption_laws_2
     choices:
-      - Clothing (Neb. Rev. Stat. § 25-1556(1)(b))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
-      - Immediate personal possessions (Neb. Rev. Stat. § 25-1556(1)(a))
+      code: |
+        get_exemption_choices_combined('jewelry')
     show if: prop.jewelry_is_claiming_exemption
     required: False
 
@@ -901,8 +864,8 @@ fields:
     show if: prop.animal_claiming_sub_100
   - Specific laws that allow exemption: prop.animal_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.animal_is_claiming_exemption
   - note: Second Exemption
     show if: prop.animal_is_claiming_exemption
@@ -912,8 +875,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.animal_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.animal_is_claiming_exemption
     required: False
 
@@ -939,9 +902,8 @@ fields:
     show if: prop.other_household_items_claiming_sub_100
   - Specific laws that allow exemption: prop.other_household_items_exemption_laws
     choices:
-      - Health Aids (Neb. Rev. Stat. § 25-1556(1)(f))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('other_household_items')
     show if: prop.other_household_items_is_claiming_exemption
   - note: Second Exemption
     show if: prop.other_household_items_is_claiming_exemption
@@ -951,9 +913,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.other_household_items_exemption_laws_2
     choices:
-      - Health Aids (Neb. Rev. Stat. § 25-1556(1)(f))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('other_household_items')
     show if: prop.other_household_items_is_claiming_exemption
     required: False
 
@@ -1003,9 +964,8 @@ fields:
     show if: prop.financial_assets.cash_sub_100
   - Specific laws that allow exemption: prop.financial_assets.cash_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Public Benefits (Neb. Rev. Stat. § 68-148)
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('cash')
     show if: prop.financial_assets.cash_is_claiming_exemption
   - note: Second Exemption
     show if: prop.financial_assets.cash_is_claiming_exemption
@@ -1015,9 +975,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.financial_assets.cash_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Public Benefits (Neb. Rev. Stat. § 68-148)
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('cash')
     show if: prop.financial_assets.cash_is_claiming_exemption
     required: False
 ---
@@ -1096,8 +1055,8 @@ fields:
     show if: prop.financial_assets.deposits[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.deposits[i].exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.financial_assets.deposits[i].is_claiming_exemption
   - note: Second Exemption
     show if: prop.financial_assets.deposits[i].is_claiming_exemption
@@ -1107,8 +1066,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.financial_assets.deposits[i].exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.financial_assets.deposits[i].is_claiming_exemption
     required: False
 list collect: True
@@ -1180,8 +1139,8 @@ fields:
     show if: prop.financial_assets.bonds_and_stocks[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.bonds_and_stocks[i].exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.financial_assets.bonds_and_stocks[i].is_claiming_exemption
   - note: Second Exemption
     show if: prop.financial_assets.bonds_and_stocks[i].is_claiming_exemption
@@ -1191,8 +1150,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.financial_assets.bonds_and_stocks[i].exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.financial_assets.bonds_and_stocks[i].is_claiming_exemption
     required: False
 list collect: True 
@@ -1268,8 +1227,8 @@ fields:
     show if: prop.financial_assets.non_traded_stock[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.non_traded_stock[i].exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.financial_assets.non_traded_stock[i].is_claiming_exemption
   - note: Second Exemption
     show if: prop.financial_assets.non_traded_stock[i].is_claiming_exemption
@@ -1279,8 +1238,8 @@ fields:
     required: false
   - Specific laws that allow exemption: prop.financial_assets.non_traded_stock[i].exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.financial_assets.non_traded_stock[i].is_claiming_exemption
     required: false
 list collect: True 
@@ -1352,8 +1311,8 @@ fields:
     show if: prop.financial_assets.corporate_bonds[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.corporate_bonds[i].exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.financial_assets.corporate_bonds[i].is_claiming_exemption
   - note: Second Exemption
     show if: prop.financial_assets.corporate_bonds[i].is_claiming_exemption
@@ -1363,8 +1322,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.financial_assets.corporate_bonds[i].exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.financial_assets.corporate_bonds[i].is_claiming_exemption
     required: False
 list collect: True
@@ -1447,11 +1406,8 @@ fields:
     show if: prop.financial_assets.retirement_accounts[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.retirement_accounts[i].exemption_laws
     choices:
-      - Retirement accounts (Neb. Rev. Stat. § 25-1563.01)
-      - Social Security (42 U.S.C. § 407)
-      - VA Benefits (38 U.S.C. § 5301(a))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('retirement')
     show if: prop.financial_assets.retirement_accounts[i].has_claim
   - note: Second Exemption
     show if: prop.financial_assets.retirement_accounts[i].has_claim
@@ -1461,11 +1417,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.financial_assets.retirement_accounts[i].exemption_laws_2
     choices:
-      - Retirement accounts (Neb. Rev. Stat. § 25-1563.01)
-      - Social Security (42 U.S.C. § 407)
-      - VA Benefits (38 U.S.C. § 5301(a))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('retirement')
     show if: prop.financial_assets.retirement_accounts[i].has_claim
     required: False
 list collect: True
@@ -1551,8 +1504,8 @@ fields:
     show if: prop.financial_assets.prepayments[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.prepayments[i].exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.financial_assets.prepayments[i].has_claim
   - note: Second Exemption
     show if: prop.financial_assets.prepayments[i].has_claim
@@ -1562,8 +1515,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.financial_assets.prepayments[i].exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.financial_assets.prepayments[i].has_claim
     required: False
 list collect: True
@@ -1636,9 +1589,8 @@ fields:
     show if: prop.financial_assets.annuities[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.annuities[i].exemption_laws
     choices:
-      - Wages (Neb. Rev. Stat. § 25-1558)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wages')
     show if: prop.financial_assets.annuities[i].has_claim
   - note: Second Exemption
     show if: prop.financial_assets.annuities[i].has_claim
@@ -1648,9 +1600,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.financial_assets.annuities[i].exemption_laws_2
     choices:
-      - Wages (Neb. Rev. Stat. § 25-1558)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wages')
     show if: prop.financial_assets.annuities[i].has_claim
     required: False
 list collect: True
@@ -1723,9 +1674,8 @@ fields:
     show if: prop.financial_assets.edu_accounts[i].sub_100
   - Specific laws that allow exemption: prop.financial_assets.edu_accounts[i].exemption_laws
     choices:
-      - College Savings Plan (Neb. Rev. Stat. § 85-1809)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('edu_accounts')
     show if: prop.financial_assets.edu_accounts[i].has_claim
   - note: Second Exemption
     show if: prop.financial_assets.edu_accounts[i].has_claim
@@ -1735,9 +1685,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.financial_assets.edu_accounts[i].exemption_laws_2
     choices:
-      - College Savings Plan (Neb. Rev. Stat. § 85-1809)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('edu_accounts')
     show if: prop.financial_assets.edu_accounts[i].has_claim
     required: False
 list collect: True
@@ -1787,8 +1736,8 @@ fields:
     show if: prop.financial_assets.future_property_interest_sub_100
   - Specific laws that allow exemption: prop.financial_assets.future_property_interest_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.financial_assets.future_property_interest_has_claim
   - note: Second Exemption
     show if: prop.financial_assets.future_property_interest_has_claim
@@ -1798,8 +1747,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.financial_assets.future_property_interest_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.financial_assets.future_property_interest_has_claim
     required: False
 ---
@@ -1850,8 +1799,8 @@ fields:
     show if: prop.financial_assets.ip_interest_sub_100
   - Specific laws that allow exemption: prop.financial_assets.ip_interest_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.financial_assets.ip_interest_has_claim
   - note: Second Exemption
     show if: prop.financial_assets.ip_interest_has_claim
@@ -1861,8 +1810,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.financial_assets.ip_interest_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.financial_assets.ip_interest_has_claim
     required: False
 ---
@@ -1912,8 +1861,8 @@ fields:
     show if: prop.financial_assets.intangible_interest_sub_100
   - Specific laws that allow exemption: prop.financial_assets.intangible_interest_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.financial_assets.intangible_interest_has_claim
   - note: Second Exemption
     show if: prop.financial_assets.intangible_interest_has_claim
@@ -1923,8 +1872,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.financial_assets.intangible_interest_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.financial_assets.intangible_interest_has_claim
     required: False
 ---
@@ -2074,9 +2023,8 @@ fields:
     datatype: currency
   - Specific laws that allow exemption: prop.owed_property.tax_refund_exemption_laws
     choices:
-      - Earned Income Tax Credit (Neb Rev Stat 25-1553)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('tax_refund')
     show if: prop.owed_property.tax_refund_has_claim
   - note: Second Exemption
     show if: prop.owed_property.tax_refund_has_claim
@@ -2086,9 +2034,8 @@ fields:
     show if: prop.owed_property.tax_refund_has_claim
   - Specific laws that allow exemption: prop.owed_property.tax_refund_exemption_laws_2
     choices:
-      - Earned Income Tax Credit (Neb Rev Stat 25-1553)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('tax_refund')
     show if: prop.owed_property.tax_refund_has_claim
     required: False
 
@@ -2134,9 +2081,8 @@ fields:
     show if: prop.owed_property.family_support_sub_100
   - Specific laws that allow exemption: prop.owed_property.family_support_exemption_laws
     choices:
-      - Wages (Neb. Rev. Stat. § 25-1558)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wages')
     show if: prop.owed_property.family_support_has_claim
   - note: Second Exemption
     show if: prop.owed_property.family_support_has_claim
@@ -2146,9 +2092,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.owed_property.family_support_exemption_laws_2
     choices:
-      - Wages (Neb. Rev. Stat. § 25-1558)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wages')
     show if: prop.owed_property.family_support_has_claim
     required: False
 
@@ -2179,9 +2124,8 @@ fields:
     show if: prop.owed_property.other_amounts_sub_100
   - Specific laws that allow exemption: prop.owed_property.other_amounts_exemption_laws
     choices:
-      - Wages (Neb. Rev. Stat. § 25-1558)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wages')
     show if: prop.owed_property.other_amounts_has_claim
   - note: Second Exemption
     show if: prop.owed_property.other_amounts_has_claim
@@ -2191,9 +2135,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.owed_property.other_amounts_exemption_laws_2
     choices:
-      - Wages (Neb. Rev. Stat. § 25-1558)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wages')
     show if: prop.owed_property.other_amounts_has_claim
     required: False
 
@@ -2228,10 +2171,8 @@ fields:
     show if: prop.owed_property.first_insurance_interest_sub_100
   - Specific laws that allow exemption: prop.owed_property.first_insurance_interest_exemption_laws
     choices:
-      - Life insurance proceeds (Neb. Rev. Stat. § 44-371)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Health Savings (Neb. Rev. Stat. § 8-1,131(2)(b))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('insurance')
     show if: prop.owed_property.first_insurance_interest_has_claim
   - note: Second Exemption
     show if: prop.owed_property.first_insurance_interest_has_claim
@@ -2241,10 +2182,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.owed_property.first_insurance_interest_exemption_laws_2
     choices:
-      - Life insurance proceeds (Neb. Rev. Stat. § 44-371)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Health Savings (Neb. Rev. Stat. § 8-1,131(2)(b))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('insurance')
     show if: prop.owed_property.first_insurance_interest_has_claim
     required: False
 
@@ -2276,10 +2215,8 @@ fields:
     show if: prop.owed_property.second_insurance_interest_sub_100
   - Specific laws that allow exemption: prop.owed_property.second_insurance_interest_exemption_laws
     choices:
-      - Life insurance proceeds (Neb. Rev. Stat. § 44-371)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Health Savings (Neb. Rev. Stat. § 8-1,131(2)(b))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('insurance')
     show if: prop.owed_property.second_insurance_interest_has_claim
   - note: Second Exemption
     show if: prop.owed_property.second_insurance_interest_has_claim
@@ -2289,10 +2226,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.owed_property.second_insurance_interest_exemption_laws_2
     choices:
-      - Life insurance proceeds (Neb. Rev. Stat. § 44-371)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Health Savings (Neb. Rev. Stat. § 8-1,131(2)(b))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('insurance')
     show if: prop.owed_property.second_insurance_interest_has_claim
     required: False
 
@@ -2324,10 +2259,8 @@ fields:
     show if: prop.owed_property.third_insurance_interest_sub_100
   - Specific laws that allow exemption: prop.owed_property.third_insurance_interest_exemption_laws
     choices:
-      - Life insurance proceeds (Neb. Rev. Stat. § 44-371)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Health Savings (Neb. Rev. Stat. § 8-1,131(2)(b))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('insurance')
     show if: prop.owed_property.third_insurance_interest_has_claim
   - note: Second Exemption
     show if: prop.owed_property.third_insurance_interest_has_claim
@@ -2337,10 +2270,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.owed_property.third_insurance_interest_exemption_laws_2
     choices:
-      - Life insurance proceeds (Neb. Rev. Stat. § 44-371)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Health Savings (Neb. Rev. Stat. § 8-1,131(2)(b))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('insurance')
     show if: prop.owed_property.third_insurance_interest_has_claim
     required: False
 
@@ -2371,9 +2302,8 @@ fields:
     show if: prop.owed_property.trust_sub_100
   - Specific laws that allow exemption: prop.owed_property.trust_exemption_laws
     choices:
-      - Structured settlement (Neb. Rev. Stat. § 25-1563.02)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('trust')
     show if: prop.owed_property.trust_has_claim
   - note: Second Exemption
     show if: prop.owed_property.trust_has_claim
@@ -2383,9 +2313,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.owed_property.trust_exemption_laws_2
     choices:
-      - Structured settlement (Neb. Rev. Stat. § 25-1563.02)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('trust')
     show if: prop.owed_property.trust_has_claim
     required: False
 
@@ -2416,10 +2345,8 @@ fields:
     show if: prop.owed_property.third_party_sub_100
   - Specific laws that allow exemption: prop.owed_property.third_party_exemption_laws
     choices:
-      - Structured settlement (Neb. Rev. Stat. § 25-1563.02)
-      - Life insurance proceeds (Neb. Rev. Stat. § 44-371)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('third_party')
     show if: prop.owed_property.third_party_has_claim
   - note: Second Exemption
     show if: prop.owed_property.third_party_has_claim
@@ -2429,10 +2356,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.owed_property.third_party_exemption_laws_2
     choices:
-      - Structured settlement (Neb. Rev. Stat. § 25-1563.02)
-      - Life insurance proceeds (Neb. Rev. Stat. § 44-371)
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('third_party')
     show if: prop.owed_property.third_party_has_claim
     required: False
 
@@ -2461,8 +2386,8 @@ fields:
     show if: prop.owed_property.contingent_claims_sub_100
   - Specific laws that allow exemption: prop.owed_property.contingent_claims_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.owed_property.contingent_claims_has_claim
   - note: Second Exemption
     show if: prop.owed_property.contingent_claims_has_claim
@@ -2472,8 +2397,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.owed_property.contingent_claims_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.owed_property.contingent_claims_has_claim
     required: False
 
@@ -2503,8 +2428,8 @@ fields:
     show if: prop.owed_property.other_assets_sub_100
   - Specific laws that allow exemption: prop.owed_property.other_assets_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.owed_property.other_assets_has_claim
   - note: Second Exemption
     show if: prop.owed_property.other_assets_has_claim
@@ -2514,8 +2439,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.owed_property.other_assets_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.owed_property.other_assets_has_claim
     required: False
 ---
@@ -2635,9 +2560,8 @@ fields:
     show if: prop.business_property.ar_sub_100
   - Specific laws that allow exemption: prop.business_property.ar_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('business_other')
     show if: prop.business_property.ar_has_claim
   - note: Second Exemption
     show if: prop.business_property.ar_has_claim
@@ -2647,9 +2571,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.business_property.ar_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('business_other')
     show if: prop.business_property.ar_has_claim
     required: False
 
@@ -2680,9 +2603,8 @@ fields:
     show if: prop.business_property.equipment_sub_100
   - Specific laws that allow exemption: prop.business_property.equipment_exemption_laws
     choices:
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('business_equipment')
     show if: prop.business_property.equipment_has_claim
   - note: Second Exemption
     show if: prop.business_property.equipment_has_claim
@@ -2692,9 +2614,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.business_property.equipment_exemption_laws_2
     choices:
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('business_equipment')
     show if: prop.business_property.equipment_has_claim
     required: False
 
@@ -2724,9 +2645,8 @@ fields:
     show if: prop.business_property.machinery_sub_100
   - Specific laws that allow exemption: prop.business_property.machinery_exemption_laws
     choices:
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('business_equipment')
     show if: prop.business_property.machinery_has_claim
   - note: Second Exemption
     show if: prop.business_property.machinery_has_claim
@@ -2736,9 +2656,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.business_property.machinery_exemption_laws_2
     choices:
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('business_equipment')
     show if: prop.business_property.machinery_has_claim
     required: False
 
@@ -2767,9 +2686,8 @@ fields:
     show if: prop.business_property.inventory_sub_100
   - Specific laws that allow exemption: prop.business_property.inventory_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('business_other')
     show if: prop.business_property.inventory_has_claim
   - note: Second Exemption
     show if: prop.business_property.inventory_has_claim
@@ -2779,9 +2697,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.business_property.inventory_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('business_other')
     show if: prop.business_property.inventory_has_claim
     required: False
 
@@ -2858,9 +2775,8 @@ fields:
     show if: prop.business_property.partnership_sub_100
   - Specific laws that allow exemption: prop.business_property.partnership_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('business_other')
     show if: prop.business_property.partnership_has_claim
   - note: Second Exemption
     show if: prop.business_property.partnership_has_claim
@@ -2870,9 +2786,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.business_property.partnership_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('business_other')
     show if: prop.business_property.partnership_has_claim
     required: False
 
@@ -2905,9 +2820,8 @@ fields:
     show if: prop.business_property.lists_sub_100
   - Specific laws that allow exemption: prop.business_property.lists_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('business_other')
     show if: prop.business_property.lists_has_claim
   - note: Second Exemption
     show if: prop.business_property.lists_has_claim
@@ -2917,9 +2831,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.business_property.lists_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('business_other')
     show if: prop.business_property.lists_has_claim
     required: False
 
@@ -2983,9 +2896,8 @@ fields:
     show if: prop.business_property.otherProperty_sub_100
   - Specific laws that allow exemption: prop.business_property.otherProperty_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('business_other')
     show if: prop.business_property.otherProperty_has_claim
   - note: Second Exemption
     show if: prop.business_property.otherProperty_has_claim
@@ -2995,9 +2907,8 @@ fields:
     show if: prop.business_property.otherProperty_sub_100
   - Specific laws that allow exemption: prop.business_property.otherProperty_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('business_other')
     show if: prop.business_property.otherProperty_has_claim
     required: False
 
@@ -3098,8 +3009,8 @@ fields:
     show if: prop.farming_property.animal_sub_100
   - Specific laws that allow exemption: prop.farming_property.animal_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.farming_property.has_animal_claim
   - note: Second Exemption
     show if: prop.farming_property.has_animal_claim
@@ -3109,8 +3020,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.farming_property.animal_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.farming_property.has_animal_claim
     required: False
 
@@ -3139,8 +3050,8 @@ fields:
     show if: prop.farming_property.crops_sub_100
   - Specific laws that allow exemption: prop.farming_property.crops_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.farming_property.has_crops_claim
   - note: Second Exemption
     show if: prop.farming_property.has_crops_claim
@@ -3150,8 +3061,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.farming_property.crops_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.farming_property.has_crops_claim
     required: False
 
@@ -3179,8 +3090,8 @@ fields:
     show if: prop.farming_property.equipment_sub_100
   - Specific laws that allow exemption: prop.farming_property.equipment_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.farming_property.has_equipment_claim
   - note: Second Exemption
     show if: prop.farming_property.has_equipment_claim
@@ -3190,8 +3101,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.farming_property.equipment_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.farming_property.has_equipment_claim
     required: False
 
@@ -3219,8 +3130,8 @@ fields:
     show if: prop.farming_property.supplies_sub_100
   - Specific laws that allow exemption: prop.farming_property.supplies_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.farming_property.has_supplies_claim
   - note: Second Exemption
     show if: prop.farming_property.has_supplies_claim
@@ -3230,8 +3141,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.farming_property.supplies_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.farming_property.has_supplies_claim
     required: False
 
@@ -3260,8 +3171,8 @@ fields:
     show if: prop.farming_property.fishing_sub_100
   - Specific laws that allow exemption: prop.farming_property.fishing_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.farming_property.has_fishing_claim
   - note: Second Exemption
     show if: prop.farming_property.has_fishing_claim
@@ -3271,8 +3182,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.farming_property.fishing_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.farming_property.has_fishing_claim
     required: False
 
@@ -3341,8 +3252,8 @@ fields:
     show if: prop.other_prop_sub_100
   - Specific laws that allow exemption: prop.other_prop_exemption_laws
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.other_prop_has_claim
   - note: Second Exemption
     show if: prop.other_prop_has_claim
@@ -3352,8 +3263,8 @@ fields:
     required: False
   - Specific laws that allow exemption: prop.other_prop_exemption_laws_2
     choices:
-      - Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))
-      - Unknown law
+      code: |
+        get_exemption_choices_combined('wildcard_only')
     show if: prop.other_prop_has_claim
     required: False
 ---

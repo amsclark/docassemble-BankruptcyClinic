@@ -1,105 +1,148 @@
 from docassemble.base.util import DAObject, Individual
 
 # State-specific exemption laws
+SOUTH_DAKOTA_EXEMPTIONS = {
+    'homestead': 'Homestead (SDCL 43-31-1 – 43-31-6)',
+    'homestead_proceeds': 'Homestead, proceeds of sale (SDCL 43-31-4)',
+    'household_goods': 'Furniture and bedding (SDCL 43-45-5(5))',
+    'wildcard': 'Wildcard (SDCL 43-5-4)',
+    'personal_property': 'Bible, books, family pictures, burial plots, all wearing apparel, church pew, food & fuel to last one year, and clothing (SDCL 43-45-2)',
+    'domestic_support': 'Alimony, maintenance, or support of the debtor (SDCL 43-45-2)',
+    'health_aids': 'Health aids (SDCL 43-45-2)',
+    'tools': 'Tools of the trade (SDCL 43-45-5(6))',
+    'city_employee_pensions': 'City employee pensions (SDCL 9-16-47)',
+    'public_employee_pensions': 'Public employee pensions (SDCL 3-12-115)',
+    'retirement': 'Retirement (SDCL 43-45-26)',
+    'public_assistance': 'Public assistance (SDCL 28-7-16)',
+    'wages': 'Wages (SDCL 15-20-12)',
+    'life_insurance': 'Life insurance proceeds (SDCL 58-12-4. 43-45-6)',
+    'workers_comp': 'Workers compensation (SDCL 62-4-42)',
+    'unemployment': 'Unemployment (SDCL 61-6-28)',
+    'student_loan': 'Student loan (20 U.S.C. § 1095a(d))',
+    'social_security': 'Social Security (42 U.S.C. § 407)',
+    'va': 'VA Benefits (38 U.S.C. § 5301(a))',
+    'unknown': 'Unknown law',
+}
+
+NEBRASKA_EXEMPTIONS = {
+    'homestead': 'Homestead (Neb. Rev. Stat. §§ 40-101 - 40-118)',
+    'homestead_proceeds': 'Homestead, proceeds of sale (Neb. Rev. Stat. § 40-116)',
+    'motor_vehicle': 'Motor vehicle (Neb. Rev. Stat. § 25-1556(1)(e))',
+    'household_goods': 'Household goods (Neb. Rev. Stat. § 25-1556(1)(c))',
+    'tools': 'Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))',
+    'clothing': 'Clothing (Neb. Rev. Stat. § 25-1556(1)(b))',
+    'personal_possessions': 'Immediate personal possessions (Neb. Rev. Stat. § 25-1556(1)(a))',
+    'health_aids': 'Health aids (Neb. Rev. Stat. § 25-1556(1)(f))',
+    'health_savings': 'Health savings (Neb. Rev. Stat. § 8-1,131(2)(b))',
+    'retirement': 'Retirement accounts (Neb. Rev. Stat. § 25-1563.01)',
+    'wages': 'Wages (Neb. Rev. Stat. § 25-1558)',
+    'public_benefits': 'Public benefits (Neb. Rev. Stat. § 68-148)',
+    'earned_income': 'Earned Income Tax Credit (Neb Rev Stat 25-1553)',
+    'life_insurance': 'Life insurance proceeds (Neb. Rev. Stat. § 44-371)',
+    'structured_settlement': 'Structured settlement (Neb. Rev. Stat. § 25-1563.02)',
+    'workers_comp': 'Workers compensation (Neb. Rev. Stat. § 48-149)',
+    'unemployment': 'Unemployment (Neb. Rev. Stat. § 48-647)',
+    'college_savings': 'College Savings Plan (Neb. Rev. Stat. § 85-1809)',
+    'student_loan': 'Student loan (20 U.S.C. § 1095a(d))',
+    'social_security': 'Social Security (42 U.S.C. § 407)',
+    'va': 'VA Benefits (38 U.S.C. § 5301(a))',
+    'wildcard': 'Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))',
+    'unknown': 'Unknown law',
+}
+
+# Per-property-type list of exemption keys to surface in the dropdown.
+# Keys absent from a state's dict are skipped, so the same category can be
+# resolved for any supported state.
+CATEGORY_KEYS = {
+    'real_property':            ['homestead', 'homestead_proceeds', 'wildcard', 'unknown'],
+    'vehicle':                  ['motor_vehicle', 'wildcard', 'unknown'],
+    'household_goods':          ['household_goods', 'wildcard', 'unknown'],
+    'electronics':              ['tools', 'household_goods', 'wildcard', 'unknown'],
+    'collectibles':             ['wildcard', 'unknown'],
+    'hobby_equipment':          ['wildcard', 'unknown'],
+    'firearms':                 ['wildcard', 'unknown'],
+    'clothes':                  ['clothing', 'personal_property', 'wildcard', 'unknown'],
+    'jewelry':                  ['clothing', 'personal_possessions', 'personal_property', 'wildcard', 'unknown'],
+    'animal':                   ['wildcard', 'unknown'],
+    'other_household_items':    ['health_aids', 'wildcard', 'unknown'],
+    'cash':                     ['wildcard', 'public_benefits', 'public_assistance', 'unknown'],
+    'deposits':                 ['wildcard', 'unknown'],
+    'bonds_stocks':             ['wildcard', 'unknown'],
+    'non_traded_stock':         ['wildcard', 'unknown'],
+    'corporate_bonds':          ['wildcard', 'unknown'],
+    'retirement':               ['retirement', 'social_security', 'va', 'wildcard',
+                                 'city_employee_pensions', 'public_employee_pensions', 'unknown'],
+    'prepayments':              ['wildcard', 'unknown'],
+    'wages':                    ['wages', 'wildcard', 'unknown'],
+    'wildcard_only':            ['wildcard', 'unknown'],
+    'edu_accounts':             ['college_savings', 'wildcard', 'unknown'],
+    'tax_refund':               ['earned_income', 'wildcard', 'unknown'],
+    'insurance':                ['life_insurance', 'wildcard', 'health_savings', 'unknown'],
+    'trust':                    ['structured_settlement', 'wildcard', 'unknown'],
+    'third_party':              ['structured_settlement', 'life_insurance', 'wildcard', 'unknown'],
+    'contingent_claims':        ['wildcard', 'unknown'],
+    'other_assets':             ['wildcard', 'unknown'],
+    'future_property_interest': ['wildcard', 'unknown'],
+    'ip':                       ['wildcard', 'unknown'],
+    'intangible':               ['wildcard', 'unknown'],
+    'business_ar':              ['wildcard', 'tools', 'unknown'],
+    'business_equipment':       ['tools', 'wildcard', 'unknown'],
+    'business_machinery':       ['tools', 'wildcard', 'unknown'],
+    'business_inventory':       ['wildcard', 'tools', 'unknown'],
+    'business_partnership':     ['wildcard', 'tools', 'unknown'],
+    'business_lists':           ['wildcard', 'tools', 'unknown'],
+    'business_other':           ['wildcard', 'tools', 'unknown'],
+    'farming_animal':           ['wildcard', 'unknown'],
+    'farming_crops':            ['wildcard', 'unknown'],
+    'farming_equipment':        ['tools', 'wildcard', 'unknown'],
+    'farming_supplies':         ['wildcard', 'unknown'],
+    'farming_fishing':          ['wildcard', 'unknown'],
+    'other_prop':               ['wildcard', 'unknown'],
+}
+
+# States supported by get_exemption_choices_combined(); keep in sync with
+# the per-state exemption dicts above.
+SUPPORTED_STATES = ('Nebraska', 'South Dakota')
+
+
 def get_exemption_choices(user_state, property_type='all'):
     """
     Returns a list of exemption law choices based on the user's state and property type.
-    
+
     Args:
         user_state (str): The user's state (e.g., "Nebraska", "South Dakota")
-        property_type (str): Type of property - 'real_property', 'vehicle', or 'all'
-    
+        property_type (str): Property category key (see CATEGORY_KEYS) or 'all'.
+
     Returns:
-        list: List of exemption law strings
+        list: List of exemption law strings (state-specific).
     """
-    
-    # Handle case where user_state might be None or undefined
     try:
         state_str = str(user_state).lower() if user_state else ''
     except Exception:
         state_str = ''
 
-    # South Dakota exemptions
-    south_dakota_exemptions = {
-        'homestead': 'Homestead (SDCL 43-31-1 – 43-31-6)',
-        'homestead_proceeds': 'Homestead, proceeds of sale (SDCL 43-31-4)',
-        'household_goods': 'Furniture and bedding (SDCL 43-45-5(5))',
-        'wildcard': 'Wildcard (SDCL 43-5-4)',
-        'personal_property': 'Bible, books, family pictures, burial plots, all wearing apparel, church pew, food & fuel to last one year, and clothing (SDCL 43-45-2)',
-        'domestic_support': 'Alimony, maintenance, or support of the debtor (SDCL 43-45-2)',
-        'health_aids': 'Health aids (SDCL 43-45-2)',
-        'tools': 'Tools of the trade (SDCL 43-45-5(6))',
-        'city_employee_pensions': 'City employee pensions (SDCL 9-16-47)',
-        'public_employee_pensions': 'Public employee pensions (SDCL 3-12-115)',
-        'retirement': 'Retirement (SDCL 43-45-26)',
-        'public_assistance': 'Public assistance (SDCL 28-7-16)',
-        'wages': 'Wages (SDCL 15-20-12)',
-        'life_insurance': 'Life insurance proceeds (SDCL 58-12-4. 43-45-6)',
-        'workers_comp': 'Workers compensation (SDCL 62-4-42)',
-        'unemployment': 'Unemployment (SDCL 61-6-28)',
-        'student_loan': 'Student loan (20 U.S.C. § 1095a(d))',
-        'social_security': 'Social Security (42 U.S.C. § 407)',
-        'va': 'VA Benefits (38 U.S.C. § 5301(a))',
-        'unknown': 'Unknown law'
-    }
-    
-    # Nebraska exemptions  
-    nebraska_exemptions = {
-        'homestead': 'Homestead (Neb. Rev. Stat. §§ 40-101 - 40-118)',
-        'homestead_proceeds': 'Homestead, proceeds of sale (Neb. Rev. Stat. § 40-116)',
-        'motor_vehicle': 'Motor vehicle (Neb. Rev. Stat. § 25-1556(1)(e))',
-        'household_goods': 'Household goods (Neb. Rev. Stat. § 25-1556(1)(c))',
-        'tools': 'Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))',
-        'clothing': 'Clothing (Neb. Rev. Stat. § 25-1556(1)(b))',
-        'personal_possessions': 'Immediate personal possessions (Neb. Rev. Stat. § 25-1556(1)(a))',
-        'health_aids': 'Health aids (Neb. Rev. Stat. § 25-1556(1)(f))',
-        'health_savings': 'Health savings (Neb. Rev. Stat. § 8-1,131(2)(b))',
-        'retirement': 'Retirement accounts (Neb. Rev. Stat. § 25-1563.01)',
-        'wages': 'Wages (Neb. Rev. Stat. § 25-1558)',
-        'public_benefits': 'Public benefits (Neb. Rev. Stat. § 68-148)',
-        'earned_income': 'Earned Income Tax Credit (Neb Rev Stat 25-1553)',
-        'life_insurance': 'Life insurance proceeds (Neb. Rev. Stat. § 44-371)',
-        'structured_settlement': 'Structured settlement (Neb. Rev. Stat. § 25-1563.02)',
-        'workers_comp': 'Workers compensation (Neb. Rev. Stat. § 48-149)',
-        'unemployment': 'Unemployment (Neb. Rev. Stat. § 48-647)',
-        'college_savings': 'College Savings Plan (Neb. Rev. Stat. § 85-1809)',
-        'student_loan': 'Student loan (20 U.S.C. § 1095a(d))',
-        'social_security': 'Social Security (42 U.S.C. § 407)',
-        'va': 'VA Benefits (38 U.S.C. § 5301(a))',
-        'wildcard': 'Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))',
-        'unknown': 'Unknown law'
-    }
-    # Determine which exemption set to use
-    if 'south dakota' in state_str:
-        exemptions = south_dakota_exemptions
-    else:
-        exemptions = nebraska_exemptions
-    
-    # Filter based on property type
-    if property_type == 'real_property':
-        choices = [
-            exemptions['homestead'],
-            exemptions['homestead_proceeds'],
-            exemptions['wildcard'],
-            exemptions['unknown']
-        ]
-    elif property_type == 'vehicle':
-        if 'south dakota' in state_str:
-            choices = [
-                exemptions['wildcard'],
-                exemptions['unknown']
-            ]
-        else:
-            choices = [
-                exemptions['motor_vehicle'],
-                exemptions['wildcard'],
-                exemptions['unknown']
-            ]
-    else:
-        # Return all exemptions for general property
-        choices = list(exemptions.values())
-    
-    return choices
+    exemptions = SOUTH_DAKOTA_EXEMPTIONS if 'south dakota' in state_str else NEBRASKA_EXEMPTIONS
+
+    if property_type == 'all':
+        return list(exemptions.values())
+
+    keys = CATEGORY_KEYS.get(property_type, [])
+    return [exemptions[k] for k in keys if k in exemptions]
+
+
+def get_exemption_choices_combined(property_type='all'):
+    """
+    Returns the de-duplicated union of every supported state's exemption law
+    choices for the given property category. Use this in interview YAML so the
+    dropdown is consistent across pages and does not depend on whether the
+    debtor's address has been entered yet.
+    """
+    seen = []
+    for state in SUPPORTED_STATES:
+        for law in get_exemption_choices(state, property_type):
+            if law not in seen:
+                seen.append(law)
+    return seen
 
 def get_exemption_limits(user_state):
     """
@@ -173,61 +216,14 @@ def compute_exemption_totals(prop, debtor_state):
         dict: {law_string: {'claimed': total_claimed, 'limit': limit_value, 'remaining': remaining}}
     """
     limits = get_exemption_limits(debtor_state)
-    law_choices = get_exemption_choices(debtor_state, 'all')
 
-    # Map law strings to category keys for limit lookups
+    # Map every supported state's law string -> category key. The user can pick
+    # any state's law from the unified dropdowns, so the tracker has to recognize
+    # all of them; limits are still looked up using the debtor's own state.
     law_to_category = {}
-    if 'south dakota' in str(debtor_state).lower():
-        sd_exemptions = {
-            'homestead': 'Homestead (SDCL 43-31-1',
-            'homestead_proceeds': 'Homestead, proceeds',
-            'household_goods': 'Furniture and bedding',
-            'wildcard': 'Wildcard',
-            'personal_property': 'Bible, books',
-            'health_aids': 'Health aids',
-            'tools': 'Tools of the trade',
-            'retirement': 'Retirement',
-            'wages': 'Wages',
-            'life_insurance': 'Life insurance',
-            'workers_comp': 'Workers compensation',
-            'unemployment': 'Unemployment',
-            'social_security': 'Social Security',
-            'va': 'VA Benefits',
-        }
-        for cat, prefix in sd_exemptions.items():
-            for law_str in law_choices:
-                if law_str.startswith(prefix):
-                    law_to_category[law_str] = cat
-                    break
-    else:
-        ne_exemptions = {
-            'homestead': 'Homestead (Neb. Rev. Stat. §§ 40-101',
-            'homestead_proceeds': 'Homestead, proceeds',
-            'motor_vehicle': 'Motor vehicle',
-            'household_goods': 'Household goods',
-            'wildcard': 'Wildcard',
-            'clothing': 'Clothing',
-            'personal_possessions': 'Immediate personal possessions',
-            'health_aids': 'Health aids',
-            'health_savings': 'Health savings',
-            'tools': 'Tools of the trade',
-            'retirement': 'Retirement',
-            'wages': 'Wages',
-            'public_benefits': 'Public benefits',
-            'earned_income': 'Earned Income',
-            'life_insurance': 'Life insurance',
-            'structured_settlement': 'Structured settlement',
-            'workers_comp': 'Workers compensation',
-            'unemployment': 'Unemployment',
-            'college_savings': 'College Savings',
-            'social_security': 'Social Security',
-            'va': 'VA Benefits',
-        }
-        for cat, prefix in ne_exemptions.items():
-            for law_str in law_choices:
-                if law_str.startswith(prefix):
-                    law_to_category[law_str] = cat
-                    break
+    for _state_dict in (NEBRASKA_EXEMPTIONS, SOUTH_DAKOTA_EXEMPTIONS):
+        for cat, law in _state_dict.items():
+            law_to_category[law] = cat
 
     # Accumulate claimed amounts per law string
     claimed_by_law = {}
