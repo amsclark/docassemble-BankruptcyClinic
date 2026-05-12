@@ -7,6 +7,7 @@ modules:
 ---
 include:
   - mandatory-initial-code.yml
+  - cross-validation.yml
   - 101-question-blocks.yml
   - 101A-question-blocks.yml
   - 103A-question-blocks.yml

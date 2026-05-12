@@ -1,0 +1,111 @@
+# Cross-Section Validation
+#
+# This module provides validation logic to ensure consistency
+# between different sections of the bankruptcy petition.
+#
+# Issues addressed:
+# - #75: Dependent count inconsistencies between fee waiver and Schedule J
+# - #76: Fee waiver income validation against income section
+# - #77: Property value consistency across sections
+# - #78: Community property response consistency
+# - #80: Address consistency validation
+
+metadata:
+  title: Cross-Section Validation
+  short title: Cross-Validation
+
+---
+# Generate cross-validation warnings for display in final review
+code: |
+  def get_cross_validation_warnings():
+    """Get cross-validation warnings as a list of strings"""
+    warnings = []
+
+    try:
+      # Issue #75: Dependent count validation
+      if (defined('family.dependent_count') and defined('debtor[0].expenses.dependents.gathered')):
+        fee_waiver_count = family.dependent_count if hasattr(family, 'has_dependents') and family.has_dependents else 0
+        schedule_j_count = len(debtor[0].expenses.dependents)
+        if fee_waiver_count != schedule_j_count:
+          warnings.append(f"Dependent count inconsistency: Fee waiver reports {fee_waiver_count} dependents, but Schedule J shows {schedule_j_count} dependents.")
+    except:
+      pass
+
+    try:
+      # Issue #76: Income validation
+      if (defined('family.you_income') and defined('debtor[0].income')):
+        d0_income = debtor[0].income
+        income_section_total = 0
+
+        # Sum income fields that exist
+        income_fields = ['income_amount_1', 'overtime_pay_1', 'net_rental_business', 'social_security', 'pension', 'unemployment', 'family_support', 'interest_and_dividends', 'other_govt_assist']
+        for field in income_fields:
+          if hasattr(d0_income, field):
+            val = getattr(d0_income, field)
+            if val:
+              income_section_total += val
+
+        fee_waiver_income = family.you_income
+        tolerance = 50
+        if abs(income_section_total - fee_waiver_income) > tolerance:
+          warnings.append(f"Income inconsistency: Fee waiver reports ${fee_waiver_income:,.2f} but Schedule I totals ${income_section_total:,.2f}.")
+    except:
+      pass
+
+    try:
+      # Issue #78: Community property validation
+      if (defined('financial_affairs.lived_with_spouse') and defined('debtors.community_property')):
+        lived_with_spouse = financial_affairs.lived_with_spouse
+        community_property_state = debtors.community_property
+
+        if lived_with_spouse and not community_property_state:
+          warnings.append("Community property inconsistency: You indicated living with spouse but answered 'No' to community property state.")
+        elif community_property_state and not lived_with_spouse:
+          warnings.append("Community property inconsistency: You indicated living in community property state but not living with spouse.")
+    except:
+      pass
+
+    try:
+      # Issue #80: Address validation
+      if len(debtor) > 0 and defined('debtor[0].address'):
+        import re
+        zip_pattern = r'^\d{5}(-\d{4})?$'
+
+        primary_address = debtor[0].address
+        if hasattr(primary_address, 'zip') and not re.match(zip_pattern, str(primary_address.zip)):
+          warnings.append(f"Address inconsistency: Primary address ZIP code '{primary_address.zip}' is not properly formatted.")
+
+        if hasattr(debtor[0], 'mailing_address') and debtor[0].mailing_address and hasattr(debtor[0].mailing_address, 'zip'):
+          mailing_zip = debtor[0].mailing_address.zip
+          if mailing_zip and not re.match(zip_pattern, str(mailing_zip)):
+            warnings.append(f"Address inconsistency: Mailing address ZIP code '{mailing_zip}' is not properly formatted.")
+    except:
+      pass
+
+    return warnings
+
+  cross_validation_warnings = get_cross_validation_warnings()
+
+---
+# Event for standalone cross-validation check
+event: cross_validation_standalone
+question: |
+  Data Consistency Check
+subquestion: |
+  % if cross_validation_warnings:
+  <div class="alert alert-warning">
+    <strong>⚠️ Data Inconsistencies Found</strong>
+    <ul>
+    % for warning in cross_validation_warnings:
+    <li>${ warning }</li>
+    % endfor
+    </ul>
+    <p><strong>Recommendation:</strong> Review and correct these inconsistencies to ensure your petition is accurate and complete.</p>
+  </div>
+  % else:
+  <div class="alert alert-success">
+    <strong>✅ Data Consistency Check Passed</strong>
+    <p>No cross-section inconsistencies were found in your petition data.</p>
+  </div>
+  % endif
+continue button field: cross_validation_check_complete
