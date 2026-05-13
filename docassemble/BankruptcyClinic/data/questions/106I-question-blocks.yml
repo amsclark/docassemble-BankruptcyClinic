@@ -101,7 +101,11 @@ fields:
 ---
 id: debtor1_payroll_deductions
 section: schedule_i
-question: List total payroll deductions in the previous month
+question: List expected monthly payroll deductions at the time of filing
+subquestion: |
+  Use the deductions you reasonably expect to see on a paycheck at the time
+  you file the petition. If last month was unusual, adjust to reflect your
+  typical, ongoing amounts.
 fields:
   - Tax, Medicare, and Social Security deductions: debtor[0].income.tax_deduction
     datatype: currency
@@ -260,9 +264,11 @@ fields:
   - Do you have other monthly income?: debtor[0].income.other_monthly_income
     datatype: yesnoradio
   - Specify income type: debtor[0].income.specify_monthly_income
+    required: false
     show if: debtor[0].income.other_monthly_income
   - Income amount: debtor[0].income.other_monthly_amount
     datatype: currency
+    required: false
     show if: debtor[0].income.other_monthly_income
 ---
 id: debtor2_employment_info
@@ -368,7 +374,10 @@ fields:
 ---
 id: debtor2_payroll_deductions
 section: schedule_i
-question: List all payroll deductions
+question: List Debtor 2's expected monthly payroll deductions at the time of filing
+subquestion: |
+  Use the deductions you reasonably expect at filing time. Adjust for
+  unusual one-off events.
 fields:
   - Tax, Medicare, and Social Security deductions: debtor[1].income.tax_deduction
     datatype: currency
@@ -503,9 +512,11 @@ fields:
   - Do you have other monthly income?: debtor[1].income.other_monthly_income
     datatype: yesnoradio
   - Specify income type: debtor[1].income.specify_monthly_income
+    required: false
     show if: debtor[1].income.other_monthly_income
   - Income amount: debtor[1].income.other_monthly_amount
     datatype: currency
+    required: false
     show if: debtor[1].income.other_monthly_income
 ---
 id: other_contributions_income_changes

@@ -203,6 +203,7 @@ fields:
       - Retain the property and enter into a Reaffirmation Agreement
       - Retain the property and do something else
   - What will you do with the property?: prop.creditors[i].property_action_other
+    required: False
     show if:
       variable: prop.creditors[i].property_action
       is: Retain the property and do something else
@@ -217,21 +218,28 @@ fields:
   - Is there a codebtor for this debt?: prop.creditors[i].has_codebtor
     datatype: yesnoradio
   - note: Codebtor Address Information
+    show if:
+      variable: prop.creditors[i].has_codebtor
+      is: True
   - Name: prop.creditors[i].codebtor_name
+    required: False
     show if:
       variable: prop.creditors[i].has_codebtor
       is: True
   - Address/PO Box: prop.creditors[i].codebtor_street
+    required: False
     show if:
       variable: prop.creditors[i].has_codebtor
       is: True
   - City: prop.creditors[i].codebtor_city
+    required: False
     show if:
       variable: prop.creditors[i].has_codebtor
       is: True
   - State: prop.creditors[i].codebtor_state
     input type: dropdown
     code: get_all_us_states()
+    required: False
     show if:
       variable: prop.creditors[i].has_codebtor
       is: True
@@ -239,6 +247,7 @@ fields:
     datatype: text
     minlength: 5
     maxlength: 5
+    required: False
     show if:
       variable: prop.creditors[i].has_codebtor
       is: True

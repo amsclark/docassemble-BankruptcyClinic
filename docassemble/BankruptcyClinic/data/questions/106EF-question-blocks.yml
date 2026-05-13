@@ -367,6 +367,7 @@ fields:
     datatype: yesnoradio
 
   - note: Party 1
+    show if: prop.nonpriority_claims[i].has_notify
 
   - Name: prop.nonpriority_claims[i].other_name
     show if: prop.nonpriority_claims[i].has_notify
@@ -388,6 +389,7 @@ fields:
     required: False
 
   - note: Party 2
+    show if: prop.nonpriority_claims[i].has_notify
 
   - Name: prop.nonpriority_claims[i].other_name_2
     show if: prop.nonpriority_claims[i].has_notify
@@ -409,6 +411,7 @@ fields:
     required: False
 
   - note: Party 3
+    show if: prop.nonpriority_claims[i].has_notify
 
   - Name: prop.nonpriority_claims[i].other_name_3
     show if: prop.nonpriority_claims[i].has_notify
