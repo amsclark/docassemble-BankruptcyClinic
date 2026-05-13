@@ -166,6 +166,79 @@ review:
         % endif
       % endif
 ---
+# Issue #70: exemption overview screen
+# Aggregates every claimed exemption (real property, vehicles, household goods,
+# household-goods-secured) into a per-statute summary, compares against the
+# statutory cap from get_exemption_limits(), and flags overages.
+id: exemption_summary_overview
+section: schedule_c
+question: |
+  Exemption summary
+subquestion: |
+  Here's a running total of every exemption you've claimed so far, grouped by
+  the statute you cited. **Claims that exceed the statutory cap are flagged in
+  red** — you'll want to revisit the underlying property page and reduce the
+  claim, switch to a different exemption (such as Wildcard), or drop it.
+
+  % if exemption_totals_summary:
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Statute / law</th>
+        <th class="text-right">Claimed</th>
+        <th class="text-right">Cap</th>
+        <th class="text-right">Remaining</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+    % for law, info in exemption_totals_summary.items():
+      <tr class="${ 'table-danger' if info['over'] else '' }">
+        <td>${ law }</td>
+        <td class="text-right">${ currency(info['claimed']) }</td>
+        <td class="text-right">${ ('Unlimited' if info['limit'] == 0 else currency(info['limit'])) }</td>
+        <td class="text-right">${ ('—' if info['limit'] == 0 else currency(max(0, info['limit'] - info['claimed']))) }</td>
+        <td>
+          % if info['over']:
+            <strong>Over cap by ${ currency(info['claimed'] - info['limit']) }</strong>
+          % elif info['limit'] == 0:
+            OK (no cap)
+          % else:
+            OK
+          % endif
+        </td>
+      </tr>
+    % endfor
+    </tbody>
+  </table>
+  % else:
+  No exemptions have been claimed yet.
+  % endif
+
+  % if any(info['over'] for info in exemption_totals_summary.values()):
+  <div class="alert alert-warning">
+    One or more claims exceed their statutory cap. Revisit the underlying
+    property pages (Schedule A/B and the household-goods page) to fix this
+    before continuing.
+  </div>
+  % endif
+continue button field: exemption_summary_acknowledged
+---
+# Code block that builds exemption_totals_summary in the form the overview
+# screen above renders. Uses the existing compute_exemption_totals helper.
+code: |
+  _state = debtor[0].address.state if defined('debtor[0].address.state') else 'Nebraska'
+  _totals = compute_exemption_totals(prop, _state)
+  exemption_totals_summary = {}
+  for _law, _info in _totals.items():
+    _claimed = _info.get('claimed', 0)
+    _limit = _info.get('limit', 0)
+    exemption_totals_summary[_law] = {
+      'claimed': _claimed,
+      'limit': _limit,
+      'over': bool(_limit > 0 and _claimed > _limit),
+    }
+---
 code: |
   debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
   if len(debtor) > 1:

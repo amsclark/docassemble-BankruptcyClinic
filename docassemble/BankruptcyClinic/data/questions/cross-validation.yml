@@ -53,6 +53,28 @@ code: |
       pass
 
     try:
+      # Issue #77: Fee waiver property value vs Schedule A/B
+      if (defined('prop.mortgage_current_value') and defined('prop.interests.gathered')):
+        fee_waiver_property_total = 0
+        if defined('prop.mortgage_current_value') and prop.mortgage_current_value:
+          fee_waiver_property_total += float(prop.mortgage_current_value)
+        if defined('prop.other_mortgage_current_value') and prop.other_mortgage_current_value:
+          fee_waiver_property_total += float(prop.other_mortgage_current_value)
+
+        schedule_ab_total = 0
+        for interest in prop.interests:
+          if hasattr(interest, 'current_value') and interest.current_value:
+            schedule_ab_total += float(interest.current_value)
+
+        # Only flag if both sides have nonzero values (skip when fee waiver wasn't filled in)
+        if fee_waiver_property_total > 0 and schedule_ab_total > 0:
+          tolerance = max(1000, schedule_ab_total * 0.10)
+          if abs(fee_waiver_property_total - schedule_ab_total) > tolerance:
+            warnings.append(f"Property value inconsistency: Fee waiver reports ${fee_waiver_property_total:,.2f} in real-property value but Schedule A/B totals ${schedule_ab_total:,.2f}.")
+    except:
+      pass
+
+    try:
       # Issue #78: Community property validation
       if (defined('financial_affairs.lived_with_spouse') and defined('debtors.community_property')):
         lived_with_spouse = financial_affairs.lived_with_spouse

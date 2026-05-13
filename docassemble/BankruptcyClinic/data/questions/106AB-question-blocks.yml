@@ -97,10 +97,19 @@ validation code: |
     prop.interests[i].current_owned_value = prop.interests[i].current_value - prop.interests[i].current_owed_amount
   else:
     prop.interests[i].current_owned_value = prop.interests[i].current_value
+  # Issue #63: city / ZIP format validation
+  city_err = is_valid_city(prop.interests[i].city)
+  if city_err is not True:
+    validation_error(city_err, field="prop.interests[i].city")
+  zip_err = is_valid_zip(prop.interests[i].zip)
+  if zip_err is not True:
+    validation_error(zip_err, field="prop.interests[i].zip")
 fields:
   - Street: prop.interests[i].street
   - City: prop.interests[i].city
   - State: prop.interests[i].state
+    input type: dropdown
+    code: get_all_us_states()
   - Zip: prop.interests[i].zip
     datatype: text
     minlength: 5
@@ -245,6 +254,19 @@ validation code: |
     prop.ab_vehicles[i].current_owned_value = prop.ab_vehicles[i].current_value - prop.ab_vehicles[i].current_owed_amount
   else:
     prop.ab_vehicles[i].current_owned_value = prop.ab_vehicles[i].current_value
+  # Issue #53: limit Motor Vehicle exemption to one vehicle
+  def _claims_motor_vehicle(v):
+    for attr in ('exemption_laws', 'exemption_laws_2'):
+      val = getattr(v, attr, None)
+      if val and 'motor vehicle' in str(val).lower():
+        return True
+    return False
+  if prop.ab_vehicles[i].is_claiming_exemption and _claims_motor_vehicle(prop.ab_vehicles[i]):
+    for j in range(i):
+      prev = prop.ab_vehicles[j]
+      if getattr(prev, 'is_claiming_exemption', False) and _claims_motor_vehicle(prev):
+        prev_name = ' '.join(str(getattr(prev, a, '')) for a in ('year', 'make', 'model')).strip() or f'Vehicle #{j+1}'
+        validation_error("The Motor Vehicle exemption may only be claimed for one vehicle. You already claimed it for " + prev_name + ". Please choose a different exemption (for example, Wildcard) for this vehicle.")
 fields:
   - Make: prop.ab_vehicles[i].make
   - Model: prop.ab_vehicles[i].model
@@ -285,6 +307,7 @@ fields:
     show if: prop.ab_vehicles[i].is_claiming_exemption
   - Value of exemption being claimed: prop.ab_vehicles[i].exemption_value
     datatype: currency
+    required: False
     show if: prop.ab_vehicles[i].claiming_sub_100
   - Specific laws that allow exemption: prop.ab_vehicles[i].exemption_laws
     choices:
@@ -3340,7 +3363,7 @@ code: |
       ab['prop'+str(i)+'AtLeastOneDebtor'] = True if interest.who == 'At least one of the debtors and another' else False
       ab['prop'+str(i)+'Street'] = interest.street
       ab['prop'+str(i)+'City'] = interest.city
-      ab['prop'+str(i)+'State'] = interest.state
+      ab['prop'+str(i)+'State'] = state_abbr(interest.state)
       _zip = interest.zip
       ab['prop'+str(i)+'Zip'] = str(int(_zip)) if isinstance(_zip, float) else str(_zip)
       ab['prop'+str(i)+'County'] = interest.county

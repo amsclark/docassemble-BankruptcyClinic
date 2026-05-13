@@ -208,10 +208,33 @@ async function handleListCollectReview(
 //  CUSTOM: Multi-item property section (3 real, 3 vehicle, 3 deposit)
 // ════════════════════════════════════════════════════════════════════
 
+const STATE_BY_ABBR: Record<string, string> = {
+  AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California',
+  CO: 'Colorado', CT: 'Connecticut', DE: 'Delaware', FL: 'Florida', GA: 'Georgia',
+  HI: 'Hawaii', ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', IA: 'Iowa',
+  KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana', ME: 'Maine', MD: 'Maryland',
+  MA: 'Massachusetts', MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi', MO: 'Missouri',
+  MT: 'Montana', NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey',
+  NM: 'New Mexico', NY: 'New York', NC: 'North Carolina', ND: 'North Dakota', OH: 'Ohio',
+  OK: 'Oklahoma', OR: 'Oregon', PA: 'Pennsylvania', RI: 'Rhode Island', SC: 'South Carolina',
+  SD: 'South Dakota', TN: 'Tennessee', TX: 'Texas', UT: 'Utah', VT: 'Vermont',
+  VA: 'Virginia', WA: 'Washington', WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming',
+};
+
 async function fillRealProperty(page: Page, rp: any, index: number) {
   await page.locator(`#${b64(`prop.interests[${index}].street`)}`).fill(rp.street);
   await page.locator(`#${b64(`prop.interests[${index}].city`)}`).fill(rp.city);
-  await page.locator(`#${b64(`prop.interests[${index}].state`)}`).fill(rp.stateAbbr);
+  // State is now a dropdown (issue #63 widening) — selectOption with the full name.
+  const stateLoc = page.locator(`#${b64(`prop.interests[${index}].state`)}`);
+  const stateTag = await stateLoc.evaluate((el) => el.tagName.toLowerCase()).catch(() => '');
+  if (stateTag === 'select') {
+    const full = STATE_BY_ABBR[rp.stateAbbr] || rp.stateAbbr;
+    await stateLoc.selectOption({ label: full }).catch(async () => {
+      await stateLoc.selectOption({ value: full }).catch(() => {});
+    });
+  } else {
+    await stateLoc.fill(rp.stateAbbr);
+  }
   await page.locator(`#${b64(`prop.interests[${index}].zip`)}`).fill(rp.zip);
   await page.locator(`#${b64(`prop.interests[${index}].county`)}`).fill(rp.county);
   await page.locator(`label[for="${b64(`prop.interests[${index}].type`)}_${rp.typeIndex}"]`).click();
@@ -588,7 +611,14 @@ async function navigateFinancialAffairsMaximalist(page: Page) {
   // Fill previous address 1
   await fillById(page, b64('financial_affairs.address_street_1'), '999 Old Oak Ln');
   await fillById(page, b64('financial_affairs.address_city_1'), 'Lincoln');
-  await fillById(page, b64('financial_affairs.address_state_1'), 'Nebraska');
+  // State is now a dropdown (issue #63 widening) — selectOption, not fill.
+  const stateSel1 = page.locator(`#${b64('financial_affairs.address_state_1')}`);
+  const stateTag1 = await stateSel1.evaluate((el) => el.tagName.toLowerCase()).catch(() => '');
+  if (stateTag1 === 'select') {
+    await stateSel1.selectOption({ label: 'Nebraska' }).catch(() => {});
+  } else {
+    await fillById(page, b64('financial_affairs.address_state_1'), 'Nebraska');
+  }
   await fillById(page, b64('financial_affairs.address_zip_1'), '68508');
   // Dates
   const fromField = page.locator(`#${b64('financial_affairs.address_from_1')}`);
@@ -637,6 +667,21 @@ async function navigateFinancialAffairsMaximalist(page: Page) {
       }
       input.dispatchEvent(new Event('input', { bubbles: true }));
       input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    // Any visible <select> that's still on the empty placeholder — pick the
+    // first non-empty option so it doesn't block submit. Used for the
+    // additional address-history state dropdowns the test doesn't fill explicitly.
+    document.querySelectorAll('select').forEach(el => {
+      const sel = el as HTMLSelectElement;
+      if (sel.offsetParent === null) return;
+      if (sel.value && sel.value !== '') return;
+      for (const opt of Array.from(sel.options)) {
+        if (opt.value && opt.value !== '') {
+          sel.value = opt.value;
+          break;
+        }
+      }
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
     });
   });
 
@@ -876,7 +921,11 @@ async function fillSecuredCreditor(page: Page, sc: any, index: number) {
   await page.locator(`#${b64(`prop.creditors[${index}].name`)}`).fill(sc.name);
   await page.locator(`#${b64(`prop.creditors[${index}].street`)}`).fill(sc.street);
   await page.locator(`#${b64(`prop.creditors[${index}].city`)}`).fill(sc.city);
-  await page.locator(`select#${b64(`prop.creditors[${index}].state`)}`).selectOption(sc.state);
+  // The state dropdown contains full state names from get_all_us_states();
+  // the MAXIMALIST fixture uses abbreviations ('NE', 'CA') for compactness, so
+  // map abbreviation → label before selectOption.
+  const fullState = STATE_BY_ABBR[sc.state] || sc.state;
+  await page.locator(`select#${b64(`prop.creditors[${index}].state`)}`).selectOption({ label: fullState });
   await page.locator(`#${b64(`prop.creditors[${index}].zip`)}`).fill(sc.zip);
   // 'who' dropdown
   const secWhoSelect = page.locator(`select#${b64(`prop.creditors[${index}].who`)}`);
@@ -982,7 +1031,7 @@ async function fillPriorityCreditor(page: Page, pc: any, index: number) {
   await page.locator(`#${b64(`prop.priority_claims[${index}].name`)}`).fill(pc.name);
   await page.locator(`#${b64(`prop.priority_claims[${index}].street`)}`).fill(pc.street);
   await page.locator(`#${b64(`prop.priority_claims[${index}].city`)}`).fill(pc.city);
-  await page.locator(`select#${b64(`prop.priority_claims[${index}].state`)}`).selectOption(pc.state);
+  await page.locator(`select#${b64(`prop.priority_claims[${index}].state`)}`).selectOption({ label: STATE_BY_ABBR[pc.state] || pc.state });
   await page.locator(`#${b64(`prop.priority_claims[${index}].zip`)}`).fill(pc.zip);
   const prWhoSelect = page.locator(`select#${b64(`prop.priority_claims[${index}].who`)}`);
   if (await prWhoSelect.count() > 0) await prWhoSelect.selectOption('Debtor 1 only');
@@ -1000,7 +1049,7 @@ async function fillNonpriorityCreditor(page: Page, np: any, index: number) {
   await page.locator(`#${b64(`prop.nonpriority_claims[${index}].name`)}`).fill(np.name);
   await page.locator(`#${b64(`prop.nonpriority_claims[${index}].street`)}`).fill(np.street);
   await page.locator(`#${b64(`prop.nonpriority_claims[${index}].city`)}`).fill(np.city);
-  await page.locator(`select#${b64(`prop.nonpriority_claims[${index}].state`)}`).selectOption(np.state);
+  await page.locator(`select#${b64(`prop.nonpriority_claims[${index}].state`)}`).selectOption({ label: STATE_BY_ABBR[np.state] || np.state });
   await page.locator(`#${b64(`prop.nonpriority_claims[${index}].zip`)}`).fill(np.zip);
   const npWhoSelect = page.locator(`select#${b64(`prop.nonpriority_claims[${index}].who`)}`);
   if (await npWhoSelect.count() > 0) await npWhoSelect.selectOption('Debtor 1 only');

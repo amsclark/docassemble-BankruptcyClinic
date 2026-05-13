@@ -170,7 +170,41 @@ export async function clickById(page: Page, id: string) {
 /** Click the nth element that matches `[name="<name>"]`. */
 export async function clickNthByName(page: Page, name: string, index = 0) {
   await waitForDaPageLoad(page);
-  await page.locator(`[name="${name}"]`).nth(index).click();
+
+  // For docassemble yesno fields rendered as buttons, use more flexible text matching
+  // index 0 = "Yes", index 1 = "No"
+  const buttonText = index === 0 ? 'Yes' : 'No';
+
+  // Try multiple approaches to find the right button
+  let buttonLocator = page.locator(`button[name="${name}"]`).filter({ hasText: buttonText });
+  let buttonCount = await buttonLocator.count();
+
+  if (buttonCount === 0) {
+    // Try with case-insensitive matching
+    buttonLocator = page.locator(`button[name="${name}"]`).filter({ hasText: new RegExp(buttonText, 'i') });
+    buttonCount = await buttonLocator.count();
+  }
+
+  if (buttonCount === 0) {
+    // Try finding all buttons with this name and select by index
+    const allButtons = page.locator(`button[name="${name}"]`);
+    const allCount = await allButtons.count();
+    if (allCount > index) {
+      await allButtons.nth(index).click();
+      await page.waitForLoadState('networkidle');
+      return;
+    }
+  }
+
+  if (buttonCount > 0) {
+    // Found Yes/No buttons - use them
+    await buttonLocator.first().click();
+  } else {
+    // Fallback to original approach for other field types
+    const exactMatch = page.locator(`[name="${name}"]`);
+    await exactMatch.nth(index).click();
+  }
+
   await page.waitForLoadState('networkidle');
 }
 

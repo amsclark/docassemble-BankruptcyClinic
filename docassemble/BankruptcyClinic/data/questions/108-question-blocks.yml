@@ -1,48 +1,21 @@
+# Form 108 — Statement of Intention
+#
+# Issue #79: This used to maintain an independent `secured_claims` list and
+# re-ask the creditor name, property description, intended action, and
+# Schedule-C-exempt question that were already answered on Schedule D
+# (form 106D). We now read straight from `prop.creditors`, which already
+# stores those answers. No re-entry required.
+---
 table: secured_claims_table
-rows: secured_claims
+rows: prop.creditors
 columns:
-  - Name: row_item.creditor_name
-  - Description: row_item.property_description
+  - Name: row_item.name
+  - Description: row_item.prop_description
   - Property action: row_item.property_action
 edit:
-  - creditor_name
-  - property_description
   - property_action
----
-id: secured_claims_any_exist
-section: form_108
-question: |
-  Do you have any creditors with secured claims?
-yesno: secured_claims.there_are_any
----
-id: secured_claims_add_another
-section: form_108
-question: |
-  Are there any more creditors with secured claims?
-yesno: secured_claims.there_is_another
-under: |
-  ${ secured_claims_table }
----
-id: secured_claims_creditor_property_details
-section: form_108
-question: |
-  Identify the creditor and the property that is collateral
-fields: 
-  - Creditor's Name: secured_claims[i].creditor_name
-  - Description of property: secured_claims[i].property_description
-    input type: area
-  - What do you intend to do with the property that secures the debt?: secured_claims[i].property_action
-    choices:
-      - Surrender the property
-      - Retain the property and redeem it
-      - Retain the property and enter into a Reaffirmation Agreement
-      - Retain the property and do something else
-  - What will you do with the property?: secured_claims[i].property_action_other
-    show if: 
-      variable: secured_claims[i].property_action
-      is: Retain the property and do something else
-  - Did you claim the property as exempt on Schedule C?: secured_claims[i].exempt
-    datatype: yesnoradio
+  - property_action_other
+  - exempt
 ---
 table: personal_leases_table
 rows: personal_leases
@@ -84,16 +57,17 @@ event: form_108
 section: form_108
 question: |
   Revisit Statement of Intention for Individuals
+subquestion: |
+  Secured claims are pulled in from Schedule D (Secured Creditors); you can
+  revisit them there if any look wrong.
 review:
   - note: |
      <br>
-    
-     % if len(secured_claims) > 0:
+
+     % if len(prop.creditors) > 0:
       ${ secured_claims_table }
-      ${ secured_claims.add_action() }
      % else:
       No Secured Claims Listed
-      ${ secured_claims.add_action() }
      % endif
   - note: |
      % if len(personal_leases) > 0:
@@ -118,7 +92,7 @@ code: |
   else:
     debtor2_name = ''
   leases = {}
-  
+
   leases['debtor1_name_1'] = debtor_name
   leases['debtor1_name_2'] = debtor_name
   leases['debtor2_name_1'] = debtor2_name
@@ -126,12 +100,12 @@ code: |
   leases['case_number_1'] = case_number
   leases['case_number_2'] = case_number
   leases['isAmended'] = amended_filing
-  
+
   i = 1
-  for claim in secured_claims:
-    leases['name'+str(i)] = claim.creditor_name
-    leases['desc'+str(i)] = claim.property_description
-    
+  for claim in prop.creditors:
+    leases['name'+str(i)] = claim.name
+    leases['desc'+str(i)] = claim.prop_description
+
     leases['surrender'+str(i)] = True if claim.property_action == 'Surrender the property' else False
     leases['redeem'+str(i)] = True if claim.property_action == 'Retain the property and redeem it' else False
     leases['reaffirm'+str(i)] = True if claim.property_action == 'Retain the property and enter into a Reaffirmation Agreement' else False
@@ -139,15 +113,5 @@ code: |
     leases['otherDesc'+str(i)] = claim.property_action_other if claim.property_action == 'Retain the property and do something else' else None
     leases['noClaim'+str(i)] = True if claim.exempt == False else False
     leases['yesClaim'+str(i)] = True if claim.exempt == True else False
-    
+
     i += 1
-  #
-  #y = 1
-  #for lease in personal_leases:
-  #  leases['lessor'+str(y)] = lease.name
-  #  leases['leaseDesc'+str(y)] = lease.description
-  #  leases['noLease'+str(y)] = True if lease.lease_assumed == False else False
-  #  leases['yesLease'+str(y)] = True if lease.lease_assumed == True else False
-  #  
-  #  y += 1
-  #  

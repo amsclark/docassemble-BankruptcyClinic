@@ -14,8 +14,11 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on failure (section tests can be flaky due to timing) */
   retries: 2,
-  /* Limit workers to avoid overloading the single docassemble server */
-  workers: process.env.CI ? 1 : (process.env.LIVE_WATCH ? 1 : 2),
+  /* Docassemble is a multi-user web app — concurrent sessions are fine.
+     Override with PLAYWRIGHT_WORKERS env var when needed. */
+  workers: process.env.PLAYWRIGHT_WORKERS
+    ? Number(process.env.PLAYWRIGHT_WORKERS)
+    : (process.env.CI ? 1 : (process.env.LIVE_WATCH ? 1 : 6)),
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['html', { open: 'never', outputFolder: 'playwright-report' }],
@@ -34,7 +37,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
 
     /* Video recording — set to 'on' for customer demo recordings */
-    video: 'on-first-retry',
+    video: 'on',
     
     /* Slow down for live watching when enabled */
     launchOptions: {

@@ -132,6 +132,21 @@ subquestion: |
 check in: unsecured_claim_amount
 allowed to set:
   - prop.creditors[i].complete
+validation code: |
+  # Issue #63: city / ZIP format validation on secured-creditor address
+  city_err = is_valid_city(prop.creditors[i].city)
+  if city_err is not True:
+    validation_error(city_err, field="prop.creditors[i].city")
+  zip_err = is_valid_zip(prop.creditors[i].zip)
+  if zip_err is not True:
+    validation_error(zip_err, field="prop.creditors[i].zip")
+  if getattr(prop.creditors[i], 'has_codebtor', False):
+    co_city_err = is_valid_city(prop.creditors[i].codebtor_city)
+    if co_city_err is not True:
+      validation_error(co_city_err, field="prop.creditors[i].codebtor_city")
+    co_zip_err = is_valid_zip(prop.creditors[i].codebtor_zip)
+    if co_zip_err is not True:
+      validation_error(co_zip_err, field="prop.creditors[i].codebtor_zip")
 fields:
   - Creditor Name: prop.creditors[i].name
   - note: |
@@ -203,6 +218,7 @@ fields:
       - Retain the property and enter into a Reaffirmation Agreement
       - Retain the property and do something else
   - What will you do with the property?: prop.creditors[i].property_action_other
+    required: False
     show if:
       variable: prop.creditors[i].property_action
       is: Retain the property and do something else
@@ -217,21 +233,28 @@ fields:
   - Is there a codebtor for this debt?: prop.creditors[i].has_codebtor
     datatype: yesnoradio
   - note: Codebtor Address Information
+    show if:
+      variable: prop.creditors[i].has_codebtor
+      is: True
   - Name: prop.creditors[i].codebtor_name
+    required: False
     show if:
       variable: prop.creditors[i].has_codebtor
       is: True
   - Address/PO Box: prop.creditors[i].codebtor_street
+    required: False
     show if:
       variable: prop.creditors[i].has_codebtor
       is: True
   - City: prop.creditors[i].codebtor_city
+    required: False
     show if:
       variable: prop.creditors[i].has_codebtor
       is: True
   - State: prop.creditors[i].codebtor_state
     input type: dropdown
     code: get_all_us_states()
+    required: False
     show if:
       variable: prop.creditors[i].has_codebtor
       is: True
@@ -239,6 +262,7 @@ fields:
     datatype: text
     minlength: 5
     maxlength: 5
+    required: False
     show if:
       variable: prop.creditors[i].has_codebtor
       is: True

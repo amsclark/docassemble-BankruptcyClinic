@@ -4,6 +4,14 @@ question: |
   Give details about your marital status and where you lived before
 subquestion: |
   Be as complete and accurate as possible. If two married people are filing together, both are equally responsible for supplying correct information.
+validation code: |
+  if financial_affairs.lived_elsewhere:
+    city_err = is_valid_city(financial_affairs.address_city_1)
+    if city_err is not True:
+      validation_error(city_err, field="financial_affairs.address_city_1")
+    zip_err = is_valid_zip(financial_affairs.address_zip_1)
+    if zip_err is not True:
+      validation_error(zip_err, field="financial_affairs.address_zip_1")
 fields:
   - Are you currently married?: financial_affairs.marital_status
     datatype: yesnoradio
@@ -18,6 +26,8 @@ fields:
   - City: financial_affairs.address_city_1
     show if: financial_affairs.lived_elsewhere
   - State: financial_affairs.address_state_1
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.lived_elsewhere
   - Zip: financial_affairs.address_zip_1
     datatype: text
@@ -29,9 +39,11 @@ fields:
   - From: financial_affairs.address_from_1
     datatype: date
     show if: financial_affairs.lived_elsewhere
+    required: False
   - To: financial_affairs.address_to_1
     datatype: date
     show if: financial_affairs.lived_elsewhere
+    required: False
   - note: Debtor 2 Address
     show if:
       code: |
@@ -91,6 +103,7 @@ fields:
     hide if:
       variable: financial_affairs.address_same_dates_1
       is: True
+    required: False
   - To: financial_affairs.debtor2_address_to_1
     datatype: date
     show if:
@@ -99,6 +112,7 @@ fields:
     hide if:
       variable: financial_affairs.address_same_dates_1
       is: True
+    required: False
   - Has second address: financial_affairs.has_second_address
     datatype: yesnoradio
     show if: financial_affairs.lived_elsewhere
@@ -1225,6 +1239,13 @@ under: |
 id: lawsuit_details
 question: |
   Tell the court about the lawsuit filed against you.
+validation code: |
+  city_err = is_valid_city(financial_affairs.lawsuits[i].court_city)
+  if city_err is not True:
+    validation_error(city_err, field="financial_affairs.lawsuits[i].court_city")
+  zip_err = is_valid_zip(financial_affairs.lawsuits[i].court_zip)
+  if zip_err is not True:
+    validation_error(zip_err, field="financial_affairs.lawsuits[i].court_zip")
 fields:
   - Case Title: financial_affairs.lawsuits[i].case_title
   - Case Number: financial_affairs.lawsuits[i].case_number
@@ -1237,6 +1258,8 @@ fields:
   - Address/PO Box: financial_affairs.lawsuits[i].court_street
   - City: financial_affairs.lawsuits[i].court_city
   - State: financial_affairs.lawsuits[i].court_state
+    input type: dropdown
+    code: get_all_us_states()
   - Zip: financial_affairs.lawsuits[i].court_zip
     datatype: text
     minlength: 5
@@ -1275,11 +1298,20 @@ under: |
 id: repossessed_property_details
 question: |
   Tell the court about a repossessed, foreclosed, garnished, attached, seized, or levied property in the last year.
+validation code: |
+  city_err = is_valid_city(financial_affairs.levies[i].creditor_city)
+  if city_err is not True:
+    validation_error(city_err, field="financial_affairs.levies[i].creditor_city")
+  zip_err = is_valid_zip(financial_affairs.levies[i].creditor_zip)
+  if zip_err is not True:
+    validation_error(zip_err, field="financial_affairs.levies[i].creditor_zip")
 fields:
   - Creditor Name: financial_affairs.levies[i].creditor_name
   - Address/PO Box: financial_affairs.levies[i].creditor_street
   - City: financial_affairs.levies[i].creditor_city
   - State: financial_affairs.levies[i].creditor_state
+    input type: dropdown
+    code: get_all_us_states()
   - Zip: financial_affairs.levies[i].creditor_zip
     datatype: text
     minlength: 5
@@ -1448,6 +1480,7 @@ fields:
   - no label: financial_affairs.disaster_description
     input type: area
     show if: financial_affairs.has_disaster
+    required: False
   - note: Describe any insurance coverage for the loss
     show if: financial_affairs.has_disaster
   - note: Include the amount that insurance has paid.
@@ -1455,12 +1488,15 @@ fields:
   - no label: financial_affairs.disaster_insurance
     input type: area
     show if: financial_affairs.has_disaster
+    required: False
   - Date of your loss: financial_affairs.disaster_date
     input type: area
     show if: financial_affairs.has_disaster
+    required: False
   - Value of property lost: financial_affairs.disaster_value
     datatype: currency
     show if: financial_affairs.has_disaster
+    required: False
 ---
 table: bankruptcy_payments_table
 rows: financial_affairs.bankruptcy_payments
@@ -2070,6 +2106,7 @@ fields:
     show if: financial_affairs.has_statement
   - no label: financial_affairs.statement_date
     datatype: date
+    show if: financial_affairs.has_statement
     required: False
 ---
 attachment:
