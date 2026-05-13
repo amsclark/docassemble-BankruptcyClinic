@@ -921,7 +921,11 @@ async function fillSecuredCreditor(page: Page, sc: any, index: number) {
   await page.locator(`#${b64(`prop.creditors[${index}].name`)}`).fill(sc.name);
   await page.locator(`#${b64(`prop.creditors[${index}].street`)}`).fill(sc.street);
   await page.locator(`#${b64(`prop.creditors[${index}].city`)}`).fill(sc.city);
-  await page.locator(`select#${b64(`prop.creditors[${index}].state`)}`).selectOption(sc.state);
+  // The state dropdown contains full state names from get_all_us_states();
+  // the MAXIMALIST fixture uses abbreviations ('NE', 'CA') for compactness, so
+  // map abbreviation → label before selectOption.
+  const fullState = STATE_BY_ABBR[sc.state] || sc.state;
+  await page.locator(`select#${b64(`prop.creditors[${index}].state`)}`).selectOption({ label: fullState });
   await page.locator(`#${b64(`prop.creditors[${index}].zip`)}`).fill(sc.zip);
   // 'who' dropdown
   const secWhoSelect = page.locator(`select#${b64(`prop.creditors[${index}].who`)}`);
@@ -1027,7 +1031,7 @@ async function fillPriorityCreditor(page: Page, pc: any, index: number) {
   await page.locator(`#${b64(`prop.priority_claims[${index}].name`)}`).fill(pc.name);
   await page.locator(`#${b64(`prop.priority_claims[${index}].street`)}`).fill(pc.street);
   await page.locator(`#${b64(`prop.priority_claims[${index}].city`)}`).fill(pc.city);
-  await page.locator(`select#${b64(`prop.priority_claims[${index}].state`)}`).selectOption(pc.state);
+  await page.locator(`select#${b64(`prop.priority_claims[${index}].state`)}`).selectOption({ label: STATE_BY_ABBR[pc.state] || pc.state });
   await page.locator(`#${b64(`prop.priority_claims[${index}].zip`)}`).fill(pc.zip);
   const prWhoSelect = page.locator(`select#${b64(`prop.priority_claims[${index}].who`)}`);
   if (await prWhoSelect.count() > 0) await prWhoSelect.selectOption('Debtor 1 only');
@@ -1045,7 +1049,7 @@ async function fillNonpriorityCreditor(page: Page, np: any, index: number) {
   await page.locator(`#${b64(`prop.nonpriority_claims[${index}].name`)}`).fill(np.name);
   await page.locator(`#${b64(`prop.nonpriority_claims[${index}].street`)}`).fill(np.street);
   await page.locator(`#${b64(`prop.nonpriority_claims[${index}].city`)}`).fill(np.city);
-  await page.locator(`select#${b64(`prop.nonpriority_claims[${index}].state`)}`).selectOption(np.state);
+  await page.locator(`select#${b64(`prop.nonpriority_claims[${index}].state`)}`).selectOption({ label: STATE_BY_ABBR[np.state] || np.state });
   await page.locator(`#${b64(`prop.nonpriority_claims[${index}].zip`)}`).fill(np.zip);
   const npWhoSelect = page.locator(`select#${b64(`prop.nonpriority_claims[${index}].who`)}`);
   if (await npWhoSelect.count() > 0) await npWhoSelect.selectOption('Debtor 1 only');

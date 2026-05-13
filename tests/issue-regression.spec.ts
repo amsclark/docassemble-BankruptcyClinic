@@ -124,6 +124,48 @@ test.describe('Shallow issues (early petition)', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────
+// MID — reachable from the debtor identity page
+// ─────────────────────────────────────────────────────────────────────
+
+test.describe('Validation issues at debtor identity', () => {
+  test('Issue #63: debtor city with no letters is rejected on submit', async ({ page }) => {
+    await page.goto(INTERVIEW_URL + '&new_session=1');
+    await waitForDaPageLoad(page);
+    await clickNthByName(page, b64('introduction_screen'), 0);
+    await waitForDaPageLoad(page);
+    await selectByName(page, b64('current_district'), 'District of Nebraska');
+    await clickContinueStrict(page);
+    await waitForDaPageLoad(page);
+    await clickNthByName(page, b64('amended_filing'), 1); // No
+    await waitForDaPageLoad(page);
+    await clickNthByName(page, b64('district_final'), 0);
+    await waitForDaPageLoad(page);
+    await clickById(page, `${b64('filing_status')}_0`);
+    await clickContinueStrict(page);
+    await waitForDaPageLoad(page);
+    // On debtor identity page — fill required fields with bad city
+    await page.locator(`#${b64('debtor[i].name.first')}`).fill('Reg');
+    await page.locator(`#${b64('debtor[i].name.last')}`).fill('Test');
+    await page.locator(`#${b64('debtor[i].address.address')}`).fill('123 Test St');
+    await page.locator(`#${b64('debtor[i].address.city')}`).fill('12345'); // numeric — bad
+    const stateSel = page.locator(`#${b64('debtor[i].address.state')}`);
+    if ((await stateSel.evaluate(el => el.tagName.toLowerCase()).catch(() => '')) === 'select') {
+      await stateSel.selectOption({ label: 'Nebraska' });
+    }
+    await page.locator(`#${b64('debtor[i].address.zip')}`).fill('68508');
+    // SSN
+    await clickById(page, `${b64('debtor[i].tax_id.tax_id_type')}_0`);
+    const ssn = page.locator(`#${b64('debtor[i].tax_id.tax_id')}`);
+    if (await ssn.count()) await ssn.fill('123-45-6789');
+    await clickContinueStrict(page);
+    await waitForDaPageLoad(page);
+    // Should still be on the debtor identity page — validation rejected the bad city
+    const stillOnPage = (await page.locator(`#${b64('debtor[i].address.city')}`).count()) > 0;
+    expect(stillOnPage, 'bad city should keep user on debtor identity page').toBe(true);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
 // SOFA (form 107) issues
 // ─────────────────────────────────────────────────────────────────────
 
