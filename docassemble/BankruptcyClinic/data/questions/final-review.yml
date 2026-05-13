@@ -6,6 +6,16 @@ question: |
 subquestion: |
   Please review each section below. Click **Revisit** to make changes. When everything looks correct, click **Continue** to generate your documents.
 
+  % if cross_validation_errors:
+  <div class="alert alert-warning">
+    <strong>⚠️ Data Consistency Issues Found</strong>
+    <p>Please review and correct the following issues before proceeding:</p>
+    % for error in cross_validation_errors:
+    <li><strong>${ error['field'] }</strong>: ${ error['message'] }</li>
+    % endfor
+  </div>
+  % endif
+
   ---
 
   ### District & Filing Information
