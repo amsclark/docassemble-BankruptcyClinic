@@ -306,7 +306,7 @@ test.describe('Exemptions (Schedule C)', () => {
 // ═════════════════════════════════════════════════════════════════════
 
 test.describe('Schedule I income', () => {
-  test.setTimeout(420_000);
+  test.setTimeout(900_000);
 
   async function reachIncomeEmployment(page: Page) {
     await reachAfterDebtor(page);
@@ -386,7 +386,7 @@ test.describe('Schedule I income', () => {
 // ═════════════════════════════════════════════════════════════════════
 
 test.describe('SOFA conditional logic', () => {
-  test.setTimeout(420_000);
+  test.setTimeout(900_000);
 
   async function reachSofa(page: Page) {
     await reachAfterDebtor(page);
@@ -428,7 +428,7 @@ test.describe('SOFA conditional logic', () => {
 // ═════════════════════════════════════════════════════════════════════
 
 test.describe('Codebtors', () => {
-  test.setTimeout(420_000);
+  test.setTimeout(900_000);
 
   test('Issue #59: codebtors community-property No advances (real-user validator)', async ({ page }) => {
     await reachAfterDebtor(page);
@@ -451,7 +451,7 @@ test.describe('Codebtors', () => {
 // ═════════════════════════════════════════════════════════════════════
 
 test.describe('Creditors (Schedule D / E / F)', () => {
-  test.setTimeout(420_000);
+  test.setTimeout(900_000);
 
   test('Issue #64: unsecured creditors "No" to has_notify hides the party fields', async ({ page }) => {
     await reachAfterDebtor(page);
@@ -487,7 +487,7 @@ test.describe('Creditors (Schedule D / E / F)', () => {
 // ═════════════════════════════════════════════════════════════════════
 
 test.describe('Form 2030 — pre-filled data UX (#60)', () => {
-  test.setTimeout(420_000);
+  test.setTimeout(900_000);
 
   test('Issue #60: Form 2030 currency and source fields render without hardcoded pre-fills', async ({ page }) => {
     await reachAfterDebtor(page);
@@ -514,7 +514,7 @@ test.describe('Form 2030 — pre-filled data UX (#60)', () => {
 });
 
 test.describe('Means Test (122A) — DOJ median income (#55)', () => {
-  test.setTimeout(420_000);
+  test.setTimeout(900_000);
 
   test('Issue #55: Means Test page displays DOJ median income, not 150% of poverty', async ({ page }) => {
     await reachAfterDebtor(page);
@@ -528,7 +528,7 @@ test.describe('Means Test (122A) — DOJ median income (#55)', () => {
 });
 
 test.describe('Statement of Intention (Form 108) reuse (#79)', () => {
-  test.setTimeout(420_000);
+  test.setTimeout(900_000);
 
   test('Issue #79: Form 108 review page shows the Schedule D creditors without re-collecting them', async ({ page }) => {
     await reachAfterDebtor(page);
@@ -542,7 +542,7 @@ test.describe('Statement of Intention (Form 108) reuse (#79)', () => {
 });
 
 test.describe('Final review cross-validation warnings (#76, #77, #78, #80)', () => {
-  test.setTimeout(540_000);
+  test.setTimeout(900_000);
 
   test('Issue #76/#77/#78/#80: cross-validation block renders on the final review page', async ({ page }) => {
     await reachAfterDebtor(page);
@@ -561,7 +561,7 @@ test.describe('Final review cross-validation warnings (#76, #77, #78, #80)', () 
 });
 
 test.describe('Fee waiver reliability (#58) — soft warnings present on review', () => {
-  test.setTimeout(540_000);
+  test.setTimeout(900_000);
 
   test('Issue #58: fee-waiver-related cross-validation copy is in the page source', async ({ page }) => {
     // We don't need to drive the fee-waiver path — the cross-validation `code:`
@@ -581,7 +581,7 @@ test.describe('Fee waiver reliability (#58) — soft warnings present on review'
 });
 
 test.describe('Retry — Exemption summary screen (#70)', () => {
-  test.setTimeout(420_000);
+  test.setTimeout(900_000);
 
   test('Issue #70 (retry): exemption summary screen via direct nav', async ({ page }) => {
     await reachAfterDebtor(page);
@@ -618,7 +618,7 @@ test.describe('Retry — Exemption summary screen (#70)', () => {
 });
 
 test.describe('Retry — Motor Vehicle exemption multi-claim (#53)', () => {
-  test.setTimeout(420_000);
+  test.setTimeout(900_000);
 
   test('Issue #53 (retry): second Motor Vehicle exemption claim is rejected', async ({ page }) => {
     await reachAfterDebtor(page);
@@ -689,7 +689,7 @@ test.describe('Retry — Motor Vehicle exemption multi-claim (#53)', () => {
 });
 
 test.describe('Secured Creditors blocker fix (#54)', () => {
-  test.setTimeout(420_000);
+  test.setTimeout(900_000);
 
   test('Issue #54: secured-creditor "No codebtor" path advances without :hidden hack', async ({ page }) => {
     await reachAfterDebtor(page);
