@@ -1,3 +1,10 @@
+---
+title: "BankruptcyClinic — Resolved Issues"
+layout: default
+---
+
+[← Back to the project home](index.html)
+
 # Resolved Issues — Bug Fix Summary
 
 This page summarizes every customer-reported bug that was investigated and addressed during the May 2026 fix sweep. Each section explains the issue in plain language and shows a video of the fix working in the live system.
