@@ -86,10 +86,12 @@ async function advanceUntilHeading(page: Page, until: RegExp, maxSteps = 600): P
       continue;
     }
 
-    // 2) Fill any unselected visible <select> with its first non-empty option
-    //    (covers the "Which set of exemptions are you claiming?" page,
-    //    debtor.state / county dropdowns, etc.).
-    const handledSelect = await page.evaluate(() => {
+    // 2) Fill any unselected visible <select> with its first non-empty option,
+    //    and fill any empty visible text / number / currency / date input with
+    //    placeholder data. Covers the "Which set of exemptions are you claiming?"
+    //    page, the "Fill in your employment information" page, and the many
+    //    similar prompt-and-continue screens in the petition.
+    const handledFields = await page.evaluate(() => {
       let touched = false;
       document.querySelectorAll('select').forEach((sel) => {
         const s = sel as HTMLSelectElement;
@@ -104,10 +106,49 @@ async function advanceUntilHeading(page: Page, until: RegExp, maxSteps = 600): P
           }
         }
       });
+      document.querySelectorAll('input').forEach((el) => {
+        const i = el as HTMLInputElement;
+        if (i.offsetParent === null) return;
+        if (i.value) return;
+        const t = (i.type || '').toLowerCase();
+        if (t === 'hidden' || t === 'submit' || t === 'button' || t === 'reset' || t === 'file') return;
+        const label = i.id ? document.querySelector(`label[for="${i.id}"]`) : null;
+        const labelText = (label?.textContent || '').toLowerCase();
+        let v = 'N/A';
+        if (t === 'number' || t === 'tel') v = '0';
+        else if (labelText.includes('zip')) v = '68508';
+        else if (labelText.includes('amount') || labelText.includes('income') || labelText.includes('value') || labelText.includes('pay') || labelText.includes('expense')) v = '0';
+        else if (t === 'date') v = '2024-01-01';
+        else if (t === 'email') v = 'test@example.com';
+        else if (labelText.includes('year')) v = '2020';
+        else if (labelText.includes('mileage') || labelText.includes('milage')) v = '50000';
+        i.value = v;
+        i.dispatchEvent(new Event('input', { bubbles: true }));
+        i.dispatchEvent(new Event('change', { bubbles: true }));
+        touched = true;
+      });
+      // Also try ticking required yesno-radio fields to 'No' if neither option is set
+      document.querySelectorAll('input[type="radio"]').forEach((r) => {
+        const radio = r as HTMLInputElement;
+        if (radio.offsetParent === null) return;
+        const name = radio.name;
+        if (!name) return;
+        const group = document.querySelectorAll(`input[type="radio"][name="${CSS.escape(name)}"]`);
+        const anyChecked = Array.from(group).some(g => (g as HTMLInputElement).checked);
+        if (anyChecked) return;
+        // Pick the "No" / "False" option if available, else first
+        const noOne = Array.from(group).find(g => (g as HTMLInputElement).value === 'False' || (g as HTMLInputElement).value === 'No' || (g as HTMLInputElement).value === 'false');
+        const target = (noOne || group[0]) as HTMLInputElement;
+        if (target) {
+          target.checked = true;
+          target.dispatchEvent(new Event('change', { bubbles: true }));
+          touched = true;
+        }
+      });
       return touched;
     }).catch(() => false);
-    if (handledSelect) {
-      await page.waitForTimeout(300);
+    if (handledFields) {
+      await page.waitForTimeout(400);
       await clickContinue(page).catch(() => {});
       await waitForDaPageLoad(page);
       continue;
