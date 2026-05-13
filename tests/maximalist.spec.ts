@@ -611,7 +611,14 @@ async function navigateFinancialAffairsMaximalist(page: Page) {
   // Fill previous address 1
   await fillById(page, b64('financial_affairs.address_street_1'), '999 Old Oak Ln');
   await fillById(page, b64('financial_affairs.address_city_1'), 'Lincoln');
-  await fillById(page, b64('financial_affairs.address_state_1'), 'Nebraska');
+  // State is now a dropdown (issue #63 widening) — selectOption, not fill.
+  const stateSel1 = page.locator(`#${b64('financial_affairs.address_state_1')}`);
+  const stateTag1 = await stateSel1.evaluate((el) => el.tagName.toLowerCase()).catch(() => '');
+  if (stateTag1 === 'select') {
+    await stateSel1.selectOption({ label: 'Nebraska' }).catch(() => {});
+  } else {
+    await fillById(page, b64('financial_affairs.address_state_1'), 'Nebraska');
+  }
   await fillById(page, b64('financial_affairs.address_zip_1'), '68508');
   // Dates
   const fromField = page.locator(`#${b64('financial_affairs.address_from_1')}`);
@@ -660,6 +667,21 @@ async function navigateFinancialAffairsMaximalist(page: Page) {
       }
       input.dispatchEvent(new Event('input', { bubbles: true }));
       input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    // Any visible <select> that's still on the empty placeholder — pick the
+    // first non-empty option so it doesn't block submit. Used for the
+    // additional address-history state dropdowns the test doesn't fill explicitly.
+    document.querySelectorAll('select').forEach(el => {
+      const sel = el as HTMLSelectElement;
+      if (sel.offsetParent === null) return;
+      if (sel.value && sel.value !== '') return;
+      for (const opt of Array.from(sel.options)) {
+        if (opt.value && opt.value !== '') {
+          sel.value = opt.value;
+          break;
+        }
+      }
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
     });
   });
 
