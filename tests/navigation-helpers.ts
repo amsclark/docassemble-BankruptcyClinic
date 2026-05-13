@@ -148,10 +148,33 @@ export async function passDebtorFinal(page: Page) {
 //  PROPERTY SECTION (Schedule A/B)
 // ════════════════════════════════════════════════════════════════════
 
+const STATE_NAMES: Record<string, string> = {
+  AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California',
+  CO: 'Colorado', CT: 'Connecticut', DE: 'Delaware', FL: 'Florida', GA: 'Georgia',
+  HI: 'Hawaii', ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', IA: 'Iowa',
+  KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana', ME: 'Maine', MD: 'Maryland',
+  MA: 'Massachusetts', MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi', MO: 'Missouri',
+  MT: 'Montana', NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey',
+  NM: 'New Mexico', NY: 'New York', NC: 'North Carolina', ND: 'North Dakota', OH: 'Ohio',
+  OK: 'Oklahoma', OR: 'Oregon', PA: 'Pennsylvania', RI: 'Rhode Island', SC: 'South Carolina',
+  SD: 'South Dakota', TN: 'Tennessee', TX: 'Texas', UT: 'Utah', VT: 'Vermont',
+  VA: 'Virginia', WA: 'Washington', WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming',
+};
+
 async function fillRealProperty(page: Page, rp: RealPropertyData, index: number) {
   await page.locator(`#${b64(`prop.interests[${index}].street`)}`).fill(rp.street);
   await page.locator(`#${b64(`prop.interests[${index}].city`)}`).fill(rp.city);
-  await page.locator(`#${b64(`prop.interests[${index}].state`)}`).fill(rp.stateAbbr);
+  // State field is now a dropdown of US states (issue #63 widening).
+  const stateLoc = page.locator(`#${b64(`prop.interests[${index}].state`)}`);
+  const tagName = await stateLoc.evaluate((el) => el.tagName.toLowerCase()).catch(() => '');
+  if (tagName === 'select') {
+    const fullName = STATE_NAMES[rp.stateAbbr] || rp.stateAbbr;
+    await stateLoc.selectOption({ label: fullName }).catch(async () => {
+      await stateLoc.selectOption({ value: fullName }).catch(() => {});
+    });
+  } else {
+    await stateLoc.fill(rp.stateAbbr);
+  }
   await page.locator(`#${b64(`prop.interests[${index}].zip`)}`).fill(rp.zip);
   await page.locator(`#${b64(`prop.interests[${index}].county`)}`).fill(rp.county);
   await page.locator(`label[for="${b64(`prop.interests[${index}].type`)}_${rp.typeIndex}"]`).click();
@@ -321,6 +344,15 @@ export async function navigateExemptionSection(page: Page) {
 
   await waitForDaPageLoad(page);
   await clickYesNoButton(page, 'prop.exempt_property.properties.there_are_any', false);
+
+  // Issue #70: exemption_summary_overview screen — running totals + cap warnings.
+  // It only has a Continue button, so click through.
+  await waitForDaPageLoad(page);
+  const summaryHeading = await page.locator('h1').first().textContent().catch(() => '');
+  if (summaryHeading && summaryHeading.toLowerCase().includes('exemption summary')) {
+    await clickContinue(page);
+    await waitForDaPageLoad(page);
+  }
 }
 
 // ════════════════════════════════════════════════════════════════════

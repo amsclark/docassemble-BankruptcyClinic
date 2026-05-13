@@ -262,13 +262,36 @@ test.describe('YAML-structural proofs', () => {
   test('Issue #63: lawsuit/levy/marital city + state + zip validation in 107', async ({ page: _ }) => {
     const { readFileSync } = await import('fs');
     const yml = readFileSync('docassemble/BankruptcyClinic/data/questions/107-question-blocks.yml', 'utf8');
-    // Three validation blocks
-    const cityChecks = (yml.match(/validation_error\("Please enter a valid city name/g) || []).length;
+    const objs = readFileSync('docassemble/BankruptcyClinic/objects.py', 'utf8');
+    // Centralized helper functions exist in objects.py
+    expect(objs, 'is_valid_city helper defined').toMatch(/def is_valid_city/);
+    expect(objs, 'is_valid_zip helper defined').toMatch(/def is_valid_zip/);
+    expect(objs, 'is_valid_city rejects all-numeric').toMatch(/Please enter a valid city name/);
+    expect(objs, 'is_valid_zip rejects 4-digit').toMatch(/Please enter a 5-digit ZIP/);
+    // Three validation_code blocks in 107 call the helpers
+    const cityChecks = (yml.match(/is_valid_city\(/g) || []).length;
     expect(cityChecks, 'city validation present on lawsuits/levies/marital').toBeGreaterThanOrEqual(3);
+    const zipChecks = (yml.match(/is_valid_zip\(/g) || []).length;
+    expect(zipChecks, 'zip validation present on lawsuits/levies/marital').toBeGreaterThanOrEqual(3);
     // State dropdowns
     expect(yml).toMatch(/court_state\s*\n\s*input type:\s*dropdown/);
     expect(yml).toMatch(/creditor_state\s*\n\s*input type:\s*dropdown/);
     expect(yml).toMatch(/address_state_1\s*\n\s*input type:\s*dropdown/);
+  });
+
+  test('Issue #63 widened: validators also wired into 101, 106AB, 106D', async ({ page: _ }) => {
+    const { readFileSync } = await import('fs');
+    const y101 = readFileSync('docassemble/BankruptcyClinic/data/questions/101-question-blocks.yml', 'utf8');
+    const y106ab = readFileSync('docassemble/BankruptcyClinic/data/questions/106AB-question-blocks.yml', 'utf8');
+    const y106d = readFileSync('docassemble/BankruptcyClinic/data/questions/106D-question-blocks.yml', 'utf8');
+    expect(y101, 'debtor_basic_info validates city + zip').toMatch(/is_valid_city\(debtor\[i\]\.address\.city\)/);
+    expect(y101).toMatch(/is_valid_zip\(debtor\[i\]\.address\.zip\)/);
+    expect(y106ab, 'real estate validates city + zip').toMatch(/is_valid_city\(prop\.interests\[i\]\.city\)/);
+    expect(y106ab).toMatch(/is_valid_zip\(prop\.interests\[i\]\.zip\)/);
+    expect(y106d, 'secured creditor validates city + zip').toMatch(/is_valid_city\(prop\.creditors\[i\]\.city\)/);
+    expect(y106d).toMatch(/is_valid_zip\(prop\.creditors\[i\]\.zip\)/);
+    // 106AB real estate state field is now a dropdown
+    expect(y106ab).toMatch(/prop\.interests\[i\]\.state\s*\n\s*input type:\s*dropdown/);
   });
 
   test('Issue #65: income wording asks for "at time of filing", not "last month"', async ({ page: _ }) => {
@@ -330,6 +353,28 @@ test.describe('YAML-structural proofs', () => {
     // Many specify_other_deduction* fields, all should have required: false
     const otherDedReq = (yml.match(/other_deduction[\s\S]{0,200}?required:\s*false/g) || []).length;
     expect(otherDedReq, 'specify_other_deduction fields marked required: false').toBeGreaterThanOrEqual(2);
+  });
+
+  test('Issue #70: exemption overview screen is wired into the petition flow', async ({ page: _ }) => {
+    const { readFileSync } = await import('fs');
+    const y106c = readFileSync('docassemble/BankruptcyClinic/data/questions/106C-question-blocks.yml', 'utf8');
+    const yvp = readFileSync('docassemble/BankruptcyClinic/data/questions/voluntary-petition.yml', 'utf8');
+    // The summary screen question block exists
+    expect(y106c, 'exemption summary question block defined').toMatch(/id:\s*exemption_summary_overview/);
+    expect(y106c, 'pulls from compute_exemption_totals').toContain('compute_exemption_totals');
+    expect(y106c, 'compares against caps from get_exemption_limits via the helper').toContain('exemption_totals_summary');
+    expect(y106c, 'flags overages').toMatch(/Over cap by/);
+    // And it's gated by exemption_summary_acknowledged in the mandatory flow
+    expect(yvp, 'wired into mandatory flow').toContain('exemption_summary_acknowledged');
+  });
+
+  test('Issue #77 deeper: fee-waiver real-estate value pre-fills from Schedule A/B + hard-blocks divergence', async ({ page: _ }) => {
+    const { readFileSync } = await import('fs');
+    const y103b = readFileSync('docassemble/BankruptcyClinic/data/questions/103B-question-blocks.yml', 'utf8');
+    // Default pulls from prop.interests[0]
+    expect(y103b, 'fee waiver mortgage_current_value defaults from Schedule A/B').toMatch(/prop\.mortgage_current_value[\s\S]{0,200}?default:.*prop\.interests\[0\]\.current_value/);
+    // Hard validation block compares fee waiver value against Schedule A/B
+    expect(y103b, '#77 hard-block validation present').toMatch(/Issue #77[\s\S]+?validation_error/);
   });
 
   test('Issue #80: ZIP-format consistency check in cross-validation', async ({ page: _ }) => {

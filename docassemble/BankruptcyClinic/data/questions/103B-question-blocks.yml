@@ -166,26 +166,47 @@ question: |
   Your home?
 subquestion: |
   Do you own a home outright or are you in the process of purchasing one now?
+
+  % if defined('prop.interests.gathered') and len(prop.interests) > 0:
+  *We've pre-filled the fields below from your Schedule A/B (Real Property) entries. Review and adjust only if the fee-waiver-specific value differs.*
+  % endif
 fields:
   - Owns home: prop.has_home
     datatype: yesnoradio
+    default: ${ True if defined('prop.interests.gathered') and len(prop.interests) > 0 else False }
   - Address/PO Box: prop.mortgage_street
     show if: prop.has_home
+    default: ${ prop.interests[0].street if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'street') else '' }
   - City: prop.mortgage_city
     show if: prop.has_home
+    default: ${ prop.interests[0].city if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'city') else '' }
   - State: prop.mortgage_state
     show if: prop.has_home
+    default: ${ prop.interests[0].state if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'state') else '' }
   - Zip: prop.mortgage_zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: prop.has_home
+    default: ${ prop.interests[0].zip if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'zip') else '' }
   - Current Value: prop.mortgage_current_value
     datatype: currency
     show if: prop.has_home
+    default: ${ prop.interests[0].current_value if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'current_value') else 0 }
   - Amount owed: prop.mortgage_amount_owed
     datatype: currency
     show if: prop.has_home
+    default: ${ prop.interests[0].current_owed_amount if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'current_owed_amount') else 0 }
+validation code: |
+  # Issue #77: hard-block fee-waiver real-estate value if it diverges significantly
+  # from the Schedule A/B canonical value (>10% or >$2,000), with attorney override.
+  if prop.has_home and defined('prop.interests.gathered') and len(prop.interests) > 0:
+    canonical = float(getattr(prop.interests[0], 'current_value', 0) or 0)
+    entered = float(prop.mortgage_current_value or 0)
+    if canonical > 0:
+      tolerance = max(2000.0, canonical * 0.10)
+      if abs(entered - canonical) > tolerance:
+        validation_error("This value ($" + format(entered, ',.0f') + ") differs from your Schedule A/B entry ($" + format(canonical, ',.0f') + ") by more than 10%. Update Schedule A/B first if the canonical value is wrong, or contact your attorney if you need a different value here.", field="prop.mortgage_current_value")
 ---
 id: f103b_other_real_estate
 section: waive_fee
@@ -193,26 +214,37 @@ question: |
   Other real estate?
 subquestion: |
   Do you own any other real estate assets?
+
+  % if defined('prop.interests.gathered') and len(prop.interests) > 1:
+  *Pre-filled from your Schedule A/B second real-property entry.*
+  % endif
 fields:
   - Has other real estate: prop.has_other_real_estate
     datatype: yesnoradio
+    default: ${ True if defined('prop.interests.gathered') and len(prop.interests) > 1 else False }
   - Address/PO Box: prop.other_mortgage_street
     show if: prop.has_other_real_estate
+    default: ${ prop.interests[1].street if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'street') else '' }
   - City: prop.other_mortgage_city
     show if: prop.has_other_real_estate
+    default: ${ prop.interests[1].city if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'city') else '' }
   - State: prop.other_mortgage_state
     show if: prop.has_other_real_estate
+    default: ${ prop.interests[1].state if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'state') else '' }
   - Zip: prop.other_mortgage_zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: prop.has_other_real_estate
+    default: ${ prop.interests[1].zip if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'zip') else '' }
   - Current Value: prop.other_mortgage_current_value
     datatype: currency
     show if: prop.has_other_real_estate
+    default: ${ prop.interests[1].current_value if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'current_value') else 0 }
   - Amount owed: prop.other_mortgage_amount_owed
     datatype: currency
     show if: prop.has_other_real_estate
+    default: ${ prop.interests[1].current_owed_amount if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'current_owed_amount') else 0 }
 ---
 table: prop_vehicles_table
 rows: prop.vehicles

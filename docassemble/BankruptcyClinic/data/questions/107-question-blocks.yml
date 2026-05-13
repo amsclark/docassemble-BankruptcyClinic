@@ -5,14 +5,13 @@ question: |
 subquestion: |
   Be as complete and accurate as possible. If two married people are filing together, both are equally responsible for supplying correct information.
 validation code: |
-  import re
   if financial_affairs.lived_elsewhere:
-    city = financial_affairs.address_city_1
-    if city and not re.search(r'[A-Za-z]', str(city)):
-      validation_error("Please enter a valid city name (letters required).", field="financial_affairs.address_city_1")
-    zip_code = financial_affairs.address_zip_1
-    if zip_code and not re.match(r'^\d{5}(-\d{4})?$', str(zip_code)):
-      validation_error("Please enter a 5-digit ZIP (e.g. 68508) or ZIP+4 (68508-1234).", field="financial_affairs.address_zip_1")
+    city_err = is_valid_city(financial_affairs.address_city_1)
+    if city_err is not True:
+      validation_error(city_err, field="financial_affairs.address_city_1")
+    zip_err = is_valid_zip(financial_affairs.address_zip_1)
+    if zip_err is not True:
+      validation_error(zip_err, field="financial_affairs.address_zip_1")
 fields:
   - Are you currently married?: financial_affairs.marital_status
     datatype: yesnoradio
@@ -1241,13 +1240,12 @@ id: lawsuit_details
 question: |
   Tell the court about the lawsuit filed against you.
 validation code: |
-  import re
-  city = financial_affairs.lawsuits[i].court_city
-  if city and not re.search(r'[A-Za-z]', str(city)):
-    validation_error("Please enter a valid city name (letters required).", field="financial_affairs.lawsuits[i].court_city")
-  zip_code = financial_affairs.lawsuits[i].court_zip
-  if zip_code and not re.match(r'^\d{5}(-\d{4})?$', str(zip_code)):
-    validation_error("Please enter a 5-digit ZIP (e.g. 68508) or ZIP+4 (68508-1234).", field="financial_affairs.lawsuits[i].court_zip")
+  city_err = is_valid_city(financial_affairs.lawsuits[i].court_city)
+  if city_err is not True:
+    validation_error(city_err, field="financial_affairs.lawsuits[i].court_city")
+  zip_err = is_valid_zip(financial_affairs.lawsuits[i].court_zip)
+  if zip_err is not True:
+    validation_error(zip_err, field="financial_affairs.lawsuits[i].court_zip")
 fields:
   - Case Title: financial_affairs.lawsuits[i].case_title
   - Case Number: financial_affairs.lawsuits[i].case_number
@@ -1301,13 +1299,12 @@ id: repossessed_property_details
 question: |
   Tell the court about a repossessed, foreclosed, garnished, attached, seized, or levied property in the last year.
 validation code: |
-  import re
-  city = financial_affairs.levies[i].creditor_city
-  if city and not re.search(r'[A-Za-z]', str(city)):
-    validation_error("Please enter a valid city name (letters required).", field="financial_affairs.levies[i].creditor_city")
-  zip_code = financial_affairs.levies[i].creditor_zip
-  if zip_code and not re.match(r'^\d{5}(-\d{4})?$', str(zip_code)):
-    validation_error("Please enter a 5-digit ZIP (e.g. 68508) or ZIP+4 (68508-1234).", field="financial_affairs.levies[i].creditor_zip")
+  city_err = is_valid_city(financial_affairs.levies[i].creditor_city)
+  if city_err is not True:
+    validation_error(city_err, field="financial_affairs.levies[i].creditor_city")
+  zip_err = is_valid_zip(financial_affairs.levies[i].creditor_zip)
+  if zip_err is not True:
+    validation_error(zip_err, field="financial_affairs.levies[i].creditor_zip")
 fields:
   - Creditor Name: financial_affairs.levies[i].creditor_name
   - Address/PO Box: financial_affairs.levies[i].creditor_street

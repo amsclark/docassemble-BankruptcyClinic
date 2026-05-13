@@ -236,6 +236,21 @@ fields:
 
 validation code: |
   import re
+  # Issue #63: city / ZIP format validation
+  city_err = is_valid_city(debtor[i].address.city)
+  if city_err is not True:
+    validation_error(city_err, field="debtor[i].address.city")
+  zip_err = is_valid_zip(debtor[i].address.zip)
+  if zip_err is not True:
+    validation_error(zip_err, field="debtor[i].address.zip")
+  if getattr(debtor[i], 'has_other_mailing_address', False):
+    m_city_err = is_valid_city(debtor[i].mailing_city)
+    if m_city_err is not True:
+      validation_error(m_city_err, field="debtor[i].mailing_city")
+    m_zip_err = is_valid_zip(debtor[i].mailing_zip)
+    if m_zip_err is not True:
+      validation_error(m_zip_err, field="debtor[i].mailing_zip")
+  # SSN / ITIN format
   if debtor[i].tax_id.tax_id:
     if not re.match(r'^\d{3}-\d{2}-\d{4}$', debtor[i].tax_id.tax_id):
       validation_error("Please enter in the format XXX-XX-XXXX (e.g., 123-45-6789).")

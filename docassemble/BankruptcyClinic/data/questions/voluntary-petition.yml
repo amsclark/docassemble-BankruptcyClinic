@@ -424,6 +424,9 @@ code: |
   prop.exempt_property.exemption_type
   prop.exempt_property.properties.gather()
   prop.exempt_property.claim_homestead_exemption = False
+  # Issue #70: exemption overview screen — show running totals + cap warnings
+  # after Schedule C is gathered.
+  exemption_summary_acknowledged
 
   #106I - Income (moved earlier in flow for better UX)
   debtor[0].income.employment

@@ -105,6 +105,29 @@ CATEGORY_KEYS = {
 SUPPORTED_STATES = ('Nebraska', 'South Dakota')
 
 
+# ── Field-level validators (referenced via `validate:` in question YAML) ──
+import re as _re
+
+_ZIP_PATTERN = _re.compile(r'^\d{5}(-\d{4})?$')
+_CITY_PATTERN = _re.compile(r'[A-Za-z]')
+
+def is_valid_zip(value):
+    """Reject ZIPs that aren't 5 digits or 5+4 (e.g. 'abcde' or '1234')."""
+    if value is None or value == '':
+        return True  # let `required:` handle empties
+    if not _ZIP_PATTERN.match(str(value)):
+        return "Please enter a 5-digit ZIP (e.g. 68508) or ZIP+4 (68508-1234)."
+    return True
+
+def is_valid_city(value):
+    """City must contain at least one letter; reject pure-numeric / garbage input."""
+    if value is None or value == '':
+        return True
+    if not _CITY_PATTERN.search(str(value)):
+        return "Please enter a valid city name (letters required)."
+    return True
+
+
 def get_exemption_choices(user_state, property_type='all'):
     """
     Returns a list of exemption law choices based on the user's state and property type.

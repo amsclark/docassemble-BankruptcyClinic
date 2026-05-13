@@ -97,10 +97,19 @@ validation code: |
     prop.interests[i].current_owned_value = prop.interests[i].current_value - prop.interests[i].current_owed_amount
   else:
     prop.interests[i].current_owned_value = prop.interests[i].current_value
+  # Issue #63: city / ZIP format validation
+  city_err = is_valid_city(prop.interests[i].city)
+  if city_err is not True:
+    validation_error(city_err, field="prop.interests[i].city")
+  zip_err = is_valid_zip(prop.interests[i].zip)
+  if zip_err is not True:
+    validation_error(zip_err, field="prop.interests[i].zip")
 fields:
   - Street: prop.interests[i].street
   - City: prop.interests[i].city
   - State: prop.interests[i].state
+    input type: dropdown
+    code: get_all_us_states()
   - Zip: prop.interests[i].zip
     datatype: text
     minlength: 5
