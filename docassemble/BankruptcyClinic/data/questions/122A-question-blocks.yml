@@ -74,15 +74,15 @@ fields:
     default: ${ debtor[0].income.net_rental_business if debtor[0].income.net_rental_business > 0 else 0 }
   - Ordinary and necessary operating expenses: monthly_income.business_operating_expenses1
     datatype: currency
-    default: 0
+    required: False
   - note: |
       Net income from rental and other real property
   - Gross receipts (before all deductions): monthly_income.rental_gross_receipts1
     datatype: currency
-    default: 0
+    required: False
   - Ordinary and necessary operating expenses: monthly_income.rental_operating_expenses1
     datatype: currency
-    default: 0
+    required: False
   - note: <br>
   - Interest, dividends, and royalties: monthly_income.interest1
     datatype: currency
@@ -95,7 +95,7 @@ fields:
     default: ${ debtor[0].income.social_security }
   - Spouse Social Security Act compensation: monthly_income.spouse_social1
     datatype: currency
-    default: 0
+    required: False
   - note: |
       Pension or retirement. Do not include any amount received that was a benefit under the Social Security Act. Also, except as stated in the next sentence, do not include any compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with disability, combat-related injury or disability, or death of a member of the uniformed services. If you received any retired pay paid under chapter 61 of title 10, then include that pay only to the extent that it does not exceed the amount of retired pay to which you would otherwise be entitled if retired under any provision of title 10 other than chapter 61 of that title.
   - Pension or retirement: monthly_income.pension1
@@ -104,15 +104,16 @@ fields:
   - note: |
       Income from all other sources not listed. Specify the source and amount. Do not include any benefits received under the Social Security Act; payments received as a victim of a war crime, a crime against humanity, or international or domestic terrorism; or compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with a disability, combat-related injury or disability, or death of a member of the uniformed services.
   - Source 1: monthly_income.source1_1
-    default: " "
+    required: False
   - Amount: monthly_income.source1_amount_1
     datatype: currency
-    default: ${ getattr(debtor[0].income, 'other_monthly_amount', 0) }
+    required: False
+    default: ${ getattr(debtor[0].income, 'other_monthly_amount', 0) if getattr(debtor[0].income, 'other_monthly_amount', 0) else '' }
   - Source 2: monthly_income.source2_1
-    default: " "
+    required: False
   - Amount: monthly_income.source2_amount_1
     datatype: currency
-    default: 0
+    required: False
 ---
 id: debtor2_current_monthly_income
 section: form_122a
@@ -138,15 +139,15 @@ fields:
     default: ${ debtor[1].income.net_rental_business if len(debtor) > 1 and debtor[1].income.net_rental_business > 0 else 0 }
   - Ordinary and necessary operating expenses: monthly_income.business_operating_expenses2
     datatype: currency
-    default: 0
+    required: False
   - note: |
       Net income from rental and other real property
   - Gross receipts (before all deductions): monthly_income.rental_gross_receipts2
     datatype: currency
-    default: 0
+    required: False
   - Ordinary and necessary operating expenses: monthly_income.rental_operating_expenses2
     datatype: currency
-    default: 0
+    required: False
   - note: <br>
   - Interest, dividends, and royalties: monthly_income.interest2
     datatype: currency
@@ -159,7 +160,7 @@ fields:
     default: ${ debtor[1].income.social_security if len(debtor) > 1 else 0 }
   - Spouse Social Security Act compensation: monthly_income.spouse_social2
     datatype: currency
-    default: 0
+    required: False
   - note: |
       Pension or retirement. Do not include any amount received that was a benefit under the Social Security Act. Also, except as stated in the next sentence, do not include any compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with disability, combat-related injury or disability, or death of a member of the uniformed services. If you received any retired pay paid under chapter 61 of title 10, then include that pay only to the extent that it does not exceed the amount of retired pay to which you would otherwise be entitled if retired under any provision of title 10 other than chapter 61 of that title.
   - Pension or retirement: monthly_income.pension2
@@ -168,15 +169,16 @@ fields:
   - note: |
       Income from all other sources not listed. Specify the source and amount. Do not include any benefits received under the Social Security Act; payments received as a victim of a war crime, a crime against humanity, or international or domestic terrorism; or compensation, pension, pay, annuity, or allowance paid by the United States Government in connection with a disability, combat-related injury or disability, or death of a member of the uniformed services.
   - Source 1: monthly_income.source1_2
-    default: " "
+    required: False
   - Amount: monthly_income.source1_amount_2
     datatype: currency
-    default: ${ getattr(debtor[1].income, 'other_monthly_amount', 0) if len(debtor) > 1 else 0 }
+    required: False
+    default: ${ getattr(debtor[1].income, 'other_monthly_amount', 0) if len(debtor) > 1 and getattr(debtor[1].income, 'other_monthly_amount', 0) else '' }
   - Source 2: monthly_income.source2_2
-    default: " "
+    required: False
   - Amount: monthly_income.source2_amount_2
     datatype: currency
-    default: 0
+    required: False
 ---
 event: review_122
 question: |
@@ -195,37 +197,45 @@ question: |
 continue button field: monthly_income.reviewed
 ---
 code: |
-  debtor_1_income = (monthly_income.gross_wages1 + 
-                          monthly_income.alimony1 + 
-                          monthly_income.other_income1 +
-                          monthly_income.business_gross_receipts1  +
-                          monthly_income.rental_gross_receipts1 +
-                          monthly_income.interest1 +
-                          monthly_income.unemployment1 +
-                          monthly_income.social1 +
-                          monthly_income.pension1 +
-                          monthly_income.source1_amount_1 +
-                          monthly_income.source2_amount_1
+  # Issue #60: some fields are now optional (no hardcoded 0 pre-fill); coerce
+  # empty/None to 0 before summing so the math still works.
+  def _n(obj, attr):
+    v = getattr(obj, attr, 0)
+    try:
+      return float(v) if v not in (None, '') else 0.0
+    except (TypeError, ValueError):
+      return 0.0
+  debtor_1_income = (_n(monthly_income, 'gross_wages1') +
+                          _n(monthly_income, 'alimony1') +
+                          _n(monthly_income, 'other_income1') +
+                          _n(monthly_income, 'business_gross_receipts1') +
+                          _n(monthly_income, 'rental_gross_receipts1') +
+                          _n(monthly_income, 'interest1') +
+                          _n(monthly_income, 'unemployment1') +
+                          _n(monthly_income, 'social1') +
+                          _n(monthly_income, 'pension1') +
+                          _n(monthly_income, 'source1_amount_1') +
+                          _n(monthly_income, 'source2_amount_1')
                           ) - (
-                           monthly_income.business_operating_expenses1 +
-                           monthly_income.rental_operating_expenses1
+                           _n(monthly_income, 'business_operating_expenses1') +
+                           _n(monthly_income, 'rental_operating_expenses1')
                           )
   debtor_2_income = 0
   if len(debtor) > 1:
-    debtor_2_income = (monthly_income.gross_wages2 + 
-                            monthly_income.alimony2 + 
-                            monthly_income.other_income2 +
-                            monthly_income.business_gross_receipts2 +
-                            monthly_income.rental_gross_receipts2 +
-                            monthly_income.interest2 +
-                            monthly_income.unemployment2 +
-                            monthly_income.social2 +
-                            monthly_income.pension2 +
-                            monthly_income.source1_amount_2 +
-                            monthly_income.source2_amount_2
+    debtor_2_income = (_n(monthly_income, 'gross_wages2') +
+                            _n(monthly_income, 'alimony2') +
+                            _n(monthly_income, 'other_income2') +
+                            _n(monthly_income, 'business_gross_receipts2') +
+                            _n(monthly_income, 'rental_gross_receipts2') +
+                            _n(monthly_income, 'interest2') +
+                            _n(monthly_income, 'unemployment2') +
+                            _n(monthly_income, 'social2') +
+                            _n(monthly_income, 'pension2') +
+                            _n(monthly_income, 'source1_amount_2') +
+                            _n(monthly_income, 'source2_amount_2')
                             ) - (
-                             monthly_income.business_operating_expenses2 +
-                             monthly_income.rental_operating_expenses2
+                             _n(monthly_income, 'business_operating_expenses2') +
+                             _n(monthly_income, 'rental_operating_expenses2')
                             )
 
 

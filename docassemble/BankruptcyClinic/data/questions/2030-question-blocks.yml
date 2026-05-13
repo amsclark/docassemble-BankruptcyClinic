@@ -57,7 +57,6 @@ fields:
     datatype: currency
     min: 0
     required: True
-    default: 0
     help: |
       Enter the total amount already paid to you before filing
       this disclosure statement.
@@ -74,7 +73,6 @@ fields:
     choices:
       - Debtor: debtor
       - Other: other
-    default: debtor
   - "Specify the source": attorney_disclosure.source_paid_other_detail
     show if:
       variable: attorney_disclosure.source_paid
@@ -93,7 +91,6 @@ fields:
     choices:
       - Debtor: debtor
       - Other: other
-    default: debtor
   - "Specify the source": attorney_disclosure.source_topay_other_detail
     show if:
       variable: attorney_disclosure.source_topay
