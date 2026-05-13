@@ -29,7 +29,7 @@ Covers the sections you previously reported as "dead in the water" — vehicle e
 
 <video src="https://github.com/amsclark/docassemble-BankruptcyClinic/raw/main/docs/videos/01-navigation-success.mp4" controls width="720"></video>
 
-**Issues covered:** [#53](../../issues/53), [#54](../../issues/54), [#56](../../issues/56), [#57](../../issues/57), [#59](../../issues/59)
+**Issues covered:** [#53](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/53), [#54](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/54), [#56](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/56), [#57](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/57), [#59](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/59)
 
 [Download `01-navigation-success.mp4`](https://github.com/amsclark/docassemble-BankruptcyClinic/raw/main/docs/videos/01-navigation-success.mp4)
 
@@ -39,7 +39,7 @@ Shows the system rejecting invalid input it used to accept (case-number format, 
 
 <video src="https://github.com/amsclark/docassemble-BankruptcyClinic/raw/main/docs/videos/02-validation-enforcement.mp4" controls width="720"></video>
 
-**Issues covered:** [#63](../../issues/63), [#68](../../issues/68), [#74](../../issues/74), [#80](../../issues/80)
+**Issues covered:** [#63](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/63), [#68](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/68), [#74](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/74), [#80](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/80)
 
 [Download `02-validation-enforcement.mp4`](https://github.com/amsclark/docassemble-BankruptcyClinic/raw/main/docs/videos/02-validation-enforcement.mp4)
 
@@ -49,7 +49,7 @@ The final review page now warns you if data conflicts between sections (e.g. fee
 
 <video src="https://github.com/amsclark/docassemble-BankruptcyClinic/raw/main/docs/videos/03-cross-validation.mp4" controls width="720"></video>
 
-**Issues covered:** [#58](../../issues/58), [#76](../../issues/76), [#77](../../issues/77), [#78](../../issues/78)
+**Issues covered:** [#58](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/58), [#76](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/76), [#77](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/77), [#78](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/78)
 
 [Download `03-cross-validation.mp4`](https://github.com/amsclark/docassemble-BankruptcyClinic/raw/main/docs/videos/03-cross-validation.mp4)
 
@@ -57,7 +57,7 @@ The final review page now warns you if data conflicts between sections (e.g. fee
 
 ## 🎯 Issue-by-issue proof
 
-### [#53](../../issues/53) Vehicle Motor-Vehicle exemption single-claim
+### [#53](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/53) Vehicle Motor-Vehicle exemption single-claim
 
 **Bug:** Claiming the Motor Vehicle exemption on two vehicles crashed the form.
 
@@ -67,7 +67,7 @@ Demonstrated in the **Navigation past previously-blocking sections** video above
 
 ---
 
-### [#54](../../issues/54) Secured creditors section
+### [#54](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/54) Secured creditors section
 
 **Bug:** You couldn't get past the secured creditors page no matter what you filled in.
 
@@ -77,7 +77,7 @@ Demonstrated in the **Navigation past previously-blocking sections** video above
 
 ---
 
-### [#55](../../issues/55) Means Test thresholds
+### [#55](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/55) Means Test thresholds
 
 **Bug:** Means Test was using "150% of poverty level" thresholds (~$37k) instead of the actual U.S. Trustee Program median-income tables (~$103k for a NE family of 3).
 
@@ -87,7 +87,7 @@ Demonstrated in the **Navigation past previously-blocking sections** video above
 
 ---
 
-### [#56](../../issues/56) Income deductions "No" no longer blocks
+### [#56](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/56) Income deductions "No" no longer blocks
 
 **Bug:** Answering "No" to "Do you have any deductions to claim?" silently blocked Continue.
 
@@ -97,7 +97,7 @@ Demonstrated in the **Navigation past previously-blocking sections** video above
 
 ---
 
-### [#57](../../issues/57) Other monthly income "No" no longer blocks
+### [#57](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/57) Other monthly income "No" no longer blocks
 
 **Bug:** Leaving the "Other monthly income" page unchanged silently blocked Continue.
 
@@ -107,7 +107,7 @@ Demonstrated in the **Navigation past previously-blocking sections** video above
 
 ---
 
-### [#58](../../issues/58) Fee waiver reliability (umbrella for #76/#77)
+### [#58](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/58) Fee waiver reliability (umbrella for #76/#77)
 
 **Bug:** Fee waiver re-collected property and income, accepted made-up numbers, and the cross-validation code that was supposed to catch this had been broken (referencing an undefined variable).
 
@@ -120,7 +120,7 @@ Demonstrated in the **Cross-section consistency check** video above.
 
 ---
 
-### [#59](../../issues/59) Codebtors community-property "No" no longer blocks
+### [#59](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/59) Codebtors community-property "No" no longer blocks
 
 **Bug:** Answering "No" to the codebtors community-property question silently blocked Continue.
 
@@ -130,7 +130,7 @@ Demonstrated in the **Navigement past previously-blocking sections** video above
 
 ---
 
-### [#60](../../issues/60) Pre-filled data confusing for clients
+### [#60](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/60) Pre-filled data confusing for clients
 
 **Bug:** Hardcoded pre-fills (zeros, default selections) confused users — they couldn't tell what was their own data versus a default.
 
@@ -138,7 +138,7 @@ Demonstrated in the **Navigement past previously-blocking sections** video above
 
 ---
 
-### [#61](../../issues/61) Marital status — date fields hidden when "No"
+### [#61](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/61) Marital status — date fields hidden when "No"
 
 **Bug:** Answering "No" to "have you lived elsewhere in the last 3 years?" still displayed five sets of empty date fields.
 
@@ -150,7 +150,7 @@ Demonstrated in the **Navigement past previously-blocking sections** video above
 
 ---
 
-### [#62](../../issues/62) Debtor 2 questions hidden for individual filers
+### [#62](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/62) Debtor 2 questions hidden for individual filers
 
 **Bug:** Filing as an individual still surfaced "Debtor 2" questions throughout the petition.
 
@@ -162,7 +162,7 @@ Demonstrated in the **Navigement past previously-blocking sections** video above
 
 ---
 
-### [#63](../../issues/63) Address validation actually validates
+### [#63](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/63) Address validation actually validates
 
 **Bug:** City fields accepted random text like "abc123xyz", state fields accepted things like "Denial", ZIP fields accepted 4-digit input.
 
@@ -174,7 +174,7 @@ Demonstrated in the **Navigement past previously-blocking sections** video above
 
 ---
 
-### [#64](../../issues/64) Unsecured creditors — party fields hidden when "No"
+### [#64](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/64) Unsecured creditors — party fields hidden when "No"
 
 **Bug:** Selecting "No" to "do others need to be notified?" still rendered three blank party-entry blocks.
 
@@ -182,7 +182,7 @@ Demonstrated in the **Navigement past previously-blocking sections** video above
 
 ---
 
-### [#65](../../issues/65) Schedule I/J — "at time of filing" wording
+### [#65](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/65) Schedule I/J — "at time of filing" wording
 
 **Bug:** Payroll-deduction question asked for "the previous month" instead of the more legally appropriate "at the time of filing".
 
@@ -190,7 +190,7 @@ Demonstrated in the **Navigement past previously-blocking sections** video above
 
 ---
 
-### [#66](../../issues/66) No case number when not filing amended
+### [#66](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/66) No case number when not filing amended
 
 **Bug:** Even after answering "No" to "amended filing?", the form still asked for a case number.
 
@@ -202,13 +202,13 @@ Demonstrated in the **Navigement past previously-blocking sections** video above
 
 ---
 
-### [#67](../../issues/67) Duplicate contact information
+### [#67](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/67) Duplicate contact information
 
 ⏸ **Awaiting your input.** The current question YAML has only one collection point for debtor name / contact. If you can share the screen URL or heading where the duplicate appeared, we can identify it and fix it.
 
 ---
 
-### [#68](../../issues/68) Real-estate ZIP requires real ZIP format
+### [#68](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/68) Real-estate ZIP requires real ZIP format
 
 **Bug:** Property ZIP accepted fewer than 5 digits.
 
@@ -218,13 +218,13 @@ Demonstrated in the **Validation actually enforces** video above.
 
 ---
 
-### [#69](../../issues/69) Updated exemption amounts
+### [#69](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/69) Updated exemption amounts
 
 ⏸ **Awaiting attorney input.** You've emailed them for the current NE/SD exemption dollar values; the structure is in place — the table is in `docassemble/BankruptcyClinic/objects.py` and feeds the new #70 summary screen and the cross-validation warnings. Drop the new values into that table whenever they arrive.
 
 ---
 
-### [#70](../../issues/70) Exemption overview screen
+### [#70](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/70) Exemption overview screen
 
 **Bug:** When you went over the wildcard exemption limit, there was no easy way to review what you'd already claimed.
 
@@ -232,7 +232,7 @@ Demonstrated in the **Validation actually enforces** video above.
 
 ---
 
-### [#71](../../issues/71) Money/Property exemption bifurcation
+### [#71](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/71) Money/Property exemption bifurcation
 
 **Bug:** Tax refunds couldn't have two exemption amounts the way household goods could.
 
@@ -240,7 +240,7 @@ Demonstrated in the **Validation actually enforces** video above.
 
 ---
 
-### [#72](../../issues/72) Theft/Disaster — no description required on "No"
+### [#72](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/72) Theft/Disaster — no description required on "No"
 
 **Bug:** Selecting "No" to "did you experience theft or disaster losses?" still required a description.
 
@@ -248,7 +248,7 @@ Demonstrated in the **Validation actually enforces** video above.
 
 ---
 
-### [#73](../../issues/73) Financial Statements — no date required on "No"
+### [#73](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/73) Financial Statements — no date required on "No"
 
 **Bug:** Selecting "No" to "have you prepared financial statements?" still required a date.
 
@@ -256,7 +256,7 @@ Demonstrated in the **Validation actually enforces** video above.
 
 ---
 
-### [#74](../../issues/74) Case number format validation
+### [#74](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/74) Case number format validation
 
 **Bug:** The case-number field accepted any random text.
 
@@ -268,13 +268,13 @@ Demonstrated in the **Validation actually enforces** video above.
 
 ---
 
-### [#76](../../issues/76) Fee-waiver income vs Schedule I
+### [#76](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/76) Fee-waiver income vs Schedule I
 
 **Fix:** The cross-validation check (sum of Schedule I income vs `family.you_income`) now actually surfaces — see the **Cross-section consistency check** video above.
 
 ---
 
-### [#77](../../issues/77) Fee-waiver property values vs Schedule A/B
+### [#77](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/77) Fee-waiver property values vs Schedule A/B
 
 **Fix:** Added a property-value cross-check, plus the fee-waiver real-estate page now pre-fills from Schedule A/B and hard-blocks save if the user enters a value that diverges by more than 10%.
 
@@ -282,7 +282,7 @@ Demonstrated in the **Cross-section consistency check** video above.
 
 ---
 
-### [#78](../../issues/78) Codebtors community-property vs SOFA
+### [#78](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/78) Codebtors community-property vs SOFA
 
 **Fix:** Cross-validation now flags when the codebtors-section community-property answer disagrees with the SOFA answer.
 
@@ -290,7 +290,7 @@ Demonstrated in the **Cross-section consistency check** video above.
 
 ---
 
-### [#79](../../issues/79) Statement of Intention — no re-entry of secured debts
+### [#79](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/79) Statement of Intention — no re-entry of secured debts
 
 **Bug:** Form 108 (Statement of Intention) made you re-enter creditor names and property descriptions you'd already entered on Schedule D.
 
@@ -298,7 +298,7 @@ Demonstrated in the **Cross-section consistency check** video above.
 
 ---
 
-### [#80](../../issues/80) Address consistency
+### [#80](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/80) Address consistency
 
 **Fix:** Cross-validation checks ZIP format consistency on both the primary and mailing addresses; flags get surfaced on the final review page.
 
@@ -308,5 +308,5 @@ Demonstrated in the **Cross-section consistency check** video above.
 
 ## Still open (awaiting your input)
 
-- [**#67**](../../issues/67) Duplicate contact info — couldn't locate a second collection point; need the screen URL where you saw it.
-- [**#69**](../../issues/69) Exemption dollar amounts — needs the attorney's updated table.
+- [**#67**](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/67) Duplicate contact info — couldn't locate a second collection point; need the screen URL where you saw it.
+- [**#69**](https://github.com/amsclark/docassemble-BankruptcyClinic/issues/69) Exemption dollar amounts — needs the attorney's updated table.
