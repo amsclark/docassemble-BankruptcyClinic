@@ -419,6 +419,21 @@ test.describe('YAML-structural proofs', () => {
     expect(y103b, '#77 hard-block validation present').toMatch(/Issue #77[\s\S]+?validation_error/);
   });
 
+  test('Issue #60: non-user-sourced data defaults removed from 2030 + 122A', async ({ page: _ }) => {
+    const { readFileSync } = await import('fs');
+    const y2030 = readFileSync('docassemble/BankruptcyClinic/data/questions/2030-question-blocks.yml', 'utf8');
+    const y122a = readFileSync('docassemble/BankruptcyClinic/data/questions/122A-question-blocks.yml', 'utf8');
+    // Form 2030: no hardcoded data defaults (currency, radio source). Yes/No
+    // navigation defaults are kept (they're not user-confusing pre-fills).
+    expect(y2030, '2030 has no default: debtor on radio fields').not.toMatch(/^\s*default:\s*debtor\s*$/m);
+    expect(y2030, '2030 has no default: 0 on currency fields').not.toMatch(/^\s*default:\s*0\s*$/m);
+    // 122A: no hardcoded default: 0 / default: " " left on currency/source fields
+    expect(y122a, '122A has no default: 0 on currency fields').not.toMatch(/^\s*default:\s*0\s*$/m);
+    expect(y122a, '122A has no default: " " on text fields').not.toMatch(/^\s*default:\s*" "\s*$/m);
+    // Defensive sum helper present so empty fields don't break the means-test math
+    expect(y122a, 'means-test math uses defensive _n() helper').toContain('def _n(obj, attr)');
+  });
+
   test('Issue #80: ZIP-format consistency check in cross-validation', async ({ page: _ }) => {
     const { readFileSync } = await import('fs');
     const cv = readFileSync('docassemble/BankruptcyClinic/data/questions/cross-validation.yml', 'utf8');
