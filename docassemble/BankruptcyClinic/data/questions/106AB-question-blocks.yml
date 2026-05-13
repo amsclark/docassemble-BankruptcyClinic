@@ -3363,7 +3363,7 @@ code: |
       ab['prop'+str(i)+'AtLeastOneDebtor'] = True if interest.who == 'At least one of the debtors and another' else False
       ab['prop'+str(i)+'Street'] = interest.street
       ab['prop'+str(i)+'City'] = interest.city
-      ab['prop'+str(i)+'State'] = interest.state
+      ab['prop'+str(i)+'State'] = state_abbr(interest.state)
       _zip = interest.zip
       ab['prop'+str(i)+'Zip'] = str(int(_zip)) if isinstance(_zip, float) else str(_zip)
       ab['prop'+str(i)+'County'] = interest.county

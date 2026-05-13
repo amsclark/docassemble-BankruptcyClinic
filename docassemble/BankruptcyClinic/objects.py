@@ -128,6 +128,35 @@ def is_valid_city(value):
     return True
 
 
+_STATE_TO_ABBR = {
+    'alabama': 'AL', 'alaska': 'AK', 'arizona': 'AZ', 'arkansas': 'AR',
+    'california': 'CA', 'colorado': 'CO', 'connecticut': 'CT', 'delaware': 'DE',
+    'florida': 'FL', 'georgia': 'GA', 'hawaii': 'HI', 'idaho': 'ID',
+    'illinois': 'IL', 'indiana': 'IN', 'iowa': 'IA', 'kansas': 'KS',
+    'kentucky': 'KY', 'louisiana': 'LA', 'maine': 'ME', 'maryland': 'MD',
+    'massachusetts': 'MA', 'michigan': 'MI', 'minnesota': 'MN', 'mississippi': 'MS',
+    'missouri': 'MO', 'montana': 'MT', 'nebraska': 'NE', 'nevada': 'NV',
+    'new hampshire': 'NH', 'new jersey': 'NJ', 'new mexico': 'NM', 'new york': 'NY',
+    'north carolina': 'NC', 'north dakota': 'ND', 'ohio': 'OH', 'oklahoma': 'OK',
+    'oregon': 'OR', 'pennsylvania': 'PA', 'rhode island': 'RI', 'south carolina': 'SC',
+    'south dakota': 'SD', 'tennessee': 'TN', 'texas': 'TX', 'utah': 'UT',
+    'vermont': 'VT', 'virginia': 'VA', 'washington': 'WA', 'west virginia': 'WV',
+    'wisconsin': 'WI', 'wyoming': 'WY', 'district of columbia': 'DC',
+}
+
+def state_abbr(value):
+    """Return the 2-letter abbreviation for a state name; pass through if already
+    an abbreviation or unrecognized. Used to keep court-form PDF fields in the
+    'NE' / 'SD' format the templates expect even when the question stores the
+    full state name (e.g. from a get_all_us_states() dropdown)."""
+    if value is None or value == '':
+        return ''
+    s = str(value).strip()
+    if len(s) == 2 and s.upper() == s:
+        return s
+    return _STATE_TO_ABBR.get(s.lower(), s)
+
+
 def get_exemption_choices(user_state, property_type='all'):
     """
     Returns a list of exemption law choices based on the user's state and property type.
