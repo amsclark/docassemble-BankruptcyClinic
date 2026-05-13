@@ -1,42 +1,40 @@
 ---
-title: "BankruptcyClinic — Free, Open-Source Chapter 7 Petition Generator"
+title: "BankruptcyClinic — Open-Source Chapter 7 Petition Generator"
 layout: default
 ---
 
-# BankruptcyClinic
+# Stop typing the same client data into seventeen separate court forms.
 
-**An open-source guided interview that turns a plain-English Q&A into a complete, filing-ready Chapter 7 bankruptcy petition packet.**
+**BankruptcyClinic** is an open-source guided interview that turns one plain-English conversation with your client into a complete, filing-ready Chapter 7 bankruptcy petition packet — every Official Form, properly cross-referenced, with the legally-correct exemptions for your state.
 
-[See it in action ▶](RESOLVED.html) &nbsp; [Browse the code](https://github.com/amsclark/docassemble-BankruptcyClinic)
+[**Contact me to set it up for your clinic →**](#get-started)
 
 <video src="videos/04-complete-petition.mp4" controls width="900" muted></video>
 
-*Full single-filer petition, intro screen to document-generation page. Recorded May 2026.*
+*The system in motion: a real petition assembled in a single sitting.*
 
 ---
 
-## Who it's for
+## Built for the people doing the actual filing
 
-- **Bankruptcy clinics** serving low-income clients pro bono
-- **Solo attorneys** who want to spend billable hours on legal strategy, not data entry
-- **Law-school clinics** training students on Chapter 7 petition prep
-- **Self-represented filers** who need a structured walkthrough of the Official Forms
-
-The system asks plain-English questions and assembles the answers into the **official US Bankruptcy Court forms** — no document-template wrestling required.
+- **Bankruptcy clinics** serving low-income clients pro bono — get your students or volunteers productive on day one instead of week three.
+- **Solo and small-firm attorneys** — spend your billable hours on counseling and strategy, not on retyping the same address into fifteen PDFs.
+- **Law-school clinics** training the next generation — students learn the legal logic, not the data-entry mechanics.
+- **Legal-aid organizations** scaling pro-bono Chapter 7 work without scaling staff.
 
 ---
 
-## What it generates
+## What it does
 
-Every filing-ready form an individual Chapter 7 petition needs, completed from the same one-time interview:
+You answer questions. It produces the official US Bankruptcy Court forms. **All of them.**
 
 | Form | What it is |
 |---|---|
 | **B 101** | Voluntary Petition for Individuals Filing for Bankruptcy |
 | **B 106A/B** | Schedule A/B — Property |
-| **B 106C** | Schedule C — The Property You Claim as Exempt |
-| **B 106D** | Schedule D — Creditors Who Have Claims Secured by Property |
-| **B 106E/F** | Schedule E/F — Creditors Who Have Unsecured Claims |
+| **B 106C** | Schedule C — Property You Claim as Exempt |
+| **B 106D** | Schedule D — Secured Creditors |
+| **B 106E/F** | Schedule E/F — Unsecured Creditors |
 | **B 106G** | Schedule G — Executory Contracts and Unexpired Leases |
 | **B 106H** | Schedule H — Your Codebtors |
 | **B 106I** | Schedule I — Your Income |
@@ -46,117 +44,73 @@ Every filing-ready form an individual Chapter 7 petition needs, completed from t
 | **B 107** | Statement of Financial Affairs |
 | **B 108** | Statement of Intention for Individuals |
 | **B 121** | Your Statement About Your Social Security Numbers |
-| **B 122A-1** | Chapter 7 Statement of Your Current Monthly Income (Means Test) |
+| **B 122A-1** | Means Test (Statement of Current Monthly Income) |
 | **B 2030** | Disclosure of Compensation of Attorney for Debtor |
 
-All output as filled, downloadable PDFs at the end of the interview.
+Filled, downloadable, ready to file. The same answer flows into every form that needs it — names, addresses, debts, exemptions, income — without you re-entering anything.
 
 ---
 
-## Key features
+## Why use this
 
-### 🛡 Real validation, where it matters
+### One interview → every form
+Enter the property once. It shows up on Schedule A/B, the exemption claim on Schedule C, the secured-debt entry on Schedule D, the intention on Form 108, and the values on the means test. **No duplicate data entry, ever.**
 
-<video src="videos/02-validation-enforcement.mp4" controls width="720" muted></video>
+### State-specific exemptions built in
+- **Nebraska** — full NE Rev. Stat. exemption table with statutory caps
+- **South Dakota** — full SDCL exemption table with statutory caps
+- The exemption summary screen tracks running totals by statute and **flags any claim that exceeds its cap before you file**.
 
-- Court-format **case-number validation** — rejects invalid formats before they reach a clerk
-- **Address validation** — city must contain letters, ZIP must be 5 or 5+4 digits, state is a verified dropdown
-- **SSN / ITIN format** enforcement (ITIN must start with 9)
+### Means test from current DOJ tables
+No more stale "150% of poverty" calculations. The 122A page uses the actual US Trustee Program median-income thresholds for the debtor's state.
 
-### 📊 Means test from current DOJ tables, not stale poverty lines
+### Cross-section consistency
+The system catches inconsistencies between sections before they become court rejections:
+- Schedule I income vs fee-waiver application
+- Schedule A/B property values vs fee-waiver real-estate page (10% tolerance)
+- Codebtors community-property answer vs SOFA answer
+- ZIP-format consistency on every address
 
-- Hard-coded **US Trustee Program median income** thresholds for Nebraska and South Dakota
-- Family of 3 in NE = **$103,358** (was a buggy **$37,290** that used 150% of the poverty line)
-- Threshold values live in `objects.py` for easy refresh as DOJ publishes new tables
+### Real validation, where it matters
+Case numbers must match court format. Cities must contain letters. ZIP codes must be digits. SSN/ITIN format enforced. State fields are verified dropdowns, not free-text boxes.
 
-### 🔁 Cross-section data consistency
+### No vendor lock-in
+- **Open source** (MIT license) — fork it, audit it, modify it.
+- **Self-hosted** — your client data never leaves your infrastructure.
+- **Standard PDFs out** — filled AcroForm PDFs that any clerk can re-edit.
 
-<video src="videos/03-cross-validation.mp4" controls width="720" muted></video>
+---
 
-- Schedule I income totals reconciled against the fee-waiver application
-- Real-property values cross-checked between Schedule A/B and the fee-waiver page (10% tolerance)
-- Codebtors community-property answer flagged when it disagrees with the SOFA answer
-- ZIP-format consistency check on both primary and mailing addresses
-- All warnings surfaced on the **final review page** before document generation
+## Adopt it
 
-### 🏠 Exemption tracking and overview
+The system is in production use at a Nebraska bankruptcy clinic right now. If you want it running at yours, I do this professionally — let's talk.
 
-- Running totals by statute across **real property, vehicles, household goods, and financial assets**
-- Per-statute caps (NE / SD) loaded from a central table
-- **Exemption summary screen** flags any claim that exceeds its statutory cap, with the dollar overage
+### Services I offer
 
-### 📝 No duplicate data entry
+**Setup & deployment** — Get the docassemble server stood up, the package deployed, integrated with your auth (LDAP / Google / SSO), and behind your domain. Typical timeline: **2–3 weeks** from kickoff.
 
-- Statement of Intention (Form 108) reads from Schedule D — secured-creditor names, property descriptions, and intended actions are not re-collected
-- Schedule C exempt property auto-populated from Schedule A/B selections
-- Codebtors auto-populated from secured creditors with codebtors
-- Fee waiver pre-fills addresses, income totals, and property values from earlier sections
+**Adding your state** — Don't see your jurisdiction in the supported list above? The exemption table is a per-state dictionary in plain Python. I'll research your state's exemption statutes (with attorney verification), build the table, wire it into the dropdowns, and add it to the means-test data. Fixed-fee per state.
 
-### 🎯 Built for the 21st-century clerk's office
+**Custom forms & workflows** — Chapter 11, Chapter 13, business filings, state-specific local forms, jurisdiction-specific cover sheets, intake forms, fee-waiver workflows tailored to your clinic. The architecture is designed to extend.
 
-- Generated PDFs are AcroForm-filled — clerks can re-edit if needed
-- State abbreviations on court forms (NE / SD) regardless of how the interview field captures them
-- Each PDF is downloadable individually or as a bundle
+**Ongoing maintenance** — DOJ refreshes median-income tables roughly every 6 months. Court forms get revised. Federal exemption caps change. I track those changes and roll them out on a maintenance contract so you don't have to.
 
-### ⚖️ Two-state coverage
-
-- **Nebraska** — District of Nebraska, NE Rev. Stat. exemption table
-- **South Dakota** — District of South Dakota, SDCL exemption table
-- Easy to add additional states via the `NEBRASKA_EXEMPTIONS` / `SOUTH_DAKOTA_EXEMPTIONS` dicts in `objects.py`
+**Training** — Walk-throughs for your attorneys, paralegals, and students. Recorded for ongoing onboarding.
 
 ---
 
 ## What it's built on
 
-- **[docassemble](https://docassemble.org/)** — the open-source guided-interview platform
-- **YAML question blocks** for the interview flow (~18 000 lines, structured per form)
-- **Python** for the business logic (means-test math, exemption tracking, cross-validation)
-- **PDF AcroForm filling** for the court forms
-- **Playwright + TypeScript** for ~80 end-to-end tests that exercise the full interview against a live docassemble container
+[**docassemble**](https://docassemble.org/) — the open-source guided-interview platform — drives the question flow. Python handles the business logic (means-test math, exemption tracking, cross-validation). PDF AcroForm filling produces the court forms. A Playwright + TypeScript test suite (~80 end-to-end tests, plus regression tests covering every customer-reported bug) keeps the petition flow trustworthy through every change. ([See the QA detail here.](RESOLVED.html))
 
 ---
 
-## Quality assurance
+## Get started
 
-The repository has a **three-tier test suite**:
+<a id="get-started"></a>
 
-1. **Regression suite** — 26+ tests pinning every customer-reported fix as either a focused E2E recording or a structural YAML assertion.
-2. **Scenario suite** — 5 persona-driven end-to-end interviews (simple single filer, homeowner with car loan, joint couple, complex case, stress test) that drive every section and verify the resulting PDFs field-by-field.
-3. **PDF verification** — 14 dedicated assertions across all forms checking that the user's answers land in the correct AcroForm fields.
+**Alex Clark** &nbsp;·&nbsp; [`alex@metatheria.solutions`](mailto:alex@metatheria.solutions) &nbsp;·&nbsp; [github.com/amsclark](https://github.com/amsclark)
 
-[See the full resolved-issues status page with video evidence →](RESOLVED.html)
+Reach out and tell me about your jurisdiction, your caseload, and what state-specific things you need. I'll get back with a scoping note.
 
----
-
-## Status
-
-🟢 **Active development.** The system is in real use by a bankruptcy clinic in Nebraska. May 2026 saw a comprehensive fix sweep addressing 25 customer-reported issues across navigation, validation, conditional logic, and data-consistency — every fix has video evidence on the [resolved issues page](RESOLVED.html).
-
----
-
-## Try it locally
-
-The interview runs in any modern web browser against a self-hosted docassemble container:
-
-```bash
-docker run -d --name docassemble -p 8080:80 \
-  -e DA_ADMIN_EMAIL=admin@admin.com \
-  -e DA_ADMIN_PASSWORD=password \
-  -e DA_ADMIN_API_KEY=testingkey123 \
-  -e DAHOSTNAME=localhost \
-  jhpyle/docassemble
-
-git clone https://github.com/amsclark/docassemble-BankruptcyClinic
-cd docassemble-BankruptcyClinic
-bash deploy.sh
-```
-
-Open <http://localhost:8080> and start a new interview.
-
----
-
-## Contact
-
-Built by **Alex Clark** — [`alex@metatheria.solutions`](mailto:alex@metatheria.solutions)
-
-Open source, MIT licensed. Issues and pull requests welcome on [GitHub](https://github.com/amsclark/docassemble-BankruptcyClinic).
+If you'd rather kick the tires first, the [GitHub repo](https://github.com/amsclark/docassemble-BankruptcyClinic) has the full quickstart for spinning up a local copy on Docker.
