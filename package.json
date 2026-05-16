@@ -21,7 +21,7 @@
     "test:video-analysis": "playwright test --headed && npm run test:report"
   },
   "devDependencies": {
-    "@playwright/test": "^1.55.0",
+    "@playwright/test": "^1.60.0",
     "@types/node": "^25.6.2",
     "pdf-lib": "^1.17.1",
     "playwright": "^1.55.0",
