@@ -49,8 +49,9 @@ A second clinic review (May 2026) produced a fresh batch of notes. The items bel
 - **Section order** — Secured Creditors, Unsecured Creditors, Contracts & Leases, and Co-signers now come **right after Exemptions** (standard schedule order), instead of after Income/Expenses/SOFA. This also resolves most of the "I couldn't get to those sections" trouble. *(Order pending Lea's confirmation.)*
 - **Leases no longer drop you into the SOFA section** — personal-property leases are gathered in their own Statement-of-Intention step.
 - **Exemptions are no longer re-entered** — claiming an exemption on a property now auto-fills Schedule C, so you're not asked "Do you have any property to claim as exempt?" and made to type everything again.
+- **No more stray "claiming an exemption" prompt** — for less-common items (trusts, copyright/IP, etc.), the second exemption question no longer appears after you've said you have no interest.
 
-> **Still in progress (deliberately deferred for a focused, separately-tested pass):** auto-hiding the second "claiming an exemption" prompt for items where you said you have no interest, and filtering the exemption list to your filing state. Held back so they get their own regression-tested change.
+> **Needs a decision — exemption list by filing state.** Roxanne asked that filing in Nebraska show only Nebraska exemptions. However, a prior fix Lea requested (issue #37) deliberately shows **both** Nebraska and South Dakota citations in every exemption dropdown, and there's a regression test enforcing it. These two requests conflict, so this one is paused pending Lea + Roxanne agreeing on the desired behavior rather than silently overriding the earlier fix.
 
 ---
 
