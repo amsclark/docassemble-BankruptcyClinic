@@ -191,7 +191,26 @@ async function fillRealProperty(page: Page, rp: RealPropertyData, index: number)
   await page.locator(`#${b64(`prop.interests[${index}].ownership_interest`)}`).fill(rp.ownershipInterest);
   await fillYesNoRadio(page, `prop.interests[${index}].is_community_property`, false);
   await page.locator(`#${b64(`prop.interests[${index}].other_info`)}`).fill(rp.otherInfo);
-  await fillYesNoRadio(page, `prop.interests[${index}].is_claiming_exemption`, false);
+  if (rp.claimExemption) {
+    // Claim a full (100%) wildcard exemption inline so we can verify Schedule C
+    // auto-populates without re-asking for the property. Use JS-based radio
+    // setting (selectYesNoRadio) — claiming_sub_100/exemption_laws are revealed
+    // by show-if, so a plain label click can race the reveal.
+    await selectYesNoRadio(page, `prop.interests[${index}].is_claiming_exemption`, true);
+    await page.waitForTimeout(800);
+    await selectYesNoRadio(page, `prop.interests[${index}].claiming_sub_100`, false);
+    await page.waitForTimeout(500);
+    const lawId = b64(`prop.interests[${index}].exemption_laws`);
+    const lawSel = page.locator(`select#${lawId}`);
+    const lawValue = 'Wildcard (Neb. Rev. Stat. § 25-1552)';
+    if (await lawSel.count() > 0) {
+      await lawSel.selectOption(lawValue).catch(() => lawSel.selectOption({ label: lawValue }).catch(() => {}));
+    } else {
+      await page.locator(`#${lawId}`).fill(lawValue).catch(() => {});
+    }
+  } else {
+    await fillYesNoRadio(page, `prop.interests[${index}].is_claiming_exemption`, false);
+  }
 }
 
 async function fillVehicle(page: Page, v: VehicleData, index: number) {
@@ -342,8 +361,14 @@ export async function navigateExemptionSection(page: Page) {
   await selectByName(page, b64('prop.exempt_property.exemption_type'), 'You are claiming federal exemptions.');
   await clickContinue(page);
 
+  // "Do you have any property to claim as exempt?" — this gate is SKIPPED when
+  // exemptions were claimed inline (auto-populated into Schedule C). Only answer
+  // it if it actually appears.
   await waitForDaPageLoad(page);
-  await clickYesNoButton(page, 'prop.exempt_property.properties.there_are_any', false);
+  const exemptGate = page.locator(`[name="${b64('prop.exempt_property.properties.there_are_any')}"]`);
+  if (await exemptGate.count() > 0) {
+    await clickYesNoButton(page, 'prop.exempt_property.properties.there_are_any', false);
+  }
 
   // Homestead exemption question — claim_homestead_exemption is no longer
   // hard-coded to False (Roxanne feedback), so it's now asked here. Answer "No".

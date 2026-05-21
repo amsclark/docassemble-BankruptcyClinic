@@ -34,6 +34,8 @@ export interface RealPropertyData {
   value: string;
   ownershipInterest: string;
   otherInfo: string;
+  /** When true, claim a full (100%) wildcard exemption on this property inline. */
+  claimExemption?: boolean;
 }
 
 export interface VehicleData {
