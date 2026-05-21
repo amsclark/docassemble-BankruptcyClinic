@@ -430,6 +430,24 @@ code: |
   # after Schedule C is gathered.
   exemption_summary_acknowledged
 
+  # ── Creditors, leases & co-signers come right after Exemptions (Roxanne
+  # feedback + standard schedule order A/B, C, D, E/F, G, H). Referencing the
+  # gather()s here pulls those questions to this point; the later
+  # #106D/#106EF/#106G/#106H blocks remain harmless no-ops (gather() is
+  # idempotent) so the save-to-library loop and Reporting code that follow them
+  # still run in place. ORDER: confirm with Lea.
+  creditor_library_seeded
+  creditor_library_picker_done
+  creditor_library_injected
+  prop.creditors.gather()
+  prop.priority_claims.gather()
+  prop.nonpriority_claims.gather()
+  prop.contracts_and_leases.gather()
+  codebtor_auto_populated
+  debtors.community_property
+  if not debtors.community_property:
+    debtors.had_spouse = False
+
   #106I - Income (moved earlier in flow for better UX)
   debtor[0].income.employment
   if debtor[0].income.employment == 'Employed':
@@ -771,9 +789,9 @@ code: |
   reporting.assets_estimate = _assets_total
   reporting.liabilities_estimate = sum(claim.total_claim for claim in prop.priority_claims) + sum(claim.total_claim for claim in prop.nonpriority_claims)
 
-  #106G
+  #106G  (contracts gathered earlier; personal_leases now has its own form_108
+  # step below so it no longer fires during Schedule G — Roxanne feedback)
   prop.contracts_and_leases.gather()
-  personal_leases.gather()
 
   #106H
   codebtor_auto_populated
@@ -782,6 +800,11 @@ code: |
     debtors.had_spouse = False
 
   # 106I and 106J moved earlier in flow (after exemptions, before financial affairs)
+
+  #108 - Statement of Intention: personal property leases. Gathered in its own
+  # form_108 step (not during Schedule G) so listing a lease no longer jumps the
+  # user into the SOFA section (Roxanne feedback).
+  personal_leases.gather()
 
   #122a - Income and means test
   monthly_income.means_type

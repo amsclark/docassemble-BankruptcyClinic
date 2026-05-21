@@ -43,8 +43,14 @@ code: |
     _laws = str(getattr(prop, 'household_goods_exemption_laws', '')) if hasattr(prop, 'household_goods_exemption_laws') else ''
     _auto_entries.append({'description': 'Household goods', 'value': _val, 'exemption': _exemption, 'laws': _laws, 'line': _line})
 
-  # Pre-populate if we have entries and the list hasn't been gathered yet
-  if _auto_entries and defined('prop.exempt_property.properties') and not prop.exempt_property.properties.gathered:
+  # Pre-populate if we have entries and the list hasn't been gathered yet.
+  # NOTE: prop.exempt_property.properties is a lazily-created DAList (objects
+  # block), so it isn't "defined" yet when this runs — the old
+  # `defined(...)` guard meant the auto-fill never fired and the debtor was
+  # asked to re-enter every item (Roxanne feedback). Reference the list directly
+  # (which instantiates it) and gate only on whether it's already been gathered.
+  _already_gathered = defined('prop.exempt_property.properties.gathered') and prop.exempt_property.properties.gathered
+  if _auto_entries and not _already_gathered:
     prop.exempt_property.properties.clear()
     for _entry in _auto_entries:
       _item = prop.exempt_property.properties.appendObject()

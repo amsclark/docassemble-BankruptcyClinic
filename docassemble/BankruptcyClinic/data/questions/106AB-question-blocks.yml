@@ -1759,6 +1759,7 @@ fields:
     show if: prop.financial_assets.has_future_property_interest
   - Claiming Exemption?: prop.financial_assets.future_property_interest_has_claim
     datatype: yesnoradio
+    show if: prop.financial_assets.has_future_property_interest
   - Are you claiming less than 100% of fair market value?: prop.financial_assets.future_property_interest_sub_100
     datatype: yesnoradio
     show if: prop.financial_assets.future_property_interest_has_claim
@@ -1822,6 +1823,7 @@ fields:
     show if: prop.financial_assets.has_ip_interest
   - Claiming Exemption?: prop.financial_assets.ip_interest_has_claim
     datatype: yesnoradio
+    show if: prop.financial_assets.has_ip_interest
   - Are you claiming less than 100% of fair market value?: prop.financial_assets.ip_interest_sub_100
     datatype: yesnoradio
     show if: prop.financial_assets.ip_interest_has_claim
@@ -1884,6 +1886,7 @@ fields:
     show if: prop.financial_assets.has_intangible_interest
   - Claiming Exemption?: prop.financial_assets.intangible_interest_has_claim
     datatype: yesnoradio
+    show if: prop.financial_assets.has_intangible_interest
   - Are you claiming less than 100% of fair market value?: prop.financial_assets.intangible_interest_sub_100
     datatype: yesnoradio
     show if: prop.financial_assets.intangible_interest_has_claim
@@ -2325,6 +2328,7 @@ fields:
     show if: prop.owed_property.has_trust
   - Claiming Exemption?: prop.owed_property.trust_has_claim
     datatype: yesnoradio
+    show if: prop.owed_property.has_trust
   - Are you claiming less than 100% of fair market value?: prop.owed_property.trust_sub_100
     datatype: yesnoradio
     show if: prop.owed_property.trust_has_claim
@@ -2368,6 +2372,7 @@ fields:
     show if: prop.owed_property.has_third_party
   - Claiming Exemption?: prop.owed_property.third_party_has_claim
     datatype: yesnoradio
+    show if: prop.owed_property.has_third_party
   - Are you claiming less than 100% of fair market value?: prop.owed_property.third_party_sub_100
     datatype: yesnoradio
     show if: prop.owed_property.third_party_has_claim
@@ -2409,6 +2414,7 @@ fields:
     show if: prop.owed_property.has_contingent_claims
   - Claiming Exemption?: prop.owed_property.contingent_claims_has_claim
     datatype: yesnoradio
+    show if: prop.owed_property.has_contingent_claims
   - Are you claiming less than 100% of fair market value?: prop.owed_property.contingent_claims_sub_100
     datatype: yesnoradio
     show if: prop.owed_property.contingent_claims_has_claim
@@ -2451,6 +2457,7 @@ fields:
     show if: prop.owed_property.has_other_assets
   - Claiming Exemption?: prop.owed_property.other_assets_has_claim
     datatype: yesnoradio
+    show if: prop.owed_property.has_other_assets
   - Are you claiming less than 100% of fair market value?: prop.owed_property.other_assets_sub_100
     datatype: yesnoradio
     show if: prop.owed_property.other_assets_has_claim

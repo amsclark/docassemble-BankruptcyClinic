@@ -1180,11 +1180,8 @@ async function navigateContractsLeasesMaximalist(page: Page) {
       await clickContinue(page);
     }
   }
-
-  // Personal leases -> No
-  await waitForDaPageLoad(page);
-  console.log('  [contracts] Personal leases: No');
-  await clickYesNoButton(page, 'personal_leases.there_are_any', false);
+  // Personal leases now gather in their own form_108 step (handled later in the
+  // main sequence), not here during Schedule G.
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -1441,20 +1438,8 @@ test.describe('Maximalist End-to-End: Joint Filing with Every Field', () => {
     await navigateExemptionSection(page);
     console.log('  Exemptions complete');
 
-    // ---- Income (both employed, full data) ----
-    log('INCOME');
-    await navigateIncomeMaximalist(page);
-    console.log('  Income complete');
-
-    // ---- Expenses (all optional categories) ----
-    log('EXPENSES');
-    await navigateExpensesMaximalist(page);
-    console.log('  Expenses complete');
-
-    // ---- Financial Affairs (employed=Yes, other_income=Yes, lived_elsewhere=Yes) ----
-    log('FINANCIAL AFFAIRS');
-    await navigateFinancialAffairsMaximalist(page);
-    console.log('  Financial affairs complete');
+    // Creditors / leases / co-signers now come right after Exemptions (Roxanne
+    // feedback — standard schedule order A/B, C, D, E/F, G, H), before income.
 
     // ---- Creditor Library Picker ----
     log('CREDITOR LIBRARY');
@@ -1471,11 +1456,6 @@ test.describe('Maximalist End-to-End: Joint Filing with Every Field', () => {
     await navigateUnsecuredCreditorsMulti(page);
     console.log('  Unsecured creditors complete');
 
-    // ---- Reporting ----
-    log('REPORTING');
-    await navigateReporting(page);
-    console.log('  Reporting complete');
-
     // ---- Contracts & Leases (3) ----
     log('CONTRACTS & LEASES');
     await navigateContractsLeasesMaximalist(page);
@@ -1485,6 +1465,31 @@ test.describe('Maximalist End-to-End: Joint Filing with Every Field', () => {
     log('COMMUNITY PROPERTY');
     await navigateCommunityPropertyMaximalist(page);
     console.log('  Community property complete');
+
+    // ---- Income (both employed, full data) ----
+    log('INCOME');
+    await navigateIncomeMaximalist(page);
+    console.log('  Income complete');
+
+    // ---- Expenses (all optional categories) ----
+    log('EXPENSES');
+    await navigateExpensesMaximalist(page);
+    console.log('  Expenses complete');
+
+    // ---- Financial Affairs (employed=Yes, other_income=Yes, lived_elsewhere=Yes) ----
+    log('FINANCIAL AFFAIRS');
+    await navigateFinancialAffairsMaximalist(page);
+    console.log('  Financial affairs complete');
+
+    // ---- Reporting ----
+    log('REPORTING');
+    await navigateReporting(page);
+    console.log('  Reporting complete');
+
+    // ---- Personal property leases (form 108) — now its own step after SOFA ----
+    log('PERSONAL LEASES');
+    await clickYesNoButton(page, 'personal_leases.there_are_any', false);
+    console.log('  Personal leases complete');
 
     // ---- Means Test (full form, non_consumer_debts=False) ----
     log('MEANS TEST');
