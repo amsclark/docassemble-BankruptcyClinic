@@ -78,11 +78,15 @@ id: exemption_type_selection
 section: schedule_c
 question: |
   Which set of exemptions are you claiming?
-fields: 
+subquestion: |
+  "State exemptions" means the Nebraska or South Dakota exemptions together with
+  the federal *nonbankruptcy* exemptions (11 U.S.C. § 522(b)(3)). "Federal
+  exemptions" means the federal bankruptcy exemption set (11 U.S.C. § 522(b)(2)).
+fields:
   - no label: prop.exempt_property.exemption_type
     choices:
-    - You are claiming state and federal nonbankruptcy exemptions.
-    - You are claiming federal exemptions.
+      - State exemptions: You are claiming state and federal nonbankruptcy exemptions.
+      - Federal exemptions: You are claiming federal exemptions.
 ---
 id: exempt_property_any_exist
 section: schedule_c
