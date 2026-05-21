@@ -13,6 +13,42 @@ If a video doesn't appear inline below, click the link underneath it to download
 
 ---
 
+## ✅ May 2026 — Pro se reviewer (Roxanne) feedback
+
+A second clinic review (May 2026) produced a fresh batch of notes. The items below are fixed, deployed, and covered by automated tests (`tests/roxanne-feedback-fixes.spec.ts`, plus the end-to-end scenario suite for no-regression).
+
+<video src="https://github.com/amsclark/docassemble-BankruptcyClinic/raw/main/docs/videos/roxanne-feedback-2026-05.mp4" controls width="720"></video>
+
+[Download `roxanne-feedback-2026-05.mp4`](https://github.com/amsclark/docassemble-BankruptcyClinic/raw/main/docs/videos/roxanne-feedback-2026-05.mp4)
+
+**Property (Schedule A/B)**
+- **Ownership interest is now a pick-list** — "Describe the nature of your ownership interest" offers Fee Simple, Joint Tenant, Life Estate, Equitable Interest, Future Interest, Tenancy by the Entireties, and Tenants in Common (and still lets you type a custom value).
+- **"Other information about item" is no longer required.**
+- **Vehicles:** "mortgage/loan" reworded to "loan or lien"; the confusing "State" field is relabeled "State where the vehicle is registered or titled" and made optional.
+- **Collectibles** can now claim the household-goods exemption (not just wildcard).
+- **Contingent/unliquidated claims** can claim more than wildcard (e.g. wages for back pay, structured settlement for personal injury). *(Attorney review flagged in code for the per-claim mapping.)*
+- **Farm/Commercial Fishing** question text corrected (it previously read "business related property").
+
+**Exemptions (Schedule C)**
+- **Wildcard citation corrected** to `Neb. Rev. Stat. § 25-1552` — the previous `§ 25-1552(1)(c)` cited a subsection that does not exist (verified against the live Nebraska statute; final wording to be confirmed by the attorneys).
+- **Exemption-set choices relabeled** to "State exemptions" / "Federal exemptions" with a plain-language explanation of the "federal nonbankruptcy" distinction.
+- **Homestead exemption** is now actually asked — the review previously showed "Claiming Homestead Exemption: No" regardless of input, because the value was hard-coded.
+- **Exemption summary now counts full (100%) claims.** It previously reported "No exemptions have been claimed yet" even after you claimed exemptions, because a 100% claim never captured a dollar value; it now falls back to the property's owned value.
+
+**Creditors (Schedules D/E/F)**
+- **Schedule E priority debts are discoverable** — the gate now clearly covers tax debt, child support, and alimony, and the "type of priority claim" picker offers those explicit options (mapped to the correct statutory categories).
+- **The clinic creditor library is seeded** with the IRS and the Nebraska Department of Revenue, and selecting a tax creditor now files it on **Schedule E** (priority) rather than Schedule F. *(Mailing addresses flagged for staff confirmation.)*
+- **Co-signers** — the "Codebtors" section is relabeled "Co-signers (codebtors)" with a clearer explanation.
+
+**Statement of Financial Affairs (Form 107)**
+- **Prior address** — answering "No, I haven't lived elsewhere" no longer demands an address; the address is required only when you say you *did* live elsewhere.
+- **Payments over $600** — the "any other creditors?" prompt now reads "Any other creditors paid over $600 in the past 90 days?"
+- **Charitable contributions** — consolidated to a single value box.
+
+> **Still in progress (deliberately deferred for a focused, separately-tested pass):** re-sequencing the interview so Secured/Unsecured/Leases/Co-signers come immediately after Exemptions (the "order" question Lea is deciding) and moving personal-property leases out of the Schedule G step; pre-filling Schedule C item-by-item so exemptions never have to be re-entered; auto-hiding the second exemption prompt for items with no interest; and filtering the exemption list to the filing state. These rewrite the master interview sequence and are being handled in a dedicated, fully-regression-tested change so they don't destabilize the petition flow.
+
+---
+
 ## ✅ End-to-end walkthroughs (covers most of the petition)
 
 ### Complete petition — start to finish
