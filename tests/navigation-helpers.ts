@@ -754,7 +754,11 @@ export async function navigateUnsecuredCreditors(page: Page, scenario: TestScena
 export async function navigateContractsLeases(page: Page) {
   await waitForDaPageLoad(page);
   await clickYesNoButton(page, 'prop.contracts_and_leases.there_are_any', false);
+}
 
+/** Personal-property leases (Statement of Intention / form 108). Moved out of
+ *  the Schedule G step so it no longer fires during Contracts & Leases. */
+export async function navigatePersonalLeases(page: Page) {
   await waitForDaPageLoad(page);
   await clickYesNoButton(page, 'personal_leases.there_are_any', false);
 }
@@ -1366,15 +1370,19 @@ export async function runFullInterview(page: Page, scenario: TestScenario) {
   log('debtorFinal'); await passDebtorFinal(page);
   log('property'); await navigatePropertySection(page, scenario);
   log('exemptions'); await navigateExemptionSection(page);
-  log('income'); await navigateIncome(page, scenario);
-  log('expenses'); await navigateExpenses(page, scenario.rentExpense);
-  log('financialAffairs'); await navigateFinancialAffairs(page, scenario);
+  // Creditors / leases / co-signers now come right after Exemptions (Roxanne
+  // feedback — standard schedule order A/B, C, D, E/F, G, H), before income.
   log('creditorLibrary'); await navigateCreditorLibraryPicker(page);
   log('securedCreditors'); await navigateSecuredCreditors(page, scenario);
   log('unsecuredCreditors'); await navigateUnsecuredCreditors(page, scenario);
-  log('reporting'); await navigateReporting(page);
   log('contractsLeases'); await navigateContractsLeases(page);
   log('communityProperty'); await navigateCommunityProperty(page);
+  log('income'); await navigateIncome(page, scenario);
+  log('expenses'); await navigateExpenses(page, scenario.rentExpense);
+  log('financialAffairs'); await navigateFinancialAffairs(page, scenario);
+  log('reporting'); await navigateReporting(page);
+  // Personal-property leases (form 108) now gather in their own step, after SOFA.
+  log('personalLeases'); await navigatePersonalLeases(page);
   log('meansTest'); await navigateMeansTest(page);
   log('caseDetails'); await navigateCaseDetails(page);
   log('business'); await navigateBusiness(page);
