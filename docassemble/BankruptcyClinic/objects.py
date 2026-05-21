@@ -296,8 +296,18 @@ def compute_exemption_totals(prop, debtor_state):
         is_claiming = getattr(item, attr_prefix + 'is_claiming_exemption', False)
         if not is_claiming:
             return
+        # When the debtor claims a FULL (100%) exemption, no explicit
+        # exemption_value is captured (that field only shows when claiming less
+        # than 100%). Fall back to the property's owned value so the claim still
+        # counts in the running totals — otherwise the summary wrongly reported
+        # "No exemptions have been claimed yet" (Roxanne feedback).
+        sub_100 = getattr(item, attr_prefix + 'claiming_sub_100', False)
+        full_value = getattr(item, attr_prefix + 'current_owned_value',
+                             getattr(item, attr_prefix + 'current_value', 0))
         law1 = getattr(item, attr_prefix + 'exemption_laws', '')
         val1 = getattr(item, attr_prefix + 'exemption_value', 0)
+        if law1 and not val1 and not sub_100:
+            val1 = full_value
         if law1 and val1:
             claimed_by_law[law1] = claimed_by_law.get(law1, 0) + _safe_float(val1)
 
@@ -320,12 +330,16 @@ def compute_exemption_totals(prop, debtor_state):
     if getattr(prop, 'household_goods_is_claiming_exemption', False):
         law1 = getattr(prop, 'household_goods_exemption_laws', '')
         val1 = getattr(prop, 'household_goods_exemption_value', 0)
+        if law1 and not val1 and not getattr(prop, 'household_goods_claiming_sub_100', False):
+            val1 = getattr(prop, 'household_goods_value', 0)
         if law1 and val1:
             claimed_by_law[law1] = claimed_by_law.get(law1, 0) + _safe_float(val1)
 
     if getattr(prop, 'secured_household_goods_is_claiming_exemption', False):
         law1 = getattr(prop, 'secured_household_goods_exemption_laws', '')
         val1 = getattr(prop, 'secured_household_goods_exemption_value', 0)
+        if law1 and not val1 and not getattr(prop, 'secured_household_goods_claiming_sub_100', False):
+            val1 = getattr(prop, 'secured_household_goods_value', 0)
         if law1 and val1:
             claimed_by_law[law1] = claimed_by_law.get(law1, 0) + _safe_float(val1)
 
