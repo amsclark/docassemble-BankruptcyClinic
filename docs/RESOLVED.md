@@ -45,7 +45,12 @@ A second clinic review (May 2026) produced a fresh batch of notes. The items bel
 - **Payments over $600** — the "any other creditors?" prompt now reads "Any other creditors paid over $600 in the past 90 days?"
 - **Charitable contributions** — consolidated to a single value box.
 
-> **Still in progress (deliberately deferred for a focused, separately-tested pass):** re-sequencing the interview so Secured/Unsecured/Leases/Co-signers come immediately after Exemptions (the "order" question Lea is deciding) and moving personal-property leases out of the Schedule G step; pre-filling Schedule C item-by-item so exemptions never have to be re-entered; auto-hiding the second exemption prompt for items with no interest; and filtering the exemption list to the filing state. These rewrite the master interview sequence and are being handled in a dedicated, fully-regression-tested change so they don't destabilize the petition flow.
+*Navigation & flow (second change set)*
+- **Section order** — Secured Creditors, Unsecured Creditors, Contracts & Leases, and Co-signers now come **right after Exemptions** (standard schedule order), instead of after Income/Expenses/SOFA. This also resolves most of the "I couldn't get to those sections" trouble. *(Order pending Lea's confirmation.)*
+- **Leases no longer drop you into the SOFA section** — personal-property leases are gathered in their own Statement-of-Intention step.
+- **Exemptions are no longer re-entered** — claiming an exemption on a property now auto-fills Schedule C, so you're not asked "Do you have any property to claim as exempt?" and made to type everything again.
+
+> **Still in progress (deliberately deferred for a focused, separately-tested pass):** auto-hiding the second "claiming an exemption" prompt for items where you said you have no interest, and filtering the exemption list to your filing state. Held back so they get their own regression-tested change.
 
 ---
 
