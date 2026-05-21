@@ -6,9 +6,17 @@ subquestion: |
   Be as complete and accurate as possible. If two married people are filing together, both are equally responsible for supplying correct information.
 validation code: |
   if financial_affairs.lived_elsewhere:
+    # The address fields are required:False so that answering "No" never blocks
+    # (Roxanne feedback); enforce them here only when the debtor DID live elsewhere.
+    if not str(financial_affairs.address_street_1 or '').strip():
+      validation_error("Please enter the prior street address.", field="financial_affairs.address_street_1")
     city_err = is_valid_city(financial_affairs.address_city_1)
     if city_err is not True:
       validation_error(city_err, field="financial_affairs.address_city_1")
+    if not str(financial_affairs.address_city_1 or '').strip():
+      validation_error("Please enter the city.", field="financial_affairs.address_city_1")
+    if not str(financial_affairs.address_state_1 or '').strip():
+      validation_error("Please choose the state.", field="financial_affairs.address_state_1")
     zip_err = is_valid_zip(financial_affairs.address_zip_1)
     if zip_err is not True:
       validation_error(zip_err, field="financial_affairs.address_zip_1")
@@ -22,17 +30,21 @@ fields:
   - note: Address 1
     show if: financial_affairs.lived_elsewhere
   - Address/PO Box: financial_affairs.address_street_1
+    required: False
     show if: financial_affairs.lived_elsewhere
   - City: financial_affairs.address_city_1
+    required: False
     show if: financial_affairs.lived_elsewhere
   - State: financial_affairs.address_state_1
     input type: dropdown
     code: get_all_us_states()
+    required: False
     show if: financial_affairs.lived_elsewhere
   - Zip: financial_affairs.address_zip_1
     datatype: text
     minlength: 5
     maxlength: 5
+    required: False
     show if: financial_affairs.lived_elsewhere
   - note: Dates you lived there
     show if: financial_affairs.lived_elsewhere
@@ -1045,7 +1057,7 @@ yesno: financial_affairs.consumer_debt_payments.there_are_any
 ---
 id: consumer_debt_additional_creditors
 question: |
-  Any other creditors you would like to add?
+  Any other creditors paid over $600 in the past 90 days?
 yesno: financial_affairs.consumer_debt_payments.there_is_another
 under: |
   ${ consumer_debts_table }
@@ -1458,14 +1470,8 @@ fields:
   - no label: financial_affairs.charity_date_1
     input type: area
     show if: financial_affairs.has_charity
-  - note: Values
-    show if: financial_affairs.has_charity
-  - no label: financial_affairs.charity_value_1
+  - Value of the gift or contribution: financial_affairs.charity_value_1
     datatype: currency
-    show if: financial_affairs.has_charity
-  - no label: financial_affairs.charity_value_2
-    datatype: currency
-    required: False
     show if: financial_affairs.has_charity
 ---
 question: |
@@ -2532,7 +2538,7 @@ code: |
     fin['charity1'] = financial_affairs.charity_name
     fin['charity_date1-1'] = financial_affairs.charity_date_1
     fin['charity_amt1-1'] = currency(financial_affairs.charity_value_1)
-    fin['charity_amt2-1'] = currency(financial_affairs.charity_value_2)
+    fin['charity_amt2-1'] = ''
     fin['charity_address1'] = financial_affairs.charity_street
     fin['charity_city1'] = financial_affairs.charity_city
     fin['charity_state1'] = financial_affairs.charity_state

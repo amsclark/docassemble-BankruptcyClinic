@@ -14,13 +14,18 @@ edit:
 id: priority_unsecured_claims_any_exist
 section: schedule_ef
 question: |
-  Do you owe any taxes or owe anyone child support?
+  Do you have any PRIORITY unsecured debts?
+subquestion: |
+  Priority debts are listed on **Schedule E** and include **tax debt**, **child
+  support**, **alimony / spousal support**, and certain other obligations the
+  law treats as priority. You will list ordinary unsecured debts (credit cards,
+  medical bills, etc.) on the next screen.
 yesno: prop.priority_claims.there_are_any
 ---
 id: priority_unsecured_claims_add_another
 section: schedule_ef
 question: |
-  Are there any more creditors that are owed taxes or child support?
+  Do you have any more priority unsecured debts (tax, child support, alimony, etc.)?
 yesno: prop.priority_claims.there_is_another
 under: |
   ${ prop_priority_claims_table }
@@ -67,10 +72,11 @@ fields:
     datatype: yesno
   - Type of priority claim: prop.priority_claims[i].type
     choices:
-      - Domestic support obligations
-      - Taxes and certain other debts you owe the government
-      - Claims for death or personal injury while you were intoxicated
-      - Other
+      - Child support: Domestic support obligations
+      - Alimony / spousal support: Domestic support obligations
+      - Tax debt (federal, state, or local): Taxes and certain other debts you owe the government
+      - Claim for death or personal injury while you were intoxicated: Claims for death or personal injury while you were intoxicated
+      - Other priority debt: Other
   - Specify other unsecured claim type: prop.priority_claims[i].other_type
     required: True
     show if:
@@ -262,7 +268,11 @@ edit:
 id: nonpriority_unsecured_claims_any_exist
 section: schedule_ef
 question: |
-  Do any creditors have nonpriority unsecured claims against you?
+  Do you have any ordinary (nonpriority) unsecured debts?
+subquestion: |
+  These are everyday unsecured debts that are **not** priority debts — for
+  example credit cards, medical bills, personal loans, and most judgments.
+  Almost every filer has at least one. They are listed on **Schedule F**.
 yesno: prop.nonpriority_claims.there_are_any
 ---
 id: nonpriority_unsecured_claims_add_another

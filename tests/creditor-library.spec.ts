@@ -404,7 +404,7 @@ test.describe('Creditor Library – Picker', () => {
     // The picker should show the creditor
     const body = await page.locator('body').textContent();
     expect(body).toContain(TEST_CREDITOR.name);
-    expect(body).toContain('commonly-seen creditors');
+    expect(body).toContain('commonly seen creditors');
 
     // Verify there's at least one labelauty checkbox
     const checkboxLabels = page.locator('label[role="checkbox"]');

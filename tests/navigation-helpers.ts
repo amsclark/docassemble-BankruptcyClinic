@@ -345,6 +345,16 @@ export async function navigateExemptionSection(page: Page) {
   await waitForDaPageLoad(page);
   await clickYesNoButton(page, 'prop.exempt_property.properties.there_are_any', false);
 
+  // Homestead exemption question — claim_homestead_exemption is no longer
+  // hard-coded to False (Roxanne feedback), so it's now asked here. Answer "No".
+  await waitForDaPageLoad(page);
+  const homesteadField = page.locator(`[name="${b64('prop.exempt_property.claim_homestead_exemption')}"]`);
+  if (await homesteadField.count() > 0) {
+    await selectYesNoRadio(page, 'prop.exempt_property.claim_homestead_exemption', false);
+    await page.waitForTimeout(300);
+    await clickContinue(page);
+  }
+
   // Issue #70: exemption_summary_overview screen — running totals + cap warnings.
   // It only has a Continue button, so click through.
   await waitForDaPageLoad(page);

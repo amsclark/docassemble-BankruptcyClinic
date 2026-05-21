@@ -68,15 +68,16 @@ edit:
 id: codebtors_any_exist
 section: schedule_h
 question: |
-  Do you have any codebtors?
+  Do you have any co-signers (codebtors)?
 subquestion: |
-  If you are filing a joint case, do not list either spouse as a codebtor.
+  A co-signer (codebtor) is anyone else who is also legally responsible for a
+  debt you listed. If you are filing a joint case, do not list either spouse.
 yesno: debtors.codebtors.there_are_any
 ---
 id: codebtors_add_another
 section: schedule_h
 question: |
-  Are there any more codebtors?
+  Are there any more co-signers?
 yesno: debtors.codebtors.there_is_another
 under: |
   ${ codebtors_table }
@@ -84,13 +85,13 @@ under: |
 id: codebtor_details
 section: schedule_h
 question: |
-  Tell us about your codebtor
+  Tell us about your co-signer
 subquestion: |
-  Do not include your spouse as a codebtor if your spouse is filing with you.
+  Do not include your spouse as a co-signer if your spouse is filing with you.
 allowed to set:
   - debtors.codebtors[i].complete
 fields:
-  - note: Codebtor Address Information
+  - note: Co-signer Address Information
   - Name: debtors.codebtors[i].name
   - Address/PO Box: debtors.codebtors[i].street
   - City: debtors.codebtors[i].city

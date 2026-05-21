@@ -98,6 +98,55 @@ def get_creditor_choices(creditor_type_filter=None):
     return choices
 
 
+# Priority-claim creditor types (Schedule E). Used by the picker to route a
+# selected library creditor into priority vs. nonpriority claims.
+PRIORITY_CREDITOR_TYPES = (
+    'Domestic support obligations',
+    'Taxes and certain other debts you owe the government',
+    'Claims for death or personal injury while you were intoxicated',
+)
+
+# Default common creditors the clinic almost always needs. Seeded idempotently
+# by name (see seed_default_creditors). ZIP is stored 5-digit to satisfy the
+# claim-entry form; the full ZIP+4 is noted for staff.
+# NOTE: addresses are the standard bankruptcy-notice addresses but SHOULD BE
+# CONFIRMED BY CLINIC STAFF before relying on them.
+DEFAULT_CREDITORS = [
+    {
+        'name': 'Internal Revenue Service',
+        'street': 'Centralized Insolvency Operation, P.O. Box 7346',
+        'city': 'Philadelphia', 'state': 'PA', 'zip': '19101',
+        'type': 'Taxes and certain other debts you owe the government',
+        'notes': 'IRS bankruptcy-notice address (Centralized Insolvency Operation), '
+                 'full ZIP 19101-7346. CONFIRM before filing.',
+    },
+    {
+        'name': 'Nebraska Department of Revenue',
+        'street': 'P.O. Box 94818',
+        'city': 'Lincoln', 'state': 'NE', 'zip': '68509',
+        'type': 'Taxes and certain other debts you owe the government',
+        'notes': 'Nebraska Department of Revenue, full ZIP 68509-4818. CONFIRM before filing.',
+    },
+]
+
+
+def seed_default_creditors():
+    """Idempotently add the clinic's default common creditors (IRS, NE Dept of
+    Revenue) to the shared library. Safe to call repeatedly: a creditor is added
+    only if no existing record has the same (case-insensitive) name, so staff
+    edits to the address are preserved. Returns the number added."""
+    existing = {str(d.get('name', '')).strip().lower()
+                for d in get_all_creditors().values()}
+    added = 0
+    for c in DEFAULT_CREDITORS:
+        if c['name'].strip().lower() in existing:
+            continue
+        add_creditor(c['name'], c['street'], c['city'], c['state'], c['zip'],
+                     c['type'], notes=c.get('notes', ''))
+        added += 1
+    return added
+
+
 def get_creditor_table_data():
     """
     Return a list of dicts for display in a table, with record IDs included.

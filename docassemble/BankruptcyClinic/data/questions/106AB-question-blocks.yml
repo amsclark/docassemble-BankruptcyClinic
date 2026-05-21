@@ -150,10 +150,19 @@ fields:
     datatype: currency
     show if: prop.interests[i].has_loan
   - Describe the nature of your ownership interest: prop.interests[i].ownership_interest
-    input type: area
+    datatype: combobox
+    choices:
+      - Fee Simple
+      - Joint Tenant
+      - Life Estate
+      - Equitable Interest
+      - Future Interest
+      - Tenancy by the Entireties
+      - Tenants in Common
   - Is this community property?: prop.interests[i].is_community_property
     datatype: yesnoradio
   - Other information about item, such as local property identification number: prop.interests[i].other_info
+    required: False
   - Claiming Exemption?: prop.interests[i].is_claiming_exemption
     datatype: yesnoradio
   - Are you claiming less than 100% of fair market value?: prop.interests[i].claiming_sub_100
@@ -287,8 +296,9 @@ fields:
           'At least one of the debtors and another'])
   - Current property value: prop.ab_vehicles[i].current_value
     datatype: currency
-  - State: prop.ab_vehicles[i].state
-  - Do you have a mortgage/loan on the vehicle?: prop.ab_vehicles[i].has_loan
+  - State where the vehicle is registered or titled: prop.ab_vehicles[i].state
+    required: False
+  - Do you have a loan or lien on the vehicle?: prop.ab_vehicles[i].has_loan
     datatype: yesno
   - How much do you owe on the loan?: prop.ab_vehicles[i].current_owed_amount
     datatype: currency
@@ -417,7 +427,7 @@ fields:
           'At least one of the debtors and another'])
   - Current property value: prop.ab_other_vehicles[i].current_value
     datatype: currency
-  - Do you have a mortgage/loan on the vehicle?: prop.ab_other_vehicles[i].has_loan
+  - Do you have a loan or lien on the vehicle?: prop.ab_other_vehicles[i].has_loan
     datatype: yesno
   - How much do you owe on the loan?: prop.ab_other_vehicles[i].current_owed_amount
     datatype: currency
@@ -2410,7 +2420,7 @@ fields:
   - Specific laws that allow exemption: prop.owed_property.contingent_claims_exemption_laws
     choices:
       code: |
-        get_exemption_choices_combined('wildcard_only')
+        get_exemption_choices_combined('contingent_claims')
     show if: prop.owed_property.contingent_claims_has_claim
   - note: Second Exemption
     show if: prop.owed_property.contingent_claims_has_claim
@@ -2421,7 +2431,7 @@ fields:
   - Specific laws that allow exemption: prop.owed_property.contingent_claims_exemption_laws_2
     choices:
       code: |
-        get_exemption_choices_combined('wildcard_only')
+        get_exemption_choices_combined('contingent_claims')
     show if: prop.owed_property.contingent_claims_has_claim
     required: False
 
@@ -2940,7 +2950,7 @@ section: schedule_ab
 question: |
   Do you own or have any legal or equitable interest in any farm- or commercial fishing-related property?
 fields:
-  - Do you own or have any legal or equitable interest in any business related property?: prop.farming_property.has_property
+  - Do you own or have any legal or equitable interest in any farm or commercial fishing related property?: prop.farming_property.has_property
     datatype: yesnoradio
 ---
 section: schedule_ab

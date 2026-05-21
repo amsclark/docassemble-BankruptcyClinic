@@ -46,7 +46,7 @@ NEBRASKA_EXEMPTIONS = {
     'student_loan': 'Student loan (20 U.S.C. § 1095a(d))',
     'social_security': 'Social Security (42 U.S.C. § 407)',
     'va': 'VA Benefits (38 U.S.C. § 5301(a))',
-    'wildcard': 'Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))',
+    'wildcard': 'Wildcard (Neb. Rev. Stat. § 25-1552)',
     'unknown': 'Unknown law',
 }
 
@@ -58,7 +58,7 @@ CATEGORY_KEYS = {
     'vehicle':                  ['motor_vehicle', 'wildcard', 'unknown'],
     'household_goods':          ['household_goods', 'wildcard', 'unknown'],
     'electronics':              ['tools', 'household_goods', 'wildcard', 'unknown'],
-    'collectibles':             ['wildcard', 'unknown'],
+    'collectibles':             ['household_goods', 'wildcard', 'unknown'],
     'hobby_equipment':          ['wildcard', 'unknown'],
     'firearms':                 ['wildcard', 'unknown'],
     'clothes':                  ['clothing', 'personal_property', 'wildcard', 'unknown'],
@@ -80,7 +80,11 @@ CATEGORY_KEYS = {
     'insurance':                ['life_insurance', 'wildcard', 'health_savings', 'unknown'],
     'trust':                    ['structured_settlement', 'wildcard', 'unknown'],
     'third_party':              ['structured_settlement', 'life_insurance', 'wildcard', 'unknown'],
-    'contingent_claims':        ['wildcard', 'unknown'],
+    # Contingent/unliquidated claims can be many things (back pay -> wages,
+    # personal-injury settlement -> structured settlement, benefits, etc.), so
+    # offer more than wildcard. ATTORNEY REVIEW: confirm this list per claim type.
+    'contingent_claims':        ['wildcard', 'wages', 'structured_settlement',
+                                 'public_benefits', 'workers_comp', 'social_security', 'unknown'],
     'other_assets':             ['wildcard', 'unknown'],
     'future_property_interest': ['wildcard', 'unknown'],
     'ip':                       ['wildcard', 'unknown'],
@@ -292,8 +296,18 @@ def compute_exemption_totals(prop, debtor_state):
         is_claiming = getattr(item, attr_prefix + 'is_claiming_exemption', False)
         if not is_claiming:
             return
+        # When the debtor claims a FULL (100%) exemption, no explicit
+        # exemption_value is captured (that field only shows when claiming less
+        # than 100%). Fall back to the property's owned value so the claim still
+        # counts in the running totals — otherwise the summary wrongly reported
+        # "No exemptions have been claimed yet" (Roxanne feedback).
+        sub_100 = getattr(item, attr_prefix + 'claiming_sub_100', False)
+        full_value = getattr(item, attr_prefix + 'current_owned_value',
+                             getattr(item, attr_prefix + 'current_value', 0))
         law1 = getattr(item, attr_prefix + 'exemption_laws', '')
         val1 = getattr(item, attr_prefix + 'exemption_value', 0)
+        if law1 and not val1 and not sub_100:
+            val1 = full_value
         if law1 and val1:
             claimed_by_law[law1] = claimed_by_law.get(law1, 0) + _safe_float(val1)
 
@@ -316,12 +330,16 @@ def compute_exemption_totals(prop, debtor_state):
     if getattr(prop, 'household_goods_is_claiming_exemption', False):
         law1 = getattr(prop, 'household_goods_exemption_laws', '')
         val1 = getattr(prop, 'household_goods_exemption_value', 0)
+        if law1 and not val1 and not getattr(prop, 'household_goods_claiming_sub_100', False):
+            val1 = getattr(prop, 'household_goods_value', 0)
         if law1 and val1:
             claimed_by_law[law1] = claimed_by_law.get(law1, 0) + _safe_float(val1)
 
     if getattr(prop, 'secured_household_goods_is_claiming_exemption', False):
         law1 = getattr(prop, 'secured_household_goods_exemption_laws', '')
         val1 = getattr(prop, 'secured_household_goods_exemption_value', 0)
+        if law1 and not val1 and not getattr(prop, 'secured_household_goods_claiming_sub_100', False):
+            val1 = getattr(prop, 'secured_household_goods_value', 0)
         if law1 and val1:
             claimed_by_law[law1] = claimed_by_law.get(law1, 0) + _safe_float(val1)
 
