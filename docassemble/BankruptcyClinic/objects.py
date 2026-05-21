@@ -46,7 +46,7 @@ NEBRASKA_EXEMPTIONS = {
     'student_loan': 'Student loan (20 U.S.C. § 1095a(d))',
     'social_security': 'Social Security (42 U.S.C. § 407)',
     'va': 'VA Benefits (38 U.S.C. § 5301(a))',
-    'wildcard': 'Wildcard (Neb. Rev. Stat. § 25-1552(1)(c))',
+    'wildcard': 'Wildcard (Neb. Rev. Stat. § 25-1552)',
     'unknown': 'Unknown law',
 }
 
@@ -58,7 +58,7 @@ CATEGORY_KEYS = {
     'vehicle':                  ['motor_vehicle', 'wildcard', 'unknown'],
     'household_goods':          ['household_goods', 'wildcard', 'unknown'],
     'electronics':              ['tools', 'household_goods', 'wildcard', 'unknown'],
-    'collectibles':             ['wildcard', 'unknown'],
+    'collectibles':             ['household_goods', 'wildcard', 'unknown'],
     'hobby_equipment':          ['wildcard', 'unknown'],
     'firearms':                 ['wildcard', 'unknown'],
     'clothes':                  ['clothing', 'personal_property', 'wildcard', 'unknown'],
@@ -80,7 +80,11 @@ CATEGORY_KEYS = {
     'insurance':                ['life_insurance', 'wildcard', 'health_savings', 'unknown'],
     'trust':                    ['structured_settlement', 'wildcard', 'unknown'],
     'third_party':              ['structured_settlement', 'life_insurance', 'wildcard', 'unknown'],
-    'contingent_claims':        ['wildcard', 'unknown'],
+    # Contingent/unliquidated claims can be many things (back pay -> wages,
+    # personal-injury settlement -> structured settlement, benefits, etc.), so
+    # offer more than wildcard. ATTORNEY REVIEW: confirm this list per claim type.
+    'contingent_claims':        ['wildcard', 'wages', 'structured_settlement',
+                                 'public_benefits', 'workers_comp', 'social_security', 'unknown'],
     'other_assets':             ['wildcard', 'unknown'],
     'future_property_interest': ['wildcard', 'unknown'],
     'ip':                       ['wildcard', 'unknown'],
