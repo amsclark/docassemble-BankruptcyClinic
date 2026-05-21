@@ -719,6 +719,7 @@ code: |
   financial_affairs.has_statement
 
   # Creditor Library — let users pre-fill from shared list
+  creditor_library_seeded
   creditor_library_picker_done
   creditor_library_injected
 

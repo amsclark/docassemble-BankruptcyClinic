@@ -12,6 +12,12 @@
 #  questions appear.
 # ──────────────────────────────────────────────
 ---
+# Seed the clinic's default common creditors (IRS, Nebraska Dept of Revenue)
+# before the picker renders so they appear in the list. Idempotent by name.
+code: |
+  seed_default_creditors()
+  creditor_library_seeded = True
+---
 # The picker screen — shown once before the creditor-gather sections.
 # It offers checkboxes for every creditor in the library and lets
 # the user pick which ones to pre-load.
@@ -53,29 +59,39 @@ code: |
       _rec_id = int(_sel_id)
       if _rec_id in _all_records:
         _data = _all_records[_rec_id]
-        # Create a new item in the nonpriority claims list
-        _idx = len(prop.nonpriority_claims)
-        prop.nonpriority_claims.appendObject()
-        _claim = prop.nonpriority_claims[_idx]
+        _ctype = _data.get('type', '')
+        if _ctype in PRIORITY_CREDITOR_TYPES:
+          # Priority claim (Schedule E) — e.g. tax debt (IRS / NE Dept of
+          # Revenue), domestic support. Route here, not to nonpriority.
+          _idx = len(prop.priority_claims)
+          prop.priority_claims.appendObject()
+          _claim = prop.priority_claims[_idx]
+          _claim.type = _ctype
+          prop.priority_claims.there_are_any = True
+        else:
+          # Nonpriority claim (Schedule F)
+          _idx = len(prop.nonpriority_claims)
+          prop.nonpriority_claims.appendObject()
+          _claim = prop.nonpriority_claims[_idx]
+          if _ctype in [
+            'Student loans',
+            'Medical',
+            'Credit Card',
+            'Contract',
+            'Other',
+            'Obligations arising out of a separation agreement or divorce that you did not report as priority claims',
+            'Debts to pension or profit-sharing plans, and other similar debts',
+          ]:
+            _claim.type = _ctype
+          else:
+            _claim.type = 'Other'
+            _claim.other_type = _ctype
+        # Common pre-fill (name/address/who) for either list
         _claim.name = _data['name']
         _claim.street = _data.get('street', '')
         _claim.city = _data.get('city', '')
         _claim.state = _data.get('state', '')
         _claim.zip = _data.get('zip', '')
-        if _data.get('type', '') in [
-          'Student loans',
-          'Medical',
-          'Credit Card',
-          'Contract',
-          'Other',
-          'Obligations arising out of a separation agreement or divorce that you did not report as priority claims',
-          'Debts to pension or profit-sharing plans, and other similar debts',
-        ]:
-          _claim.type = _data['type']
-        else:
-          _claim.type = 'Other'
-          _claim.other_type = _data.get('type', '')
-        # Set the "who" field default for individual filing
         _claim.who = 'Debtor 1 only'
         _claim.account_number = _data.get('account_suffix', '')
         _injected_count += 1
