@@ -287,6 +287,12 @@ id: nonpriority_unsecured_claim_details
 section: schedule_ef
 question: |
   Tell the court about a nonpriority unsecured claim
+subquestion: |
+  Nonpriority unsecured debts are everyday debts that aren't backed by
+  collateral and aren't priority debts — for example **credit cards, medical
+  bills, personal loans, and most court judgments**. Almost every filer has at
+  least one. List each creditor you owe below; they appear on **Schedule F**.
+  (If you have none to add, you can continue past this section.)
 allowed to set:
   - prop.nonpriority_claims[i].complete
 fields:
