@@ -1,14 +1,14 @@
 /**
- * Runtime regression test for issue #37.
+ * Runtime test for the exemption dropdowns.
  *
- * The static-analysis spec (exemption-consistency.spec.ts) proves no hardcoded
- * NE-only law lists remain in the YAML. This spec proves the fix actually
- * renders both NE and SD options in the dropdown when the page is loaded.
+ * Clinic decision (supersedes the original issue #37 "show both states"):
+ * exemptions are now restricted to the FILING STATE — a Nebraska filing shows
+ * Nebraska exemptions only, a South Dakota filing shows SD only.
  *
  * Walks a Nebraska debtor through intro → debtor → property → vehicles, lands
- * on the personal-and-household-items page (the page Lea reported as missing
- * SD options), claims an exemption on household goods, and asserts that the
- * exemption-laws dropdown contains both Nebraska and South Dakota citations.
+ * on the personal-and-household-items page, claims an exemption on household
+ * goods, and asserts the exemption-laws dropdown shows Nebraska citations and
+ * NOT South Dakota citations.
  */
 import { test, expect } from '@playwright/test';
 import { LEGACY_NE_MINIMAL } from './fixtures';
@@ -28,7 +28,7 @@ import {
 test.describe('Exemption dropdown runtime (issue #37)', () => {
   test.setTimeout(300_000);
 
-  test('household-goods exemption dropdown shows both NE and SD options', async ({ page }) => {
+  test('household-goods exemption dropdown is restricted to the filing state (NE only)', async ({ page }) => {
     const scenario = LEGACY_NE_MINIMAL;
 
     // intro → district → amendment → debtor identity
@@ -74,12 +74,12 @@ test.describe('Exemption dropdown runtime (issue #37)', () => {
     console.log(`  Dropdown options (${cleaned.length}):`);
     for (const o of cleaned) console.log(`    - ${o}`);
 
-    // The fix means this dropdown should contain both Nebraska and South
-    // Dakota law citations. Before the fix it was NE-only.
+    // Clinic decision: a Nebraska filing shows Nebraska citations and NOT
+    // South Dakota ones (exemptions restricted to the filing state).
     const hasNE = cleaned.some((o) => /Neb\.\s*Rev\.\s*Stat\./i.test(o));
     const hasSD = cleaned.some((o) => /\bSDCL\b/i.test(o));
 
-    expect(hasNE, 'expected at least one Nebraska citation in the dropdown').toBe(true);
-    expect(hasSD, 'expected at least one South Dakota citation in the dropdown — this is the regression Lea reported (#37)').toBe(true);
+    expect(hasNE, 'expected Nebraska citations in the dropdown for a NE filing').toBe(true);
+    expect(hasSD, 'expected NO South Dakota citations for a NE filing (exemptions restricted to filing state)').toBe(false);
   });
 });

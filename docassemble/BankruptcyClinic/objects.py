@@ -200,6 +200,21 @@ def get_exemption_choices_combined(property_type='all'):
                 seen.append(law)
     return seen
 
+
+def get_exemption_choices_or_combined(state, property_type='all'):
+    """
+    If `state` is one of the supported states, return ONLY that state's exemption
+    choices — filing in Nebraska shows Nebraska exemptions, filing in South
+    Dakota shows South Dakota exemptions (Roxanne feedback / clinic decision).
+    If `state` is empty/unknown (district not chosen yet), fall back to the
+    de-duplicated NE+SD union so the dropdown is never empty.
+    """
+    if state:
+        for s in SUPPORTED_STATES:
+            if s.lower() == str(state).lower():
+                return get_exemption_choices(s, property_type)
+    return get_exemption_choices_combined(property_type)
+
 def get_exemption_limits(user_state):
     """
     Returns a dict of exemption category -> dollar limit for the given state.
