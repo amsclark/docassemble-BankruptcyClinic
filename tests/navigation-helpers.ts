@@ -192,22 +192,18 @@ async function fillRealProperty(page: Page, rp: RealPropertyData, index: number)
   await fillYesNoRadio(page, `prop.interests[${index}].is_community_property`, false);
   await page.locator(`#${b64(`prop.interests[${index}].other_info`)}`).fill(rp.otherInfo);
   if (rp.claimExemption) {
-    // Claim a full (100%) wildcard exemption inline so we can verify Schedule C
-    // auto-populates without re-asking for the property. Use JS-based radio
-    // setting (selectYesNoRadio) — claiming_sub_100/exemption_laws are revealed
-    // by show-if, so a plain label click can race the reveal.
-    await selectYesNoRadio(page, `prop.interests[${index}].is_claiming_exemption`, true);
-    await page.waitForTimeout(800);
-    await selectYesNoRadio(page, `prop.interests[${index}].claiming_sub_100`, false);
-    await page.waitForTimeout(500);
-    const lawId = b64(`prop.interests[${index}].exemption_laws`);
-    const lawSel = page.locator(`select#${lawId}`);
+    // Claim an exemption inline: Yes -> pick a law -> enter the amount. The
+    // "<100% of FMV?" question was removed (clinic feedback); the law and amount
+    // are both revealed by is_claiming_exemption, so wait for each before acting.
+    await page.locator(`label[for="${b64(`prop.interests[${index}].is_claiming_exemption`)}_0"]`).click();
+    const lawSel = page.locator(`select#${b64(`prop.interests[${index}].exemption_laws`)}`);
+    await lawSel.waitFor({ state: 'visible', timeout: 15000 });
     const lawValue = 'Wildcard (Neb. Rev. Stat. § 25-1552)';
-    if (await lawSel.count() > 0) {
-      await lawSel.selectOption(lawValue).catch(() => lawSel.selectOption({ label: lawValue }).catch(() => {}));
-    } else {
-      await page.locator(`#${lawId}`).fill(lawValue).catch(() => {});
-    }
+    await lawSel.selectOption({ label: lawValue }).catch(() => lawSel.selectOption(lawValue).catch(() => {}));
+    const amt = page.locator(`#${b64(`prop.interests[${index}].exemption_value`)}`);
+    await amt.waitFor({ state: 'visible', timeout: 15000 });
+    // Full owned value -> 100% / fair-market claim (derived in 106AB).
+    await amt.fill(rp.value || '5000');
   } else {
     await fillYesNoRadio(page, `prop.interests[${index}].is_claiming_exemption`, false);
   }

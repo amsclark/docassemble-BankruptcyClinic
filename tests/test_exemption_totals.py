@@ -14,7 +14,8 @@ Run inside the docassemble container (it needs docassemble.base.util):
       docker exec docassemble /usr/share/docassemble/local3.12/bin/python /tmp/test_exemption_totals.py"
 """
 import types
-from docassemble.BankruptcyClinic.objects import compute_exemption_totals, NEBRASKA_EXEMPTIONS
+from docassemble.BankruptcyClinic.objects import (
+    compute_exemption_totals, NEBRASKA_EXEMPTIONS, claiming_less_than_full)
 
 WILD = NEBRASKA_EXEMPTIONS['wildcard']
 
@@ -55,9 +56,22 @@ def test_citation_has_no_bogus_subsection():
     assert WILD == 'Wildcard (Neb. Rev. Stat. § 25-1552)'
 
 
+def test_claiming_less_than_full_derivation():
+    """The '<100% of FMV' flag is derived: amount < value => partial (True),
+    amount == or > value => 100%/fair-market (False); bad input => False."""
+    assert claiming_less_than_full(1500, 4000) is True      # partial
+    assert claiming_less_than_full(4000, 4000) is False     # exactly 100%
+    assert claiming_less_than_full(5000, 4000) is False     # over -> 100%
+    assert claiming_less_than_full(None, 4000) is False     # no amount
+    assert claiming_less_than_full(1500, None) is False     # no value
+    assert claiming_less_than_full('$1,500', '$4,000') is True   # currency strings
+    assert claiming_less_than_full('bogus', 4000) is False  # unparseable
+
+
 if __name__ == '__main__':
     test_full_claim_counts_owned_value()
     test_partial_claim_uses_explicit_value()
     test_claim_without_law_ignored()
     test_citation_has_no_bogus_subsection()
+    test_claiming_less_than_full_derivation()
     print('OK: all exemption-totals unit tests passed')

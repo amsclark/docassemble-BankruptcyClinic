@@ -215,6 +215,26 @@ def get_exemption_choices_or_combined(state, property_type='all'):
                 return get_exemption_choices(s, property_type)
     return get_exemption_choices_combined(property_type)
 
+
+def claiming_less_than_full(amount, value):
+    """
+    Derive the Schedule C "claiming less than 100% of fair market value" flag.
+
+    The explicit question was removed from the property pages (clinic feedback);
+    instead we infer it: a claimed `amount` strictly less than the item's `value`
+    is a partial (specific-dollar) claim; an amount equal to (or above) the value
+    is a 100%/fair-market claim. Safe by construction — any bad/None input falls
+    back to False (= 100% / fair market, the debtor-favorable default).
+    """
+    try:
+        if amount is None or value is None:
+            return False
+        amt = float(str(amount).replace('$', '').replace(',', ''))
+        val = float(str(value).replace('$', '').replace(',', ''))
+        return amt < val
+    except (TypeError, ValueError):
+        return False
+
 def get_exemption_limits(user_state):
     """
     Returns a dict of exemption category -> dollar limit for the given state.
