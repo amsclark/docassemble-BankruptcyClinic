@@ -53,6 +53,23 @@ A second clinic review (May 2026) produced a fresh batch of notes. The items bel
 
 > **Needs a decision — exemption list by filing state.** Roxanne asked that filing in Nebraska show only Nebraska exemptions. However, a prior fix Lea requested (issue #37) deliberately shows **both** Nebraska and South Dakota citations in every exemption dropdown, and there's a regression test enforcing it. These two requests conflict, so this one is paused pending Lea + Roxanne agreeing on the desired behavior rather than silently overriding the earlier fix.
 
+### Complete walkthrough in the new section order
+
+A full single-filer petition — real estate, a vehicle with a loan, exemptions, creditors, leases, co-signers — run start to finish in the **new** order (creditors right after exemptions), reaching the document-generation page cleanly.
+
+<video src="https://github.com/amsclark/docassemble-BankruptcyClinic/raw/main/docs/videos/roxanne-complete-walkthrough-2026-05.mp4" controls width="720"></video>
+
+[Download `roxanne-complete-walkthrough-2026-05.mp4`](https://github.com/amsclark/docassemble-BankruptcyClinic/raw/main/docs/videos/roxanne-complete-walkthrough-2026-05.mp4)
+
+### Testing & verification
+
+These changes ship with automated tests, and the full suite was run for regressions:
+
+- **New tests:** `tests/roxanne-feedback-fixes.spec.ts` (ownership pick-list, corrected § 25-1552 citation, State/Federal relabel) and `tests/test_exemption_totals.py` (the exemption-summary fix).
+- **No-regression run:** the committed Playwright suite was run **one worker per server across two servers** — so there's no container contention to produce false failures: **111 passed, 7 failed.**
+- **Of the 7 failures:** one was a test that hard-coded the *old* section order (updated in PR #89); the other six are **pre-existing** test-harness limitations — confirmed by running them against the prior release, where they fail identically. **None are caused by these changes.**
+- The end-to-end scenario walkthroughs (single filer, joint couple, homeowner with car loan, amended/complex case) all reach the document-generation page in the new section order.
+
 ---
 
 ## ✅ End-to-end walkthroughs (covers most of the petition)
