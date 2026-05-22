@@ -354,8 +354,14 @@ export async function navigatePropertySection(page: Page, scenario: TestScenario
 
 export async function navigateExemptionSection(page: Page) {
   await waitForDaPageLoad(page);
-  await selectByName(page, b64('prop.exempt_property.exemption_type'), 'You are claiming federal exemptions.');
-  await clickContinue(page);
+  // The "state vs federal exemptions" question was removed — NE/SD opted out of
+  // the federal scheme, so it's defaulted to state exemptions and never asked
+  // (Phil/Roxanne feedback). Only handle it if an old build still shows it.
+  const exemptionTypeField = page.locator(`[name="${b64('prop.exempt_property.exemption_type')}"]`);
+  if (await exemptionTypeField.count() > 0) {
+    await selectByName(page, b64('prop.exempt_property.exemption_type'), 'You are claiming state and federal nonbankruptcy exemptions.');
+    await clickContinue(page);
+  }
 
   // "Do you have any property to claim as exempt?" — this gate is SKIPPED when
   // exemptions were claimed inline (auto-populated into Schedule C). Only answer

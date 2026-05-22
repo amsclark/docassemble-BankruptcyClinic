@@ -143,9 +143,15 @@ fields:
     maxlength: 5
   - County: debtor[i].address.county
     input type: dropdown
-    choices: 
-      - N/A
-    #js enable if: val('debtor[i].address.state')
+    # Server-side choice list of every supported county (NE + SD). This keeps
+    # the dropdown populated and the submitted value valid even after a
+    # validation-error re-render — previously the list was just ["N/A"] and the
+    # JS that filled it on state-change did NOT re-run on re-render, leaving the
+    # field empty so filers were stuck and had to type "N/A" (Phil/Roxanne). The
+    # `check in: update_counties` below still narrows the list to the chosen
+    # state the moment the state changes, for a cleaner pick.
+    code: |
+      ['N/A'] + county_list('Nebraska') + county_list('South Dakota')
     datatype: str
   - field: hidden_county
     input type: hidden
@@ -184,7 +190,12 @@ fields:
         // Handle dynamic county population based on state selection
         $(document).on('daPageLoad', function() {
           var questionPage = document.getElementsByTagName("H1")[0].innerHTML;
-          if (questionPage.includes("Tell the court about")) {
+          // Match this screen's actual heading. It used to read "Tell the court
+          // about" — the title was later changed to "Basic Identity and Contact
+          // Information", which silently disabled county population (so after a
+          // validation error the county dropdown was left empty and the filer
+          // was stuck). Match both, defensively. (Phil/Roxanne, May 2026.)
+          if (questionPage.includes("Basic Identity") || questionPage.includes("Tell the court about")) {
             var stateDropdown = document.getElementById(btoa("debtor[${ i }].address.state").replace(/=/g,""));
             var countyDropdown = document.getElementById(btoa("debtor[${ i }].address.county").replace(/=/g,""));
             var hiddenCountyField = document.getElementById(btoa("hidden_county").replace(/=/g,""));
@@ -250,12 +261,16 @@ validation code: |
     m_zip_err = is_valid_zip(debtor[i].mailing_zip)
     if m_zip_err is not True:
       validation_error(m_zip_err, field="debtor[i].mailing_zip")
-  # SSN / ITIN format
+  # SSN / ITIN format — accept with OR without hyphens (Phil/Roxanne: a missing
+  # hyphen produced a hard error), then normalize to XXX-XX-XXXX for storage.
   if debtor[i].tax_id.tax_id:
-    if not re.match(r'^\d{3}-\d{2}-\d{4}$', debtor[i].tax_id.tax_id):
-      validation_error("Please enter in the format XXX-XX-XXXX (e.g., 123-45-6789).")
-    if debtor[i].tax_id.tax_id_type == 2 and not debtor[i].tax_id.tax_id.startswith('9'):
-      validation_error("ITIN must start with the digit 9.")
+    _digits = re.sub(r'\D', '', debtor[i].tax_id.tax_id)
+    if len(_digits) != 9:
+      validation_error("Please enter a 9-digit number — e.g. 123-45-6789 (hyphens optional).", field="debtor[i].tax_id.tax_id")
+    elif debtor[i].tax_id.tax_id_type == 2 and not _digits.startswith('9'):
+      validation_error("ITIN must start with the digit 9.", field="debtor[i].tax_id.tax_id")
+    else:
+      debtor[i].tax_id.tax_id = _digits[:3] + '-' + _digits[3:5] + '-' + _digits[5:]
 check in: update_counties
 continue button field: debtor_basic_info
 
