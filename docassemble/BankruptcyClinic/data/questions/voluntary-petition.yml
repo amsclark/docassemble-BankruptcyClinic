@@ -441,6 +441,10 @@ code: |
   creditor_library_injected
   prop.creditors.gather()
   prop.priority_claims.gather()
+  # Skip the "do any creditors have nonpriority unsecured claims?" gate and go
+  # straight to the list (clinic decision — virtually every filer has at least
+  # one ordinary unsecured debt).
+  prop.nonpriority_claims.there_are_any = True
   prop.nonpriority_claims.gather()
   prop.contracts_and_leases.gather()
   codebtor_auto_populated
