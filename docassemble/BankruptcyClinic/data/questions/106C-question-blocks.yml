@@ -56,7 +56,11 @@ code: |
       _item = prop.exempt_property.properties.appendObject()
       _item.description = _entry['description']
       _item.value = _entry['value']
-      _item.not_full_exemption = True
+      # "Less than 100% of FMV" is now derived (amount < value) rather than asked.
+      try:
+        _item.not_full_exemption = float(_entry['exemption']) < float(_entry['value'])
+      except Exception:
+        _item.not_full_exemption = False
       _item.exemption = _entry['exemption']
       _item.laws = _entry['laws']
       _item.line = _entry['line']
