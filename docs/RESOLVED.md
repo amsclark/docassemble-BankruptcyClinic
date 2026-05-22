@@ -13,7 +13,7 @@ If a video doesn't appear inline below, click the link underneath it to download
 
 ---
 
-## ✅ May 2026 — Pro se reviewer (Roxanne) feedback
+## ✅ May 2026 — Clinic staff review (Roxanne) feedback
 
 A second clinic review (May 2026) produced a fresh batch of notes. The items below are fixed, deployed, and covered by automated tests (`tests/roxanne-feedback-fixes.spec.ts`, plus the end-to-end scenario suite for no-regression).
 
@@ -51,7 +51,9 @@ A second clinic review (May 2026) produced a fresh batch of notes. The items bel
 - **Exemptions are no longer re-entered** — claiming an exemption on a property now auto-fills Schedule C, so you're not asked "Do you have any property to claim as exempt?" and made to type everything again.
 - **No more stray "claiming an exemption" prompt** — for less-common items (trusts, copyright/IP, etc.), the second exemption question no longer appears after you've said you have no interest.
 
-> **Needs a decision — exemption list by filing state.** Roxanne asked that filing in Nebraska show only Nebraska exemptions. However, a prior fix Lea requested (issue #37) deliberately shows **both** Nebraska and South Dakota citations in every exemption dropdown, and there's a regression test enforcing it. These two requests conflict, so this one is paused pending Lea + Roxanne agreeing on the desired behavior rather than silently overriding the earlier fix.
+- **Exemptions now follow the filing state** — per the clinic's decision, a Nebraska filing shows Nebraska exemptions and a South Dakota filing shows South Dakota exemptions (this supersedes the earlier "show both states" behavior from issue #37).
+- **The "do any creditors have nonpriority unsecured claims?" gate is removed** — the interview goes straight to the unsecured-creditor list.
+- **Filers can save a creditor to the clinic's shared library** from any creditor screen (opt-in).
 
 ### Complete walkthrough in the new section order
 
