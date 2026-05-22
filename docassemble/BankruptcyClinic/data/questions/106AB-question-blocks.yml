@@ -15,6 +15,20 @@ code: |
   else:
     exemption_filing_state = ''
 ---
+code: |
+  # "Are you claiming less than 100% of fair market value?" is no longer asked
+  # on the property pages (clinic feedback — confusing/premature). Derive it from
+  # the entered exemption amount vs. the owned value: amount < owned value means a
+  # partial (specific-dollar) claim; otherwise it's a 100%/fair-market claim.
+  # Safe by construction — never errors; defaults to False (= 100% / fair market).
+  try:
+    prop.interests[i].claiming_sub_100 = (
+      prop.interests[i].exemption_value is not None
+      and float(prop.interests[i].exemption_value) < float(prop.interests[i].current_owned_value)
+    )
+  except Exception:
+    prop.interests[i].claiming_sub_100 = False
+---
 id: schedule_ab_property_intro
 event: property_intro
 section: schedule_ab
@@ -179,29 +193,29 @@ fields:
     required: False
   - Claiming Exemption?: prop.interests[i].is_claiming_exemption
     datatype: yesnoradio
-  - Are you claiming less than 100% of fair market value?: prop.interests[i].claiming_sub_100
-    datatype: yesnoradio
-    show if: prop.interests[i].is_claiming_exemption
   - note: First Exemption
     show if: prop.interests[i].is_claiming_exemption
-  - Value of exemption being claimed: prop.interests[i].exemption_value
-    datatype: currency
-    show if: prop.interests[i].claiming_sub_100
   - Specific laws that allow exemption: prop.interests[i].exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'real_property')
     show if: prop.interests[i].is_claiming_exemption
-  - note: Second Exemption
-    show if: prop.interests[i].is_claiming_exemption
-  - Value of exemption being claimed: prop.interests[i].exemption_value_2
+  - Amount you're claiming as exempt: prop.interests[i].exemption_value
     datatype: currency
-    show if: prop.interests[i].claiming_sub_100
-    required: False
-  - Specific laws that allow exemption: prop.interests[i].exemption_laws_2
+    help: |
+      Enter the value you're claiming as exempt — the full owned value to claim
+      100% of fair market value, or a smaller dollar amount for a partial claim.
+    show if: prop.interests[i].is_claiming_exemption
+  - note: Second exemption (optional — only if a second law also applies)
+    show if: prop.interests[i].is_claiming_exemption
+  - Specific laws that allow exemption (second): prop.interests[i].exemption_laws_2
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state, 'real_property')
+    show if: prop.interests[i].is_claiming_exemption
+    required: False
+  - Amount you're claiming as exempt (second): prop.interests[i].exemption_value_2
+    datatype: currency
     show if: prop.interests[i].is_claiming_exemption
     required: False
 list collect: True
