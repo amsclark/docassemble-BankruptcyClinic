@@ -495,20 +495,30 @@ id: debtor2_other_income_sources
 section: schedule_i
 question: List all other income regularly received
 fields:
+  # These mirror Debtor 1's "other income" screen, where every line is optional
+  # (leave blank if it doesn't apply). They were inadvertently left required for
+  # Debtor 2, forcing entries in every box (Phil/Roxanne feedback).
   - Net income from rental property and from operating a business, profession, or farm: debtor[1].income.net_rental_business
     datatype: currency
+    required: False
   - Interest and dividends: debtor[1].income.interest_and_dividends
     datatype: currency
+    required: False
   - Family support payments that you, a non-filing spouse, or a dependent regularly receive: debtor[1].income.family_support
     datatype: currency
+    required: False
   - Unemployment compensation: debtor[1].income.unemployment
     datatype: currency
+    required: False
   - Social Security: debtor[1].income.social_security
     datatype: currency
+    required: False
   - Other government assistance that you regularly receive: debtor[1].income.other_govt_assist
     datatype: currency
+    required: False
   - Pension or retirement income: debtor[1].income.pension
     datatype: currency
+    required: False
   - Do you have other monthly income?: debtor[1].income.other_monthly_income
     datatype: yesnoradio
   - Specify income type: debtor[1].income.specify_monthly_income

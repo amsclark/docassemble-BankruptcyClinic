@@ -1,0 +1,71 @@
+/**
+ * Identity-screen validation (Phil/Roxanne batch 4, May 2026).
+ *
+ * Two real bugs reported on the "Tell the court about the debtor" screen:
+ *  1. An SSN entered without hyphens produced a hard error.
+ *  2. After ANY validation error on that screen re-rendered the page, the
+ *     County dropdown was wiped to only "N/A" — you couldn't pick a county and
+ *     were stuck (Phil had to type "NA" to get through).
+ *
+ * This test reproduces the bug condition (invalid SSN → re-render) and asserts
+ * the County dropdown still lists the state's counties, then that a hyphen-less
+ * SSN is accepted.
+ */
+import { test, expect } from '@playwright/test';
+import { SIMPLE_SINGLE } from './fixtures';
+import { navigateToDebtorPage } from './navigation-helpers';
+import {
+  b64, waitForDaPageLoad, fillById, selectById, clickById, clickNthByName,
+} from './helpers';
+
+test.describe('Identity screen — SSN + county (batch 4)', () => {
+  test.setTimeout(180_000);
+
+  test('hyphen-less SSN is accepted and county survives a validation re-render', async ({ page }) => {
+    await navigateToDebtorPage(page, SIMPLE_SINGLE);
+    await waitForDaPageLoad(page);
+
+    await fillById(page, b64('debtor[i].name.first'), 'Pat');
+    await fillById(page, b64('debtor[i].name.last'), 'Tester');
+    await fillById(page, b64('debtor[i].address.address'), '123 Main St');
+    await fillById(page, b64('debtor[i].address.city'), 'Omaha');
+    await selectById(page, b64('debtor[i].address.state'), 'Nebraska');
+    await fillById(page, b64('debtor[i].address.zip'), '68102');
+
+    // County is JS/AJAX-populated after the state is chosen.
+    await page.waitForTimeout(1500);
+    const county = page.locator(`#${b64('debtor[i].address.county')}`);
+    expect(await county.locator('option').count(),
+      'counties should populate after choosing a state').toBeGreaterThan(1);
+    await county.selectOption({ label: 'Sarpy County' });
+
+    // SSN type = SSN, then enter an INVALID value to force a validation re-render.
+    await clickById(page, b64('debtor[i].tax_id.tax_id_type') + '_0');
+    await page.waitForTimeout(300);
+    await fillById(page, b64('_field_19'), 'abc');
+    await clickNthByName(page, b64('debtor_basic_info'), 0);
+    await waitForDaPageLoad(page);
+
+    // Still on the identity screen (validation failed) ...
+    const heading1 = (await page.locator('h1').first().textContent().catch(() => '')) ?? '';
+    expect(heading1.toLowerCase()).toContain('basic identity');
+
+    // ... and the county dropdown must still list the NE counties (the bug
+    // collapsed it to just "Select…/N/A"). Wait for repopulation, then assert
+    // a real county is present.
+    const countyAfter = page.locator(`#${b64('debtor[i].address.county')}`);
+    await expect(countyAfter.locator('option', { hasText: 'Sarpy County' }))
+      .toHaveCount(1, { timeout: 10_000 });
+
+    // Re-pick the county (the selection resets on re-render) and provide a
+    // valid SSN WITHOUT hyphens — it should be accepted (normalized server-side).
+    await countyAfter.selectOption({ label: 'Sarpy County' });
+    await fillById(page, b64('_field_19'), '123456789');
+    await clickNthByName(page, b64('debtor_basic_info'), 0);
+    await waitForDaPageLoad(page);
+
+    const heading2 = (await page.locator('h1').first().textContent().catch(() => '')) ?? '';
+    expect(heading2.toLowerCase(),
+      'a hyphen-less SSN should be accepted and advance the interview').not.toContain('basic identity');
+  });
+});

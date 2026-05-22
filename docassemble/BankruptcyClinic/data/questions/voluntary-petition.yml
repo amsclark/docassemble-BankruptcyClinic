@@ -419,7 +419,13 @@ code: |
 
   #106C
   schedule_c_auto_populated
-  prop.exempt_property.exemption_type
+  # Both supported jurisdictions (Nebraska and South Dakota) have opted out of
+  # the federal bankruptcy exemption scheme (11 U.S.C. § 522(b)(2)), so debtors
+  # in these districts must claim the state exemptions (the state + federal
+  # nonbankruptcy set, § 522(b)(3)). The old "state vs federal" question only
+  # confused filers and didn't change behavior — selecting "federal" still
+  # showed the state exemptions (Phil/Roxanne feedback). Default it and skip.
+  prop.exempt_property.exemption_type = 'You are claiming state and federal nonbankruptcy exemptions.'
   prop.exempt_property.properties.gather()
   # Ask the debtor instead of forcing False (Roxanne feedback: the review showed
   # "Claiming Homestead Exemption: No" regardless of input).

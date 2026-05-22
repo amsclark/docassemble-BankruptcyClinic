@@ -1,12 +1,15 @@
 
-// Nebraska exemptions — synced with objects.py get_exemption_limits()
-// Update from: https://www.justice.gov/ust/means-testing
+// Nebraska exemptions — MUST stay in sync with objects.py get_exemption_limits().
+// These are a client-side copy used only for the live per-screen tracker/warning;
+// the authoritative caps (and joint-case stacking) live in objects.py. When you
+// change a dollar limit there (e.g. the § 25-1556 CPI adjustment), change it here
+// too. Update from: https://www.justice.gov/ust/means-testing
 const nebraskaExemptions = {
   homestead: { law: 'Homestead (Neb. Rev. Stat. §§ 40-101 - 40-118)', limit: 120000, amount: 0 },
   homestead_proceeds: { law: 'Homestead, proceeds of sale (Neb. Rev. Stat. § 40-116)', limit: 60000, amount: 0 },
-  motor_vehicle: { law: 'Motor vehicle (Neb. Rev. Stat. § 25-1556(1)(e))', limit: 5000, amount: 0 },
-  household_goods: { law: 'Household goods (Neb. Rev. Stat. § 25-1556(1)(c))', limit: 3000, amount: 0 },
-  tools: { law: 'Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))', limit: 5000, amount: 0 },
+  motor_vehicle: { law: 'Motor vehicle (Neb. Rev. Stat. § 25-1556(1)(e))', limit: 5970, amount: 0 },
+  household_goods: { law: 'Household goods (Neb. Rev. Stat. § 25-1556(1)(c))', limit: 3582, amount: 0 },
+  tools: { law: 'Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))', limit: 5970, amount: 0 },
   health_savings: { law: 'Health savings (Neb. Rev. Stat. § 8-1,131(2)(b))', limit: 25000, amount: 0 },
   life_insurance: { law: 'Life insurance proceeds (Neb. Rev. Stat. § 44-371)', limit: 100000, amount: 0 },
   wildcard: { law: 'Wildcard (Neb. Rev. Stat. § 25-1552)', limit: 5000, amount: 0 },
@@ -198,27 +201,30 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
       // If not claiming exemptions skip check
   if (!isClaimingExemption) {return;}
 
+      // NOTE: these caps are per single debtor and do NOT account for joint-case
+      // stacking (each spouse gets a separate set under 11 U.S.C. § 522(m)).
+      // They are therefore shown as a non-blocking WARNING only — previously they
+      // hard-blocked via setCustomValidity, which stopped legitimate joint claims
+      // (e.g. $5,970 per vehicle) cold (Phil/Roxanne, May 2026). The authoritative,
+      // joint-aware over-cap check lives in the server-side Schedule C summary.
+      function overCapNote(law) {
+        return "Heads up: this may exceed the per-debtor " + law +
+               " cap. If you're filing jointly each spouse has a separate cap — " +
+               "the Exemption Summary will confirm the totals.";
+      }
+
   if (!isCustomExemption && law1Element.value && currentExemptions[law1]) {
         if (parseFloat(currentValue) > currentExemptions[law1].limit && currentExemptions[law1].limit !== 0) {
-          console.log('ERROR OVER LIMIT');
-          flash(currentValue + " is over " + law1 + " limit.", "danger");
-          law1Element.setCustomValidity("Invalid");
-          currentValueElement.setCustomValidity("Invalid");
+          flash(overCapNote(law1), "warning");
         }
       }
 
       if (currentExemptions[law1] && currentExemptions[law1].limit !== 0 && (parseFloat(value1) + currentExemptions[law1].amount) > currentExemptions[law1].limit) {
-        console.log('ERROR VALUE 1 TOO HIGH');
-        flash(value1 + " would exceed limit of " + law1 + ".", "danger");
-        value1Element.setCustomValidity("Invalid");
-        law1Element.setCustomValidity("Invalid");
+        flash(overCapNote(law1), "warning");
       }
 
       if (currentExemptions[law2] && currentExemptions[law2].limit !== 0 && (parseFloat(value2) + currentExemptions[law2].amount) > currentExemptions[law2].limit) {
-        console.log('ERROR VALUE 2 TOO HIGH');
-        flash(value2 + " would exceed limit of " + law2 + ".", "danger");
-        value2Element.setCustomValidity("Invalid");
-        law2Element.setCustomValidity("Invalid");
+        flash(overCapNote(law2), "warning");
       }
 
     }

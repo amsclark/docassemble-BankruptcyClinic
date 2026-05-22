@@ -598,6 +598,7 @@ fields:
     show if: prop.has_household_goods
   - Claiming Exemption?: prop.household_goods_is_claiming_exemption
     datatype: yesnoradio
+    show if: prop.has_household_goods
   - note: Exemption 1
     show if: prop.household_goods_is_claiming_exemption
   - Value of exemption being claimed: prop.household_goods_exemption_value
@@ -633,6 +634,7 @@ fields:
     show if: prop.has_secured_household_goods
   - Claiming Exemption?: prop.secured_household_goods_is_claiming_exemption
     datatype: yesnoradio
+    show if: prop.has_secured_household_goods
   - note: Exemption 1
     show if: prop.secured_household_goods_is_claiming_exemption
   - Value of exemption being claimed: prop.secured_household_goods_exemption_value
@@ -668,6 +670,7 @@ fields:
     show if: prop.has_electronics
   - Claiming Exemption?: prop.electronics_is_claiming_exemption
     datatype: yesnoradio
+    show if: prop.has_electronics
   - note: First Exemption
     show if: prop.electronics_is_claiming_exemption
   - Value of exemption being claimed: prop.electronics_exemption_value
@@ -703,6 +706,7 @@ fields:
     show if: prop.has_collectibles
   - Claiming Exemption?: prop.collectibles_is_claiming_exemption
     datatype: yesnoradio
+    show if: prop.has_collectibles
   - note: First Exemption
     show if: prop.collectibles_is_claiming_exemption
   - Value of exemption being claimed: prop.collectibles_exemption_value
@@ -738,6 +742,7 @@ fields:
     show if: prop.has_hobby_equipment
   - Claiming Exemption?: prop.hobby_equipment_is_claiming_exemption
     datatype: yesnoradio
+    show if: prop.has_hobby_equipment
   - note: First Exemption
     show if: prop.hobby_equipment_is_claiming_exemption
   - Value of exemption being claimed: prop.hobby_equipment_exemption_value
@@ -773,6 +778,7 @@ fields:
     show if: prop.has_firearms
   - Claiming Exemption?: prop.firearms_is_claiming_exemption
     datatype: yesnoradio
+    show if: prop.has_firearms
   - note: First Exemption
     show if: prop.firearms_is_claiming_exemption
   - Value of exemption being claimed: prop.firearms_exemption_value
@@ -808,6 +814,7 @@ fields:
     show if: prop.has_clothes
   - Claiming Exemption?: prop.clothes_is_claiming_exemption
     datatype: yesnoradio
+    show if: prop.has_clothes
   - note: First Exemption
     show if: prop.clothes_is_claiming_exemption
   - Value of exemption being claimed: prop.clothes_exemption_value
@@ -843,6 +850,7 @@ fields:
     show if: prop.has_jewelry
   - Claiming Exemption?: prop.jewelry_is_claiming_exemption
     datatype: yesnoradio
+    show if: prop.has_jewelry
   - note: First Exemption
     show if: prop.jewelry_is_claiming_exemption
   - Value of exemption being claimed: prop.jewelry_exemption_value
@@ -878,6 +886,7 @@ fields:
     show if: prop.has_animals
   - Claiming Exemption?: prop.animal_is_claiming_exemption
     datatype: yesnoradio
+    show if: prop.has_animals
   - note: First Exemption
     show if: prop.animal_is_claiming_exemption
   - Value of exemption being claimed: prop.animal_exemption_value
@@ -913,6 +922,7 @@ fields:
     show if: prop.has_other_household_items
   - Claiming Exemption?: prop.other_household_items_is_claiming_exemption
     datatype: yesnoradio
+    show if: prop.has_other_household_items
   - note: First Exemption
     show if: prop.other_household_items_is_claiming_exemption
   - Value of exemption being claimed: prop.other_household_items_exemption_value
@@ -972,6 +982,7 @@ fields:
     show if: prop.financial_assets.has_cash
   - Claiming Exemption?: prop.financial_assets.cash_is_claiming_exemption
     datatype: yesnoradio
+    show if: prop.financial_assets.has_cash
   - note: First Exemption
     show if: prop.financial_assets.cash_is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.cash_exemption_value
