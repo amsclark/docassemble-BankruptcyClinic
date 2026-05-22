@@ -12,6 +12,13 @@ import {
   passDebtorFinal,
   navigatePropertySection,
   navigateExemptionSection,
+  navigateCreditorLibraryPicker,
+  navigateSecuredCreditors,
+  navigateUnsecuredCreditors,
+  navigateContractsLeases,
+  navigateCommunityProperty,
+  navigateIncome,
+  navigateExpenses,
 } from './navigation-helpers';
 import {
   b64,
@@ -32,6 +39,16 @@ test.describe('GitHub Issue Verification', () => {
     await passDebtorFinal(page);
     await navigatePropertySection(page, scenario);
     await navigateExemptionSection(page);
+    // Creditors/leases/co-signers now come right after Exemptions (reorder),
+    // before income/expenses/SOFA — walk through them (all "No") to reach the
+    // financial-affairs marital/residence page where Issue #11 lives.
+    await navigateCreditorLibraryPicker(page);
+    await navigateSecuredCreditors(page, scenario);
+    await navigateUnsecuredCreditors(page, scenario);
+    await navigateContractsLeases(page);
+    await navigateCommunityProperty(page);
+    await navigateIncome(page, scenario);
+    await navigateExpenses(page, scenario.rentExpense);
 
     // Now on financial affairs marital/residence page
     await waitForDaPageLoad(page);
