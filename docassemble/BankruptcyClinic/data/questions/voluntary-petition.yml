@@ -131,8 +131,7 @@ objects:
   - debtor[i].expenses.dependents: |
       DAList.using(
         object_type=DAObject,
-        complete_attribute='complete',
-        ask_number=True)
+        complete_attribute='complete')
   - debtor[i].ssn_info: |
       DAObject.using(
         complete_attribute='complete')
@@ -361,9 +360,8 @@ code: |
     debtor.target_number = 2
     debtor[0].expenses.joint_case = True
   debtor.gather()
-  # don't do this. causes an infinite loop
-  # debtor[0].expenses.other_household
-  # debtor[0].expenses.dependents.gather()
+  # Dependents are gathered later, in the Schedule J section below — gathering
+  # them here (while debtor itself is still being gathered) caused a seek loop.
   debtor_final
 
 
@@ -631,6 +629,12 @@ code: |
       debtor[1].income.other_monthly_amount = 0
 
   #106J - Expenses
+  # Household composition first: surface the Schedule J "Describe your household"
+  # screen and let the debtor enumerate dependents in the normal flow. Until now
+  # the only place dependents could be added was the fee-waiver application, so a
+  # filer who didn't request a waiver never reached a dependents menu (Roxanne
+  # feedback). Gathered here (not during debtor.gather()) to avoid a seek loop.
+  debtor[0].expenses.dependents.gather()
   debtor[0].expenses.rent_expense
   debtor[0].expenses.real_estate_taxes
   debtor[0].expenses.renters_insurance

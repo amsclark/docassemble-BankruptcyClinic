@@ -847,8 +847,41 @@ export async function navigateIncome(page: Page, scenario: TestScenario) {
 //  EXPENSES (Schedule J)
 // ════════════════════════════════════════════════════════════════════
 
-export async function navigateExpenses(page: Page, rentAmount: string) {
+export async function navigateExpenses(page: Page, rentAmount: string, dependents: number = 0) {
   await waitForDaPageLoad(page);
+
+  // Schedule J now opens with the "Describe your household" screen, where the
+  // debtor declares dependents. Until recently this menu was only reachable
+  // through the fee-waiver application, so a filer who didn't request a waiver
+  // never got to add dependents (Roxanne feedback). It now appears for everyone.
+  const householdGate = page.locator(`[name="${b64('debtor[0].expenses.dependents.there_are_any')}"]`);
+  if (await householdGate.count() > 0) {
+    // "Does debtor 2 live in a separate household?" only renders for joint cases.
+    const otherHousehold = page.locator(`[name="${b64('debtor[0].expenses.other_household')}"]`);
+    if (await otherHousehold.count() > 0) {
+      await selectYesNoRadio(page, 'debtor[0].expenses.other_household', false);
+    }
+    await selectYesNoRadio(page, 'debtor[0].expenses.dependents.there_are_any', dependents > 0);
+    await selectYesNoRadio(page, 'debtor[0].expenses.other_people_expenses', false);
+    await clickContinue(page);
+    await waitForDaPageLoad(page);
+
+    // Enumerate each dependent (relationship / age / lives-with), then the
+    // "Are there any more dependents?" gate (yesno buttons). The detail screen
+    // is a generic-index question, so docassemble renders its field ids with a
+    // literal `[i]` (not the concrete element index) and shows one dependent at
+    // a time — so the same selectors apply on every iteration.
+    for (let k = 0; k < dependents; k++) {
+      await fillById(page, b64('debtor[0].expenses.dependents[i].relationship'), 'Child');
+      await fillById(page, b64('debtor[0].expenses.dependents[i].age'), '10');
+      await selectYesNoRadio(page, 'debtor[0].expenses.dependents[i].same_residence', true);
+      await clickContinue(page);
+      await waitForDaPageLoad(page);
+      await clickYesNoButton(page, 'debtor[0].expenses.dependents.there_is_another', k < dependents - 1);
+      await waitForDaPageLoad(page);
+    }
+  }
+
   await selectYesNoRadio(page, 'debtor[0].expenses.util_other', false);
   await page.waitForTimeout(300);
   await selectYesNoRadio(page, 'debtor[0].expenses.other_insurance', false);
@@ -1395,7 +1428,7 @@ export async function runFullInterview(page: Page, scenario: TestScenario) {
   log('contractsLeases'); await navigateContractsLeases(page);
   log('communityProperty'); await navigateCommunityProperty(page);
   log('income'); await navigateIncome(page, scenario);
-  log('expenses'); await navigateExpenses(page, scenario.rentExpense);
+  log('expenses'); await navigateExpenses(page, scenario.rentExpense, scenario.dependents ?? 0);
   log('financialAffairs'); await navigateFinancialAffairs(page, scenario);
   log('reporting'); await navigateReporting(page);
   // Personal-property leases (form 108) now gather in their own step, after SOFA.

@@ -194,6 +194,12 @@ subquestion: |
   red** — you'll want to revisit the underlying property page and reduce the
   claim, switch to a different exemption (such as Wildcard), or drop it.
 
+  % if exemption_caps_stacked:
+  Because this is a **joint filing**, each debtor is entitled to a separate set
+  of exemptions, so the caps below reflect **both debtors combined** (for
+  example, $240,000 homestead and $11,940 on motor vehicles).
+  % endif
+
   % if exemption_totals_summary:
   <table class="table table-striped">
     <thead>
@@ -242,7 +248,10 @@ continue button field: exemption_summary_acknowledged
 # screen above renders. Uses the existing compute_exemption_totals helper.
 code: |
   _state = debtor[0].address.state if defined('debtor[0].address.state') else 'Nebraska'
-  _totals = compute_exemption_totals(prop, _state)
+  # Joint filings stack exemption caps per debtor (11 U.S.C. § 522(m)).
+  _num_debtors = len(debtor) if defined('debtor.gathered') and debtor.gathered else 1
+  _totals = compute_exemption_totals(prop, _state, _num_debtors)
+  exemption_caps_stacked = _num_debtors > 1
   exemption_totals_summary = {}
   for _law, _info in _totals.items():
     _claimed = _info.get('claimed', 0)

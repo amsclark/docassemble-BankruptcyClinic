@@ -66,7 +66,9 @@ code: |
   # Compute exemption totals from all property items
   import json as _json
   _debtor_state = debtor[0].address.state if defined('debtor[0].address.state') else 'Nebraska'
-  exemption_totals = compute_exemption_totals(prop, _debtor_state)
+  # Joint filings stack exemption caps per debtor (11 U.S.C. § 522(m)).
+  _num_debtors = len(debtor) if defined('debtor.gathered') and debtor.gathered else 1
+  exemption_totals = compute_exemption_totals(prop, _debtor_state, _num_debtors)
   exemption_totals_json = _json.dumps(exemption_totals)
 ---
 features:

@@ -55,6 +55,11 @@ A second clinic review (May 2026) produced a fresh batch of notes. The items bel
 - **The "do any creditors have nonpriority unsecured claims?" gate is removed** — the interview goes straight to the unsecured-creditor list.
 - **Filers can save a creditor to the clinic's shared library** from any creditor screen (opt-in).
 
+*Exemption amounts, joint-filing stacking & dependents (third change set — May 2026)*
+- **Nebraska exemption caps updated to the current (2023 CPI-adjusted) amounts** — motor vehicle and tools of the trade are now **$5,970** (was $5,000) and household goods is **$3,582** (was $3,000), per Neb. Rev. Stat. § 25-1556(2), which adjusts these limits for inflation. *(Source: Roxanne Alhejaj, Legal Aid of Nebraska. The statute re-adjusts in 2028 — flagged in code for annual review.)*
+- **Exemption caps now "stack" for joint filings** — because each debtor in a joint case is entitled to a separate set of exemptions (11 U.S.C. § 522(m)), the Schedule C summary now doubles the cap for a two-debtor case (e.g. **$240,000** homestead and **$11,940** on motor vehicles), with a note explaining why. Single filings are unchanged.
+- **Dependents can be added without requesting a fee waiver** — the "Describe your household / dependents" screen now appears in the normal Schedule J flow for every filer. Previously the only place to enter dependents was inside the fee-waiver application, so a filer who paid the fee never reached a dependents menu.
+
 ### Complete walkthrough in the new section order
 
 A full single-filer petition — real estate, a vehicle with a loan, exemptions, creditors, leases, co-signers — run start to finish in the **new** order (creditors right after exemptions), reaching the document-generation page cleanly.
@@ -67,7 +72,8 @@ A full single-filer petition — real estate, a vehicle with a loan, exemptions,
 
 These changes ship with automated tests, and the full suite was run for regressions:
 
-- **New tests:** `tests/roxanne-feedback-fixes.spec.ts` (ownership pick-list, corrected § 25-1552 citation, State/Federal relabel) and `tests/test_exemption_totals.py` (the exemption-summary fix).
+- **New tests:** `tests/roxanne-feedback-fixes.spec.ts` (ownership pick-list, corrected § 25-1552 citation, State/Federal relabel) and `tests/test_exemption_totals.py` (the exemption-summary fix; extended with the 2023 CPI-adjusted amounts and joint-filing cap stacking).
+- **Third change set verification (amounts / stacking / dependents):** the extended `test_exemption_totals.py` unit tests pass in-container, and the end-to-end **single-filer** and **joint-couple (2 dependents)** scenarios both run start-to-finish to the document-generation page — the joint run exercises both the dependents-enumeration screen and the stacked exemption caps.
 - **No-regression run:** the committed Playwright suite was run **one worker per server across two servers** — so there's no container contention to produce false failures: **111 passed, 7 failed.**
 - **Of the 7 failures:** one was a test that hard-coded the *old* section order (updated in PR #89); the other six are **pre-existing** test-harness limitations — confirmed by running them against the prior release, where they fail identically. **None are caused by these changes.**
 - The end-to-end scenario walkthroughs (single filer, joint couple, homeowner with car loan, amended/complex case) all reach the document-generation page in the new section order.
