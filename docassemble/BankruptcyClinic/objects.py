@@ -270,17 +270,27 @@ def get_exemption_limits(user_state):
         }
     else:
         # Nebraska (default)
+        #
+        # The § 25-1556 personal-property dollar limits are adjusted for
+        # inflation by the Nebraska Department of Revenue every fifth year
+        # beginning with 2023 (Neb. Rev. Stat. § 25-1556(2)). The amounts below
+        # reflect the 2023 adjustment (a uniform +19.4% CPI factor applied to
+        # the statutory base figures): motor vehicle/tools $5,000 -> $5,970 and
+        # household goods $3,000 -> $3,582. Source: Roxanne Alhejaj, Legal Aid
+        # of Nebraska (May 2026). NEXT REVIEW: 2028 adjustment.
+        # Homestead (§ 40-101, $120,000) is a separate statute with no CPI
+        # clause, so it is not adjusted here.
         return {
             'homestead': 120000,
             'homestead_proceeds': 60000,
-            'motor_vehicle': 5000,
-            'household_goods': 3000,
+            'motor_vehicle': 5970,    # § 25-1556(1)(e), 2023 CPI-adjusted
+            'household_goods': 3582,  # § 25-1556(1)(c), 2023 CPI-adjusted
             'wildcard': 5000,
             'clothing': 0,            # Unlimited
             'personal_possessions': 0, # Unlimited
             'health_aids': 0,         # Unlimited
             'health_savings': 25000,
-            'tools': 5000,
+            'tools': 5970,            # § 25-1556(1)(d), 2023 CPI-adjusted
             'retirement': 0,          # Unlimited
             'wages': 0,              # Unlimited (85% protected)
             'public_benefits': 0,     # Unlimited
@@ -295,18 +305,32 @@ def get_exemption_limits(user_state):
         }
 
 
-def compute_exemption_totals(prop, debtor_state):
+def compute_exemption_totals(prop, debtor_state, num_debtors=1):
     """
     Compute running exemption totals from all property items.
 
     Args:
         prop: The prop DAObject containing interests, vehicles, etc.
         debtor_state (str): The debtor's state for looking up limits.
+        num_debtors (int): Number of debtors in the case (1 or 2). In a joint
+            case each debtor is entitled to a full, separate set of exemptions
+            (11 U.S.C. § 522(m)), so the finite statutory caps "stack" — e.g.
+            two Nebraska debtors can together claim $240,000 homestead and
+            $11,940 (2 x $5,970) on motor vehicles. Unlimited caps (0) stay
+            unlimited. Confirmed for homestead + motor vehicle/tools by Roxanne
+            Alhejaj, Legal Aid of Nebraska (May 2026).
 
     Returns:
         dict: {law_string: {'claimed': total_claimed, 'limit': limit_value, 'remaining': remaining}}
     """
-    limits = get_exemption_limits(debtor_state)
+    try:
+        _n = int(num_debtors)
+    except (TypeError, ValueError):
+        _n = 1
+    if _n < 1:
+        _n = 1
+    limits = {cat: (lim * _n if lim and lim > 0 else 0)
+              for cat, lim in get_exemption_limits(debtor_state).items()}
 
     # Map every supported state's law string -> category key. The user can pick
     # any state's law from the unified dropdowns, so the tracker has to recognize
