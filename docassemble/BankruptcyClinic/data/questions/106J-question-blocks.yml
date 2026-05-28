@@ -17,6 +17,7 @@ fields:
   - Does debtor 2 live in a separate household: debtor[0].expenses.other_household
     datatype: yesnoradio
     show if: debtor[0].expenses.joint_case
+    required: False
   - Do you have dependents?: debtor[0].expenses.dependents.there_are_any
     datatype: yesnoradio
   - Do your expenses include expenses of people other than yourself and your dependents?: debtor[0].expenses.other_people_expenses
