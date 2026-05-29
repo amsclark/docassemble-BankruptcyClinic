@@ -13,10 +13,12 @@ fields:
     show if:
       variable: debtor[0].income.employment
       is: Employed
+    required: False
   - Employer Name: debtor[0].income.employer
     show if:
       variable: debtor[0].income.employment
       is: Employed
+    required: False
   - note: Employer Address
     show if:
       variable: debtor[0].income.employment
@@ -25,14 +27,17 @@ fields:
     show if:
       variable: debtor[0].income.employment
       is: Employed
+    required: False
   - City: debtor[0].income.employer_city
     show if:
       variable: debtor[0].income.employment
       is: Employed
+    required: False
   - State: debtor[0].income.employer_state
     show if:
       variable: debtor[0].income.employment
       is: Employed
+    required: False
   - Zip: debtor[0].income.employer_zip
     datatype: text
     minlength: 5
@@ -40,10 +45,12 @@ fields:
     show if:
       variable: debtor[0].income.employment
       is: Employed
+    required: False
   - How long employed there?: debtor[0].income.employment_length
     show if:
       variable: debtor[0].income.employment
       is: Employed
+    required: False
 ---
 id: debtor1_monthly_income_details
 section: schedule_i
@@ -286,10 +293,12 @@ fields:
     show if:
       variable: debtor[1].income.employment
       is: Employed
+    required: False
   - Employer Name: debtor[1].income.employer
     show if:
       variable: debtor[1].income.employment
       is: Employed
+    required: False
   - note: Employer Address
     show if:
       variable: debtor[1].income.employment
@@ -298,14 +307,17 @@ fields:
     show if:
       variable: debtor[1].income.employment
       is: Employed
+    required: False
   - City: debtor[1].income.employer_city
     show if:
       variable: debtor[1].income.employment
       is: Employed
+    required: False
   - State: debtor[1].income.employer_state
     show if:
       variable: debtor[1].income.employment
       is: Employed
+    required: False
   - Zip: debtor[1].income.employer_zip
     datatype: text
     minlength: 5
@@ -313,10 +325,12 @@ fields:
     show if:
       variable: debtor[1].income.employment
       is: Employed
+    required: False
   - How long employed there?: debtor[1].income.employment_length
     show if:
       variable: debtor[1].income.employment
       is: Employed
+    required: False
 ---
 id: debtor2_monthly_income_details
 section: schedule_i
@@ -542,9 +556,11 @@ fields:
     datatype: yesnoradio
   - Specify: debtor[0].income.specify_other_regular_contributions
     show if: debtor[0].income.other_regular_contributions
+    required: False
   - Amount: debtor[0].income.other_regular_contributions_amount
     datatype: currency
     show if: debtor[0].income.other_regular_contributions
+    required: False
   - Do you expect an increase or decrease of income within the year after you file this form?: debtor[0].income.expect_year_delta
     datatype: yesnoradio
   - Explain any changes or other notes: debtor[0].income.year_delta_explain

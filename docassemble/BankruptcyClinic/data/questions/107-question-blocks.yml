@@ -68,6 +68,7 @@ fields:
     show if:
       code: |
         financial_affairs.debtor_count > 1
+    required: False
     hide if:
       variable: financial_affairs.lived_elsewhere
       is: False
@@ -75,6 +76,7 @@ fields:
     show if:
       code: |
         financial_affairs.debtor_count > 1
+    required: False
     hide if:
       variable: financial_affairs.address_same_1
       is: True
@@ -82,6 +84,7 @@ fields:
     show if:
       code: |
         financial_affairs.debtor_count > 1
+    required: False
     hide if:
       variable: financial_affairs.address_same_1
       is: True
@@ -89,6 +92,7 @@ fields:
     show if:
       code: |
         financial_affairs.debtor_count > 1
+    required: False
     hide if:
       variable: financial_affairs.address_same_1
       is: True
@@ -99,6 +103,7 @@ fields:
     show if:
       code: |
         financial_affairs.debtor_count > 1
+    required: False
     hide if:
       variable: financial_affairs.address_same_1
       is: True
@@ -107,6 +112,7 @@ fields:
     show if:
       code: |
         financial_affairs.debtor_count > 1
+    required: False
   - From: financial_affairs.debtor2_address_from_1
     datatype: date
     show if:
@@ -128,6 +134,7 @@ fields:
   - Has second address: financial_affairs.has_second_address
     datatype: yesnoradio
     show if: financial_affairs.lived_elsewhere
+    required: False
   - note: Address 2
     show if: financial_affairs.has_second_address
   - Address/PO Box: financial_affairs.address_street_2
@@ -232,6 +239,7 @@ fields:
   - Do you have a third address?: financial_affairs.has_third_address
     datatype: yesnoradio
     show if: financial_affairs.has_second_address
+    required: False
   - note: Address 3
     show if: financial_affairs.has_third_address
   - Address/PO Box: financial_affairs.address_street_3
@@ -336,6 +344,7 @@ fields:
   - Do you have a fourth address?: financial_affairs.has_fourth_address
     datatype: yesnoradio
     show if: financial_affairs.has_third_address
+    required: False
   - note: Address 4
     show if: financial_affairs.has_fourth_address
   - Address/PO Box: financial_affairs.address_street_4
@@ -440,6 +449,7 @@ fields:
   - Do you have a fifth address?: financial_affairs.has_fifth_address
     datatype: yesnoradio
     show if: financial_affairs.has_fourth_address
+    required: False
   - note: Address 5
     show if: financial_affairs.has_fifth_address
   - Address/PO Box: financial_affairs.address_street_5
@@ -544,6 +554,7 @@ fields:
   - Do you have a sixth address?: financial_affairs.has_sixth_address
     datatype: yesnoradio
     show if: financial_affairs.has_fifth_address
+    required: False
   - note: Address 6
     show if: financial_affairs.has_sixth_address
   - Address/PO Box: financial_affairs.address_street_6
@@ -1099,6 +1110,7 @@ fields:
     show if:
       variable: financial_affairs.consumer_debt_payments[i].payment_for
       is: Other
+    required: False
 ---
 table: insider_payments_table
 rows: financial_affairs.insider_payments
@@ -1356,22 +1368,28 @@ fields:
     datatype: yesnoradio
   - Creditors Name: financial_affairs.refusal_creditor_name
     show if: financial_affairs.has_refusal
+    required: False
   - Address/PO Box: financial_affairs.refusal_creditor_street
     show if: financial_affairs.has_refusal
+    required: False
   - City: financial_affairs.refusal_creditor_city
     show if: financial_affairs.has_refusal
+    required: False
   - State: financial_affairs.refusal_creditor_state
     show if: financial_affairs.has_refusal
+    required: False
   - Zip: financial_affairs.refusal_creditor_zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: financial_affairs.has_refusal
+    required: False
   - note: Describe the action the creditor took
     show if: financial_affairs.has_refusal
   - no label: financial_affairs.refusal_description
     input type: area
     show if: financial_affairs.has_refusal
+    required: False
   - Last 4 digits of account number XXXX-: financial_affairs.refusal_account_number
     show if: financial_affairs.has_refusal
     required: False
@@ -1382,6 +1400,7 @@ fields:
   - Amount: financial_affairs.refusal_amount
     datatype: currency
     show if: financial_affairs.has_refusal
+    required: False
 ---
 question: |
   Property Assignee
@@ -1449,30 +1468,38 @@ fields:
     datatype: yesnoradio
   - Charity name: financial_affairs.charity_name
     show if: financial_affairs.has_charity
+    required: False
   - Address/PO Box: financial_affairs.charity_street
     show if: financial_affairs.has_charity
+    required: False
   - City: financial_affairs.charity_city
     show if: financial_affairs.has_charity
+    required: False
   - State: financial_affairs.charity_state
     show if: financial_affairs.has_charity
+    required: False
   - Zip: financial_affairs.charity_zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: financial_affairs.has_charity
+    required: False
   - note: Describe what you contributed
     show if: financial_affairs.has_charity
   - no label: financial_affairs.charity_description
     input type: area
     show if: financial_affairs.has_charity
+    required: False
   - note: Dates you contributed
     show if: financial_affairs.has_charity
   - no label: financial_affairs.charity_date_1
     input type: area
     show if: financial_affairs.has_charity
+    required: False
   - Value of the gift or contribution: financial_affairs.charity_value_1
     datatype: currency
     show if: financial_affairs.has_charity
+    required: False
 ---
 question: |
   Theft or Disaster Losses
@@ -1570,27 +1597,34 @@ fields:
     datatype: yesnoradio
   - Person who was paid: financial_affairs.creditor_help.name
     show if: financial_affairs.has_creditor_help
+    required: False
   - Address/PO Box: financial_affairs.creditor_help.street
     show if: financial_affairs.has_creditor_help
+    required: False
   - City: financial_affairs.creditor_help.city
     show if: financial_affairs.has_creditor_help
+    required: False
   - State: financial_affairs.creditor_help.state
     show if: financial_affairs.has_creditor_help
+    required: False
   - Zip: financial_affairs.creditor_help.zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: financial_affairs.has_creditor_help
+    required: False
   - note: Description and value of any property transferred
     show if: financial_affairs.has_creditor_help
   - no label: financial_affairs.creditor_help.property_description
     input type: area
     show if: financial_affairs.has_creditor_help
+    required: False
   - note: Date payment or transfer was made
     show if: financial_affairs.has_creditor_help
   - no label: financial_affairs.creditor_help.date_1
     datatype: date
     show if: financial_affairs.has_creditor_help
+    required: False
   - no label: financial_affairs.creditor_help.date_2
     datatype: date
     required: False
@@ -1600,6 +1634,7 @@ fields:
   - no label: financial_affairs.creditor_help.value_1
     datatype: currency
     show if: financial_affairs.has_creditor_help
+    required: False
   - no label: financial_affairs.creditor_help.value_2
     datatype: currency
     required: False
@@ -1661,14 +1696,17 @@ fields:
   - Name of trust: financial_affairs.self_settled_trust.name
     input type: area
     show if: financial_affairs.has_self_settled_trust
+    required: False
   - note: Description and value of the property transferred
     show if: financial_affairs.has_self_settled_trust
   - no label: financial_affairs.self_settled_trust.description
     input type: area
     show if: financial_affairs.has_self_settled_trust
+    required: False
   - Date transfer was made: financial_affairs.self_settled_trust.date
     datatype: date
     show if: financial_affairs.has_self_settled_trust
+    required: False
 ---
 table: instruments_table
 rows: financial_affairs.instruments
@@ -1722,6 +1760,7 @@ fields:
     show if:
       variable: financial_affairs.instruments[i].account_type
       is: Other
+    required: False
   - note: Date account was closed, sold, moved, or transferred
   - no label: financial_affairs.instruments[i].date
     input type: area
@@ -1738,17 +1777,22 @@ fields:
     datatype: yesnoradio
   - Name of financial institution: financial_affairs.deposit_box.name
     show if: financial_affairs.has_deposit_box
+    required: False
   - Address/PO Box: financial_affairs.deposit_box.street
     show if: financial_affairs.has_deposit_box
+    required: False
   - City: financial_affairs.deposit_box.city
     show if: financial_affairs.has_deposit_box
+    required: False
   - State: financial_affairs.deposit_box.state
     show if: financial_affairs.has_deposit_box
+    required: False
   - Zip: financial_affairs.deposit_box.zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: financial_affairs.has_deposit_box
+    required: False
   - note: Who else had access to it?
     show if: financial_affairs.has_deposit_box
   - Name: financial_affairs.deposit_box.other_name
@@ -1774,9 +1818,11 @@ fields:
   - no label: financial_affairs.deposit_box.contents
     input type: area
     show if: financial_affairs.has_deposit_box
+    required: False
   - Do you still have it?: financial_affairs.deposit_box.still_owns
     datatype: yesnoradio
     show if: financial_affairs.has_deposit_box
+    required: False
 ---
 question: |
   Storage Unit
@@ -1787,17 +1833,22 @@ fields:
     datatype: yesnoradio
   - Name of storage facility: financial_affairs.storage_unit.name
     show if: financial_affairs.has_storage_unit
+    required: False
   - Address/PO Box: financial_affairs.storage_unit.street
     show if: financial_affairs.has_storage_unit
+    required: False
   - City: financial_affairs.storage_unit.city
     show if: financial_affairs.has_storage_unit
+    required: False
   - State: financial_affairs.storage_unit.state
     show if: financial_affairs.has_storage_unit
+    required: False
   - Zip: financial_affairs.storage_unit.zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: financial_affairs.has_storage_unit
+    required: False
   - note: Who else had access to it?
     show if: financial_affairs.has_storage_unit
   - Name: financial_affairs.storage_unit.other_name
@@ -1823,9 +1874,11 @@ fields:
   - no label: financial_affairs.storage_unit.contents
     input type: area
     show if: financial_affairs.has_storage_unit
+    required: False
   - Do you still have it?: financial_affairs.storage_unit.still_owns
     datatype: yesnoradio
     show if: financial_affairs.has_storage_unit
+    required: False
 ---
 question: |
   Borrowed Property
@@ -1836,38 +1889,49 @@ fields:
     datatype: yesnoradio
   - Owner's name: financial_affairs.held_property.name
     show if: financial_affairs.has_held_property
+    required: False
   - Address/PO Box: financial_affairs.held_property.street
     show if: financial_affairs.has_held_property
+    required: False
   - City: financial_affairs.held_property.city
     show if: financial_affairs.has_held_property
+    required: False
   - State: financial_affairs.held_property.state
     show if: financial_affairs.has_held_property
+    required: False
   - Zip: financial_affairs.held_property.zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: financial_affairs.has_held_property
+    required: False
   - note: Where is the property?
     show if: financial_affairs.has_held_property
   - Address/PO Box: financial_affairs.held_property.prop_street
     show if: financial_affairs.has_held_property
+    required: False
   - City: financial_affairs.held_property.prop_city
     show if: financial_affairs.has_held_property
+    required: False
   - State: financial_affairs.held_property.prop_state
     show if: financial_affairs.has_held_property
+    required: False
   - Zip: financial_affairs.held_property.prop_zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: financial_affairs.has_held_property
+    required: False
   - note: Describe the property
     show if: financial_affairs.has_held_property
   - no label: financial_affairs.held_property.property_description
     input type: area
     show if: financial_affairs.has_held_property
+    required: False
   - Value: financial_affairs.held_property.value
     datatype: currency
     show if: financial_affairs.has_held_property
+    required: False
 ---
 id: environmental_hazardous_gateway
 question: |
@@ -1896,42 +1960,54 @@ fields:
     datatype: yesnoradio
   - Name of site: financial_affairs.environment.liability_name
     show if: financial_affairs.environment.has_liability
+    required: False
   - Address/PO Box: financial_affairs.environment.liability_street
     show if: financial_affairs.environment.has_liability
+    required: False
   - City: financial_affairs.environment.liability_city
     show if: financial_affairs.environment.has_liability
+    required: False
   - State: financial_affairs.environment.liability_state
     show if: financial_affairs.environment.has_liability
+    required: False
   - Zip: financial_affairs.environment.liability_zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: financial_affairs.environment.has_liability
+    required: False
   - note: Government Unit
     show if: financial_affairs.environment.has_liability
   - Name: financial_affairs.environment.liability_unit_name
     show if: financial_affairs.environment.has_liability
+    required: False
   - Address/PO Box: financial_affairs.environment.liability_unit_street
     show if: financial_affairs.environment.has_liability
+    required: False
   - City: financial_affairs.environment.liability_unit_city
     show if: financial_affairs.environment.has_liability
+    required: False
   - State: financial_affairs.environment.liability_unit_state
     show if: financial_affairs.environment.has_liability
+    required: False
   - Zip: financial_affairs.environment.liability_unit_zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: financial_affairs.environment.has_liability
+    required: False
   - note: Environmental law, if you know it
     show if: financial_affairs.environment.has_liability
   - no label: financial_affairs.environment.liability_law
     input type: area
     show if: financial_affairs.environment.has_liability
+    required: False
   - note: Date of notice
     show if: financial_affairs.environment.has_liability
   - no label: financial_affairs.environment.liability_date
     datatype: date
     show if: financial_affairs.environment.has_liability
+    required: False
 ---
 id: hazardous_material_release
 question: |
@@ -1943,42 +2019,54 @@ fields:
     datatype: yesnoradio
   - Name of site: financial_affairs.environment.release_name
     show if: financial_affairs.environment.has_release
+    required: False
   - Address/PO Box: financial_affairs.environment.release_street
     show if: financial_affairs.environment.has_release
+    required: False
   - City: financial_affairs.environment.release_city
     show if: financial_affairs.environment.has_release
+    required: False
   - State: financial_affairs.environment.release_state
     show if: financial_affairs.environment.has_release
+    required: False
   - Zip: financial_affairs.environment.release_zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: financial_affairs.environment.has_release
+    required: False
   - note: Government Unit
     show if: financial_affairs.environment.has_release
   - Name: financial_affairs.environment.release_unit_name
     show if: financial_affairs.environment.has_release
+    required: False
   - Address/PO Box: financial_affairs.environment.release_unit_street
     show if: financial_affairs.environment.has_release
+    required: False
   - City: financial_affairs.environment.release_unit_city
     show if: financial_affairs.environment.has_release
+    required: False
   - State: financial_affairs.environment.release_unit_state
     show if: financial_affairs.environment.has_release
+    required: False
   - Zip: financial_affairs.environment.release_unit_zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: financial_affairs.environment.has_release
+    required: False
   - note: Environmental law, if you know it
     show if: financial_affairs.environment.has_release
   - no label: financial_affairs.environment.release_law
     input type: area
     show if: financial_affairs.environment.has_release
+    required: False
   - note: Date of notice
     show if: financial_affairs.environment.has_release
   - no label: financial_affairs.environment.release_date
     datatype: date
     show if: financial_affairs.environment.has_release
+    required: False
 ---
 id: environmental_judicial_proceeding
 question: |
@@ -1991,35 +2079,44 @@ fields:
   - Case title: financial_affairs.environment.proceeding_case_title
     input type: area
     show if: financial_affairs.environment.has_proceeding
+    required: False
   - Case number: financial_affairs.environment.proceeding_case_number
     datatype: string
     show if: financial_affairs.environment.has_proceeding
+    required: False
   - note: Court or agency
     show if: financial_affairs.environment.has_proceeding
   - Court Name: financial_affairs.environment.proceeding_court_name
     show if: financial_affairs.environment.has_proceeding
+    required: False
   - Address/PO Box: financial_affairs.environment.proceeding_court_street
     show if: financial_affairs.environment.has_proceeding
+    required: False
   - City: financial_affairs.environment.proceeding_court_city
     show if: financial_affairs.environment.has_proceeding
+    required: False
   - State: financial_affairs.environment.proceeding_court_state
     show if: financial_affairs.environment.has_proceeding
+    required: False
   - Zip: financial_affairs.environment.proceeding_court_zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: financial_affairs.environment.has_proceeding
+    required: False
   - note: Nature of the case
     show if: financial_affairs.environment.has_proceeding
   - no label: financial_affairs.environment.proceeding_description
     input type: area
     show if: financial_affairs.environment.has_proceeding
+    required: False
   - Status of the case: financial_affairs.environment.proceeding_status
     choices:
       - Pending
       - On appeal
       - Concluded
     show if: financial_affairs.environment.has_proceeding
+    required: False
 ---
 id: business_connections
 question: |
@@ -2097,17 +2194,22 @@ fields:
     datatype: yesnoradio
   - Name: financial_affairs.statement_name
     show if: financial_affairs.has_statement
+    required: False
   - Address/PO Box: financial_affairs.statement_street
     show if: financial_affairs.has_statement
+    required: False
   - City: financial_affairs.statement_city
     show if: financial_affairs.has_statement
+    required: False
   - State: financial_affairs.statement_state
     show if: financial_affairs.has_statement
+    required: False
   - Zip: financial_affairs.statement_zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: financial_affairs.has_statement
+    required: False
   - note: Date issued
     show if: financial_affairs.has_statement
   - no label: financial_affairs.statement_date

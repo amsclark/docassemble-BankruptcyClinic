@@ -47,18 +47,22 @@ fields:
     show if:
       variable: prop.contracts_and_leases[i].has_codebtor
       is: True
+    required: False
   - Address/PO Box: prop.contracts_and_leases[i].codebtor_street
     show if:
       variable: prop.contracts_and_leases[i].has_codebtor
       is: True
+    required: False
   - City: prop.contracts_and_leases[i].codebtor_city
     show if:
       variable: prop.contracts_and_leases[i].has_codebtor
       is: True
+    required: False
   - State: prop.contracts_and_leases[i].codebtor_state
     show if:
       variable: prop.contracts_and_leases[i].has_codebtor
       is: True
+    required: False
   - Zip: prop.contracts_and_leases[i].codebtor_zip
     datatype: text
     minlength: 5
@@ -66,11 +70,13 @@ fields:
     show if:
       variable: prop.contracts_and_leases[i].has_codebtor
       is: True
+    required: False
   - Is this an unexpired lease?: prop.contracts_and_leases[i].unexpired_lease
     datatype: yesnoradio
   - Will the lease be assumed?: prop.contracts_and_leases[i].lease_assumed
     datatype: yesnoradio
     show if: prop.contracts_and_leases[i].unexpired_lease
+    required: False
 list collect: True
 ---
 id: schedule_g_review

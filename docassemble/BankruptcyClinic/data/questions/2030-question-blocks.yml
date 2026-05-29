@@ -77,7 +77,7 @@ fields:
     show if:
       variable: attorney_disclosure.source_paid
       is: other
-    required: True
+    required: False
 section: attorney_disc
 ---
 id: compensation_source_future
@@ -95,7 +95,7 @@ fields:
     show if:
       variable: attorney_disclosure.source_topay
       is: other
-    required: True
+    required: False
 section: attorney_disc
 ---
 id: fee_sharing

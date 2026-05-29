@@ -155,6 +155,7 @@ fields:
       - Other
   - Other property type: prop.interests[i].other_type
     show if: prop.interests[i].type["Other"]
+    required: False
   - Who has an interest in the property?: prop.interests[i].who
     input type: radio
     choices:
@@ -173,6 +174,7 @@ fields:
   - How much do you owe on the loan?: prop.interests[i].current_owed_amount
     datatype: currency
     show if: prop.interests[i].has_loan
+    required: False
   - Describe the nature of your ownership interest: prop.interests[i].ownership_interest
     datatype: combobox
     choices:
@@ -196,12 +198,14 @@ fields:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'real_property')
     show if: prop.interests[i].is_claiming_exemption
+    required: False
   - Amount you're claiming as exempt: prop.interests[i].exemption_value
     datatype: currency
     help: |
       Enter the value you're claiming as exempt — the full owned value to claim
       100% of fair market value, or a smaller dollar amount for a partial claim.
     show if: prop.interests[i].is_claiming_exemption
+    required: False
   - note: Second exemption (optional — only if a second law also applies)
     show if: prop.interests[i].is_claiming_exemption
   - Specific laws that allow exemption (second): prop.interests[i].exemption_laws_2
@@ -324,6 +328,7 @@ fields:
   - How much do you owe on the loan?: prop.ab_vehicles[i].current_owed_amount
     datatype: currency
     show if: prop.ab_vehicles[i].has_loan
+    required: False
   - Is this community property?: prop.ab_vehicles[i].is_community_property
     datatype: yesnoradio
   - Other information: prop.ab_vehicles[i].other_info
@@ -342,6 +347,7 @@ fields:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'vehicle')
     show if: prop.ab_vehicles[i].is_claiming_exemption
+    required: False
   - note: Second Exemption
     show if: prop.ab_vehicles[i].is_claiming_exemption
   - Value of exemption being claimed: prop.ab_vehicles[i].exemption_value_2
@@ -450,6 +456,7 @@ fields:
   - How much do you owe on the loan?: prop.ab_other_vehicles[i].current_owed_amount
     datatype: currency
     show if: prop.ab_other_vehicles[i].has_loan
+    required: False
   - Is this community property?: prop.ab_other_vehicles[i].is_community_property
     datatype: yesnoradio
   - Claiming Exemption?: prop.ab_other_vehicles[i].is_claiming_exemption
@@ -459,11 +466,13 @@ fields:
   - Value of exemption being claimed: prop.ab_other_vehicles[i].exemption_value
     datatype: currency
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
+    required: False
   - Specific laws that allow exemption: prop.ab_other_vehicles[i].exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'vehicle')
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
+    required: False
   - note: Exemption 2
     show if: prop.ab_other_vehicles[i].is_claiming_exemption
   - Value of exemption being claimed: prop.ab_other_vehicles[i].exemption_value_2
@@ -593,22 +602,27 @@ fields:
   - Describe: prop.household_goods_description
     input type: area
     show if: prop.has_household_goods
+    required: False
   - Total owned value: prop.household_goods_value
     datatype: currency
     show if: prop.has_household_goods
+    required: False
   - Claiming Exemption?: prop.household_goods_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_household_goods
+    required: False
   - note: Exemption 1
     show if: prop.household_goods_is_claiming_exemption
   - Value of exemption being claimed: prop.household_goods_exemption_value
     datatype: currency
     show if: prop.household_goods_is_claiming_exemption
+    required: False
   - Specific laws that allow exemption: prop.household_goods_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'household_goods')
     show if: prop.household_goods_is_claiming_exemption
+    required: False
   - note: Exemption 2
     show if: prop.household_goods_is_claiming_exemption
   - Value of exemption being claimed: prop.household_goods_exemption_value_2
@@ -629,22 +643,27 @@ fields:
   - Describe: prop.secured_household_goods_description
     input type: area
     show if: prop.has_secured_household_goods
+    required: False
   - Total owned value: prop.secured_household_goods_value
     datatype: currency
     show if: prop.has_secured_household_goods
+    required: False
   - Claiming Exemption?: prop.secured_household_goods_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_secured_household_goods
+    required: False
   - note: Exemption 1
     show if: prop.secured_household_goods_is_claiming_exemption
   - Value of exemption being claimed: prop.secured_household_goods_exemption_value
     datatype: currency
     show if: prop.secured_household_goods_is_claiming_exemption
+    required: False
   - Specific laws that allow exemption: prop.secured_household_goods_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'household_goods')
     show if: prop.secured_household_goods_is_claiming_exemption
+    required: False
   - note: Exemption 2
     show if: prop.secured_household_goods_is_claiming_exemption
   - Value of exemption being claimed: prop.secured_household_goods_exemption_value_2
@@ -665,22 +684,27 @@ fields:
   - Describe: prop.electronics_description
     input type: area
     show if: prop.has_electronics
+    required: False
   - Total owned value: prop.electronics_value
     datatype: currency
     show if: prop.has_electronics
+    required: False
   - Claiming Exemption?: prop.electronics_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_electronics
+    required: False
   - note: First Exemption
     show if: prop.electronics_is_claiming_exemption
   - Value of exemption being claimed: prop.electronics_exemption_value
     datatype: currency
     show if: prop.electronics_is_claiming_exemption
+    required: False
   - Specific laws that allow exemption: prop.electronics_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'electronics')
     show if: prop.electronics_is_claiming_exemption
+    required: False
   - note: Second Exemption
     show if: prop.electronics_is_claiming_exemption
   - Value of exemption being claimed: prop.electronics_exemption_value_2
@@ -701,22 +725,27 @@ fields:
   - Describe: prop.collectibles_description
     input type: area
     show if: prop.has_collectibles
+    required: False
   - Total owned value: prop.collectibles_value
     datatype: currency
     show if: prop.has_collectibles
+    required: False
   - Claiming Exemption?: prop.collectibles_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_collectibles
+    required: False
   - note: First Exemption
     show if: prop.collectibles_is_claiming_exemption
   - Value of exemption being claimed: prop.collectibles_exemption_value
     datatype: currency
     show if: prop.collectibles_is_claiming_exemption
+    required: False
   - Specific laws that allow exemption: prop.collectibles_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.collectibles_is_claiming_exemption
+    required: False
   - note: Second Exemption
     show if: prop.collectibles_is_claiming_exemption
   - Value of exemption being claimed: prop.collectibles_exemption_value_2
@@ -737,22 +766,27 @@ fields:
   - Describe: prop.hobby_equipment_description
     input type: area
     show if: prop.has_hobby_equipment
+    required: False
   - Total owned value: prop.hobby_equipment_value
     datatype: currency
     show if: prop.has_hobby_equipment
+    required: False
   - Claiming Exemption?: prop.hobby_equipment_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_hobby_equipment
+    required: False
   - note: First Exemption
     show if: prop.hobby_equipment_is_claiming_exemption
   - Value of exemption being claimed: prop.hobby_equipment_exemption_value
     datatype: currency
     show if: prop.hobby_equipment_is_claiming_exemption
+    required: False
   - Specific laws that allow exemption: prop.hobby_equipment_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.hobby_equipment_is_claiming_exemption
+    required: False
   - note: Second Exemption
     show if: prop.hobby_equipment_is_claiming_exemption
   - Value of exemption being claimed: prop.hobby_equipment_exemption_value_2
@@ -773,22 +807,27 @@ fields:
   - Describe: prop.firearms_description
     input type: area
     show if: prop.has_firearms
+    required: False
   - Total owned value: prop.firearms_value
     datatype: currency
     show if: prop.has_firearms
+    required: False
   - Claiming Exemption?: prop.firearms_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_firearms
+    required: False
   - note: First Exemption
     show if: prop.firearms_is_claiming_exemption
   - Value of exemption being claimed: prop.firearms_exemption_value
     datatype: currency
     show if: prop.firearms_is_claiming_exemption
+    required: False
   - Specific laws that allow exemption: prop.firearms_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.firearms_is_claiming_exemption
+    required: False
   - note: Second Exemption
     show if: prop.firearms_is_claiming_exemption
   - Value of exemption being claimed: prop.firearms_exemption_value_2
@@ -809,22 +848,27 @@ fields:
   - Describe: prop.clothes_description
     input type: area
     show if: prop.has_clothes
+    required: False
   - Total owned value: prop.clothes_value
     datatype: currency
     show if: prop.has_clothes
+    required: False
   - Claiming Exemption?: prop.clothes_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_clothes
+    required: False
   - note: First Exemption
     show if: prop.clothes_is_claiming_exemption
   - Value of exemption being claimed: prop.clothes_exemption_value
     datatype: currency
     show if: prop.clothes_is_claiming_exemption
+    required: False
   - Specific laws that allow exemption: prop.clothes_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'clothes')
     show if: prop.clothes_is_claiming_exemption
+    required: False
   - note: Second Exemption
     show if: prop.clothes_is_claiming_exemption
   - Value of exemption being claimed: prop.clothes_exemption_value_2
@@ -845,22 +889,27 @@ fields:
   - Describe: prop.jewelry_description
     input type: area
     show if: prop.has_jewelry
+    required: False
   - Total owned value: prop.jewelry_value
     datatype: currency
     show if: prop.has_jewelry
+    required: False
   - Claiming Exemption?: prop.jewelry_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_jewelry
+    required: False
   - note: First Exemption
     show if: prop.jewelry_is_claiming_exemption
   - Value of exemption being claimed: prop.jewelry_exemption_value
     datatype: currency
     show if: prop.jewelry_is_claiming_exemption
+    required: False
   - Specific laws that allow exemption: prop.jewelry_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'jewelry')
     show if: prop.jewelry_is_claiming_exemption
+    required: False
   - note: Second Exemption
     show if: prop.jewelry_is_claiming_exemption
   - Value of exemption being claimed: prop.jewelry_exemption_value_2
@@ -881,22 +930,27 @@ fields:
   - Describe: prop.animal_description
     input type: area
     show if: prop.has_animals
+    required: False
   - Total owned value: prop.animal_value
     datatype: currency
     show if: prop.has_animals
+    required: False
   - Claiming Exemption?: prop.animal_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_animals
+    required: False
   - note: First Exemption
     show if: prop.animal_is_claiming_exemption
   - Value of exemption being claimed: prop.animal_exemption_value
     datatype: currency
     show if: prop.animal_is_claiming_exemption
+    required: False
   - Specific laws that allow exemption: prop.animal_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.animal_is_claiming_exemption
+    required: False
   - note: Second Exemption
     show if: prop.animal_is_claiming_exemption
   - Value of exemption being claimed: prop.animal_exemption_value_2
@@ -917,22 +971,27 @@ fields:
   - Describe: prop.other_household_items_description
     input type: area
     show if: prop.has_other_household_items
+    required: False
   - Total owned value: prop.other_household_items_value
     datatype: currency
     show if: prop.has_other_household_items
+    required: False
   - Claiming Exemption?: prop.other_household_items_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_other_household_items
+    required: False
   - note: First Exemption
     show if: prop.other_household_items_is_claiming_exemption
   - Value of exemption being claimed: prop.other_household_items_exemption_value
     datatype: currency
     show if: prop.other_household_items_is_claiming_exemption
+    required: False
   - Specific laws that allow exemption: prop.other_household_items_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'other_household_items')
     show if: prop.other_household_items_is_claiming_exemption
+    required: False
   - note: Second Exemption
     show if: prop.other_household_items_is_claiming_exemption
   - Value of exemption being claimed: prop.other_household_items_exemption_value_2
@@ -980,19 +1039,23 @@ fields:
   - Total value: prop.financial_assets.cash_value
     datatype: currency
     show if: prop.financial_assets.has_cash
+    required: False
   - Claiming Exemption?: prop.financial_assets.cash_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.financial_assets.has_cash
+    required: False
   - note: First Exemption
     show if: prop.financial_assets.cash_is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.cash_exemption_value
     datatype: currency
     show if: prop.financial_assets.cash_is_claiming_exemption
+    required: False
   - Specific laws that allow exemption: prop.financial_assets.cash_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'cash')
     show if: prop.financial_assets.cash_is_claiming_exemption
+    required: False
   - note: Second Exemption
     show if: prop.financial_assets.cash_is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.cash_exemption_value_2
@@ -1076,11 +1139,13 @@ fields:
   - Value of exemption being claimed: prop.financial_assets.deposits[i].exemption_value
     datatype: currency
     show if: prop.financial_assets.deposits[i].is_claiming_exemption
+    required: False
   - Specific laws that allow exemption: prop.financial_assets.deposits[i].exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.financial_assets.deposits[i].is_claiming_exemption
+    required: False
   - note: Second Exemption
     show if: prop.financial_assets.deposits[i].is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.deposits[i].exemption_value_2
@@ -1157,11 +1222,13 @@ fields:
   - Value of exemption being claimed: prop.financial_assets.bonds_and_stocks[i].exemption_value
     datatype: currency
     show if: prop.financial_assets.bonds_and_stocks[i].is_claiming_exemption
+    required: False
   - Specific laws that allow exemption: prop.financial_assets.bonds_and_stocks[i].exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.financial_assets.bonds_and_stocks[i].is_claiming_exemption
+    required: False
   - note: Second Exemption
     show if: prop.financial_assets.bonds_and_stocks[i].is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.bonds_and_stocks[i].exemption_value_2
@@ -1242,11 +1309,13 @@ fields:
   - Value of exemption being claimed: prop.financial_assets.non_traded_stock[i].exemption_value
     datatype: currency
     show if: prop.financial_assets.non_traded_stock[i].is_claiming_exemption
+    required: False
   - Specific laws that allow exemption: prop.financial_assets.non_traded_stock[i].exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.financial_assets.non_traded_stock[i].is_claiming_exemption
+    required: False
   - note: Second Exemption
     show if: prop.financial_assets.non_traded_stock[i].is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.non_traded_stock[i].exemption_value_2
@@ -1323,11 +1392,13 @@ fields:
   - Value of exemption being claimed: prop.financial_assets.corporate_bonds[i].exemption_value
     datatype: currency
     show if: prop.financial_assets.corporate_bonds[i].is_claiming_exemption
+    required: False
   - Specific laws that allow exemption: prop.financial_assets.corporate_bonds[i].exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.financial_assets.corporate_bonds[i].is_claiming_exemption
+    required: False
   - note: Second Exemption
     show if: prop.financial_assets.corporate_bonds[i].is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.corporate_bonds[i].exemption_value_2
@@ -1415,11 +1486,13 @@ fields:
   - Value of exemption being claimed: prop.financial_assets.retirement_accounts[i].exemption_value
     datatype: currency
     show if: prop.financial_assets.retirement_accounts[i].has_claim
+    required: False
   - Specific laws that allow exemption: prop.financial_assets.retirement_accounts[i].exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'retirement')
     show if: prop.financial_assets.retirement_accounts[i].has_claim
+    required: False
   - note: Second Exemption
     show if: prop.financial_assets.retirement_accounts[i].has_claim
   - Value of exemption being claimed: prop.financial_assets.retirement_accounts[i].exemption_value_2
@@ -1510,11 +1583,13 @@ fields:
   - Value of exemption being claimed: prop.financial_assets.prepayments[i].exemption_value
     datatype: currency
     show if: prop.financial_assets.prepayments[i].has_claim
+    required: False
   - Specific laws that allow exemption: prop.financial_assets.prepayments[i].exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.financial_assets.prepayments[i].has_claim
+    required: False
   - note: Second Exemption
     show if: prop.financial_assets.prepayments[i].has_claim
   - Value of exemption being claimed: prop.financial_assets.prepayments[i].exemption_value_2
@@ -1592,11 +1667,13 @@ fields:
   - Value of exemption being claimed: prop.financial_assets.annuities[i].exemption_value
     datatype: currency
     show if: prop.financial_assets.annuities[i].has_claim
+    required: False
   - Specific laws that allow exemption: prop.financial_assets.annuities[i].exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wages')
     show if: prop.financial_assets.annuities[i].has_claim
+    required: False
   - note: Second Exemption
     show if: prop.financial_assets.annuities[i].has_claim
   - Value of exemption being claimed: prop.financial_assets.annuities[i].exemption_value_2
@@ -1674,11 +1751,13 @@ fields:
   - Value of exemption being claimed: prop.financial_assets.edu_accounts[i].exemption_value
     datatype: currency
     show if: prop.financial_assets.edu_accounts[i].has_claim
+    required: False
   - Specific laws that allow exemption: prop.financial_assets.edu_accounts[i].exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'edu_accounts')
     show if: prop.financial_assets.edu_accounts[i].has_claim
+    required: False
   - note: Second Exemption
     show if: prop.financial_assets.edu_accounts[i].has_claim
   - Value of exemption being claimed: prop.financial_assets.edu_accounts[i].exemption_value_2
@@ -1723,22 +1802,27 @@ fields:
   - Describe interest: prop.financial_assets.future_property_interest_description
     input type: area
     show if: prop.financial_assets.has_future_property_interest
+    required: False
   - Interest value: prop.financial_assets.future_property_interest_value
     datatype: currency
     show if: prop.financial_assets.has_future_property_interest
+    required: False
   - Claiming Exemption?: prop.financial_assets.future_property_interest_has_claim
     datatype: yesnoradio
     show if: prop.financial_assets.has_future_property_interest
+    required: False
   - note: First Exemption
     show if: prop.financial_assets.future_property_interest_has_claim
   - Value of exemption being claimed: prop.financial_assets.future_property_interest_exemption_value
     datatype: currency
     show if: prop.financial_assets.future_property_interest_has_claim
+    required: False
   - Specific laws that allow exemption: prop.financial_assets.future_property_interest_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.financial_assets.future_property_interest_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.financial_assets.future_property_interest_has_claim
   - Value of exemption being claimed: prop.financial_assets.future_property_interest_exemption_value_2
@@ -1784,22 +1868,27 @@ fields:
   - Describe IP: prop.financial_assets.ip_interest_description
     input type: area
     show if: prop.financial_assets.has_ip_interest
+    required: False
   - IP value: prop.financial_assets.ip_interest_value
     datatype: currency
     show if: prop.financial_assets.has_ip_interest
+    required: False
   - Claiming Exemption?: prop.financial_assets.ip_interest_has_claim
     datatype: yesnoradio
     show if: prop.financial_assets.has_ip_interest
+    required: False
   - note: First Exemption
     show if: prop.financial_assets.ip_interest_has_claim
   - Value of exemption being claimed: prop.financial_assets.ip_interest_exemption_value
     datatype: currency
     show if: prop.financial_assets.ip_interest_has_claim
+    required: False
   - Specific laws that allow exemption: prop.financial_assets.ip_interest_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.financial_assets.ip_interest_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.financial_assets.ip_interest_has_claim
   - Value of exemption being claimed: prop.financial_assets.ip_interest_exemption_value_2
@@ -1844,22 +1933,27 @@ fields:
   - Describe interest: prop.financial_assets.intangible_interest_description
     input type: area
     show if: prop.financial_assets.has_intangible_interest
+    required: False
   - Interest value: prop.financial_assets.intangible_interest_value
     datatype: currency
     show if: prop.financial_assets.has_intangible_interest
+    required: False
   - Claiming Exemption?: prop.financial_assets.intangible_interest_has_claim
     datatype: yesnoradio
     show if: prop.financial_assets.has_intangible_interest
+    required: False
   - note: First Exemption
     show if: prop.financial_assets.intangible_interest_has_claim
   - Value of exemption being claimed: prop.financial_assets.intangible_interest_exemption_value
     datatype: currency
     show if: prop.financial_assets.intangible_interest_has_claim
+    required: False
   - Specific laws that allow exemption: prop.financial_assets.intangible_interest_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.financial_assets.intangible_interest_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.financial_assets.intangible_interest_has_claim
   - Value of exemption being claimed: prop.financial_assets.intangible_interest_exemption_value_2
@@ -1995,6 +2089,7 @@ fields:
   - Give specific information about them: prop.owed_property.tax_refund_description
     input type: area
     show if: prop.owed_property.has_tax_refund
+    required: False
   - Federal amount: prop.owed_property.tax_refund_federal
     datatype: currency
     show if: prop.owed_property.has_tax_refund
@@ -2013,12 +2108,14 @@ fields:
     show if: prop.owed_property.tax_refund_has_claim
   - Value of exemption being claimed: prop.owed_property.tax_refund_exemption_value
     show if: prop.owed_property.tax_refund_has_claim
+    required: False
     datatype: currency
   - Specific laws that allow exemption: prop.owed_property.tax_refund_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'tax_refund')
     show if: prop.owed_property.tax_refund_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.owed_property.tax_refund_has_claim
   - Value of exemption being claimed: prop.owed_property.tax_refund_exemption_value_2
@@ -2069,11 +2166,13 @@ fields:
   - Value of exemption being claimed: prop.owed_property.family_support_exemption_value
     datatype: currency
     show if: prop.owed_property.family_support_has_claim
+    required: False
   - Specific laws that allow exemption: prop.owed_property.family_support_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wages')
     show if: prop.owed_property.family_support_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.owed_property.family_support_has_claim
   - Value of exemption being claimed: prop.owed_property.family_support_exemption_value_2
@@ -2109,11 +2208,13 @@ fields:
   - Value of exemption being claimed: prop.owed_property.other_amounts_exemption_value
     datatype: currency
     show if: prop.owed_property.other_amounts_has_claim
+    required: False
   - Specific laws that allow exemption: prop.owed_property.other_amounts_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wages')
     show if: prop.owed_property.other_amounts_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.owed_property.other_amounts_has_claim
   - Value of exemption being claimed: prop.owed_property.other_amounts_exemption_value_2
@@ -2153,11 +2254,13 @@ fields:
   - Value of exemption being claimed: prop.owed_property.first_insurance_interest_exemption_value
     datatype: currency
     show if: prop.owed_property.first_insurance_interest_has_claim
+    required: False
   - Specific laws that allow exemption: prop.owed_property.first_insurance_interest_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'insurance')
     show if: prop.owed_property.first_insurance_interest_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.owed_property.first_insurance_interest_has_claim
   - Value of exemption being claimed: prop.owed_property.first_insurance_interest_exemption_value_2
@@ -2176,6 +2279,7 @@ fields:
   - Has second insurance interest: prop.owed_property.has_second_insurance_interest
     datatype: yesnoradio
     show if: prop.owed_property.has_insurance_interest
+    required: False
   - Institution name: prop.owed_property.second_insurance_interest_name
     required: False
     show if: prop.owed_property.has_second_insurance_interest
@@ -2189,16 +2293,19 @@ fields:
   - Claiming Exemption?: prop.owed_property.second_insurance_interest_has_claim
     datatype: yesnoradio
     show if: prop.owed_property.has_second_insurance_interest
+    required: False
   - note: First Exemption
     show if: prop.owed_property.second_insurance_interest_has_claim
   - Value of exemption being claimed: prop.owed_property.second_insurance_interest_exemption_value
     datatype: currency
     show if: prop.owed_property.second_insurance_interest_has_claim
+    required: False
   - Specific laws that allow exemption: prop.owed_property.second_insurance_interest_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'insurance')
     show if: prop.owed_property.second_insurance_interest_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.owed_property.second_insurance_interest_has_claim
   - Value of exemption being claimed: prop.owed_property.second_insurance_interest_exemption_value_2
@@ -2217,6 +2324,7 @@ fields:
   - Has third insurance interest: prop.owed_property.has_third_insurance_interest
     datatype: yesnoradio
     show if: prop.owed_property.has_insurance_interest
+    required: False
   - Institution name: prop.owed_property.third_insurance_interest_name
     required: False
     show if: prop.owed_property.has_third_insurance_interest
@@ -2230,16 +2338,19 @@ fields:
   - Claiming Exemption?: prop.owed_property.third_insurance_interest_has_claim
     datatype: yesnoradio
     show if: prop.owed_property.has_third_insurance_interest
+    required: False
   - note: First Exemption
     show if: prop.owed_property.third_insurance_interest_has_claim
   - Value of exemption being claimed: prop.owed_property.third_insurance_interest_exemption_value
     datatype: currency
     show if: prop.owed_property.third_insurance_interest_has_claim
+    required: False
   - Specific laws that allow exemption: prop.owed_property.third_insurance_interest_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'insurance')
     show if: prop.owed_property.third_insurance_interest_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.owed_property.third_insurance_interest_has_claim
   - Value of exemption being claimed: prop.owed_property.third_insurance_interest_exemption_value_2
@@ -2271,16 +2382,19 @@ fields:
   - Claiming Exemption?: prop.owed_property.trust_has_claim
     datatype: yesnoradio
     show if: prop.owed_property.has_trust
+    required: False
   - note: First Exemption
     show if: prop.owed_property.trust_has_claim
   - Value of exemption being claimed: prop.owed_property.trust_exemption_value
     datatype: currency
     show if: prop.owed_property.trust_has_claim
+    required: False
   - Specific laws that allow exemption: prop.owed_property.trust_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'trust')
     show if: prop.owed_property.trust_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.owed_property.trust_has_claim
   - Value of exemption being claimed: prop.owed_property.trust_exemption_value_2
@@ -2312,16 +2426,19 @@ fields:
   - Claiming Exemption?: prop.owed_property.third_party_has_claim
     datatype: yesnoradio
     show if: prop.owed_property.has_third_party
+    required: False
   - note: First Exemption
     show if: prop.owed_property.third_party_has_claim
   - Value of exemption being claimed: prop.owed_property.third_party_exemption_value
     datatype: currency
     show if: prop.owed_property.third_party_has_claim
+    required: False
   - Specific laws that allow exemption: prop.owed_property.third_party_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'third_party')
     show if: prop.owed_property.third_party_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.owed_property.third_party_has_claim
   - Value of exemption being claimed: prop.owed_property.third_party_exemption_value_2
@@ -2351,16 +2468,19 @@ fields:
   - Claiming Exemption?: prop.owed_property.contingent_claims_has_claim
     datatype: yesnoradio
     show if: prop.owed_property.has_contingent_claims
+    required: False
   - note: First Exemption
     show if: prop.owed_property.contingent_claims_has_claim
   - Value of exemption being claimed: prop.owed_property.contingent_claims_exemption_value
     datatype: currency
     show if: prop.owed_property.contingent_claims_has_claim
+    required: False
   - Specific laws that allow exemption: prop.owed_property.contingent_claims_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'contingent_claims')
     show if: prop.owed_property.contingent_claims_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.owed_property.contingent_claims_has_claim
   - Value of exemption being claimed: prop.owed_property.contingent_claims_exemption_value_2
@@ -2391,16 +2511,19 @@ fields:
   - Claiming Exemption?: prop.owed_property.other_assets_has_claim
     datatype: yesnoradio
     show if: prop.owed_property.has_other_assets
+    required: False
   - note: First Exemption
     show if: prop.owed_property.other_assets_has_claim
   - Value of exemption being claimed: prop.owed_property.other_assets_exemption_value
     datatype: currency
     show if: prop.owed_property.other_assets_has_claim
+    required: False
   - Specific laws that allow exemption: prop.owed_property.other_assets_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.owed_property.other_assets_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.owed_property.other_assets_has_claim
   - Value of exemption being claimed: prop.owed_property.other_assets_exemption_value_2
@@ -2525,11 +2648,13 @@ fields:
   - Value of exemption being claimed: prop.business_property.ar_exemption_value
     datatype: currency
     show if: prop.business_property.ar_has_claim
+    required: False
   - Specific laws that allow exemption: prop.business_property.ar_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'business_other')
     show if: prop.business_property.ar_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.business_property.ar_has_claim
   - Value of exemption being claimed: prop.business_property.ar_exemption_value_2
@@ -2565,11 +2690,13 @@ fields:
   - Value of exemption being claimed: prop.business_property.equipment_exemption_value
     datatype: currency
     show if: prop.business_property.equipment_has_claim
+    required: False
   - Specific laws that allow exemption: prop.business_property.equipment_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'business_equipment')
     show if: prop.business_property.equipment_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.business_property.equipment_has_claim
   - Value of exemption being claimed: prop.business_property.equipment_exemption_value_2
@@ -2604,11 +2731,13 @@ fields:
   - Value of exemption being claimed: prop.business_property.machinery_exemption_value
     datatype: currency
     show if: prop.business_property.machinery_has_claim
+    required: False
   - Specific laws that allow exemption: prop.business_property.machinery_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'business_equipment')
     show if: prop.business_property.machinery_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.business_property.machinery_has_claim
   - Value of exemption being claimed: prop.business_property.machinery_exemption_value_2
@@ -2642,11 +2771,13 @@ fields:
   - Value of exemption being claimed: prop.business_property.inventory_exemption_value
     datatype: currency
     show if: prop.business_property.inventory_has_claim
+    required: False
   - Specific laws that allow exemption: prop.business_property.inventory_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'business_other')
     show if: prop.business_property.inventory_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.business_property.inventory_has_claim
   - Value of exemption being claimed: prop.business_property.inventory_exemption_value_2
@@ -2723,16 +2854,19 @@ fields:
   - Claiming Exemption?: prop.business_property.partnership_has_claim
     datatype: yesnoradio
     show if: prop.business_property.has_partnerships
+    required: False
   - note: First Exemption
     show if: prop.business_property.partnership_has_claim
   - Value of exemption being claimed: prop.business_property.partnership_exemption_value
     datatype: currency
     show if: prop.business_property.partnership_has_claim
+    required: False
   - Specific laws that allow exemption: prop.business_property.partnership_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'business_other')
     show if: prop.business_property.partnership_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.business_property.partnership_has_claim
   - Value of exemption being claimed: prop.business_property.partnership_exemption_value_2
@@ -2770,11 +2904,13 @@ fields:
   - Value of exemption being claimed: prop.business_property.lists_exemption_value
     datatype: currency
     show if: prop.business_property.lists_has_claim
+    required: False
   - Specific laws that allow exemption: prop.business_property.lists_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'business_other')
     show if: prop.business_property.lists_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.business_property.lists_has_claim
   - Value of exemption being claimed: prop.business_property.lists_exemption_value_2
@@ -2838,16 +2974,19 @@ fields:
   - Claiming Exemption?: prop.business_property.otherProperty_has_claim
     datatype: yesnoradio
     show if: prop.business_property.has_other
+    required: False
   - note: First Exemption
     show if: prop.business_property.otherProperty_has_claim
   - Value of exemption being claimed: prop.business_property.otherProperty_exemption_value
     datatype: currency
     show if: prop.business_property.otherProperty_has_claim
+    required: False
   - Specific laws that allow exemption: prop.business_property.otherProperty_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'business_other')
     show if: prop.business_property.otherProperty_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.business_property.otherProperty_has_claim
   - Value of exemption being claimed: prop.business_property.otherProperty_exemption_value_2
@@ -2953,11 +3092,13 @@ fields:
   - Value of exemption being claimed: prop.farming_property.animal_exemption_value
     datatype: currency
     show if: prop.farming_property.has_animal_claim
+    required: False
   - Specific laws that allow exemption: prop.farming_property.animal_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.farming_property.has_animal_claim
+    required: False
   - note: Second Exemption
     show if: prop.farming_property.has_animal_claim
   - Value of exemption being claimed: prop.farming_property.animal_exemption_value_2
@@ -2991,11 +3132,13 @@ fields:
   - Value of exemption being claimed: prop.farming_property.crops_exemption_value
     datatype: currency
     show if: prop.farming_property.has_crops_claim
+    required: False
   - Specific laws that allow exemption: prop.farming_property.crops_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.farming_property.has_crops_claim
+    required: False
   - note: Second Exemption
     show if: prop.farming_property.has_crops_claim
   - Value of exemption being claimed: prop.farming_property.crops_exemption_value_2
@@ -3028,11 +3171,13 @@ fields:
   - Value of exemption being claimed: prop.farming_property.equipment_exemption_value
     datatype: currency
     show if: prop.farming_property.has_equipment_claim
+    required: False
   - Specific laws that allow exemption: prop.farming_property.equipment_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.farming_property.has_equipment_claim
+    required: False
   - note: Second Exemption
     show if: prop.farming_property.has_equipment_claim
   - Value of exemption being claimed: prop.farming_property.equipment_exemption_value_2
@@ -3065,11 +3210,13 @@ fields:
   - Value of exemption being claimed: prop.farming_property.supplies_exemption_value
     datatype: currency
     show if: prop.farming_property.has_supplies_claim
+    required: False
   - Specific laws that allow exemption: prop.farming_property.supplies_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.farming_property.has_supplies_claim
+    required: False
   - note: Second Exemption
     show if: prop.farming_property.has_supplies_claim
   - Value of exemption being claimed: prop.farming_property.supplies_exemption_value_2
@@ -3103,11 +3250,13 @@ fields:
   - Value of exemption being claimed: prop.farming_property.fishing_exemption_value
     datatype: currency
     show if: prop.farming_property.has_fishing_claim
+    required: False
   - Specific laws that allow exemption: prop.farming_property.fishing_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.farming_property.has_fishing_claim
+    required: False
   - note: Second Exemption
     show if: prop.farming_property.has_fishing_claim
   - Value of exemption being claimed: prop.farming_property.fishing_exemption_value_2
@@ -3163,6 +3312,7 @@ fields:
   - Has second unlisted property?: prop.has_second_other_prop
     datatype: yesnoradio
     show if: prop.has_other_prop
+    required: False
   - Property value: prop.other_prop_value2
     datatype: currency
     required: False
@@ -3170,6 +3320,7 @@ fields:
   - Has third unlisted property?: prop.has_third_other_prop
     datatype: yesnoradio
     show if: prop.has_other_prop
+    required: False
   - Property value: prop.other_prop_value3
     datatype: currency
     required: False
@@ -3181,11 +3332,13 @@ fields:
   - Value of exemption being claimed: prop.other_prop_exemption_value
     datatype: currency
     show if: prop.other_prop_has_claim
+    required: False
   - Specific laws that allow exemption: prop.other_prop_exemption_laws
     choices:
       code: |
         get_exemption_choices_or_combined(exemption_filing_state,'wildcard_only')
     show if: prop.other_prop_has_claim
+    required: False
   - note: Second Exemption
     show if: prop.other_prop_has_claim
   - Value of exemption being claimed: prop.other_prop_exemption_value_2

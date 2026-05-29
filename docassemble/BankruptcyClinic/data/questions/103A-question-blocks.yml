@@ -82,6 +82,7 @@ fields:
   - Filing payment amount: payment.initial_payment_amount
     datatype: currency
     show if: payment.payment_on_petition
+    required: False
 ---
 id: payment_dates_add_another
 section: payment_installments
