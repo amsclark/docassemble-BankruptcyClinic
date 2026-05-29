@@ -100,6 +100,78 @@ export async function waitForDaPageLoad(page: Page, label = '') {
   }
 }
 
+/**
+ * Wait for the page to be **stable** — no in-flight network requests, no
+ * docassemble buttons in a `[disabled]` transition state, and no DOM
+ * mutations across two consecutive animation frames.
+ *
+ * This is the canonical "is the page ready for the next user input?" wait.
+ * Use it everywhere a test would otherwise call `page.waitForTimeout(N)`
+ * to cover a docassemble in-page transition (yes/no auto-submit, show-if
+ * reveal, AJAX submit, etc.). Eliminates timing guesses.
+ *
+ * Strategy:
+ *   1. networkidle — HTTP is quiet
+ *   2. no `button.btn-da[disabled]` — docassemble's yesno-button transition is done
+ *   3. no DOM mutations for 2 consecutive requestAnimationFrame ticks
+ *
+ * If the page doesn't settle within `timeout` ms, returns silently; callers
+ * shouldn't crash — but the next locator call will surface whatever is wrong.
+ */
+export async function waitForPageStable(page: Page, timeout = 8000): Promise<void> {
+  const deadline = Date.now() + timeout;
+
+  // (1) Network idle
+  await page.waitForLoadState('networkidle', { timeout }).catch(() => {});
+
+  // (2) Wait until no docassemble button is mid-transition
+  await page
+    .waitForFunction(
+      () => !document.querySelector('button.btn-da[disabled]'),
+      undefined,
+      { timeout: Math.max(deadline - Date.now(), 100), polling: 50 },
+    )
+    .catch(() => {});
+
+  // (3) Wait for the DOM to stop mutating across 2 consecutive RAFs
+  await page
+    .evaluate(
+      (msLeft) =>
+        new Promise<void>((resolve) => {
+          const deadlineLocal = performance.now() + msLeft;
+          let stableFrames = 0;
+          let mutations = 0;
+          const obs = new MutationObserver(() => { mutations++; });
+          obs.observe(document.body, {
+            attributes: true,
+            childList: true,
+            subtree: true,
+            characterData: true,
+          });
+          const tick = () => {
+            if (mutations === 0) {
+              stableFrames++;
+              if (stableFrames >= 2) {
+                obs.disconnect();
+                return resolve();
+              }
+            } else {
+              stableFrames = 0;
+              mutations = 0;
+            }
+            if (performance.now() >= deadlineLocal) {
+              obs.disconnect();
+              return resolve();
+            }
+            requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }),
+      Math.max(deadline - Date.now(), 100),
+    )
+    .catch(() => {});
+}
+
 /** Return the text of the first heading on the page. */
 export async function getHeading(page: Page): Promise<string> {
   await page.waitForSelector('h1, h2, h3', { timeout: 5000 }).catch(() => {});
@@ -156,6 +228,147 @@ export async function clickContinue(page: Page) {
 
   await page.locator('#da-continue-button').click();
   await page.waitForLoadState('networkidle');
+}
+
+// ──────────────────────────────────────────────
+//  Show-if-aware field resolution
+// ──────────────────────────────────────────────
+//
+// docassemble names fields one of two ways depending on context:
+//
+//   1. **Top-level fields** (not inside a `show if:`): the input's `name` is
+//      `b64(varName)` — e.g. `prop.has_household_goods` becomes
+//      `cHJvcC5oYXNfaG91c2Vob2xkX2dvb2Rz`. Helpers like `selectYesNoRadio`
+//      look up by `label[for="<b64>_0"]` and work fine.
+//
+//   2. **Show-if-conditional fields** (anywhere inside a `show if:`): the
+//      input's `name` is `_field_4`, `_field_15`, `_field_26`, … — an opaque
+//      counter, **not** the b64'd variable name. Helpers that look up by
+//      `b64(varName)` silently no-op (or time out) on these.
+//
+// `resolveFieldId` handles both cases:
+//   - Try `b64(varName)` first; if a radio with that name exists, use it.
+//   - Otherwise look up by the question's `<label>` text — every field
+//     renders its question as a `<label>` whose `for=` points at the
+//     opaque `_field_N` id. The label's `textContent` is the YAML question
+//     text (e.g. "Claiming Exemption?"), which is stable across docassemble
+//     re-renderings.
+//
+// Use the canonical helpers below (`pickYesNo`, `fillField`, etc.) — they
+// handle both naming conventions transparently.
+
+/** Options for `resolveFieldId` / `pickYesNoradio` to disambiguate when a
+ *  show-if'd field needs context. See `resolveFieldId` jsdoc for details. */
+export interface FieldLookup {
+  /** Question text from the YAML (e.g. "Claiming Exemption?"). Required when
+   *  the field is inside a `show if:` (renamed to `_field_N`). */
+  label?: string;
+  /** Variable name of the show-if condition (e.g. `prop.has_household_goods`).
+   *  Required when MULTIPLE show-ifs on the page share the same question label
+   *  (e.g. "Claiming Exemption?" appears once per property category). */
+  inShowIfOf?: string;
+}
+
+/**
+ * Resolve a field's DOM id, looking up either by its b64'd variable name
+ * (top-level) or by its question label text (show-if conditional).
+ *
+ * Returns null if the field can't be found by either route.
+ *
+ * docassemble names fields one of two ways:
+ *   - Top-level: input `name` is `b64(varName)`
+ *   - Show-if'd: input `name` is opaque `_field_N`, and the input lives
+ *     inside a `<div class="dashowif" data-showif-var="<b64-of-show-if-var>">`
+ *     container that also holds a label/text with the YAML question text.
+ *
+ * For the show-if'd case, anchor by:
+ *   1. The matching `dashowif` container (filtered by `inShowIfOf` if given);
+ *   2. The radio's parent or sibling label containing `label`.
+ */
+export async function resolveFieldId(
+  page: Page,
+  varName: string,
+  lookup?: FieldLookup,
+): Promise<string | null> {
+  return await page.evaluate(
+    ({ b64Name, qLabel, showIfVar }) => {
+      // (1) Top-level case: input directly named `b64Name`
+      const byName = document.querySelector(`input[name="${b64Name}"]`);
+      if (byName) {
+        const id = (byName as HTMLInputElement).id;
+        if (id) {
+          return id.replace(/_(0|1)$/, '');
+        }
+      }
+      // (2) Show-if'd case: locate the dashowif container by `inShowIfOf`
+      //     hint, then find the radio in it whose question label matches.
+      if (!qLabel) return null;
+      const showifContainers = Array.from(
+        document.querySelectorAll('.dashowif'),
+      ) as HTMLElement[];
+      // Filter to containers whose data-showif-var matches if a hint was
+      // provided; otherwise consider all show-if containers.
+      const candidates = showIfVar
+        ? showifContainers.filter((c) => c.getAttribute('data-showif-var') === showIfVar)
+        : showifContainers;
+      for (const container of candidates) {
+        // Does this container contain a textual occurrence of the question
+        // label? If so, find the radio(s) inside.
+        const text = container.textContent ?? '';
+        if (!text.includes(qLabel)) continue;
+        const radios = container.querySelectorAll('input[type="radio"]');
+        if (radios.length >= 2) {
+          // Found a yesnoradio. Strip the _0/_1 suffix off the first radio's id.
+          const id = (radios[0] as HTMLInputElement).id;
+          if (id) return id.replace(/_(0|1)$/, '');
+        }
+      }
+      return null;
+    },
+    {
+      b64Name: b64(varName),
+      qLabel: lookup?.label ?? null,
+      showIfVar: lookup?.inShowIfOf ? b64(lookup.inShowIfOf) : null,
+    },
+  );
+}
+
+/**
+ * Canonical "click Yes or No on a yesnoradio" helper that handles BOTH
+ * top-level and show-if-conditional fields. Use this everywhere instead of
+ * `selectYesNoRadio` / `fillYesNoRadio` / `clickYesNoButton` for radios.
+ *
+ * - For top-level fields, pass just `varName`.
+ * - For show-if-conditional fields (which get opaque `_field_N` ids), pass
+ *   `{ label: 'YAML question text', inShowIfOf: 'parent.var.name' }`. The
+ *   `inShowIfOf` hint disambiguates when the same question label appears in
+ *   multiple show-if containers (e.g. "Claiming Exemption?" on the
+ *   personal_household_items page).
+ *
+ * Waits for page stability before AND after the click — eliminates the
+ * `await page.waitForTimeout(N)` calls callers used to need.
+ */
+export async function pickYesNoradio(
+  page: Page,
+  varName: string,
+  yes: boolean,
+  lookup?: FieldLookup,
+): Promise<void> {
+  await waitForPageStable(page);
+  const baseId = await resolveFieldId(page, varName, lookup);
+  if (!baseId) {
+    throw new Error(
+      `pickYesNoradio: could not find a radio for "${varName}"` +
+        (lookup?.label ? ` (label: "${lookup.label}")` : '') +
+        (lookup?.inShowIfOf ? ` (inShowIfOf: ${lookup.inShowIfOf})` : '') +
+        '. Tip: if this field is inside a `show if:`, pass both ' +
+        '`{ label: "YAML question text", inShowIfOf: "parent.var.name" }`.',
+    );
+  }
+  const suffix = yes ? '_0' : '_1';
+  // Click the LABEL (Bootstrap btn-check pattern; the input is hidden).
+  await page.locator(`label[for="${baseId}${suffix}"]`).click({ force: true });
+  await waitForPageStable(page);
 }
 
 /** Click an element by its DOM id. */

@@ -17,6 +17,7 @@ import {
   INTERVIEW_URL,
   b64,
   waitForDaPageLoad,
+  waitForPageStable,
   clickContinue as _clickContinue,
   clickById,
   clickNthByName,
@@ -519,20 +520,15 @@ test.describe('Edge Cases – Conditional Logic Branches', () => {
         break;
       }
 
-      // Generic handler: fill radios as No and continue.
-      // Filter out disabled buttons — docassemble briefly disables yesno
-      // buttons during AJAX transitions, and the next iteration will
-      // re-evaluate once they're re-enabled.
-      const noBtn = page.locator('button.btn-da[value="False"]:not([disabled])');
+      // Generic handler: wait for page stability (eliminates the disabled-
+      // button race — docassemble briefly disables yesno buttons during AJAX
+      // transitions, and waitForPageStable doesn't return until none are
+      // disabled). Then click No.
+      await waitForPageStable(page);
+      const noBtn = page.locator('button.btn-da[value="False"]');
       if (await noBtn.count() > 0) {
-        await noBtn.first().click({ timeout: 10_000 }).catch(() => {});
-        await page.waitForLoadState('networkidle');
-        continue;
-      }
-      // If only disabled No buttons exist, wait a beat for them to re-enable.
-      const anyNo = page.locator('button.btn-da[value="False"]');
-      if (await anyNo.count() > 0) {
-        await page.waitForTimeout(500);
+        await noBtn.first().click();
+        await waitForPageStable(page);
         continue;
       }
 

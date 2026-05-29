@@ -22,7 +22,7 @@ async function advanceUntilHeading(p: import('@playwright/test').Page, target: R
   for (let i = 0; i < maxSteps; i++) {
     const h = await getHeading(p);
     if (target.test(h)) return h;
-    const noBtn = p.locator(`button:has-text("No"):visible`).first();
+    const noBtn = p.locator(`button.btn-da[value="False"]:visible`).first();
     const hasContinue = (await p.locator('#da-continue-button').count()) > 0;
     if (await noBtn.count() > 0 && !hasContinue) {
       await noBtn.click().catch(() => {});

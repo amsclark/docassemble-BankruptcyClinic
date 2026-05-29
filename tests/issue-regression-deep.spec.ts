@@ -79,8 +79,10 @@ async function advanceUntilHeading(page: Page, until: RegExp, maxSteps = 600): P
       if (await anyBtn.count()) { await anyBtn.click().catch(() => {}); await waitForDaPageLoad(page); continue; }
     }
 
-    // 1) Answer No on any visible yes/no buttons
-    const noBtn = page.locator('button:has-text("No"):visible').first();
+    // 1) Answer No on any visible yes/no button. We anchor on `value="False"`
+    // (docassemble's standard for the No option) rather than text content —
+    // more robust than `:has-text("No")` and unambiguous on single-gate pages.
+    const noBtn = page.locator('button.btn-da[value="False"]:visible').first();
     if (await noBtn.count()) {
       await noBtn.click().catch(() => {});
       await waitForDaPageLoad(page);
@@ -197,9 +199,9 @@ test.describe('Property + vehicles (Schedule A/B)', () => {
     // property intro
     await clickContinue(page);
     await waitForDaPageLoad(page);
-    // Yes to real estate
-    const yesBtn = page.locator('button:has-text("Yes")').first();
-    await yesBtn.click();
+    // Yes to real estate. The real-estate gate is the only yesno on this
+    // page, so the field-name-anchored helper is unambiguous.
+    await clickYesNoButton(page, 'prop.interests.there_are_any', true);
     await waitForDaPageLoad(page);
     // Fill the page minimally with a 4-digit ZIP
     await fillById(page, b64('prop.interests[0].street'), '500 W Maple');
@@ -298,10 +300,10 @@ test.describe('Property + vehicles (Schedule A/B)', () => {
     await clickContinue(page);
     await waitForDaPageLoad(page);
     // No real estate
-    await page.locator('button:has-text("No")').first().click();
+    await clickYesNoButton(page, 'prop.interests.there_are_any', false);
     await waitForDaPageLoad(page);
     // Yes to vehicles
-    await page.locator('button:has-text("Yes")').first().click();
+    await clickYesNoButton(page, 'prop.ab_vehicles.there_are_any', true);
     await waitForDaPageLoad(page);
     // Fill vehicle 1, claim Motor Vehicle exemption
     await fillById(page, b64('prop.ab_vehicles[0].make'), 'Toyota');
@@ -330,8 +332,8 @@ test.describe('Property + vehicles (Schedule A/B)', () => {
     }
     await clickContinue(page);
     await waitForDaPageLoad(page);
-    // "Have more vehicles?" Yes
-    await page.locator('button:has-text("Yes")').first().click();
+    // "Have more vehicles?" Yes (the gather-next-item gate)
+    await clickYesNoButton(page, 'prop.ab_vehicles.there_is_another', true);
     await waitForDaPageLoad(page);
     // Fill vehicle 2, try Motor Vehicle exemption again — should be rejected
     await fillById(page, b64('prop.ab_vehicles[1].make'), 'Honda');
@@ -539,7 +541,7 @@ test.describe('Creditors (Schedule D / E / F)', () => {
     await advanceUntilHeading(page, /priority claims|priority creditor|unsecured/i, 200);
     // If we land on "do you have any priority claims" — say Yes once to get to the detail page
     if ((await heading(page)).toLowerCase().includes('have any priority')) {
-      await page.locator('button:has-text("Yes")').first().click();
+      await clickYesNoButton(page, 'prop.priority_claims.there_are_any', true);
       await waitForDaPageLoad(page);
     }
     // On the priority detail page — fill minimal data
@@ -693,8 +695,10 @@ test.describe('Retry — Exemption summary screen (#70)', () => {
         expect(body).toMatch(/no exemptions have been claimed|statute|claimed|cap/);
         return;
       }
-      // Try answering No
-      const no = page.locator('button:has-text("No")').first();
+      // Try answering No. Walker context: we don't know which specific
+      // yesno field is being shown, so we anchor on `value="False"` (the
+      // docassemble standard for the No option) rather than text content.
+      const no = page.locator('button.btn-da[value="False"]').first();
       if (await no.count() && await no.isVisible().catch(() => false)) {
         await no.click();
         await waitForDaPageLoad(page);
@@ -722,10 +726,11 @@ test.describe('Retry — Motor Vehicle exemption multi-claim (#53)', () => {
     await reachAfterDebtor(page);
     // Property intro
     await clickContinue(page); await waitForDaPageLoad(page);
-    // No real estate
-    await page.locator('button:has-text("No")').first().click(); await waitForDaPageLoad(page);
-    // Yes vehicles
-    await page.locator('button:has-text("Yes")').first().click(); await waitForDaPageLoad(page);
+    // No real estate, Yes vehicles — anchored to the specific gate variables.
+    await clickYesNoButton(page, 'prop.interests.there_are_any', false);
+    await waitForDaPageLoad(page);
+    await clickYesNoButton(page, 'prop.ab_vehicles.there_are_any', true);
+    await waitForDaPageLoad(page);
     // Vehicle 1 — fill via direct JS manipulation to avoid radio/button quirks
     await page.evaluate((b64make) => {
       const $ = (window as any).jQuery;
@@ -796,7 +801,7 @@ test.describe('Secured Creditors blocker fix (#54)', () => {
     let h = (await heading(page)).toLowerCase();
     // If intro: click Yes
     if (h.includes('do you have any creditors with secured claims') || h.includes('any creditors with secured claims')) {
-      await page.locator('button:has-text("Yes")').first().click();
+      await clickYesNoButton(page, 'prop.creditors.there_are_any', true);
       await waitForDaPageLoad(page);
     }
     // On the secured-claim details page — fill minimal data

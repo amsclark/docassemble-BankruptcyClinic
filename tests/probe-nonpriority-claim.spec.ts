@@ -34,7 +34,7 @@ test('nonpriority_unsecured_claim_details — strict Continue with safe-default 
     // No-button page?
     const hasContinue = (await page.locator('#da-continue-button').count()) > 0;
     if (!hasContinue) {
-      await page.locator('button:has-text("No"):visible').first().click().catch(() => {});
+      await page.locator('button.btn-da[value="False"]:visible').first().click().catch(() => {});
       await page.waitForLoadState('networkidle').catch(() => {});
       continue;
     }

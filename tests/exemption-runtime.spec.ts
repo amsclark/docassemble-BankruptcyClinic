@@ -20,27 +20,16 @@ import {
 import {
   b64,
   waitForDaPageLoad,
+  waitForPageStable,
   clickNthByName,
   clickYesNoButton,
-  selectYesNoRadio,
+  pickYesNoradio,
 } from './helpers';
 
 test.describe('Exemption dropdown runtime (issue #37)', () => {
   test.setTimeout(300_000);
 
-  // FIXME: The page state at the moment of the dropdown check shows the
-  // exemption_laws select as `disabled` + `hidden` even after a force-clicked
-  // label on `prop.household_goods_is_claiming_exemption=Yes`. The docassemble
-  // show-if reveal does not fire from a programmatic label click — it needs a
-  // real user pointer event sequence to trigger the jQuery-bound change
-  // handler that toggles the select's disabled attribute. Worked previously
-  // because Playwright `click()` dispatched the right event mix, but recent
-  // docassemble/Bootstrap btn-check rendering puts the input behind a label
-  // that Playwright considers not actionable. Underlying behaviour (NE-only
-  // citations in the dropdown) is verified manually + by the static YAML
-  // assertion in roxanne-feedback-fixes. Skip until the test driver can
-  // dispatch a real Bootstrap btn-check change.
-  test.fixme('household-goods exemption dropdown is restricted to the filing state (NE only)', async ({ page }) => {
+  test('household-goods exemption dropdown is restricted to the filing state (NE only)', async ({ page }) => {
     const scenario = LEGACY_NE_MINIMAL;
 
     // intro → district → amendment → debtor identity
@@ -62,26 +51,23 @@ test.describe('Exemption dropdown runtime (issue #37)', () => {
     await clickYesNoButton(page, 'prop.ab_other_vehicles.there_are_any', false);
 
     // Wait for the personal/household items page
-    await waitForDaPageLoad(page);
-    await page.waitForLoadState('networkidle');
+    await waitForPageStable(page);
     const heading = await page.locator('h1').first().textContent();
     expect(heading?.toLowerCase()).toContain('personal and household items');
 
-    // CRITICAL: every `is_claiming_exemption` field on this page is
-    // `show if:` its category's `has_X` parent. We must answer the parent
-    // Yes before the exemption-claim field even renders.
-    //
-    // The label sits in front of a Bootstrap `.btn-check` input that
-    // Playwright considers "not visible" (the input is intentionally
-    // off-screen). `force: true` bypasses the visibility check.
-    await page.locator(
-      `label[for="${b64('prop.has_household_goods')}_0"]`,
-    ).click({ force: true });
-    await page.waitForTimeout(1500);
-    await page.locator(
-      `label[for="${b64('prop.household_goods_is_claiming_exemption')}_0"]`,
-    ).click({ force: true });
-    await page.waitForTimeout(1500);
+    // The parent yesnoradio (`has_household_goods`) is a top-level field —
+    // its input is named `b64('prop.has_household_goods')`. The child
+    // (`is_claiming_exemption`) is inside a `show if:` and gets renamed to
+    // an opaque `_field_N` id; we resolve it by its question label text.
+    await pickYesNoradio(page, 'prop.has_household_goods', true);
+    await pickYesNoradio(
+      page,
+      'prop.household_goods_is_claiming_exemption',
+      true,
+      // Show-if'd field: docassemble renamed it to an opaque _field_N id.
+      // Anchor by question label + the show-if condition for unambiguous lookup.
+      { label: 'Claiming Exemption?', inShowIfOf: 'prop.has_household_goods' },
+    );
 
     // docassemble assigns opaque ids like `_field_56` to selects (not the
     // variable name), so locate the household-goods dropdown by anchoring on
