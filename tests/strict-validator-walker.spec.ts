@@ -56,25 +56,38 @@ async function fillVisibleRequiredFields(p: Page): Promise<boolean> {
       }
     });
 
-    // 2) yesno-radio groups — pick "No" if unselected
+    // 2) radio groups — pick "No"/False if unselected. CRITICAL: check the
+    //    LABEL's visibility (not the input). docassemble uses Bootstrap's
+    //    `btn-check` pattern where the input is intentionally hidden
+    //    (offsetParent === null) and the label carries both the click target
+    //    and the visible/active state. Setting .checked directly leaves the
+    //    form in a state the jQuery validator rejects on submit.
+    const seenGroups = new Set<string>();
     document.querySelectorAll('input[type="radio"]').forEach((r) => {
       const radio = r as HTMLInputElement;
-      if (radio.offsetParent === null) return;
       const name = radio.name;
-      if (!name) return;
-      const group = document.querySelectorAll(`input[type="radio"][name="${CSS.escape(name)}"]`);
-      const anyChecked = Array.from(group).some((g) => (g as HTMLInputElement).checked);
-      if (anyChecked) return;
-      const noOne = Array.from(group).find((g) => {
-        const v = (g as HTMLInputElement).value;
-        return v === 'False' || v === 'No' || v === 'false';
+      if (!name || seenGroups.has(name)) return;
+      seenGroups.add(name);
+      const group = Array.from(
+        document.querySelectorAll(`input[type="radio"][name="${CSS.escape(name)}"]`)
+      ) as HTMLInputElement[];
+      if (group.some((g) => g.checked)) return;
+      // Filter to inputs whose LABEL is visible (btn-check pattern means the
+      // input itself is hidden).
+      const visibleByLabel = group.filter((g) => {
+        if (!g.id) return false;
+        const lab = document.querySelector(`label[for="${CSS.escape(g.id)}"]`) as HTMLElement | null;
+        return !!lab && lab.offsetParent !== null;
       });
-      const target = (noOne || group[0]) as HTMLInputElement;
-      if (target) {
-        target.checked = true;
-        target.dispatchEvent(new Event('change', { bubbles: true }));
-        touched = true;
-      }
+      if (visibleByLabel.length === 0) return;
+      const noOne = visibleByLabel.find((g) => {
+        const v = g.value;
+        return v === 'False' || v === 'No' || v === 'false' || v === '0';
+      });
+      const target = noOne || visibleByLabel[0];
+      const lab = document.querySelector(`label[for="${CSS.escape(target.id)}"]`) as HTMLElement;
+      lab.click();
+      touched = true;
     });
 
     // 3) text/number/currency/date inputs — fill safe defaults
@@ -118,17 +131,20 @@ async function clickContinueStrict(p: Page) {
   await p.waitForLoadState('networkidle').catch(() => {});
 }
 
-async function clickAnyYesNoButton(p: Page, yes = false) {
+async function pageHasContinueButton(p: Page): Promise<boolean> {
+  return (await p.locator('#da-continue-button').count()) > 0;
+}
+
+async function clickYesNoButtonPage(p: Page, yes = false): Promise<boolean> {
   // Pages whose ONLY field is a single yesno render Yes/No as docassemble
-  // buttons that auto-submit; there's no Continue. Click "No" to advance.
-  const btn = p.locator(`button.btn-da:has-text("${yes ? 'Yes' : 'No'}"):visible`).first();
-  const n = await btn.count();
-  if (n > 0) {
-    await btn.click().catch(() => {});
-    await p.waitForLoadState('networkidle').catch(() => {});
-    return true;
-  }
-  return false;
+  // buttons (with a `name=<base64>` attribute) that auto-submit; there's no
+  // Continue button. Match any non-Continue button by its text.
+  const all = p.locator(`button[name]:has-text("${yes ? 'Yes' : 'No'}"):visible`);
+  const n = await all.count();
+  if (n === 0) return false;
+  await all.first().click().catch(() => {});
+  await p.waitForLoadState('networkidle').catch(() => {});
+  return true;
 }
 
 test.describe('Strict-validator interview walker', () => {
@@ -167,17 +183,24 @@ test.describe('Strict-validator interview walker', () => {
         break;
       }
 
-      // Try strict Continue first
+      // If this is a button-only yesno page (no Continue button), click No.
+      // This is NOT a Continue submission — it's docassemble's native yesno
+      // gate, which has no validator interaction. Always works.
+      if (!(await pageHasContinueButton(page))) {
+        const advanced = await clickYesNoButtonPage(page, false);
+        if (advanced) {
+          sameHeadingStreak = 0;
+          lastHeading = h;
+          continue;
+        }
+        // No Continue + no Yes/No buttons — unknown page type. Skip.
+        console.log(`[walker] step ${step}: no Continue and no Yes/No buttons on "${h}" — skipping`);
+        break;
+      }
+
+      // Normal page with Continue button: fill required fields, click STRICT
       const handled = await fillVisibleRequiredFields(page);
       if (handled) await page.waitForTimeout(250);
-
-      // If this is a button-only yesno page, click No
-      const advancedByButton = await clickAnyYesNoButton(page, false);
-      if (advancedByButton) {
-        sameHeadingStreak = 0;
-        lastHeading = h;
-        continue;
-      }
 
       await clickContinueStrict(page);
       await page.waitForTimeout(300);
