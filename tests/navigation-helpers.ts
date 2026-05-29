@@ -1446,3 +1446,70 @@ export async function runFullInterview(page: Page, scenario: TestScenario) {
   log('creditCounseling'); await navigateCreditCounseling(page, scenario);
   log('dynamicPhase'); await navigateDynamicPhase(page, scenario);
 }
+
+// ════════════════════════════════════════════════════════════════════
+//  COMPOSED MILESTONE HELPERS
+// ════════════════════════════════════════════════════════════════════
+//
+// `walkTo*` helpers chain section helpers up to a specific milestone, for
+// tests that want to land on a known page (means test intro, final review)
+// without driving a full interview. They use the same section logic as
+// `runFullInterview` so any fix to a section helper benefits both paths.
+//
+// Use these instead of `advanceUntilHeading(page, /.../)` when the target
+// page is at a known section boundary — they're deterministic and orders
+// of magnitude faster than the walker.
+
+/**
+ * Drive the interview from the start through to the **first page of the
+ * Means Test (122A)** — `means_type` selector. Returns when the next
+ * heading is the means-test intro (i.e., the page that asks which means
+ * type applies).
+ *
+ * Tests that assert on means-test page rendering should use this rather
+ * than `advanceUntilHeading(/means test|median family income/i)` — the
+ * walker is brittle on multi-field show-if pages (nonpriority claim,
+ * personal & household items) and oscillates inside its step budget.
+ */
+export async function walkToMeansTestStart(page: Page, scenario: TestScenario) {
+  await navigateToDebtorPage(page, scenario);
+  await fillDebtorAndAdvance(page, scenario.debtor);
+  if (scenario.jointFiling && scenario.spouse) {
+    await waitForDaPageLoad(page);
+    await fillDebtorAndAdvance(page, scenario.spouse);
+  }
+  await passDebtorFinal(page);
+  await navigatePropertySection(page, scenario);
+  await navigateExemptionSection(page);
+  await navigateCreditorLibraryPicker(page);
+  await navigateSecuredCreditors(page, scenario);
+  await navigateUnsecuredCreditors(page, scenario);
+  await navigateContractsLeases(page);
+  await navigateCommunityProperty(page);
+  await navigateIncome(page, scenario);
+  await navigateExpenses(page, scenario.rentExpense, scenario.dependents ?? 0);
+  await navigateFinancialAffairs(page, scenario);
+  await navigateReporting(page);
+  await navigatePersonalLeases(page);
+  // Next heading is the means-test type select.
+}
+
+/**
+ * Drive the interview all the way through to the **final review page**
+ * ("Review your petition before filing"). Caller can then assert on
+ * cross-validation warnings, debtor summary copy, etc.
+ *
+ * Used for issues #76/#77/#78/#80 (cross-validation block) and #58
+ * (fee-waiver warning copy) — both want the final review page rendered
+ * with a known minimal scenario.
+ */
+export async function walkToFinalReview(page: Page, scenario: TestScenario) {
+  await walkToMeansTestStart(page, scenario);
+  await navigateMeansTest(page);
+  await navigateCaseDetails(page);
+  await navigateBusiness(page);
+  await navigateHazardousProperty(page);
+  await navigateCreditCounseling(page, scenario);
+  // navigateCreditCounseling lands at the final review page (or just before).
+  // Caller should inspect the heading to confirm.
+}
