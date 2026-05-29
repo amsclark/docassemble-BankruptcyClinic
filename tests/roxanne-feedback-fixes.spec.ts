@@ -74,22 +74,25 @@ test.describe('Roxanne feedback fixes', () => {
     expect(htmlWithLaws).not.toContain('25-1552(1)(c)');
   });
 
-  test('Exemption set choices are relabeled to State / Federal', async ({ page }) => {
+  test('Exemption set choices are relabeled to State / Federal (now auto-defaulted)', async ({ page }) => {
     await navigateToDebtorPage(page, SIMPLE_SINGLE);
     await fillDebtorAndAdvance(page, SIMPLE_SINGLE.debtor);
     await passDebtorFinal(page);
     // SIMPLE_SINGLE has no property, so this answers "No" through Schedule A/B
-    // and lands on the Schedule C exemption-type question.
+    // and lands on the next Schedule C page.
     await navigatePropertySection(page, SIMPLE_SINGLE);
     await waitForDaPageLoad(page);
 
+    // The "Which set of exemptions are you claiming?" question is no longer
+    // asked — Phil/Roxanne feedback found that NE/SD filers in these districts
+    // must claim the state exemption set anyway, so the old prompt only
+    // confused filers without changing behavior. `prop.exempt_property
+    // .exemption_type` is now hard-coded to the state-and-federal-nonbankruptcy
+    // set in `voluntary-petition.yml`. The test verifies the question does
+    // NOT appear and the next page is the "any property to claim" gate.
     const body = await page.locator('body').innerText();
-    expect(body).toContain('Which set of exemptions');
-
-    const opts = await fieldOptions(page, b64('prop.exempt_property.exemption_type'));
-    const optsText = opts.join(' | ');
-    expect(optsText).toContain('State exemptions');
-    expect(optsText).toContain('Federal exemptions');
+    expect(body).not.toContain('Which set of exemptions');
+    expect(body.toLowerCase()).toContain('property to claim as exempt');
   });
 
   // FIXME: the assertion below is correct, but driving the list-collect property
