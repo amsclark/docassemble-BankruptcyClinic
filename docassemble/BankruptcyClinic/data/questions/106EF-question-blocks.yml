@@ -102,18 +102,22 @@ fields:
     show if:
       variable: prop.priority_claims[i].has_codebtor
       is: True
+    required: False
   - Address/PO Box: prop.priority_claims[i].codebtor_street
     show if:
       variable: prop.priority_claims[i].has_codebtor
       is: True
+    required: False
   - City: prop.priority_claims[i].codebtor_city
     show if:
       variable: prop.priority_claims[i].has_codebtor
       is: True
+    required: False
   - State: prop.priority_claims[i].codebtor_state
     show if:
       variable: prop.priority_claims[i].has_codebtor
       is: True
+    required: False
   - Zip: prop.priority_claims[i].codebtor_zip
     datatype: text
     minlength: 5
@@ -122,6 +126,7 @@ fields:
       variable: prop.priority_claims[i].has_codebtor
       is: True
 
+    required: False
   - Do others need to be notified about this debt?: prop.priority_claims[i].has_notify
     datatype: yesnoradio
 
@@ -359,18 +364,22 @@ fields:
     show if:
       variable: prop.nonpriority_claims[i].has_codebtor
       is: True
+    required: False
   - Address/PO Box: prop.nonpriority_claims[i].codebtor_street
     show if:
       variable: prop.nonpriority_claims[i].has_codebtor
       is: True
+    required: False
   - City: prop.nonpriority_claims[i].codebtor_city
     show if:
       variable: prop.nonpriority_claims[i].has_codebtor
       is: True
+    required: False
   - State: prop.nonpriority_claims[i].codebtor_state
     show if:
       variable: prop.nonpriority_claims[i].has_codebtor
       is: True
+    required: False
   - Zip: prop.nonpriority_claims[i].codebtor_zip
     datatype: text
     minlength: 5
@@ -379,6 +388,7 @@ fields:
       variable: prop.nonpriority_claims[i].has_codebtor
       is: True
 
+    required: False
   - Do others need to be notified about this debt?: prop.nonpriority_claims[i].has_notify
     datatype: yesnoradio
 

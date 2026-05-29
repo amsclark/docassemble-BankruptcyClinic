@@ -160,18 +160,22 @@ fields:
     datatype: yesno
   - Mail Address/PO Box: debtor[i].mailing_street
     show if: debtor[i].has_other_mailing_address
+    required: False
   - Mail City: debtor[i].mailing_city
     show if: debtor[i].has_other_mailing_address
+    required: False
   - Mail State: debtor[i].mailing_state
     input type: dropdown
     code: get_bk_states_list()
     datatype: str
     show if: debtor[i].has_other_mailing_address
+    required: False
   - Mail Zip: debtor[i].mailing_zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: debtor[i].has_other_mailing_address
+    required: False
   - ID Type: debtor[i].tax_id.tax_id_type
     input type: radio
     choices:
@@ -181,10 +185,12 @@ fields:
     show if:
       variable: debtor[i].tax_id.tax_id_type
       is: 2
+    required: False
   - SSN: debtor[i].tax_id.tax_id
     show if:
       variable: debtor[i].tax_id.tax_id_type
       is: 1
+    required: False
   - note: |
       <script>
         // Handle dynamic county population based on state selection

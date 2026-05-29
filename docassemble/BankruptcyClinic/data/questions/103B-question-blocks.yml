@@ -84,6 +84,7 @@ fields:
   - Explain: family.others_with_expenses_explain
     input type: area
     show if: family.has_others_with_expenses
+    required: False
   - note: |
       <br><br>
       Does anyone other than you regularly pay any of these expenses?
@@ -92,6 +93,7 @@ fields:
   - Amount: family.other_expense_payers_amount
     datatype: number
     show if: family.has_other_expense_payers
+    required: False
   - note: |
       <br><br>
       Do you expect your average monthly expenses to increase or decrease by more than 10% during the next 6 months?
@@ -100,6 +102,7 @@ fields:
   - Explain: family.expense_changes_explain
     input type: area
     show if: family.expense_changes
+    required: False
 ---
 # Part 3 - Tell the court about your property
 table: prop_accounts_table
@@ -176,26 +179,32 @@ fields:
     default: ${ True if defined('prop.interests.gathered') and len(prop.interests) > 0 else False }
   - Address/PO Box: prop.mortgage_street
     show if: prop.has_home
+    required: False
     default: ${ prop.interests[0].street if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'street') else '' }
   - City: prop.mortgage_city
     show if: prop.has_home
+    required: False
     default: ${ prop.interests[0].city if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'city') else '' }
   - State: prop.mortgage_state
     show if: prop.has_home
+    required: False
     default: ${ prop.interests[0].state if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'state') else '' }
   - Zip: prop.mortgage_zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: prop.has_home
+    required: False
     default: ${ prop.interests[0].zip if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'zip') else '' }
   - Current Value: prop.mortgage_current_value
     datatype: currency
     show if: prop.has_home
+    required: False
     default: ${ prop.interests[0].current_value if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'current_value') else 0 }
   - Amount owed: prop.mortgage_amount_owed
     datatype: currency
     show if: prop.has_home
+    required: False
     default: ${ prop.interests[0].current_owed_amount if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'current_owed_amount') else 0 }
 validation code: |
   # Issue #77: hard-block fee-waiver real-estate value if it diverges significantly
@@ -224,26 +233,32 @@ fields:
     default: ${ True if defined('prop.interests.gathered') and len(prop.interests) > 1 else False }
   - Address/PO Box: prop.other_mortgage_street
     show if: prop.has_other_real_estate
+    required: False
     default: ${ prop.interests[1].street if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'street') else '' }
   - City: prop.other_mortgage_city
     show if: prop.has_other_real_estate
+    required: False
     default: ${ prop.interests[1].city if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'city') else '' }
   - State: prop.other_mortgage_state
     show if: prop.has_other_real_estate
+    required: False
     default: ${ prop.interests[1].state if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'state') else '' }
   - Zip: prop.other_mortgage_zip
     datatype: text
     minlength: 5
     maxlength: 5
     show if: prop.has_other_real_estate
+    required: False
     default: ${ prop.interests[1].zip if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'zip') else '' }
   - Current Value: prop.other_mortgage_current_value
     datatype: currency
     show if: prop.has_other_real_estate
+    required: False
     default: ${ prop.interests[1].current_value if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'current_value') else 0 }
   - Amount owed: prop.other_mortgage_amount_owed
     datatype: currency
     show if: prop.has_other_real_estate
+    required: False
     default: ${ prop.interests[1].current_owed_amount if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'current_owed_amount') else 0 }
 ---
 table: prop_vehicles_table
@@ -380,11 +395,14 @@ fields:
       - A bankruptcy petition preparer, paralegal, or typing service
       - Someone else
     show if: additional.paid_for_services
+    required: False
   - Describe who: additional.paid_for_services_who_describe
     show if: additional.paid_for_services
+    required: False
   - How much?: additional.paid_for_services_amount
     datatype: currency
     show if: additional.paid_for_services
+    required: False
   - note: |
       <br><br>
       Have you promised to pay or do you expect to pay someone for services for your bankruptcy case?
@@ -397,11 +415,14 @@ fields:
       - A bankruptcy petition preparer, paralegal, or typing service
       - Someone else
     show if: additional.promised_for_services
+    required: False
   - Describe who: additional.promised_for_services_who_describe
     show if: additional.promised_for_services
+    required: False
   - How much?: additional.promised_for_services_amount
     datatype: currency
     show if: additional.promised_for_services
+    required: False
   - note: |
       <br><br>
       Has anyone paid someone on your behalf for services for this case?
@@ -414,6 +435,7 @@ fields:
       - A bankruptcy petition preparer, paralegal, or typing service
       - Someone else
     show if: additional.behalf_for_services
+    required: False
   - Who paid?: additional.behalf_for_services_paid
     datatype: checkboxes
     choices:
@@ -423,11 +445,14 @@ fields:
       - Pastor or clergy
       - Someone else
     show if: additional.behalf_for_services
+    required: False
   - Other payer: additional.behalf_other_payer
     show if: additional.behalf_for_services
+    required: False
   - How much was paid?: additional.behalf_for_services_amount
     datatype: currency
     show if: additional.behalf_for_services
+    required: False
 ---
 table: add_bankruptcy_table
 rows: additional.bankruptcies
