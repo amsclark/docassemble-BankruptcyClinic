@@ -179,8 +179,10 @@ test.describe('SOFA conditional-logic issues', () => {
     for (let i = 0; i < 60; i++) {
       const h = (await heading(page)).toLowerCase();
       if (h.includes('marital status')) return;
-      // Try answering No on any visible yes/no
-      const noBtn = page.locator('button:has-text("No")').first();
+      // Try answering No on any visible yes/no. Generic walker context —
+      // anchor on `value="False"` (docassemble's standard for No) rather
+      // than text content.
+      const noBtn = page.locator('button.btn-da[value="False"]').first();
       if (await noBtn.count()) {
         await noBtn.click().catch(() => {});
         await waitForDaPageLoad(page);

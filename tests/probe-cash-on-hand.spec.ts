@@ -21,7 +21,7 @@ async function advanceUntilHeading(p: import('@playwright/test').Page, target: R
     const h = await getHeading(p);
     if (target.test(h)) return h;
     // Click No on any yesno-button page; otherwise click Continue (masked)
-    const noBtn = p.locator(`button:has-text("No"):visible`).first();
+    const noBtn = p.locator(`button.btn-da[value="False"]:visible`).first();
     if (await noBtn.count() > 0) {
       // Make sure it's a docassemble yesno button (not the in-page Back)
       const isContinue = (await p.locator('#da-continue-button').count()) > 0;

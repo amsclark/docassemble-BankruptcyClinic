@@ -5,7 +5,7 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests',
-  testIgnore: ['**/archive/**'],
+  testIgnore: ['**/archive/**', '**/diag/**'],
   /* Timeout for each test */
   timeout: 420 * 1000, // 7 minutes for full interview tests
   /* Run tests in files in parallel - disable for live watching */
