@@ -198,18 +198,27 @@ test.describe('Strict-validator interview walker', () => {
         break;
       }
 
-      // Normal page with Continue button: fill required fields, click STRICT
+      // Normal page with Continue button: fill required fields, click STRICT.
+      // Read the page's `_tracker` hidden field BEFORE submitting; if the
+      // tracker advances, the server accepted the form even if the heading
+      // is the same (e.g. generic-index gather pages repeat the heading).
+      const trackerBefore = await page.locator('input[name="_tracker"]').first().getAttribute('value').catch(() => null);
       const handled = await fillVisibleRequiredFields(page);
-      if (handled) await page.waitForTimeout(250);
+      if (handled) await page.waitForTimeout(400);
 
       await clickContinueStrict(page);
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(800);
 
       const h2 = (await getHeading(page)).toLowerCase();
-      if (h2 === hLow) {
+      const trackerAfter = await page.locator('input[name="_tracker"]').first().getAttribute('value').catch(() => null);
+      const headingSame = (h2 === hLow);
+      const trackerAdvanced = (trackerBefore !== null && trackerAfter !== null && trackerBefore !== trackerAfter);
+      if (headingSame && !trackerAdvanced) {
         sameHeadingStreak += 1;
         if (sameHeadingStreak === 1) {
-          // Try once more — sometimes the click was eaten by show-if JS
+          // Try once more with a longer settle — show-if JS or server-side
+          // rendering can take a beat. Don't immediately report a block.
+          await page.waitForTimeout(800);
           continue;
         }
         // Silent block confirmed. Record + escape with masked Continue.
@@ -221,6 +230,8 @@ test.describe('Strict-validator interview walker', () => {
         await page.waitForLoadState('networkidle').catch(() => {});
         sameHeadingStreak = 0;
       } else {
+        // Heading changed OR tracker advanced (gather loop, same heading
+        // for next item). Either way, real progress was made.
         sameHeadingStreak = 0;
       }
       lastHeading = h;
