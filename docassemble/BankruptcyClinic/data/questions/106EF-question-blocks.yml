@@ -78,7 +78,7 @@ fields:
       - Claim for death or personal injury while you were intoxicated: Claims for death or personal injury while you were intoxicated
       - Other priority debt: Other
   - Specify other unsecured claim type: prop.priority_claims[i].other_type
-    required: True
+    required: False
     show if:
       variable: prop.priority_claims[i].type
       is: Other
@@ -344,7 +344,7 @@ fields:
       - Contract
       - Other
   - Specify other unsecured claim type: prop.nonpriority_claims[i].other_type
-    required: True
+    required: False
     show if:
       variable: prop.nonpriority_claims[i].type
       is: Other
