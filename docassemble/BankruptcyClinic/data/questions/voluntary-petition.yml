@@ -64,6 +64,7 @@ features:
   navigation: True
   progress bar: True
   navigation back button: false
+  question back button: True
   css:
     - https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css
     - styles.css

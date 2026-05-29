@@ -41,6 +41,7 @@ fields:
     show if:
       variable: monthly_income.filing_status
       is: Married and your spouse is NOT filing with you.
+    required: False
   - How many dependents?: monthly_income.dependents
     datatype: number
     default: ${ len(debtor[0].expenses.dependents) if defined('debtor[0].expenses.dependents.gathered') else 0 }
