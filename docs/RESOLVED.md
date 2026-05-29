@@ -13,6 +13,52 @@ If a video doesn't appear inline below, click the link underneath it to download
 
 ---
 
+## ✅ May 2026 — Lea Wroblewski feedback (Schedule J Continue + Back button)
+
+Lea reported two blockers (May 28) against the test server:
+
+1. **"It looks like you cannot get past the dependent page — the Continue button will not work."**
+2. **"If you accidentally select 'yes' for a secured debt, you cannot go back and change it."**
+
+Both are now fixed and deployed. Verified by `tests/lea-dependent-bug.spec.ts` (strict-validator regression — the bug-reproduction proof) and demonstrated in the two videos below (`tests/lea-demo.spec.ts`).
+
+### What was happening (#1 — Continue silently blocked on Schedule J)
+
+The Schedule J "Describe your household" page had a "Does debtor 2 live in a separate household?" field that's only shown for joint cases. For a single filer the field is hidden — but the docassemble app's form validator was treating the hidden field as still required, which silently blocked the Continue button with no visible error. This is the same root cause class as customer bugs #54 / #56 / #57.
+
+**Fix:** mark the conditionally-shown field `required: False` so the validator stops blocking submission when it's hidden. Same defensive fix applied to the means-test "household and dependents" page's separated-status field.
+
+<video src="https://github.com/amsclark/docassemble-BankruptcyClinic/raw/main/docs/videos/lea-2026-05-schedule-j-continue.mp4" controls width="720"></video>
+
+[Download `lea-2026-05-schedule-j-continue.mp4`](https://github.com/amsclark/docassemble-BankruptcyClinic/raw/main/docs/videos/lea-2026-05-schedule-j-continue.mp4)
+
+The video drives a single-filer interview to the "Describe your household" page, answers the two visible yes/no questions, and clicks Continue using the **strict** validator path (the same submission the real browser uses — no test-side `:hidden` override). The form advances to "Estimate your ongoing monthly expenses". Before the fix, the same click silently hung on this page. The bug reproduction (reverting the YAML change, running the strict test, observing the hang) is captured in PR #98.
+
+### What was happening (#2 — no in-page Back button)
+
+The interview was configured with `navigation back button: false` and no per-question Back button, so users had no in-page way to return to a previous question. After accidentally clicking "Yes" on the secured-debt gate, the only escape was the browser's Back button.
+
+**Fix:** enabled `question back button: True` globally. Every page now has an in-page **Back** button next to Continue.
+
+<video src="https://github.com/amsclark/docassemble-BankruptcyClinic/raw/main/docs/videos/lea-2026-05-back-button.mp4" controls width="720"></video>
+
+[Download `lea-2026-05-back-button.mp4`](https://github.com/amsclark/docassemble-BankruptcyClinic/raw/main/docs/videos/lea-2026-05-back-button.mp4)
+
+The video reproduces Lea's scenario: reach the "Do any creditors have claims secured by your property?" gate, click "Yes" (the accident), see the secured-claim details page with the new **Back** button, click Back to return to the gate, click "No" instead, and watch the interview move past secured creditors.
+
+### Testing & verification
+
+- **Strict-validator regression** — `tests/lea-dependent-bug.spec.ts` reproduces the silent-block bug deterministically. With the YAML fix reverted, the test fails (heading stays on "describe your household"); with the fix applied, it passes (advances to "Estimate your ongoing monthly expenses"). Both single-filer (0 dependents) and single-filer (1 dependent) paths are covered.
+- **No-regression check** — the existing `tests/dependents-main-flow.spec.ts` end-to-end happy path still passes (2.5 min).
+- **Demo recordings** — the two videos above are produced by `tests/lea-demo.spec.ts`, run against the deployed `fix/lea-dependent-page-2026-05` branch.
+
+### Out-of-scope but flagged for follow-up
+
+- The broader YAML audit shows **324 conditional fields without `required: False`** across the question files. Only the two on Lea's reported path are fixed in this PR; the rest are latent instances of the same trap.
+- Separately observed during this investigation: the means-test "Identify any exemptions from Presumption of Abuse" page does not advance Continue when all three yes/no answers are "No" (the consumer-debts path). The existing test suite uses `non_consumer_debts=true` so it bypasses this. Worth a separate investigation — likely affects real users with primarily consumer debts.
+
+---
+
 ## ✅ May 2026 — Clinic staff review (Roxanne) feedback
 
 A second clinic review (May 2026) produced a fresh batch of notes. The items below are fixed, deployed, and covered by automated tests (`tests/roxanne-feedback-fixes.spec.ts`, plus the end-to-end scenario suite for no-regression).
