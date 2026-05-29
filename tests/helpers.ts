@@ -650,6 +650,165 @@ export async function fillAllVisibleRadiosAsNo(page: Page) {
   await page.waitForTimeout(500);
 }
 
+/**
+ * Multi-round "fill all visible required fields with safe defaults" walker.
+ *
+ * **Why a multi-round loop:** on docassemble pages where filling a yes/no
+ * triggers `show if:` reveals (e.g. `prop.nonpriority_claims[i].has_codebtor`,
+ * `has_notify`, `type=Other`), the newly-revealed fields are NOT in the DOM
+ * until after the parent's `change` event runs. A single-pass fill misses
+ * them and Continue then fails validation. `advanceUntilHeading` used to
+ * loop the entire walker over this — that's slow and oscillates.
+ *
+ * **What it does** (per round):
+ *   1. Click the "No" / first option of every visible un-checked yesnoradio
+ *   2. Click `button.btn-da[value="False"]` for every visible un-pressed
+ *      yesno-button group (datatype: yesno)
+ *   3. Fill empty visible <select> with its first non-empty option
+ *   4. Fill empty visible text/number/date/email inputs with label-aware
+ *      safe defaults (zip → 68508, amount → 0, date → 2024-01-01, …)
+ *
+ * After each round, waits for `waitForPageStable` so the show-if cascade
+ * has finished. Stops when a round touches nothing.
+ *
+ * Returns `true` iff any field was touched (caller can decide whether to
+ * click Continue).
+ */
+export async function fillUntilStable(
+  page: Page,
+  opts: { maxRounds?: number; perRoundTimeout?: number } = {},
+): Promise<boolean> {
+  const maxRounds = opts.maxRounds ?? 5;
+  const perRoundTimeout = opts.perRoundTimeout ?? 2000;
+  let anyTouched = false;
+  for (let round = 0; round < maxRounds; round++) {
+    const touched = await page.evaluate(() => {
+      let didTouch = false;
+      // (1) yesnoradio — Bootstrap btn-check; click the LABEL not the input.
+      const seenGroups = new Set<string>();
+      document.querySelectorAll('input[type="radio"]').forEach((r) => {
+        const radio = r as HTMLInputElement;
+        const name = radio.name;
+        if (!name || seenGroups.has(name)) return;
+        seenGroups.add(name);
+        const group = Array.from(
+          document.querySelectorAll(`input[type="radio"][name="${CSS.escape(name)}"]`),
+        ) as HTMLInputElement[];
+        if (group.some((g) => g.checked)) return;
+        const visibleByLabel = group.filter((g) => {
+          if (!g.id) return false;
+          const lab = document.querySelector(`label[for="${CSS.escape(g.id)}"]`) as HTMLElement | null;
+          return !!lab && lab.offsetParent !== null;
+        });
+        if (visibleByLabel.length === 0) return;
+        const noOne = visibleByLabel.find((g) => {
+          const v = g.value;
+          return v === 'False' || v === 'No' || v === 'false';
+        });
+        const target = noOne || visibleByLabel[0];
+        const lab = document.querySelector(`label[for="${CSS.escape(target.id)}"]`) as HTMLElement;
+        lab.click();
+        didTouch = true;
+      });
+      // (2) yesno-buttons (datatype: yesno) — click value="False" if neither
+      //     option in the group is already pressed.
+      const seenBtnGroups = new Set<string>();
+      document.querySelectorAll('button.btn-da[value="False"]').forEach((btn) => {
+        const b = btn as HTMLButtonElement;
+        if (b.offsetParent === null) return;
+        const name = b.name || '';
+        if (seenBtnGroups.has(name)) return;
+        seenBtnGroups.add(name);
+        // Skip if a sibling in this name-group is already pressed
+        if (name) {
+          const groupBtns = document.querySelectorAll(
+            `button.btn-da[name="${CSS.escape(name)}"]`,
+          );
+          let pressed = false;
+          groupBtns.forEach((g) => {
+            if ((g as HTMLButtonElement).getAttribute('aria-pressed') === 'true') pressed = true;
+            if ((g as HTMLButtonElement).classList.contains('active')) pressed = true;
+          });
+          if (pressed) return;
+        }
+        b.click();
+        didTouch = true;
+      });
+      // (3) <select> — pick first non-empty option if none chosen.
+      document.querySelectorAll('select').forEach((sel) => {
+        const s = sel as HTMLSelectElement;
+        if (s.offsetParent === null) return;
+        if (s.value && s.value !== '') return;
+        for (const opt of Array.from(s.options)) {
+          if (opt.value && opt.value !== '') {
+            s.value = opt.value;
+            s.dispatchEvent(new Event('change', { bubbles: true }));
+            didTouch = true;
+            break;
+          }
+        }
+      });
+      // (4) Text-ish inputs — label-aware safe defaults.
+      //     CRITICAL: check for currency-datatype FIRST, since "N/A" fails
+      //     the currency validator and the walker stalls. docassemble wraps
+      //     currency inputs in `.input-group` with a `$` prefix span; the
+      //     input itself often has `parsley-validation-class` and a
+      //     `data-parsley-type="number"` attribute.
+      document.querySelectorAll('input').forEach((el) => {
+        const i = el as HTMLInputElement;
+        if (i.offsetParent === null) return;
+        if (i.value) return;
+        const t = (i.type || '').toLowerCase();
+        if (['hidden', 'submit', 'button', 'reset', 'file', 'radio', 'checkbox'].includes(t)) {
+          return;
+        }
+        const label = i.id ? document.querySelector(`label[for="${i.id}"]`) : null;
+        const labelText = (label?.textContent || '').toLowerCase();
+        // Detect currency by structural cue (parent `.input-group` with `$` prefix)
+        // rather than by label keyword — labels like "compensation" / "fee" /
+        // "wage" don't trigger the keyword set but ARE currency-datatype fields.
+        const inInputGroup = i.closest('.input-group');
+        const hasCurrencyPrefix = !!inInputGroup?.querySelector('.input-group-text')?.textContent?.includes('$');
+        let v = 'N/A';
+        if (hasCurrencyPrefix) v = '0';
+        else if (t === 'number' || t === 'tel') v = '0';
+        else if (labelText.includes('zip')) v = '68508';
+        else if (
+          labelText.includes('amount') ||
+          labelText.includes('income') ||
+          labelText.includes('value') ||
+          labelText.includes('pay') ||
+          labelText.includes('expense') ||
+          labelText.includes('claim') ||
+          labelText.includes('count') ||
+          labelText.includes('compensation') ||
+          labelText.includes('fee') ||
+          labelText.includes('wage') ||
+          labelText.includes('salary')
+        )
+          v = '0';
+        else if (t === 'date') v = '2024-01-01';
+        else if (t === 'email') v = 'test@example.com';
+        else if (labelText.includes('year')) v = '2020';
+        else if (labelText.includes('mileage') || labelText.includes('milage')) v = '50000';
+        else if (labelText.includes("creditor's name")) v = 'Test Creditor';
+        else if (labelText.includes('name')) v = 'Test Person';
+        else if (labelText.includes('street') || labelText.includes('address')) v = '123 Test St';
+        else if (labelText.includes('city')) v = 'Lincoln';
+        i.value = v;
+        i.dispatchEvent(new Event('input', { bubbles: true }));
+        i.dispatchEvent(new Event('change', { bubbles: true }));
+        didTouch = true;
+      });
+      return didTouch;
+    }).catch(() => false);
+    if (!touched) break;
+    anyTouched = true;
+    await waitForPageStable(page, perRoundTimeout);
+  }
+  return anyTouched;
+}
+
 /** If a case_number field is visible on the current page, click Continue past it. */
 export async function handleCaseNumberIfPresent(page: Page) {
   const caseNumberField = page.locator(`#${b64('case_number')}`);

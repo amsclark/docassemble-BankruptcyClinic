@@ -20,7 +20,8 @@
     "test:debug-step": "playwright test --debug --headed",
     "test:video-analysis": "playwright test --headed && npm run test:report",
     "lint:selectors": "./scripts/lint-test-selectors.sh",
-    "pretest": "npm run lint:selectors"
+    "lint:yaml-ids": "./scripts/yaml-question-ids-snapshot.sh",
+    "pretest": "npm run lint:selectors && npm run lint:yaml-ids"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
