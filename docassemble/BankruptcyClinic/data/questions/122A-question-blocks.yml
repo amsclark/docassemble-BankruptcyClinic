@@ -337,7 +337,7 @@ code: |
     income['marriedFiling'] = True if monthly_income.filing_status == 'Married and your spouse is filing with you.' else False
     income['marriedNotFiling'] = True if monthly_income.filing_status == 'Married and your spouse is NOT filing with you.' else False
     income['sameHouse'] = True if monthly_income.filing_status == 'Married and your spouse is NOT filing with you.' and monthly_income.separated_status == 'Living in the same household and not legally separated.' else False
-    income['separateHouse'] = True if monthly_income.separated_status == 'Living separately or are legally separated' else False
+    income['separateHouse'] = True if getattr(monthly_income, 'separated_status', '') == 'Living separately or are legally separated' else False
 
     income['wages1'] = currency(monthly_income.gross_wages1)
     income['alimony1'] = currency(monthly_income.alimony1)
