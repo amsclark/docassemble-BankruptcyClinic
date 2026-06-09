@@ -607,6 +607,107 @@ def orphan_reads(def_index, mand):
     return orphans
 
 
+# ---------- table-column gaps (plain-YAML row_item reads) ---------------------
+
+# Genuinely built-in / list-machinery attrs legitimate on any row_item.
+_TABLE_BUILTIN_ATTRS = {"instanceName", "there_are_any", "there_is_another",
+                        "gathered", "complete"}
+
+
+def table_gaps(def_index, mand, roots):
+    """`table:` block columns and `edit:` entries reference row_item.<attr> as
+    plain YAML — never inside ${ }, so the AST/Mako collector can't see them.
+    Resolve row_item against the block's `rows:` list and flag attrs that no
+    question/code defines. Rendering such a table is a guaranteed
+    'variable could not be looked up' dead-end (the hazardous_property
+    row_item.number bug the fuzz walker found; ORPHAN_READ missed it for this
+    exact reason)."""
+    definable = definable_set(def_index, mand)
+    rootalt = "|".join(sorted(map(re.escape, roots), key=len, reverse=True))
+    rows_re = re.compile(rf"^rows:\s*((?:{rootalt})(?:\.\w+|\[[^\]]*\])*)\s*$", re.M)
+    gaps = []
+    for f in sorted(QDIR.glob("*.yml")):
+        for doc in split_blocks(f):
+            if not re.search(r"^table:\s*\w", doc, re.M):
+                continue
+            # strip YAML comment lines — a '# row_item.foo ...' note is not a read
+            doc = "\n".join(l for l in doc.splitlines() if not l.lstrip().startswith("#"))
+            rm = rows_re.search(doc)
+            if not rm:
+                continue
+            base = norm(rm.group(1))
+            attrs = set(re.findall(r"row_item\.(\w+)", doc))
+            em = re.search(r"^edit:\s*\n((?:\s+-\s*\w+\s*\n?)+)", doc, re.M)
+            if em:
+                attrs |= set(re.findall(r"-\s*(\w+)", em.group(1)))
+            for a in sorted(attrs):
+                if a in _TABLE_BUILTIN_ATTRS:
+                    continue
+                cand = f"{base}[i].{a}"
+                if cand in definable:
+                    continue
+                gaps.append((f.name, cand))
+    return sorted(set(gaps))
+
+
+# ---------- optional-but-load-bearing fields (lease_assumed loop class) -------
+
+# Datatypes whose variable stays UNDEFINED when the user skips the field:
+# an unclicked radio group or a blank date submits nothing. (Text-ish fields
+# submit '' — defined — so they cannot loop this way.)
+_RISKY_OPTIONAL_DATATYPES = {"yesnoradio", "noyesradio", "yesnomaybe", "date"}
+
+
+def optional_risky_fields(roots):
+    """Map of field var -> defining file for fields that are `required: False`
+    with a skippable datatype. Such a variable is NOT guaranteed defined even
+    after its question runs."""
+    rootalt = "|".join(sorted(map(re.escape, roots), key=len, reverse=True))
+    PATH = rf"(?:{rootalt})(?:\.\w+|\[[^\]]*\])*"
+    field_re = re.compile(rf"^(\s*)-\s*(?:[^:#]+:\s*)?({PATH})\s*$")
+    out = {}
+    for f in sorted(QDIR.glob("*.yml")):
+        lines = f.read_text().splitlines()
+        for idx, ln in enumerate(lines):
+            m = field_re.match(ln)
+            if not m:
+                continue
+            indent = len(m.group(1))
+            var = norm(m.group(2))
+            dt, req_false = None, False
+            for la in lines[idx + 1: idx + 16]:
+                lai = len(la) - len(la.lstrip())
+                if la.strip() and lai <= indent:
+                    break
+                md = re.match(r"\s*datatype:\s*(\S+)", la)
+                if md:
+                    dt = md.group(1)
+                if re.match(r"\s*required:\s*[Ff]alse", la):
+                    req_false = True
+            if req_false and dt in _RISKY_OPTIONAL_DATATYPES:
+                out[var] = f.name
+    return out
+
+
+def optional_gaps(def_index, mand, roots):
+    """Optional-but-load-bearing: a skippable field (see above) that some code
+    block / template reads WITHOUT a defined()/getattr guard. A filer who
+    leaves the field blank strands that reader seeking a question that will
+    never re-define it — the contracts lease_assumed 'Infinite loop:
+    x.gathered' (matched 2026-06-05 prod hits). Fix by making the field
+    required when visible, or guarding every read."""
+    risky = optional_risky_fields(roots)
+    if not risky:
+        return []
+    reads = all_interview_reads(roots)
+    gaps = []
+    for v, fname in sorted(risky.items()):
+        rec = reads.get(v)
+        if rec and rec["undefended"]:
+            gaps.append((v, fname, sorted(rec["files"])))
+    return gaps
+
+
 # ---------- cycle / forward-reference risk (infinite-loop class) --------------
 
 def _scalar_refs(roots, code):
@@ -818,6 +919,10 @@ def findings_lines(def_index, mand, targets):
         lines.append(f"(interview)\t-\tORPHAN_READ\t{v}")
     for x, r, sf in cycle_risks(interview_roots()):
         lines.append(f"{sf}\t-\tCYCLE_RISK\t{x} (read by review screen for {r}, defined only later)")
+    for fname, cand in table_gaps(def_index, mand, interview_roots()):
+        lines.append(f"{fname}\t-\tTABLE_GAP\t{cand}")
+    for v, fname, readers in optional_gaps(def_index, mand, interview_roots()):
+        lines.append(f"{fname}\t-\tOPTIONAL_GAP\t{v} (required:False {'/'.join(sorted(_RISKY_OPTIONAL_DATATYPES))}-class; unguarded readers: {', '.join(readers)})")
     return sorted(lines)
 
 
