@@ -49,9 +49,14 @@ happy-path Playwright runs (which mask these bugs — see `tests/navigation-help
   aliases, `for`/`enumerate` loops, bare globals) and flags:
   - **NEVER DEFINED** — read by a form but defined nowhere (typo / missing field).
   - **SHOW-IF GAP** — defined only behind a `show if`, but read without mirroring
-    that condition (covers enclosing `if` *and* short-circuit `and`).
-  Caught `122A monthly_income.separated_status` and the `106AB` grand-total bug
-  (totals sum ~50 show-if'd category `*_value`/`*_amount` fields unconditionally).
+    that condition (covers enclosing `if`, short-circuit `and`, and `if defined()`
+    block guards).
+  - **BRANCH GAP** — *branch-sensitive*: the variable is collected by the
+    `mandatory` block only under some `if` guard, but a form reads it under a
+    *broader* condition. Caught `122A monthly_income.gross_wages2` (collected only
+    for married-filing, read for any consumer-debt filer → single filers crash).
+  Also caught `122A separated_status` and the `106AB` grand-total bug (totals sum
+  ~50 show-if'd category `*_value`/`*_amount` fields unconditionally).
 
 - **`python3 scripts/interview_dependency_check.py`** — "internal soundness":
   top-level scalars defined by **both a question and code** (the rule-6 loop

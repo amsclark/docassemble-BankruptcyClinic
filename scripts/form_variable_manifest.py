@@ -50,6 +50,10 @@ IGNORE_ROOTS = {
 
 SETTER_KEYS = ("yesno", "yesnoradio", "field", "continue button field", "sets", "signature")
 
+# sentinel added to a guard-set when the enclosing condition is a definedness
+# check (`if defined('X'):` / hasattr) — reads inside are defensively guarded.
+DEFENDED = "\x01defended"
+
 
 # ---------- YAML block helpers -------------------------------------------------
 
@@ -168,7 +172,18 @@ class Collector(ast.NodeVisitor):
                     out.add(val)
                 elif kind == 'local':
                     out |= self.locals[val]
+        if self._defensive(node):
+            out.add(DEFENDED)
         return out
+
+    @staticmethod
+    def _defensive(node):
+        """Does this condition contain a definedness check (defined/hasattr)?"""
+        for sub in ast.walk(node):
+            if isinstance(sub, ast.Call) and isinstance(sub.func, ast.Name) \
+                    and sub.func.id in ("defined", "hasattr"):
+                return True
+        return False
 
     def _record(self, node):
         kind, val = self._resolve(node)
@@ -276,21 +291,21 @@ def build_def_index(roots):
     assign_lhs = re.compile(rf"^\s*({PATH})\s*(?:=(?!=)|\.gather\(\))")
     path_anywhere = re.compile(rf"({PATH})")
 
-    uncond, cond = set(), {}
+    strong, field_uncond, cond = set(), set(), {}
     mtext = MAIN.read_text()
     om = re.search(r"^objects:\s*\n((?:[ \t].*\n|\n)+)", mtext, re.M)
     if om:
         for ln in om.group(1).splitlines():
             mm = re.match(r"\s*-\s*([A-Za-z_][\w.\[\]]*)\s*:", ln)
             if mm:
-                uncond.add(norm(mm.group(1)))
+                strong.add(norm(mm.group(1)))
 
     for f in sorted(QDIR.glob("*.yml")):
         lines = f.read_text().splitlines()
         for idx, ln in enumerate(lines):
             ms = setter.match(ln)
             if ms:
-                uncond.add(norm(ms.group(1))); continue
+                field_uncond.add(norm(ms.group(1))); continue
             m = field_target.match(ln)
             if m:
                 indent = len(m.group(1)); p = norm(m.group(2))
@@ -311,13 +326,47 @@ def build_def_index(roots):
                 if governing:
                     cond.setdefault(p, set()).update(governing - {p})
                 else:
-                    uncond.add(p)
+                    field_uncond.add(p)
                 continue
             ma = assign_lhs.match(ln)
             if ma:
-                uncond.add(norm(ma.group(1)))
-    cond = {p: g for p, g in cond.items() if p not in uncond}
-    return uncond, cond
+                strong.add(norm(ma.group(1)))
+    cond = {p: g for p, g in cond.items() if p not in strong and p not in field_uncond}
+    return strong, field_uncond, cond
+
+
+def mandatory_collection_guards(roots):
+    """Branch-sensitivity: parse the `mandatory` code blocks and learn the
+    CONDITION under which each variable is collected (sought).
+
+    A variable referenced with an empty guard-set is always collected. A
+    variable referenced only inside `if` guards is collected ONLY under those
+    conditions — so a form that reads it under a *broader* condition can hit it
+    undefined (the gross_wages2 class: collected only for married-filing, read
+    for any consumer-debt filer).
+
+    Returns (mand_uncond:set, mand_cond:dict var -> list[frozenset(guard paths)]).
+    """
+    mand_uncond, refs = set(), {}
+    for f in sorted(QDIR.glob("*.yml")):
+        for doc in split_blocks(f):
+            if not re.search(r"^mandatory:\s*(True|true)\b", doc, re.M):
+                continue
+            code = get_code(doc)
+            if not code:
+                continue
+            col = Collector(roots, "\x00")  # no output dict in a mandatory block
+            try:
+                col.visit(ast.parse(code))
+            except SyntaxError:
+                continue
+            for var, gsets in col.reads.items():
+                for g in gsets:
+                    refs.setdefault(var, []).append(frozenset(g))
+                    if not g:
+                        mand_uncond.add(var)
+    mand_cond = {v: gs for v, gs in refs.items() if v not in mand_uncond}
+    return mand_uncond, mand_cond
 
 
 # ---------- form discovery + analysis -----------------------------------------
@@ -339,12 +388,28 @@ def builder_blocks_for(path, dictvar):
 
 
 def guarded_in(code, leaf):
-    return bool(re.search(r"getattr\(|defined\(", code)) and bool(re.search(re.escape(leaf.replace("[i]", "")), code))
+    """Is THIS specific leaf read defensively (getattr/defined), not just any leaf?"""
+    if "[i]" not in leaf and "." in leaf:
+        # scalar obj.attr  ->  getattr(obj, 'attr', ...)
+        obj, attr = leaf.rsplit(".", 1)
+        if re.search(rf"getattr\(\s*{re.escape(obj)}\s*,\s*['\"]{re.escape(attr)}['\"]", code):
+            return True
+    else:
+        # loop-item / bare: match by final attribute name (obj is a loop var)
+        attr = leaf.rsplit(".", 1)[-1].replace("[i]", "")
+        if attr and re.search(rf"getattr\(\s*[\w\[\]. ]+,\s*['\"]{re.escape(attr)}['\"]", code):
+            return True
+    # defined('...path...') — match the leaf's tail path
+    tail = re.escape(leaf.rsplit("[i]", 1)[-1].lstrip("."))
+    if tail and re.search(rf"defined\(\s*['\"][^'\"]*{tail}['\"]", code):
+        return True
+    return False
 
 
-def analyze(path, def_index):
+def analyze(path, def_index, mand):
     roots = interview_roots()
-    uncond, cond = def_index
+    strong, field_uncond, cond = def_index
+    mand_uncond, mand_cond = mand
     out = []
     for form_name, dictvar in find_forms(path):
         blocks = builder_blocks_for(path, dictvar)
@@ -355,50 +420,67 @@ def analyze(path, def_index):
                 col.visit(ast.parse(b))
             except SyntaxError as e:
                 print(f"  ! parse error in {form_name}: {e}", file=sys.stderr)
-        missing, showif = [], []
+        missing, showif, branch = [], [], []
         for leaf, guard_sets in sorted(col.reads.items()):
-            if guarded_in(joined, leaf) or leaf in uncond:
+            if guarded_in(joined, leaf):
+                continue
+            # A genuinely unconditional definition (code assignment / object) or an
+            # unconditional reference in the mandatory block means always-defined.
+            if leaf in strong or leaf in mand_uncond:
+                continue
+            # Branch-sensitivity: a variable whose ONLY forcing reference in the
+            # mandatory block is conditional is defined only under those guards —
+            # even if it also has a no-show-if field (the field collects only if
+            # its screen is reached). Safe only if some collection guard-set is a
+            # subset of the read's guard-set (read happens only when collected).
+            if leaf in mand_cond:
+                dsets = mand_cond[leaf]
+                if any(DEFENDED not in R and not any(d <= R for d in dsets) for R in guard_sets):
+                    branch.append(leaf)
+                continue
+            if leaf in field_uncond:
                 continue
             if leaf in cond:
                 gov = cond[leaf]
-                # real gap only if some read site does NOT mirror a governing var
-                unmirrored = any(not (g & gov) for g in guard_sets)
-                if unmirrored:
+                if any(DEFENDED not in g and not (g & gov) for g in guard_sets):
                     showif.append(leaf)
             else:
                 missing.append(leaf)
-        out.append((form_name, dictvar, sorted(col.reads), sorted(col.lists), missing, showif))
+        out.append((form_name, dictvar, sorted(col.reads), sorted(col.lists), missing, showif, branch))
     return out
 
 
-def findings_lines(def_index, targets):
+def findings_lines(def_index, mand, targets):
     """Stable, diffable lines: '<file>\t<FORM>\t<TYPE>\t<leaf>' for each gap."""
     lines = []
     for path in targets:
-        for name, dv, leaves, lists, missing, showif in analyze(path, def_index):
+        for name, dv, leaves, lists, missing, showif, branch in analyze(path, def_index, mand):
             for g in missing:
                 lines.append(f"{path.name}\t{name}\tNEVER_DEFINED\t{g}")
             for g in showif:
                 lines.append(f"{path.name}\t{name}\tSHOWIF_GAP\t{g}")
+            for g in branch:
+                lines.append(f"{path.name}\t{name}\tBRANCH_GAP\t{g}")
     return sorted(lines)
 
 
 def main(argv):
     def_index = build_def_index(interview_roots())
+    mand = mandatory_collection_guards(interview_roots())
     if "--findings" in argv:
         targets = sorted(QDIR.glob("*.yml"))
-        print("\n".join(findings_lines(def_index, targets)))
+        print("\n".join(findings_lines(def_index, mand, targets)))
         return
     verbose = "-v" in argv
     argv = [a for a in argv if a != "-v"]
     targets = [QDIR / a for a in argv[1:]] if len(argv) > 1 else sorted(QDIR.glob("*.yml"))
-    tm = ts = 0
+    tm = ts = tb = 0
     for path in targets:
-        forms = analyze(path, def_index)
+        forms = analyze(path, def_index, mand)
         if not forms:
             continue
         print(f"\n===== {path.name} =====")
-        for name, dv, leaves, lists, missing, showif in forms:
+        for name, dv, leaves, lists, missing, showif, branch in forms:
             print(f"\n  FORM: {name}   (dict: {dv})  — {len(leaves)} leaf vars"
                   + (f", {len(lists)} list(s)" if lists else ""))
             if verbose:
@@ -409,12 +491,17 @@ def main(argv):
                 print(f"    !! NEVER DEFINED anywhere (likely crash/typo): {len(missing)}")
                 for g in missing:
                     print(f"      XX {g}")
+            if branch:
+                tb += len(branch)
+                print(f"    !! BRANCH GAP — collected only on a narrower branch than it's read: {len(branch)}")
+                for g in branch:
+                    print(f"      >< {g}")
             if showif:
                 ts += len(showif)
                 print(f"    !  SHOW-IF GAP — read not mirrored by its show-if condition: {len(showif)}")
                 for g in showif:
                     print(f"      ?? {g}")
-    print(f"\n==== summary: {tm} never-defined, {ts} unmirrored show-if reads ====")
+    print(f"\n==== summary: {tm} never-defined, {tb} branch gaps, {ts} unmirrored show-if reads ====")
 
 
 if __name__ == "__main__":
