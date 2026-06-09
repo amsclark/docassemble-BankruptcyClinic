@@ -63,7 +63,10 @@ test.describe('Seeded-random fuzz walker', () => {
 
         if (
           hLow.includes('voluntary petition for individuals filing for bankruptcy conclusion') ||
-          hLow.includes('form 101 output') ||
+          // NOT 'form 101 output': that's the print_101 single-form preview
+          // (event + continue button), an intermediate screen — treating it
+          // as terminal made finishAndAssertAllPdfs fail on a non-conclusion
+          // page. The loop continues through it via its Continue button.
           hLow.includes('your documents are ready') ||
           hLow.includes('interview questions complete')
         ) {
@@ -89,7 +92,15 @@ test.describe('Seeded-random fuzz walker', () => {
         // same damping.
         if (!(await pageHasContinueButton(page))) {
           const sayYes = rng() < yesBias;
-          const advanced = await clickYesNoButtonPage(page, sayYes);
+          let advanced = await clickYesNoButtonPage(page, sayYes);
+          if (!advanced) {
+            // Mid-transition pages briefly show neither Continue nor Yes/No —
+            // a single misread here forks the whole seeded path. Settle and
+            // re-check once before concluding the page is truly button-less.
+            await page.waitForTimeout(1500);
+            if (await pageHasContinueButton(page)) continue;
+            advanced = await clickYesNoButtonPage(page, sayYes);
+          }
           if (advanced) {
             sameHeadingStreak = 0;
             continue;

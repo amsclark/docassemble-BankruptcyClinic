@@ -117,7 +117,11 @@ export async function fillVisibleRequiredFields(
       const isCurrency = !!(grp && /[$]/.test(grp.textContent || ''));
       const money = () => random ? String(Math.floor(rnd() * 5000)) : '0';
       let v = 'N/A';
-      if (isCurrency || t === 'number' || t === 'tel') v = money();
+      // Date checks FIRST: "Payment Date 1" matches the money branch's 'pay'
+      // and a numeric value in a date field fails validation (silent block).
+      if (t === 'date') v = '2024-01-01';
+      else if (labelText.includes('date')) v = '01/01/2024';
+      else if (isCurrency || t === 'number' || t === 'tel') v = money();
       else if (labelText.includes('zip')) v = '68508';
       else if (
         labelText.includes('amount') || labelText.includes('income') ||
@@ -125,7 +129,6 @@ export async function fillVisibleRequiredFields(
         labelText.includes('expense') || labelText.includes('count') ||
         labelText.includes('mileage') || labelText.includes('milage')
       ) v = money();
-      else if (t === 'date') v = '2024-01-01';
       else if (t === 'email') v = 'test@example.com';
       else if (labelText.includes('year')) v = '2020';
       else if (labelText.includes('name')) v = 'Test Person';
@@ -134,6 +137,44 @@ export async function fillVisibleRequiredFields(
       i.value = v;
       i.dispatchEvent(new Event('input', { bubbles: true }));
       i.dispatchEvent(new Event('change', { bubbles: true }));
+      touched = true;
+    });
+
+    // 4) checkbox GROUPS (datatype: checkboxes) — untouched groups fail the
+    //    "check at least one option, or check None of the above" validator
+    //    (e.g. 107 "Business Connections"). Only groups (>=2 visible boxes):
+    //    a lone checkbox is a yesno whose unchecked state is a valid False,
+    //    and flipping it would change the strict walker's deterministic path.
+    const cbs = (Array.from(document.querySelectorAll('input[type="checkbox"]')) as HTMLInputElement[])
+      .filter((cb) => {
+        if (!cb.id) return false;
+        const lab = document.querySelector(`label[for="${CSS.escape(cb.id)}"]`) as HTMLElement | null;
+        return !!lab && lab.offsetParent !== null;
+      });
+    if (cbs.length >= 2 && !cbs.some((c) => c.checked)) {
+      const labelOf = (c: HTMLInputElement) =>
+        (document.querySelector(`label[for="${CSS.escape(c.id)}"]`)?.textContent || '');
+      const nota = cbs.find((c) => /none of the above/i.test(labelOf(c)));
+      let target: HTMLInputElement;
+      if (random) {
+        target = rnd() < (yesBias ?? 0.3) || !nota ? cbs[Math.floor(rnd() * cbs.length)] : nota;
+      } else {
+        target = nota || cbs[0];
+      }
+      (document.querySelector(`label[for="${CSS.escape(target.id)}"]`) as HTMLElement).click();
+      touched = true;
+    }
+
+    // 5) textareas (docassemble `input type: area`) — the insider-payment and
+    //    contract-details pages have REQUIRED textareas; leaving them empty
+    //    fails validation and reads as a silent block.
+    document.querySelectorAll('textarea').forEach((el) => {
+      const ta = el as HTMLTextAreaElement;
+      if (ta.offsetParent === null) return;
+      if (ta.value) return;
+      ta.value = 'Test details provided by the fuzz walker.';
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+      ta.dispatchEvent(new Event('change', { bubbles: true }));
       touched = true;
     });
 
