@@ -117,10 +117,20 @@ test.describe('Seeded-random fuzz walker', () => {
         await clickContinueStrict(page);
         await page.waitForTimeout(800);
 
-        const h2 = (await getHeading(page)).toLowerCase();
-        const trackerAfter = await page.locator('input[name="_tracker"]').first().getAttribute('value').catch(() => null);
-        const headingSame = (h2 === hLow);
-        const trackerAdvanced = (trackerBefore !== null && trackerAfter !== null && trackerBefore !== trackerAfter);
+        let h2 = (await getHeading(page)).toLowerCase();
+        let trackerAfter = await page.locator('input[name="_tracker"]').first().getAttribute('value').catch(() => null);
+        let headingSame = (h2 === hLow);
+        let trackerAdvanced = (trackerBefore !== null && trackerAfter !== null && trackerBefore !== trackerAfter);
+        // Under server lock contention a legitimate POST can take many seconds;
+        // judging "didn't advance" after one short wait turns slow pages into
+        // false silent blocks. Re-check the tracker for up to 10s first.
+        for (let settle = 0; settle < 10 && headingSame && !trackerAdvanced; settle++) {
+          await page.waitForTimeout(1000);
+          h2 = (await getHeading(page)).toLowerCase();
+          trackerAfter = await page.locator('input[name="_tracker"]').first().getAttribute('value').catch(() => null);
+          headingSame = (h2 === hLow);
+          trackerAdvanced = (trackerBefore !== null && trackerAfter !== null && trackerBefore !== trackerAfter);
+        }
         if (headingSame && !trackerAdvanced) {
           sameHeadingStreak += 1;
           if (sameHeadingStreak === 1) {

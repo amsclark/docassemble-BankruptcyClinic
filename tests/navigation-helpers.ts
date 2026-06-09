@@ -745,29 +745,43 @@ export async function navigateUnsecuredCreditors(page: Page, scenario: TestScena
   // to the first claim. Always fill one; use a default for scenarios that don't
   // specify a nonpriority creditor.
   await waitForDaPageLoad(page);
-  const np = scenario.creditors.nonpriority || {
-    name: 'General Unsecured Creditor', street: '1 Market St', city: 'Omaha',
-    state: 'Nebraska', zip: '68102', totalClaim: '1000', type: 'Credit Card',
-  };
-  await page.locator(`#${b64('prop.nonpriority_claims[0].name')}`).fill(np.name);
-  await page.locator(`#${b64('prop.nonpriority_claims[0].street')}`).fill(np.street);
-  await page.locator(`#${b64('prop.nonpriority_claims[0].city')}`).fill(np.city);
-  await page.locator(`select#${b64('prop.nonpriority_claims[0].state')}`).selectOption(np.state);
-  await page.locator(`#${b64('prop.nonpriority_claims[0].zip')}`).fill(np.zip);
-  // 'who' dropdown — always visible (code-generated choices)
-  const npWhoSelect = page.locator(`select#${b64('prop.nonpriority_claims[0].who')}`);
-  if (await npWhoSelect.count() > 0) await npWhoSelect.selectOption('Debtor 1 only');
+  // Drive EVERY claim in nonpriorityList when the scenario provides one — the
+  // PDF content assertions sum the list, and the multi-claim "any more?" loop
+  // is coverage nothing else exercises. Fall back to the singular fixture.
+  const npClaims = scenario.creditors.nonpriorityList?.length
+    ? scenario.creditors.nonpriorityList
+    : [scenario.creditors.nonpriority || {
+        name: 'General Unsecured Creditor', street: '1 Market St', city: 'Omaha',
+        state: 'Nebraska', zip: '68102', totalClaim: '1000', type: 'Credit Card',
+      }];
+  for (let ci = 0; ci < npClaims.length; ci++) {
+    const np = npClaims[ci];
+    const P = `prop.nonpriority_claims[${ci}]`;
+    await waitForDaPageLoad(page);
+    await page.locator(`#${b64(`${P}.name`)}`).fill(np.name);
+    await page.locator(`#${b64(`${P}.street`)}`).fill(np.street);
+    await page.locator(`#${b64(`${P}.city`)}`).fill(np.city);
+    await page.locator(`select#${b64(`${P}.state`)}`).selectOption(np.state);
+    await page.locator(`#${b64(`${P}.zip`)}`).fill(np.zip);
+    // 'who' dropdown — always visible (code-generated choices)
+    const npWhoSelect = page.locator(`select#${b64(`${P}.who`)}`);
+    if (await npWhoSelect.count() > 0) await npWhoSelect.selectOption('Debtor 1 only');
 
-  // Claim type dropdown (required)
-  const npTypeSelect = page.locator(`select#${b64('prop.nonpriority_claims[0].type')}`);
-  if (await npTypeSelect.count() > 0) await npTypeSelect.selectOption(np.type);
+    // Claim type dropdown (required)
+    const npTypeSelect = page.locator(`select#${b64(`${P}.type`)}`);
+    if (await npTypeSelect.count() > 0) await npTypeSelect.selectOption(np.type);
 
-  await page.locator(`#${b64('prop.nonpriority_claims[0].total_claim')}`).fill(np.totalClaim);
-  await fillYesNoRadio(page, 'prop.nonpriority_claims[0].save_to_library', false);
-  await fillYesNoRadio(page, 'prop.nonpriority_claims[0].has_codebtor', false);
-  await fillYesNoRadio(page, 'prop.nonpriority_claims[0].has_notify', false);
+    await page.locator(`#${b64(`${P}.total_claim`)}`).fill(np.totalClaim);
+    await fillYesNoRadio(page, `${P}.save_to_library`, false);
+    await fillYesNoRadio(page, `${P}.has_codebtor`, false);
+    await fillYesNoRadio(page, `${P}.has_notify`, false);
+    await clickContinue(page);
 
-  await clickContinue(page);
+    if (ci < npClaims.length - 1) {
+      await waitForDaPageLoad(page);
+      await clickYesNoButton(page, 'prop.nonpriority_claims.there_is_another', true);
+    }
+  }
   await handleAnotherPage(page, 'prop.nonpriority_claims.there_is_another');
 }
 
