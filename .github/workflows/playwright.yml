@@ -15,6 +15,11 @@ jobs:
         node-version: lts/*
     - name: Install dependencies
       run: npm ci
+    - name: Interview flow gates (static — no server needed)
+      run: |
+        chmod +x scripts/*.sh
+        ./scripts/lint-flow-gaps.sh
+        ./scripts/lint-test-completeness.sh
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
