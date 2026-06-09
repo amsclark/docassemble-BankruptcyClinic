@@ -460,9 +460,14 @@ code: |
     _month_var = 'debtor[' + str(_idx) + '].income.other_monthly_amount'
     _other_ded = _num(value(_ded_var)) if defined(_ded_var) else 0
     _other_month = _num(value(_month_var)) if defined(_month_var) else 0
-    _income_total = (_num(debt.income.net_rental_business) + _num(debt.income.family_support) + _num(debt.income.interest_and_dividends) + _num(debt.income.unemployment) + _num(debt.income.social_security) + _num(debt.income.other_govt_assist) + _num(debt.income.pension) + _other_month)
-    _paystub_total = (_num(debt.income.income_amount_1) + _num(debt.income.income_amount_2) + _num(debt.income.income_amount_3) + _num(debt.income.income_amount_4) + _num(debt.income.income_amount_5) + _num(debt.income.income_amount_6) + _num(debt.income.overtime_pay_1) + _num(debt.income.overtime_pay_2) + _num(debt.income.overtime_pay_3))
-    _deductions = (_num(debt.income.tax_deduction) + _num(debt.income.mandatory_contributions) + _num(debt.income.voluntary_contributions) + _num(debt.income.fund_loans) + _num(debt.income.insurance) + _num(debt.income.domestic_support) + _num(debt.income.union_dues) + _other_ded)
+    # Use getattr() so a debtor who never sees a given income/payroll/deduction
+    # screen (e.g. an unemployed debtor skips the payroll + deduction pages)
+    # doesn't trigger an undefined-variable crash here. Missing == 0.
+    def _gi(_d, _a):
+      return _num(getattr(_d.income, _a, 0))
+    _income_total = (_gi(debt, 'net_rental_business') + _gi(debt, 'family_support') + _gi(debt, 'interest_and_dividends') + _gi(debt, 'unemployment') + _gi(debt, 'social_security') + _gi(debt, 'other_govt_assist') + _gi(debt, 'pension') + _other_month)
+    _paystub_total = (_gi(debt, 'income_amount_1') + _gi(debt, 'income_amount_2') + _gi(debt, 'income_amount_3') + _gi(debt, 'income_amount_4') + _gi(debt, 'income_amount_5') + _gi(debt, 'income_amount_6') + _gi(debt, 'overtime_pay_1') + _gi(debt, 'overtime_pay_2') + _gi(debt, 'overtime_pay_3'))
+    _deductions = (_gi(debt, 'tax_deduction') + _gi(debt, 'mandatory_contributions') + _gi(debt, 'voluntary_contributions') + _gi(debt, 'fund_loans') + _gi(debt, 'insurance') + _gi(debt, 'domestic_support') + _gi(debt, 'union_dues') + _other_ded)
     _overall += _income_total + _paystub_total - _deductions
   overallIncome = _overall
   # DOJ Median Family Income thresholds for Ch. 7 means test

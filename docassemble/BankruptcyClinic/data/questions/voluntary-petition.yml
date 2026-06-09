@@ -751,17 +751,11 @@ code: |
   financial_affairs.businesses.gather()
   financial_affairs.has_statement
 
-  # Creditor Library — let users pre-fill from shared list
-  creditor_library_seeded
-  creditor_library_picker_done
-  creditor_library_injected
-
-  #106D
-  prop.creditors.gather()
-
-  #106EF
-  prop.priority_claims.gather()
-  prop.nonpriority_claims.gather()
+  # Creditors/claims were already gathered right after Exemptions. The
+  # redundant re-gather() calls that used to be here re-drove the Schedule
+  # D / E/F questions a second time (priority debts "asked twice" — Roxanne
+  # & Alex feedback). The save-to-library loop and reporting below only READ
+  # the already-gathered lists, so no gather() is needed here.
 
   # Save creditors to shared library if user opted in
   for _cred in list(prop.creditors):
@@ -804,9 +798,9 @@ code: |
   reporting.assets_estimate = _assets_total
   reporting.liabilities_estimate = sum(claim.total_claim for claim in prop.priority_claims) + sum(claim.total_claim for claim in prop.nonpriority_claims)
 
-  #106G  (contracts gathered earlier; personal_leases now has its own form_108
-  # step below so it no longer fires during Schedule G — Roxanne feedback)
-  prop.contracts_and_leases.gather()
+  #106G  (contracts_and_leases gathered earlier; the redundant re-gather() was
+  # removed to avoid re-driving Schedule G. personal_leases now has its own
+  # form_108 step below so it no longer fires during Schedule G — Roxanne feedback)
 
   #106H
   codebtor_auto_populated
@@ -829,10 +823,23 @@ code: |
     monthly_income.gross_wages1
     if monthly_income.filing_status == "Married and your spouse is filing with you.":
       monthly_income.gross_wages2
+    # review_122 reads monthly_income.median_dependents. Collect the
+    # median-income screen (state / household size / median income) HERE, before
+    # `reviewed`, so they resolve in order. Previously the median_dependents =1
+    # fallback sat AFTER `reviewed` as a competing second generator, so resolving
+    # `reviewed` (needs median_dependents) and median_dependents (needs the
+    # mandatory block to advance past `reviewed`) looped forever:
+    # "infinite loop: x.median_dependents, x.reviewed".
+    monthly_income.median_state
+    monthly_income.median_dependents
+    monthly_income.median_income
     monthly_income.reviewed
-  # Set defaults for poverty calculation if means test was skipped
-  if not defined('monthly_income.median_dependents'):
-    monthly_income.median_dependents = 1
+  else:
+    # Means test skipped (non-consumer debts / veteran / reservist) — default the
+    # household size so downstream code and the 122A PDF always have a value,
+    # without forcing the median-income screen.
+    if not defined('monthly_income.median_dependents'):
+      monthly_income.median_dependents = 1
 
 
   case.payment_method
@@ -1244,6 +1251,20 @@ code: |
   prop.contracts_and_leases[i].state
   prop.contracts_and_leases[i].zip
   prop.contracts_and_leases[i].description
+  # Reference every field the Schedule G question (and the 106G PDF) reads, so
+  # this per-item generator stays consistent with the `list collect` question.
+  # Leaving the conditional lease/codebtor fields unset caused an
+  # "Infinite loop: x.gathered" when the form was later assembled.
+  prop.contracts_and_leases[i].has_codebtor
+  if prop.contracts_and_leases[i].has_codebtor:
+    prop.contracts_and_leases[i].codebtor_name
+    prop.contracts_and_leases[i].codebtor_street
+    prop.contracts_and_leases[i].codebtor_city
+    prop.contracts_and_leases[i].codebtor_state
+    prop.contracts_and_leases[i].codebtor_zip
+  prop.contracts_and_leases[i].unexpired_lease
+  if prop.contracts_and_leases[i].unexpired_lease:
+    prop.contracts_and_leases[i].lease_assumed
   prop.contracts_and_leases[i].complete = True
 ---
 code: |

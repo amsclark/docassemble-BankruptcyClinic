@@ -288,19 +288,38 @@ validation code: |
     prop.ab_vehicles[i].current_owned_value = prop.ab_vehicles[i].current_value - prop.ab_vehicles[i].current_owed_amount
   else:
     prop.ab_vehicles[i].current_owned_value = prop.ab_vehicles[i].current_value
-  # Issue #53: limit Motor Vehicle exemption to one vehicle
+  # Issue #53: limit the Motor Vehicle exemption to one vehicle PER DEBTOR.
+  # In a joint case each spouse is entitled to their own motor-vehicle
+  # exemption (11 U.S.C. 522(m)), so only block a second claim when it is the
+  # SAME debtor's vehicle. Jointly-owned / third-party vehicles are not blocked.
   def _claims_motor_vehicle(v):
     for attr in ('exemption_laws', 'exemption_laws_2'):
       val = getattr(v, attr, None)
       if val and 'motor vehicle' in str(val).lower():
         return True
     return False
+  def _mv_owner(v):
+    w = getattr(v, 'who', 'Debtor 1 only')
+    if w == 'Debtor 1 only':
+      return 'D1'
+    if w == 'Debtor 2 only':
+      return 'D2'
+    return None  # shared or third-party ownership: do not enforce the limit
+  def _vehicle_label(v, idx):
+    _yr = getattr(v, 'year', '')
+    try:
+      _yr = str(int(float(_yr)))
+    except (TypeError, ValueError):
+      _yr = str(_yr or '')
+    parts = [p for p in (_yr, str(getattr(v, 'make', '') or ''), str(getattr(v, 'model', '') or '')) if p]
+    return ' '.join(parts).strip() or ('Vehicle #' + str(idx + 1))
   if prop.ab_vehicles[i].is_claiming_exemption and _claims_motor_vehicle(prop.ab_vehicles[i]):
-    for j in range(i):
-      prev = prop.ab_vehicles[j]
-      if getattr(prev, 'is_claiming_exemption', False) and _claims_motor_vehicle(prev):
-        prev_name = ' '.join(str(getattr(prev, a, '')) for a in ('year', 'make', 'model')).strip() or f'Vehicle #{j+1}'
-        validation_error("The Motor Vehicle exemption may only be claimed for one vehicle. You already claimed it for " + prev_name + ". Please choose a different exemption (for example, Wildcard) for this vehicle.")
+    _cur_owner = _mv_owner(prop.ab_vehicles[i])
+    if _cur_owner is not None:
+      for j in range(i):
+        prev = prop.ab_vehicles[j]
+        if getattr(prev, 'is_claiming_exemption', False) and _claims_motor_vehicle(prev) and _mv_owner(prev) == _cur_owner:
+          validation_error("The Motor Vehicle exemption may only be claimed for one vehicle per debtor. You already claimed it for " + _vehicle_label(prev, j) + ". Please choose a different exemption (for example, Wildcard) for this vehicle.")
 fields:
   - Make: prop.ab_vehicles[i].make
   - Model: prop.ab_vehicles[i].model

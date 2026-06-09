@@ -61,7 +61,7 @@ fields:
       % endif
   - Your gross wages, salary, tips, bonuses, overtime, and commissions: monthly_income.gross_wages1
     datatype: currency
-    default: ${ debtor[0].income.income_amount_1 + debtor[0].income.overtime_pay_1 }
+    default: ${ getattr(debtor[0].income, 'income_amount_1', 0) + getattr(debtor[0].income, 'overtime_pay_1', 0) }
   - Alimony and maintenance payments: monthly_income.alimony1
     datatype: currency
     default: ${ debtor[0].income.family_support }
@@ -126,7 +126,7 @@ fields:
   - note: Income calculation Debtor 2
   - Your gross wages, salary, tips, bonuses, overtime, and commissions: monthly_income.gross_wages2
     datatype: currency
-    default: ${ debtor[1].income.income_amount_1 + debtor[1].income.overtime_pay_1 if len(debtor) > 1 else 0 }
+    default: ${ (getattr(debtor[1].income, 'income_amount_1', 0) + getattr(debtor[1].income, 'overtime_pay_1', 0)) if len(debtor) > 1 else 0 }
   - Alimony and maintenance payments: monthly_income.alimony2
     datatype: currency
     default: ${ debtor[1].income.family_support if len(debtor) > 1 else 0 }
