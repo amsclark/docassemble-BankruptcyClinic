@@ -73,10 +73,14 @@ fields:
     required: False
   - Is this an unexpired lease?: prop.contracts_and_leases[i].unexpired_lease
     datatype: yesnoradio
+  # Required when visible: the 106G builder checks the assumed/not-assumed box
+  # for every unexpired lease, and the per-item complete block references it
+  # (rule 7). With `required: False` a filer could skip it -> undefined ->
+  # the gather re-seeks this same list-collect screen forever
+  # ("Infinite loop: x.gathered" — matches the 2026-06-05 prod hits).
   - Will the lease be assumed?: prop.contracts_and_leases[i].lease_assumed
     datatype: yesnoradio
     show if: prop.contracts_and_leases[i].unexpired_lease
-    required: False
 list collect: True
 ---
 id: schedule_g_review
