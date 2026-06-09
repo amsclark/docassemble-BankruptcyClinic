@@ -9,6 +9,7 @@ import { test, expect } from '@playwright/test';
 import { SIMPLE_SINGLE } from './fixtures';
 import { runFullInterview } from './navigation-helpers';
 import { downloadAllPdfs, findPdf, getField, PdfInfo } from './pdf-helpers';
+import { assertScenarioPdfValues } from './pdf-content-assertions';
 import { waitForDaPageLoad, screenshot } from './helpers';
 
 test.describe('Scenario 1: Simple Single Filer — Maria Garcia', () => {
@@ -63,5 +64,10 @@ test.describe('Scenario 1: Simple Single Filer — Maria Garcia', () => {
       expect(allNames).toContain(form);
     }
     console.log('  ✓ All key form numbers present');
+
+    // ── Deep content assertions: fixture values + cross-form invariants ──
+    // (names/address/SSN on 101, claim totals on 106EF, wages on 106I, rent
+    //  on 106J, and 106Sum lines re-derived from the source forms)
+    assertScenarioPdfValues(pdfs, SIMPLE_SINGLE);
   });
 });

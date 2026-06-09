@@ -21,12 +21,13 @@ import {
   clickYesNoButton,
   selectYesNoRadio,
   fillYesNoRadio,
+  selectChoiceRadio,
   fillAllVisibleRadiosAsNo,
   handleCaseNumberIfPresent,
   setCheckbox,
   handleAnotherPage,
 } from './helpers';
-import { TestScenario, DebtorProfile, RealPropertyData, VehicleData, DepositData } from './fixtures';
+import { TestScenario, MeansTestOptions, DebtorProfile, RealPropertyData, VehicleData, DepositData } from './fixtures';
 
 // ════════════════════════════════════════════════════════════════════
 //  INTRO → DEBTOR PAGE
@@ -792,6 +793,16 @@ export async function navigatePersonalLeases(page: Page) {
 
 export async function navigateCommunityProperty(page: Page) {
   await waitForDaPageLoad(page);
+  // Schedule H: when no creditor had has_codebtor=True, codebtor_auto_populated
+  // leaves the list ungathered and the mandatory block's explicit
+  // debtors.codebtors.gather() asks "Do you have any co-signers?" here
+  // (previously this leaked all the way to PDF assembly). Auto-populated
+  // scenarios skip the screen, so handle it conditionally.
+  const heading = (await page.locator('h1').first().textContent().catch(() => '')) ?? '';
+  if (heading.includes('co-signers')) {
+    await clickYesNoButton(page, 'debtors.codebtors.there_are_any', false);
+    await waitForDaPageLoad(page);
+  }
   await fillYesNoRadio(page, 'debtors.community_property', false);
   await clickContinue(page);
 }
@@ -907,13 +918,15 @@ export async function navigateExpenses(page: Page, rentAmount: string, dependent
 //  MEANS TEST (Form 122A)
 // ════════════════════════════════════════════════════════════════════
 
-export async function navigateMeansTest(page: Page) {
+export async function navigateMeansTest(page: Page, opts: MeansTestOptions = {}) {
   await waitForDaPageLoad(page);
   await selectByName(page, b64('monthly_income.means_type'), 'There is no presumption of abuse.');
   await clickContinue(page);
 
   await waitForDaPageLoad(page);
-  await selectYesNoRadio(page, 'monthly_income.non_consumer_debts', true);
+  // non_consumer_debts=true short-circuits the means test (the happy path the
+  // helpers always took — which is why the consumer-branch crashes hid there).
+  await selectYesNoRadio(page, 'monthly_income.non_consumer_debts', !opts.consumerDebts);
   await page.waitForTimeout(300);
   await selectYesNoRadio(page, 'monthly_income.disabled_veteran', false);
   await page.waitForTimeout(300);
@@ -921,6 +934,55 @@ export async function navigateMeansTest(page: Page) {
   await page.waitForTimeout(300);
   await clickContinue(page);
 
+  await waitForDaPageLoad(page);
+  if (!opts.consumerDebts) return;
+
+  // ── consumer-debts branch: full Form 122A means test ──
+  // household_and_dependents_info: filing status (+ separated_status when
+  // married-NOT-filing); dependents is defaulted. Both are bare `choices`
+  // fields (no datatype) — docassemble renders those as <select> dropdowns,
+  // NOT radios.
+  const FILING_STATUS_CHOICES = [
+    'Not married',
+    'Married and your spouse is filing with you.',
+    'Married and your spouse is NOT filing with you.',
+  ] as const;
+  const SEPARATED_STATUS_CHOICES = [
+    'Living in the same household and not legally separated.',
+    'Living separately or are legally separated',
+  ] as const;
+  const filingIdx = opts.filingStatusIndex ?? 0;
+  await selectByName(page, b64('monthly_income.filing_status'), FILING_STATUS_CHOICES[filingIdx]);
+  await page.waitForTimeout(300);
+  if (filingIdx === 2) {
+    // separated_status only appears (show-if) once married-NOT-filing is
+    // picked — and show-if'd fields get renamed `_field_N` inputs, so the
+    // b64(varname) selector does NOT match. Drive it by its visible label.
+    await page.getByRole('combobox', { name: /You and your spouse are/i })
+      .selectOption(SEPARATED_STATUS_CHOICES[opts.separatedStatusIndex ?? 0]);
+    await page.waitForTimeout(300);
+  }
+  await clickContinue(page);
+
+  // debtor1_current_monthly_income — all fields defaulted from Schedule I.
+  await waitForDaPageLoad(page);
+  await clickContinue(page);
+
+  // debtor2_current_monthly_income — only for married-filing-jointly.
+  if (filingIdx === 1) {
+    await waitForDaPageLoad(page);
+    await clickContinue(page);
+  }
+
+  // Median family income screen: state + household size are defaulted,
+  // median_income has NO default and is required.
+  await waitForDaPageLoad(page);
+  await fillById(page, b64('monthly_income.median_income'), opts.medianIncome ?? '85000');
+  await clickContinue(page);
+
+  // review_122 (event + continue button field: monthly_income.reviewed).
+  await waitForDaPageLoad(page);
+  await clickNthByName(page, b64('monthly_income.reviewed'), 0);
   await waitForDaPageLoad(page);
 }
 
@@ -1054,10 +1116,33 @@ export async function navigateFinalReview(page: Page) {
 export async function navigateDynamicPhase(page: Page, scenario: TestScenario) {
   await waitForDaPageLoad(page);
 
+  // ── DEBUG instrumentation: log every /interview POST response (size + returned question) ──
+  if (process.env.DEBUG_DYNAMIC) {
+    page.on('response', async (resp) => {
+      if (resp.request().method() !== 'POST' || !resp.url().includes('/interview')) return;
+      try {
+        const body = await resp.text();
+        const qn = body.match(/name="_question_name"\s+value="([^"]*)"/)?.[1]
+          ?? body.match(/"questionText":\s*"([^"]{0,60})/)?.[1] ?? '?';
+        const h1 = body.match(/<h1[^>]*>([^<]{0,80})/)?.[1] ?? '?';
+        console.log(`    [resp] ${body.length}B question_name=${qn} h1="${h1.trim()}"`);
+      } catch { /* response body unavailable */ }
+    });
+  }
+
   let maxSteps = 60;
   while (maxSteps-- > 0) {
     await page.waitForTimeout(300);
     const heading = await page.locator('h1, h2').first().textContent().catch(() => '');
+    if (process.env.DEBUG_DYNAMIC) {
+      const dbg = await page.evaluate(() => {
+        const qn = (document.querySelector('input[name="_question_name"]') as HTMLInputElement)?.value;
+        const tracker = (document.querySelector('input[name="_tracker"]') as HTMLInputElement)?.value;
+        const btn = document.getElementById('da-continue-button') as HTMLButtonElement | null;
+        return { qn, tracker, btnDisabled: btn ? btn.disabled : null, btnName: btn?.getAttribute('name') };
+      }).catch(() => null);
+      console.log(`    [dom] question_name=${dbg?.qn} tracker=${dbg?.tracker} continueDisabled=${dbg?.btnDisabled} btnName=${dbg?.btnName?.slice(0, 30)}`);
+    }
     console.log(`  [dynamicPhase step ${60 - maxSteps}] heading: "${heading}"`);
 
     // Check for conclusion — text OR presence of MANY PDF download links
@@ -1372,13 +1457,20 @@ export async function navigateDynamicPhase(page: Page, scenario: TestScenario) {
     if (await continueBtn.count() > 0) {
       try {
         await continueBtn.waitFor({ state: 'attached', timeout: 2000 });
+        // A disabled Continue means a submit is ALREADY in flight (docassemble
+        // disables it client-side on submit). Force-enabling and re-clicking
+        // fires a second POST with a stale _tracker; the server discards it
+        // and — on event screens like counseling_final — re-renders the old
+        // screen, ping-ponging the browser forever. Wait for the in-flight
+        // response (slow during PDF assembly) to swap the page instead.
         const isDisabled = await continueBtn.getAttribute('disabled');
         if (isDisabled !== null) {
-          await page.evaluate(() => {
-            const btn = document.getElementById('da-continue-button') as HTMLButtonElement;
-            if (btn) { btn.disabled = false; btn.classList.remove('btn-secondary'); btn.classList.add('btn-primary'); }
-          });
-          await page.waitForTimeout(200);
+          await page.waitForFunction(() => {
+            const btn = document.getElementById('da-continue-button') as HTMLButtonElement | null;
+            return !btn || !btn.disabled;
+          }, { timeout: 30000 });
+          await waitForDaPageLoad(page);
+          continue;  // re-evaluate the (likely new) page from the top
         }
         await clickContinue(page);
         await waitForDaPageLoad(page);
@@ -1439,7 +1531,7 @@ export async function runFullInterview(page: Page, scenario: TestScenario) {
   log('reporting'); await navigateReporting(page);
   // Personal-property leases (form 108) now gather in their own step, after SOFA.
   log('personalLeases'); await navigatePersonalLeases(page);
-  log('meansTest'); await navigateMeansTest(page);
+  log('meansTest'); await navigateMeansTest(page, scenario.meansTest ?? {});
   log('caseDetails'); await navigateCaseDetails(page);
   log('business'); await navigateBusiness(page);
   log('hazardousProperty'); await navigateHazardousProperty(page);
@@ -1505,7 +1597,7 @@ export async function walkToMeansTestStart(page: Page, scenario: TestScenario) {
  */
 export async function walkToFinalReview(page: Page, scenario: TestScenario) {
   await walkToMeansTestStart(page, scenario);
-  await navigateMeansTest(page);
+  await navigateMeansTest(page, scenario.meansTest ?? {});
   await navigateCaseDetails(page);
   await navigateBusiness(page);
   await navigateHazardousProperty(page);
