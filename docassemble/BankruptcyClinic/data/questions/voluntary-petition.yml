@@ -453,6 +453,14 @@ code: |
   prop.nonpriority_claims.gather()
   prop.contracts_and_leases.gather()
   codebtor_auto_populated
+  # codebtor_auto_populated only marks the list gathered when a creditor had
+  # has_codebtor=True. Without this explicit gather(), a filer with NO
+  # creditor co-signers is first asked "Do you have any co-signers?" during
+  # PDF assembly (the 106H builder's len(debtors.codebtors) seek) — an
+  # out-of-order screen that, raced against the counseling_final event
+  # screen, ping-ponged the browser between the two. gather() here is a
+  # no-op when auto-population already ran (rule 1: flow order lives here).
+  debtors.codebtors.gather()
   debtors.community_property
   if not debtors.community_property:
     debtors.had_spouse = False
