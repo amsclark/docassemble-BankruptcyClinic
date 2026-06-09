@@ -629,7 +629,6 @@ fields:
   - Claiming Exemption?: prop.household_goods_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_household_goods
-    required: False
   - note: Exemption 1
     show if: prop.household_goods_is_claiming_exemption
   - Value of exemption being claimed: prop.household_goods_exemption_value
@@ -711,7 +710,6 @@ fields:
   - Claiming Exemption?: prop.electronics_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_electronics
-    required: False
   - note: First Exemption
     show if: prop.electronics_is_claiming_exemption
   - Value of exemption being claimed: prop.electronics_exemption_value
@@ -752,7 +750,6 @@ fields:
   - Claiming Exemption?: prop.collectibles_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_collectibles
-    required: False
   - note: First Exemption
     show if: prop.collectibles_is_claiming_exemption
   - Value of exemption being claimed: prop.collectibles_exemption_value
@@ -793,7 +790,6 @@ fields:
   - Claiming Exemption?: prop.hobby_equipment_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_hobby_equipment
-    required: False
   - note: First Exemption
     show if: prop.hobby_equipment_is_claiming_exemption
   - Value of exemption being claimed: prop.hobby_equipment_exemption_value
@@ -834,7 +830,6 @@ fields:
   - Claiming Exemption?: prop.firearms_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_firearms
-    required: False
   - note: First Exemption
     show if: prop.firearms_is_claiming_exemption
   - Value of exemption being claimed: prop.firearms_exemption_value
@@ -875,7 +870,6 @@ fields:
   - Claiming Exemption?: prop.clothes_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_clothes
-    required: False
   - note: First Exemption
     show if: prop.clothes_is_claiming_exemption
   - Value of exemption being claimed: prop.clothes_exemption_value
@@ -916,7 +910,6 @@ fields:
   - Claiming Exemption?: prop.jewelry_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_jewelry
-    required: False
   - note: First Exemption
     show if: prop.jewelry_is_claiming_exemption
   - Value of exemption being claimed: prop.jewelry_exemption_value
@@ -957,7 +950,6 @@ fields:
   - Claiming Exemption?: prop.animal_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_animals
-    required: False
   - note: First Exemption
     show if: prop.animal_is_claiming_exemption
   - Value of exemption being claimed: prop.animal_exemption_value
@@ -998,7 +990,6 @@ fields:
   - Claiming Exemption?: prop.other_household_items_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.has_other_household_items
-    required: False
   - note: First Exemption
     show if: prop.other_household_items_is_claiming_exemption
   - Value of exemption being claimed: prop.other_household_items_exemption_value
@@ -1062,7 +1053,6 @@ fields:
   - Claiming Exemption?: prop.financial_assets.cash_is_claiming_exemption
     datatype: yesnoradio
     show if: prop.financial_assets.has_cash
-    required: False
   - note: First Exemption
     show if: prop.financial_assets.cash_is_claiming_exemption
   - Value of exemption being claimed: prop.financial_assets.cash_exemption_value
@@ -1829,7 +1819,6 @@ fields:
   - Claiming Exemption?: prop.financial_assets.future_property_interest_has_claim
     datatype: yesnoradio
     show if: prop.financial_assets.has_future_property_interest
-    required: False
   - note: First Exemption
     show if: prop.financial_assets.future_property_interest_has_claim
   - Value of exemption being claimed: prop.financial_assets.future_property_interest_exemption_value
@@ -1895,7 +1884,6 @@ fields:
   - Claiming Exemption?: prop.financial_assets.ip_interest_has_claim
     datatype: yesnoradio
     show if: prop.financial_assets.has_ip_interest
-    required: False
   - note: First Exemption
     show if: prop.financial_assets.ip_interest_has_claim
   - Value of exemption being claimed: prop.financial_assets.ip_interest_exemption_value
@@ -1960,7 +1948,6 @@ fields:
   - Claiming Exemption?: prop.financial_assets.intangible_interest_has_claim
     datatype: yesnoradio
     show if: prop.financial_assets.has_intangible_interest
-    required: False
   - note: First Exemption
     show if: prop.financial_assets.intangible_interest_has_claim
   - Value of exemption being claimed: prop.financial_assets.intangible_interest_exemption_value
@@ -2312,7 +2299,6 @@ fields:
   - Claiming Exemption?: prop.owed_property.second_insurance_interest_has_claim
     datatype: yesnoradio
     show if: prop.owed_property.has_second_insurance_interest
-    required: False
   - note: First Exemption
     show if: prop.owed_property.second_insurance_interest_has_claim
   - Value of exemption being claimed: prop.owed_property.second_insurance_interest_exemption_value
@@ -2357,7 +2343,6 @@ fields:
   - Claiming Exemption?: prop.owed_property.third_insurance_interest_has_claim
     datatype: yesnoradio
     show if: prop.owed_property.has_third_insurance_interest
-    required: False
   - note: First Exemption
     show if: prop.owed_property.third_insurance_interest_has_claim
   - Value of exemption being claimed: prop.owed_property.third_insurance_interest_exemption_value
@@ -2401,7 +2386,6 @@ fields:
   - Claiming Exemption?: prop.owed_property.trust_has_claim
     datatype: yesnoradio
     show if: prop.owed_property.has_trust
-    required: False
   - note: First Exemption
     show if: prop.owed_property.trust_has_claim
   - Value of exemption being claimed: prop.owed_property.trust_exemption_value
@@ -2445,7 +2429,6 @@ fields:
   - Claiming Exemption?: prop.owed_property.third_party_has_claim
     datatype: yesnoradio
     show if: prop.owed_property.has_third_party
-    required: False
   - note: First Exemption
     show if: prop.owed_property.third_party_has_claim
   - Value of exemption being claimed: prop.owed_property.third_party_exemption_value
@@ -2487,7 +2470,6 @@ fields:
   - Claiming Exemption?: prop.owed_property.contingent_claims_has_claim
     datatype: yesnoradio
     show if: prop.owed_property.has_contingent_claims
-    required: False
   - note: First Exemption
     show if: prop.owed_property.contingent_claims_has_claim
   - Value of exemption being claimed: prop.owed_property.contingent_claims_exemption_value
@@ -2530,7 +2512,6 @@ fields:
   - Claiming Exemption?: prop.owed_property.other_assets_has_claim
     datatype: yesnoradio
     show if: prop.owed_property.has_other_assets
-    required: False
   - note: First Exemption
     show if: prop.owed_property.other_assets_has_claim
   - Value of exemption being claimed: prop.owed_property.other_assets_exemption_value
@@ -2873,7 +2854,6 @@ fields:
   - Claiming Exemption?: prop.business_property.partnership_has_claim
     datatype: yesnoradio
     show if: prop.business_property.has_partnerships
-    required: False
   - note: First Exemption
     show if: prop.business_property.partnership_has_claim
   - Value of exemption being claimed: prop.business_property.partnership_exemption_value
@@ -2906,7 +2886,6 @@ fields:
     datatype: yesnoradio
   - Do your lists include personally identifiable information?: prop.business_property.has_identity_lists
     datatype: yesnoradio
-    required: False
     show if: prop.business_property.has_lists
   - Describe: prop.business_property.lists_description
     input type: area
@@ -2993,7 +2972,6 @@ fields:
   - Claiming Exemption?: prop.business_property.otherProperty_has_claim
     datatype: yesnoradio
     show if: prop.business_property.has_other
-    required: False
   - note: First Exemption
     show if: prop.business_property.otherProperty_has_claim
   - Value of exemption being claimed: prop.business_property.otherProperty_exemption_value

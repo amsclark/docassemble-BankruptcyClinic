@@ -589,7 +589,7 @@ code: |
     unsecured_claims['priorityAmount'+str(clm)] = currency(claim.priority_amount)
     unsecured_claims['nonpriorityAmount'+str(clm)] = currency(claim.nonpriority_amount)
     unsecured_claims['street'+str(clm)] = claim.street
-    unsecured_claims['dateIncurred'+str(clm)] = format_date(claim.date_incurred, format='MM/dd/yyyy')
+    unsecured_claims['dateIncurred'+str(clm)] = format_date(claim.date_incurred, format='MM/dd/yyyy') if getattr(claim, 'date_incurred', None) else None
     unsecured_claims['city'+str(clm)] = claim.city
     unsecured_claims['state'+str(clm)] = claim.state
     unsecured_claims['zip'+str(clm)] = claim.zip
@@ -619,7 +619,7 @@ code: |
     unsecured_claims['nonAcct'+str(clm)] = claim.account_number
     unsecured_claims['nonTotalClaim'+str(clm)] = currency(claim.total_claim)
     unsecured_claims['nonAddress'+str(clm)] = claim.street
-    unsecured_claims['nonDate'+str(clm)] = format_date(claim.date_incurred, format='MM/dd/yyyy')
+    unsecured_claims['nonDate'+str(clm)] = format_date(claim.date_incurred, format='MM/dd/yyyy') if getattr(claim, 'date_incurred', None) else None
     unsecured_claims['nonCity'+str(clm)] = claim.city
     unsecured_claims['nonState'+str(clm)] = claim.state
     unsecured_claims['nonZip'+str(clm)] = claim.zip

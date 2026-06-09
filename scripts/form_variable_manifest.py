@@ -214,11 +214,15 @@ class Collector(ast.NodeVisitor):
 
     @staticmethod
     def _defensive(node):
-        """Does this condition contain a definedness check (defined/hasattr)?"""
+        """Does this condition contain a definedness check? defined()/hasattr(),
+        or getattr(obj, 'attr', default) — the 3-arg form tolerates absence
+        (the 2-arg form seeks, so it does NOT count)."""
         for sub in ast.walk(node):
-            if isinstance(sub, ast.Call) and isinstance(sub.func, ast.Name) \
-                    and sub.func.id in ("defined", "hasattr"):
-                return True
+            if isinstance(sub, ast.Call) and isinstance(sub.func, ast.Name):
+                if sub.func.id in ("defined", "hasattr"):
+                    return True
+                if sub.func.id == "getattr" and len(sub.args) >= 3:
+                    return True
         return False
 
     def _record(self, node):

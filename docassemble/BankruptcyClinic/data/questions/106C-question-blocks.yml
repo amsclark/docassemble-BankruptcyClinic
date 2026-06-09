@@ -146,7 +146,6 @@ fields:
     datatype: yesnoradio
   - Did you acquire the property within 1,215 days?: prop.exempt_property.homestead_within_timeframe
     datatype: yesnoradio
-    required: False
     show if: prop.exempt_property.claim_homestead_exemption
 ---
 id: schedule_c_review

@@ -1822,7 +1822,6 @@ fields:
   - Do you still have it?: financial_affairs.deposit_box.still_owns
     datatype: yesnoradio
     show if: financial_affairs.has_deposit_box
-    required: False
 ---
 question: |
   Storage Unit
@@ -1878,7 +1877,6 @@ fields:
   - Do you still have it?: financial_affairs.storage_unit.still_owns
     datatype: yesnoradio
     show if: financial_affairs.has_storage_unit
-    required: False
 ---
 question: |
   Borrowed Property
@@ -2287,8 +2285,8 @@ code: |
   fin['yesLivedElsewhere'] = True if financial_affairs.lived_elsewhere == True else False
   if financial_affairs.lived_elsewhere:
     fin['add1_D1_address'] = financial_affairs.address_street_1
-    fin['add1_D1_from'] = format_date(financial_affairs.address_from_1, format='MM/dd/yyyy')
-    fin['add1_D1_to'] = format_date(financial_affairs.address_to_1, format='MM/dd/yyyy')
+    fin['add1_D1_from'] = format_date(financial_affairs.address_from_1, format='MM/dd/yyyy') if getattr(financial_affairs, 'address_from_1', None) else None
+    fin['add1_D1_to'] = format_date(financial_affairs.address_to_1, format='MM/dd/yyyy') if getattr(financial_affairs, 'address_to_1', None) else None
     fin['add1_D1_city'] = financial_affairs.address_city_1
     fin['add1_D1_state'] = financial_affairs.address_state_1
     fin['add1_D1_zip'] = financial_affairs.address_zip_1
@@ -2560,7 +2558,7 @@ code: |
     if levy.date_in_description:
       fin['seized_date'+str(x)] = 'Various'
     else:
-      fin['seized_date'+str(x)] = format_date(levy.date, format='MM/dd/yyyy')
+      fin['seized_date'+str(x)] = format_date(levy.date, format='MM/dd/yyyy') if getattr(levy, 'date', None) else None
     fin['seized_value'+str(x)] = currency(levy.property_value)
     fin['seized_isRepossessed'+str(x)] = True if levy.property_action == 'Property was repossessed' else False
     fin['seized_isForeclosed'+str(x)] = True if levy.property_action == 'Property was foreclosed' else False
@@ -2578,7 +2576,7 @@ code: |
     fin['bank_state1'] = financial_affairs.refusal_creditor_state
     fin['bank_zip1'] = financial_affairs.refusal_creditor_zip
     fin['bank_action1'] = financial_affairs.refusal_description
-    fin['bank_date1'] = format_date(financial_affairs.refusal_date, format='MM/dd/yyyy')
+    fin['bank_date1'] = format_date(financial_affairs.refusal_date, format='MM/dd/yyyy') if getattr(financial_affairs, 'refusal_date', None) else None
     fin['bank_amount1'] = currency(financial_affairs.refusal_amount)
     fin['bank_acct1'] = financial_affairs.refusal_account_number
 
@@ -2636,7 +2634,7 @@ code: |
     fin['consult_date1-'+str(x)] = format_date(payment.date_1, format='MM/dd/yyyy')
     fin['consult_amt1-'+str(x)] = currency(payment.value_1)
     if payment.value_2 > 0:
-      fin['consult_date2-'+str(x)] = format_date(payment.date_2, format='MM/dd/yyyy')
+      fin['consult_date2-'+str(x)] = format_date(payment.date_2, format='MM/dd/yyyy') if getattr(payment, 'date_2', None) else None
       fin['consult_amt2-'+str(x)] = currency(payment.value_2)
     fin['consult_who'+str(x)] = payment.payment_person
     fin['consult_describe'+str(x)] = payment.property_description
@@ -2652,10 +2650,10 @@ code: |
     fin['aid_city1'] = financial_affairs.creditor_help.city
     fin['aid_state1'] = financial_affairs.creditor_help.state
     fin['aid_zip1'] = financial_affairs.creditor_help.zip
-    fin['aid_date1-1'] = format_date(financial_affairs.creditor_help.date_1, format='MM/dd/yyyy')
+    fin['aid_date1-1'] = format_date(financial_affairs.creditor_help.date_1, format='MM/dd/yyyy') if getattr(financial_affairs.creditor_help, 'date_1', None) else None
     fin['aid_amt1-1'] = currency(financial_affairs.creditor_help.value_1)
     if financial_affairs.creditor_help.value_2 > 0:
-      fin['aid_date2-1'] = format_date(financial_affairs.creditor_help.date_2, format='MM/dd/yyyy')
+      fin['aid_date2-1'] = format_date(financial_affairs.creditor_help.date_2, format='MM/dd/yyyy') if getattr(financial_affairs.creditor_help, 'date_2', None) else None
       fin['aid_amt2-1'] = currency(financial_affairs.creditor_help.value_2)
 
   fin['noOrdinary'] = True if financial_affairs.other_transfers.there_are_any == False else False
@@ -2679,7 +2677,7 @@ code: |
   if financial_affairs.has_self_settled_trust:
     fin['trust_describe'] = financial_affairs.self_settled_trust.description
     fin['trust_name'] = financial_affairs.self_settled_trust.name
-    fin['trust_date'] = format_date(financial_affairs.self_settled_trust.date, format='MM/dd/yyyy')
+    fin['trust_date'] = format_date(financial_affairs.self_settled_trust.date, format='MM/dd/yyyy') if getattr(financial_affairs.self_settled_trust, 'date', None) else None
 
   fin['noAccounts'] = True if financial_affairs.instruments.there_are_any == False else False
   fin['yesAccounts'] = True if financial_affairs.instruments.there_are_any == True else False
@@ -2757,7 +2755,7 @@ code: |
   fin['yesLiability'] = True if financial_affairs.environment.has_liability == True else False
   if financial_affairs.environment.has_liability:
     fin['liability_describe'] = financial_affairs.environment.liability_law
-    fin['liability_date'] = format_date(financial_affairs.environment.liability_date, format='MM/dd/yyyy')
+    fin['liability_date'] = format_date(financial_affairs.environment.liability_date, format='MM/dd/yyyy') if getattr(financial_affairs.environment, 'liability_date', None) else None
     fin['liability_site'] = financial_affairs.environment.liability_name
     fin['liability_site_address'] = financial_affairs.environment.liability_street
     fin['liability_site_city'] = financial_affairs.environment.liability_city
@@ -2775,7 +2773,7 @@ code: |
     fin['hazard_site'] = financial_affairs.environment.release_name
     fin['hazard_unit'] = financial_affairs.environment.release_unit_name
     fin['hazard_describe'] = financial_affairs.environment.release_law
-    fin['hazard_date'] = format_date(financial_affairs.environment.release_date, format='MM/dd/yyyy')
+    fin['hazard_date'] = format_date(financial_affairs.environment.release_date, format='MM/dd/yyyy') if getattr(financial_affairs.environment, 'release_date', None) else None
     fin['hazard_address'] = financial_affairs.environment.release_street
     fin['hazard_city'] = financial_affairs.environment.release_city
     fin['hazard_state'] = financial_affairs.environment.release_state
@@ -2830,7 +2828,7 @@ code: |
   fin['yesFinancials'] = True if financial_affairs.has_statement == True else False
   if financial_affairs.has_statement:
     fin['financials_name'] = financial_affairs.statement_name
-    fin['financials_date'] = format_date(financial_affairs.statement_date, format='MM/dd/yyyy')
+    fin['financials_date'] = format_date(financial_affairs.statement_date, format='MM/dd/yyyy') if getattr(financial_affairs, 'statement_date', None) else None
     fin['financials_address'] = financial_affairs.statement_street
     fin['financials_state'] = financial_affairs.statement_state
     fin['financials_city'] = financial_affairs.statement_city
