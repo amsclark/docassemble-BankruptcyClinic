@@ -497,6 +497,94 @@ def orphan_reads(def_index, mand):
     return orphans
 
 
+# ---------- cycle / forward-reference risk (infinite-loop class) --------------
+
+def _scalar_refs(roots, code):
+    """Top-level scalar interview-var references in a code block, with line order.
+    Returns (earliest: var->min lineno of ANY reference, code_assign: var->min
+    lineno of a code ASSIGNMENT). Loop-item vars are ignored (the loop class we
+    target — e.g. median_dependents/reviewed — is top-level scalars)."""
+    earliest, code_assign = {}, {}
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return earliest, code_assign
+
+    def note(p, lineno, is_assign):
+        if not p or "[i]" in p:
+            return
+        pn = norm(p)
+        earliest[pn] = min(earliest.get(pn, lineno), lineno)
+        if is_assign:
+            code_assign[pn] = min(code_assign.get(pn, lineno), lineno)
+
+    class W(ast.NodeVisitor):
+        def visit_Assign(self, node):
+            for t in node.targets:
+                r, p = chain_to_path(t)
+                if r in roots and r not in IGNORE_ROOTS:
+                    note(p, node.lineno, True)
+            self.visit(node.value)
+
+        def visit_Attribute(self, node):
+            r, p = chain_to_path(node)
+            if r in roots and r not in IGNORE_ROOTS:
+                note(p, node.lineno, False)
+
+        def visit_Name(self, node):
+            if isinstance(node.ctx, ast.Load) and node.id in roots and node.id not in IGNORE_ROOTS:
+                note(node.id, node.lineno, False)
+
+    W().visit(tree)
+    return earliest, code_assign
+
+
+def _continue_button_screens(roots):
+    """Review/notice screens (`continue button field: R`) and the variables they
+    read in their template — (R, set(reads), file)."""
+    rootalt = "|".join(sorted(map(re.escape, roots), key=len, reverse=True))
+    cbf = re.compile(rf"^continue button field:\s*((?:{rootalt})(?:\.\w+|\[[^\]]*\])*)\s*$", re.M)
+    out = []
+    for f in sorted(QDIR.glob("*.yml")):
+        for doc in split_blocks(f):
+            m = cbf.search(doc)
+            if not m:
+                continue
+            R = norm(m.group(1))
+            col = Collector(roots, "\x00")
+            try:
+                col.visit(ast.parse(mako_to_py(doc)))
+            except SyntaxError:
+                pass
+            out.append((R, set(col.reads), f.name))
+    return out
+
+
+def cycle_risks(roots):
+    """Forward-reference loop risk: a continue-button review screen for R reads X,
+    X's only mandatory definer is a code fallback, and X is NOT collected before R
+    in the mandatory block — the median_dependents<->reviewed infinite-loop shape.
+    Returns list of (X, R, screen_file)."""
+    blocks = []
+    for f in sorted(QDIR.glob("*.yml")):
+        for doc in split_blocks(f):
+            if re.search(r"^mandatory:\s*(True|true)\b", doc, re.M):
+                code = get_code(doc)
+                if code:
+                    blocks.append(_scalar_refs(roots, code))
+    risks = []
+    for R, reads, sf in _continue_button_screens(roots):
+        for earliest, code_assign in blocks:
+            if R not in earliest:
+                continue
+            L_R = earliest[R]
+            for X in reads:
+                # X has a code fallback at/after R, and is not collected before R
+                if X in code_assign and code_assign[X] >= L_R and earliest.get(X, 10 ** 9) >= L_R:
+                    risks.append((X, R, sf))
+    return sorted(set(risks))
+
+
 # ---------- form discovery + analysis -----------------------------------------
 
 def find_forms(path):
@@ -589,9 +677,11 @@ def findings_lines(def_index, mand, targets):
                 lines.append(f"{path.name}\t{name}\tSHOWIF_GAP\t{g}")
             for g in branch:
                 lines.append(f"{path.name}\t{name}\tBRANCH_GAP\t{g}")
-    # orphan references are interview-wide (not per-form)
+    # interview-wide: orphan references + forward-reference loop risks
     for v in orphan_reads(def_index, mand):
         lines.append(f"(interview)\t-\tORPHAN_READ\t{v}")
+    for x, r, sf in cycle_risks(interview_roots()):
+        lines.append(f"{sf}\t-\tCYCLE_RISK\t{x} (read by review screen for {r}, defined only later)")
     return sorted(lines)
 
 
