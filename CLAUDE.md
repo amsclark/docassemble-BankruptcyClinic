@@ -90,6 +90,24 @@ These run as **burn-down gates** in `npm run lint` / `pretest`:
   with `./scripts/lint-flow-gaps.sh --update`.
 - `npm run lint:test-complete` (`scripts/lint-test-completeness.sh`) — see Testing.
 
+## Production feedback loop
+
+`./scripts/scan_prod_logs.sh` pulls the prod docassemble logs (API autologin;
+needs `DA_API_KEY`/`DA_ADMIN_PASS` env vars — Alex keeps them in
+`~/.config/bankruptcyclinic/prod-creds.env`, never in git) and greps for
+crash signatures (tracebacks, `Infinite loop`, undefined-variable seeks).
+Every hit is a real user stuck. A daily 06:00 cron on Alex's machine runs it
+(before the ~06:25 prod restart truncates the log) into
+`~/bankruptcyclinic-prodscan.log` — check it when triaging tester reports.
+
+## Exemption caps sync gate
+
+`npm run lint:caps-sync` (`scripts/lint_caps_sync.py`) statically compares the
+dollar caps in `objects.py get_exemption_limits()` against
+`data/static/exemptions.js` and fails on NEW divergence
+(`scripts/caps-sync-baseline.txt` holds known mismatches awaiting attorney
+verification — currently SD life_insurance and SD retirement).
+
 ## Testing
 
 See `tests/navigation-helpers.ts`. The section helpers drive the **happy path**

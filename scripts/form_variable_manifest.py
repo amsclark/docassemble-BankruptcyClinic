@@ -97,7 +97,11 @@ def interview_roots():
 # ---------- path flattening ----------------------------------------------------
 
 def norm(path):
-    p = re.sub(r"\[[^\]]*\]", "[i]", path)
+    # String-literal keys (checkboxes/DADict, e.g. type["Other"]) are reads of
+    # the base variable — drop them so this agrees with chain_to_path's AST
+    # handling (which also skips string-Constant subscripts).
+    p = re.sub(r"\[\s*['\"][^'\"]*['\"]\s*\]", "", path)
+    p = re.sub(r"\[[^\]]*\]", "[i]", p)
     p = p.replace(".elements[i]", "[i]")   # DAList internal .elements[k]
     while "[i][i]" in p:
         p = p.replace("[i][i]", "[i]")
@@ -110,7 +114,19 @@ def chain_to_path(node):
         if isinstance(cur, ast.Attribute):
             parts.append(cur.attr); cur = cur.value
         elif isinstance(cur, ast.Subscript):
-            parts.append("[i]"); cur = cur.value
+            sl = cur.slice
+            if isinstance(sl, ast.Slice):
+                # String/list slicing (e.g. tax_id[-4:]) — a read of the base
+                # value itself, not of an element that needs its own definer.
+                pass
+            elif isinstance(sl, ast.Constant) and isinstance(sl.value, str):
+                # String-key access (checkboxes/DADict, e.g. type['Other']) —
+                # docassemble defines the whole dict via its question, so the
+                # base variable is what must be defined.
+                pass
+            else:
+                parts.append("[i]")
+            cur = cur.value
         elif isinstance(cur, ast.Name):
             parts.append(cur.id)
             return cur.id, _join(list(reversed(parts)))
@@ -169,13 +185,29 @@ class Collector(ast.NodeVisitor):
 
     def _paths_in(self, node):
         out = set()
+        # method-name Attribute nodes (the `.get` in x.y.get(...)) are not
+        # variable reads — exclude them; their base chain is still walked.
+        method_attrs = {id(sub.func) for sub in ast.walk(node)
+                        if isinstance(sub, ast.Call) and isinstance(sub.func, ast.Attribute)}
         for sub in ast.walk(node):
+            if id(sub) in method_attrs:
+                continue
             if isinstance(sub, (ast.Attribute, ast.Subscript, ast.Name)):
                 kind, val = self._resolve(sub)
                 if kind == 'leaf':
                     out.add(val)
                 elif kind == 'local':
                     out |= self.locals[val]
+            elif (isinstance(sub, ast.Call) and isinstance(sub.func, ast.Name)
+                  and sub.func.id == 'getattr' and len(sub.args) >= 2
+                  and isinstance(sub.args[1], ast.Constant)
+                  and isinstance(sub.args[1].value, str)):
+                # getattr(obj, 'attr'[, default]) — a read of obj.attr; resolve
+                # it so a local like `_x = getattr(debtors, 'had_spouse', F)`
+                # carries the real path into guards that test `_x`.
+                kind, val = self._resolve(sub.args[0])
+                if kind == 'leaf':
+                    out.add(norm(val + "." + sub.args[1].value))
         if self._defensive(node):
             out.add(DEFENDED)
         return out
@@ -237,7 +269,11 @@ class Collector(ast.NodeVisitor):
         for c in node.body:
             self.visit(c)
         self.if_stack.pop()
-        self.if_stack.append(set())                # else: condition is false
+        # else: guards are value-insensitive paths, and reaching EITHER branch
+        # means the test vars were evaluated — so the else carries the same
+        # paths (`else` of `== False` is the True case). Never carry DEFENDED:
+        # the else of `if defined(x):` is precisely where x is undefined.
+        self.if_stack.append(self._paths_in(node.test) - {DEFENDED})
         for c in node.orelse:
             self.visit(c)
         self.if_stack.pop()
@@ -247,7 +283,7 @@ class Collector(ast.NodeVisitor):
         self.if_stack.append(self._paths_in(node.test))
         self.visit(node.body)
         self.if_stack.pop()
-        self.if_stack.append(set())
+        self.if_stack.append(self._paths_in(node.test) - {DEFENDED})
         self.visit(node.orelse)
         self.if_stack.pop()
 
@@ -264,6 +300,18 @@ class Collector(ast.NodeVisitor):
         else:
             for v in node.values:
                 self.visit(v)
+
+    def visit_Call(self, node):
+        # Method calls (x.y.get(...), lst.gather()) — the method name is not an
+        # interview variable; record a read of the base object, not `x.y.get`.
+        if isinstance(node.func, ast.Attribute):
+            self.visit(node.func.value)
+        else:
+            self.visit(node.func)
+        for a in node.args:
+            self.visit(a)
+        for kw in node.keywords:
+            self.visit(kw.value)
 
     def visit_Attribute(self, node):
         self._record(node)
@@ -405,6 +453,11 @@ def mandatory_collection_guards(roots):
     Returns (mand_uncond:set, mand_cond:dict var -> list[frozenset(guard paths)]).
     """
     mand_uncond, refs = set(), {}
+    # Attachment trigger variables (ab_attach, form_103b_attach, …) are bare
+    # names outside the object roots — include them so we learn the guard each
+    # form is ASSEMBLED under (analyze() credits it to the form's reads).
+    attach_vars = {av for f in sorted(QDIR.glob("*.yml"))
+                   for _, _, av in find_forms(f) if av}
     for f in sorted(QDIR.glob("*.yml")):
         for doc in split_blocks(f):
             if not re.search(r"^mandatory:\s*(True|true)\b", doc, re.M):
@@ -412,7 +465,7 @@ def mandatory_collection_guards(roots):
             code = get_code(doc)
             if not code:
                 continue
-            col = Collector(roots, "\x00")  # no output dict in a mandatory block
+            col = Collector(roots | attach_vars, "\x00")  # no output dict in a mandatory block
             try:
                 col.visit(ast.parse(code))
             except SyntaxError:
@@ -583,6 +636,17 @@ def _scalar_refs(roots, code):
                     note(p, node.lineno, True)
             self.visit(node.value)
 
+        def visit_Call(self, node):
+            # skip the method-name attr in x.y.get(...) — not a variable
+            if isinstance(node.func, ast.Attribute):
+                self.visit(node.func.value)
+            else:
+                self.visit(node.func)
+            for a in node.args:
+                self.visit(a)
+            for kw in node.keywords:
+                self.visit(kw.value)
+
         def visit_Attribute(self, node):
             r, p = chain_to_path(node)
             if r in roots and r not in IGNORE_ROOTS:
@@ -650,8 +714,13 @@ def find_forms(path):
         if re.search(r"^attachment:", doc, re.M):
             name = re.search(r"-?\s*(?:name|filename):\s*(.+)", doc)
             dv = re.search(r"code:\s*([A-Za-z_]\w*)\s*$", doc, re.M)
+            # The attachment's trigger variable (e.g. form_103b_attach) — the
+            # mandatory block may seek it only under a guard (payment_method),
+            # which then implicitly guards every read inside the form.
+            av = re.search(r"variable name:\s*([A-Za-z_]\w*)", doc)
             if dv:
-                forms.append(((name.group(1).strip() if name else "?"), dv.group(1)))
+                forms.append(((name.group(1).strip() if name else "?"),
+                              dv.group(1), av.group(1) if av else None))
     return forms
 
 
@@ -684,7 +753,15 @@ def analyze(path, def_index, mand):
     strong, field_uncond, cond = def_index
     mand_uncond, mand_cond = mand
     out = []
-    for form_name, dictvar in find_forms(path):
+    for form_name, dictvar, attachvar in find_forms(path):
+        # Assembly guards: the conditions under which the mandatory block seeks
+        # this form's attachment trigger (e.g. form_103b_attach only under
+        # case.payment_method). Every read inside the form's builders happens
+        # under these too — credit them when judging branch sensitivity.
+        # Multiple seek sites = assembled if ANY fires, so a read must be safe
+        # under EACH assembly guard-set separately.
+        asm_sets = ([frozenset()] if (attachvar is None or attachvar in mand_uncond)
+                    else mand_cond.get(attachvar, [frozenset()]))
         blocks = builder_blocks_for(path, dictvar)
         col = Collector(roots, dictvar)
         joined = "\n".join(blocks)
@@ -708,7 +785,9 @@ def analyze(path, def_index, mand):
             # subset of the read's guard-set (read happens only when collected).
             if leaf in mand_cond:
                 dsets = mand_cond[leaf]
-                if any(DEFENDED not in R and not any(d <= R for d in dsets) for R in guard_sets):
+                if any(DEFENDED not in R
+                       and any(not any(d <= (R | A) for d in dsets) for A in asm_sets)
+                       for R in guard_sets):
                     branch.append(leaf)
                 continue
             if leaf in field_uncond:
