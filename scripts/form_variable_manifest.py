@@ -97,7 +97,11 @@ def interview_roots():
 # ---------- path flattening ----------------------------------------------------
 
 def norm(path):
-    return re.sub(r"\[[^\]]*\]", "[i]", path)
+    p = re.sub(r"\[[^\]]*\]", "[i]", path)
+    p = p.replace(".elements[i]", "[i]")   # DAList internal .elements[k]
+    while "[i][i]" in p:
+        p = p.replace("[i][i]", "[i]")
+    return p
 
 
 def chain_to_path(node):
@@ -194,25 +198,21 @@ class Collector(ast.NodeVisitor):
                 self._add(lf)
 
     def _bind_loop(self, target, it):
-        # for x in LIST   /   for i, x in enumerate(LIST)   /   zip(...)
-        listroot = None
+        # for x in LIST  /  for i, x in enumerate(LIST)  — resolve LIST through
+        # any enclosing loop vars so `for alias in debt.alias` binds alias to
+        # debtor[i].alias, not debtor.
         if isinstance(it, ast.Call) and isinstance(it.func, ast.Name) and it.func.id in ("enumerate", "reversed") and it.args:
             it = it.args[0]
-        root, path = chain_to_path(it)
-        if root in self.roots:
-            listroot = path
-            self.lists.add(norm(path))
-        elif root in self.loopvars:
-            listroot = self.loopvars[root]
-        if listroot is None:
+        kind, val = self._resolve(it)
+        if kind != "leaf":
             return
+        self.lists.add(val)
         if isinstance(target, ast.Name):
-            self.loopvars[target.id] = listroot
+            self.loopvars[target.id] = val
         elif isinstance(target, ast.Tuple):
-            # (idx, item) from enumerate -> last elt is the item
             for elt in target.elts:
                 if isinstance(elt, ast.Name):
-                    self.loopvars[elt.id] = listroot
+                    self.loopvars[elt.id] = val
 
     def visit_For(self, node):
         self._bind_loop(node.target, node.iter)
@@ -369,6 +369,134 @@ def mandatory_collection_guards(roots):
     return mand_uncond, mand_cond
 
 
+# ---------- whole-interview reads (templates + code) --------------------------
+
+def mako_to_py(text):
+    """Roughly transpile a Mako template body to indented Python so the same
+    Collector can extract variable reads + guards. Handles `% if/elif/else/for`,
+    `% end*`, and `${ expr }`. Plain text is dropped."""
+    out, indent = [], 0
+    def emit(s):
+        out.append("    " * indent + s)
+    for raw in text.splitlines():
+        s = raw.strip()
+        if not s:
+            continue
+        if s.startswith("%"):
+            d = s[1:].strip()
+            if re.match(r"end\w+", d):
+                indent = max(0, indent - 1)
+            elif re.match(r"(elif|else)\b", d):
+                indent = max(0, indent - 1)
+                emit(d if d.endswith(":") else d + ":")
+                indent += 1
+            elif re.match(r"(if|for|while)\b", d):
+                emit(d if d.endswith(":") else d + ":")
+                indent += 1
+            # other `%` directives (e.g. `% endfor` variants) handled above
+            continue
+        for expr in re.findall(r"\$\{(.*?)\}", raw):
+            expr = expr.strip()
+            if expr:
+                emit("(" + expr + ")")
+    # ensure non-empty bodies so ast.parse doesn't choke on empty blocks
+    cleaned = []
+    for i, ln in enumerate(out):
+        cleaned.append(ln)
+        stripped = ln.strip()
+        nxt = out[i + 1].strip() if i + 1 < len(out) else ""
+        cur_ind = len(ln) - len(ln.lstrip())
+        nxt_ind = len(out[i + 1]) - len(out[i + 1].lstrip()) if i + 1 < len(out) else 0
+        if stripped.endswith(":") and (i + 1 >= len(out) or nxt_ind <= cur_ind):
+            cleaned.append("    " * (cur_ind // 4 + 1) + "pass")
+    return "\n".join(cleaned)
+
+
+def all_interview_reads(roots):
+    """Every interview-variable read across ALL code blocks AND screen templates
+    (subquestion/question/under/help/note/button/review text + field defaults +
+    show-if). Returns dict normpath -> {'files': set, 'undefended': bool} where
+    undefended is True if at least one read site is NOT hasattr/defined-guarded."""
+    rootalt = "|".join(sorted(map(re.escape, roots), key=len, reverse=True))
+    rows_re = re.compile(rf"^rows:\s*((?:{rootalt})(?:\.\w+|\[[^\]]*\])*)\s*$", re.M)
+    reads = {}
+    for f in sorted(QDIR.glob("*.yml")):
+        for doc in split_blocks(f):
+            code = get_code(doc)
+            chunks = []
+            if code:
+                chunks.append(("code", code))
+            tpy = mako_to_py(doc)
+            if tpy.strip():
+                chunks.append(("template", tpy))
+            # a `rows:` table binds the magic `row_item` to that list
+            rm = rows_re.search(doc)
+            rows_path = rm.group(1) if rm else None
+            for kind, src in chunks:
+                col = Collector(roots, "\x00")
+                if rows_path:
+                    col.loopvars["row_item"] = rows_path
+                try:
+                    col.visit(ast.parse(src))
+                except SyntaxError:
+                    continue
+                for v, gsets in col.reads.items():
+                    rec = reads.setdefault(v, {"files": set(), "undefended": False})
+                    rec["files"].add(f.name)
+                    if any(DEFENDED not in g for g in gsets):
+                        rec["undefended"] = True
+    return reads
+
+
+def definable_set(def_index, mand):
+    strong, field_uncond, cond = def_index
+    mand_uncond, mand_cond = mand
+    return strong | field_uncond | set(cond) | mand_uncond | set(mand_cond)
+
+
+# DAObject / built-in attributes & methods that are always available — not orphans
+DAOBJECT_ATTRS = {
+    "address", "name", "first", "middle", "last", "suffix", "full", "firstlast",
+    "lastfirst", "on_one_line", "line_one", "line_two", "city", "state", "zip",
+    "county", "country", "sms_number", "email", "phone_number", "instanceName",
+    "there_are_any", "there_is_another", "gathered", "complete", "number",
+    "total", "elements", "true_values", "value", "label",
+    # DAList / DAObject methods
+    "add_action", "item_actions", "appendObject", "gather", "append", "pop",
+    "remove", "comma_and_list", "comma_list", "as_list", "initializeAttribute",
+}
+
+
+def orphan_reads(def_index, mand):
+    """Interview variables referenced somewhere but defined NOWHERE — a read of
+    one is a guaranteed dead-end ('no question to define X') if reached."""
+    definable = definable_set(def_index, mand)
+    roots_set = interview_roots()
+    reads = all_interview_reads(roots_set)
+    orphans = {}
+    for v, rec in reads.items():
+        if v in definable:
+            continue
+        if not rec["undefended"]:        # every read site is hasattr/defined-guarded
+            continue
+        tail = v.rsplit(".", 1)[-1].replace("[i]", "")
+        if "." not in v:                 # bare root / bare list item
+            base = v.replace("[i]", "")
+            if base in roots_set or base in definable:
+                continue
+        if tail in DAOBJECT_ATTRS:
+            continue
+        # a trailing subscript on a definable scalar is a slice/index, not a new
+        # variable (e.g. account_number[-4:]) — not an orphan
+        if v.endswith("[i]") and v[:-3] in definable:
+            continue
+        parent = v.rsplit(".", 1)[0]     # method/attr on a definable object is OK
+        if parent in definable:
+            continue
+        orphans[v] = sorted(rec["files"])
+    return orphans
+
+
 # ---------- form discovery + analysis -----------------------------------------
 
 def find_forms(path):
@@ -461,6 +589,9 @@ def findings_lines(def_index, mand, targets):
                 lines.append(f"{path.name}\t{name}\tSHOWIF_GAP\t{g}")
             for g in branch:
                 lines.append(f"{path.name}\t{name}\tBRANCH_GAP\t{g}")
+    # orphan references are interview-wide (not per-form)
+    for v in orphan_reads(def_index, mand):
+        lines.append(f"(interview)\t-\tORPHAN_READ\t{v}")
     return sorted(lines)
 
 
@@ -470,6 +601,13 @@ def main(argv):
     if "--findings" in argv:
         targets = sorted(QDIR.glob("*.yml"))
         print("\n".join(findings_lines(def_index, mand, targets)))
+        return
+    if "--orphans" in argv:
+        orph = orphan_reads(def_index, mand)
+        print(f"Orphan references — read in code/templates, defined NOWHERE "
+              f"(a guaranteed 'no question to define X' dead-end if reached): {len(orph)}")
+        for v, files in sorted(orph.items()):
+            print(f"  XX {v}   [{', '.join(files)}]")
         return
     verbose = "-v" in argv
     argv = [a for a in argv if a != "-v"]

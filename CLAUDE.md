@@ -55,6 +55,12 @@ happy-path Playwright runs (which mask these bugs — see `tests/navigation-help
     `mandatory` block only under some `if` guard, but a form reads it under a
     *broader* condition. Caught `122A monthly_income.gross_wages2` (collected only
     for married-filing, read for any consumer-debt filer → single filers crash).
+  - **ORPHAN_READ** (`--orphans`) — a variable referenced *anywhere* in the
+    interview (code blocks AND screen templates: `${ }`, `% if`, field defaults,
+    show-if, review/`subquestion` text) that is defined **nowhere**. This is the
+    purest "user can't proceed" dead-end (`no question to define X`). Covers the
+    whole interview, not just PDF assembly. Currently **0** — and the gate keeps
+    it that way (a new stale/typo'd reference fails the build).
   Also caught `122A separated_status` and the `106AB` grand-total bug (totals sum
   ~50 show-if'd category `*_value`/`*_amount` fields unconditionally).
 

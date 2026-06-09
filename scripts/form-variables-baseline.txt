@@ -1,8 +1,4 @@
 101-question-blocks.yml	Form 101	BRANCH_GAP	debtor[i].counseling.not_required_reason
-101-question-blocks.yml	Form 101	NEVER_DEFINED	debtor[i].business
-101-question-blocks.yml	Form 101	NEVER_DEFINED	debtor[i].first_name
-101-question-blocks.yml	Form 101	NEVER_DEFINED	debtor[i].last_name
-101-question-blocks.yml	Form 101	NEVER_DEFINED	debtor[i].middle_name
 101-question-blocks.yml	Form 101	NEVER_DEFINED	debtor[i].tax_id.tax_id[i]
 103A-question-blocks.yml	Form 103a	BRANCH_GAP	payment.initial_payment_amount
 103A-question-blocks.yml	Form 103a	BRANCH_GAP	payment.payment_on_petition
@@ -101,11 +97,6 @@
 106AB-question-blocks.yml	Form 106AB	SHOWIF_GAP	prop.owed_property.third_party_amount
 106AB-question-blocks.yml	Form 106AB	SHOWIF_GAP	prop.owed_property.trust_amount
 106C-question-blocks.yml	Form 106C	SHOWIF_GAP	prop.exempt_property.properties[i].exemption
-106D-question-blocks.yml	Form 106D	NEVER_DEFINED	prop.creditors[i].other_city
-106D-question-blocks.yml	Form 106D	NEVER_DEFINED	prop.creditors[i].other_name
-106D-question-blocks.yml	Form 106D	NEVER_DEFINED	prop.creditors[i].other_state
-106D-question-blocks.yml	Form 106D	NEVER_DEFINED	prop.creditors[i].other_street
-106D-question-blocks.yml	Form 106D	NEVER_DEFINED	prop.creditors[i].other_zip
 106G-question-blocks.yml	Form 106G	SHOWIF_GAP	debtors.spouse_city
 106G-question-blocks.yml	Form 106G	SHOWIF_GAP	debtors.spouse_name
 106G-question-blocks.yml	Form 106G	SHOWIF_GAP	debtors.spouse_state
