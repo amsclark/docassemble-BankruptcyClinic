@@ -70,6 +70,18 @@ happy-path Playwright runs (which mask these bugs — see `tests/navigation-help
   Flags `monthly_income.median_dependents` — the exact variable behind the
   means-test loop.
 
+- **`python3 scripts/interview_graph.py`** (`npm run graph`) — the unifying
+  dependency graph the checks above are queries on. For every variable it
+  records where it is **defined** (file:line, kind, `show if` condition) and
+  **read**, plus the data-dependency graph with cycle detection.
+  - `interview_graph.py <variable>` — full def/use picture for one variable (the
+    fastest way to debug "why is X undefined / asked twice / looping").
+  - `npm run graph:map` — write `docs/VARIABLE-MAP.md` (whole-interview map;
+    git-ignored, regenerate on demand).
+  Note: it shows definition *sites*; whether a definition is *reachable on the
+  path that reads it* is the path-sensitive part — that's the BRANCH GAP / CYCLE
+  checks in `form_variable_manifest.py`, not the raw graph.
+
 Both are static and approximate — treat output as high-signal review lists.
 
 These run as **burn-down gates** in `npm run lint` / `pretest`:
