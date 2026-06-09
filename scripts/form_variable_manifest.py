@@ -282,6 +282,58 @@ class Collector(ast.NodeVisitor):
 
 # ---------- definition index ---------------------------------------------------
 
+def _dynamic_code_defs(code, roots):
+    """Paths defined via define('p', ...) / setattr(obj, 'a', ...), including the
+    defensive-default idiom: `for x in [<string literals>]:` loops with string
+    concat (e.g. define('prop.' + _a, 0)). Returns a set of normalized paths."""
+    out = set()
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return out
+    loopstrs = {}
+
+    def lit_list(node):
+        if isinstance(node, (ast.List, ast.Tuple)):
+            vals = [e.value for e in node.elts if isinstance(e, ast.Constant) and isinstance(e.value, str)]
+            return vals if vals and len(vals) == len(node.elts) else None
+        return None
+
+    def eval_str(node):
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            return [node.value]
+        if isinstance(node, ast.Name) and node.id in loopstrs:
+            return loopstrs[node.id]
+        if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
+            l, r = eval_str(node.left), eval_str(node.right)
+            return [a + b for a in l for b in r] if l and r else []
+        return []
+
+    class W(ast.NodeVisitor):
+        def visit_For(self, node):
+            if isinstance(node.target, ast.Name):
+                lits = lit_list(node.iter)
+                if lits is not None:
+                    loopstrs[node.target.id] = lits
+            self.generic_visit(node)
+
+        def visit_Call(self, node):
+            fn = node.func.id if isinstance(node.func, ast.Name) else None
+            if fn == "define" and node.args:
+                for p in eval_str(node.args[0]):
+                    if re.match(r"[A-Za-z_]\w*", p) and p.split(".")[0].split("[")[0] in roots:
+                        out.add(norm(p))
+            elif fn == "setattr" and len(node.args) >= 2:
+                r, p = chain_to_path(node.args[0])
+                if r in roots and p:
+                    for a in eval_str(node.args[1]):
+                        out.add(norm(p + "." + a))
+            self.generic_visit(node)
+
+    W().visit(tree)
+    return out
+
+
 def build_def_index(roots):
     """(defined_uncond:set, defined_condonly:dict path->set(governing paths))"""
     rootalt = "|".join(sorted(map(re.escape, roots), key=len, reverse=True))
@@ -331,6 +383,11 @@ def build_def_index(roots):
             ma = assign_lhs.match(ln)
             if ma:
                 strong.add(norm(ma.group(1)))
+        # define()/setattr() definitions (incl. defensive-default loops)
+        for doc in split_blocks(f):
+            c = get_code(doc)
+            if c:
+                strong.update(_dynamic_code_defs(c, roots))
     cond = {p: g for p, g in cond.items() if p not in strong and p not in field_uncond}
     return strong, field_uncond, cond
 

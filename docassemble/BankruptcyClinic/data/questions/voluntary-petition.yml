@@ -823,6 +823,20 @@ code: |
     monthly_income.gross_wages1
     if monthly_income.filing_status == "Married and your spouse is filing with you.":
       monthly_income.gross_wages2
+    else:
+      # Single / spouse-not-filing: the debtor-2 income screen is never shown, so
+      # the 122A PDF would read undefined debtor-2 fields and crash for ANY
+      # non-married-filing consumer-debt filer. Default every debtor-2 field the
+      # form reads (currency -> 0, source labels -> '').
+      for _f2 in ['gross_wages2', 'alimony2', 'other_income2', 'business_gross_receipts2',
+                  'business_operating_expenses2', 'rental_gross_receipts2',
+                  'rental_operating_expenses2', 'interest2', 'unemployment2',
+                  'spouse_social2', 'pension2', 'source1_amount_2', 'source2_amount_2']:
+        if not defined('monthly_income.' + _f2):
+          setattr(monthly_income, _f2, 0)
+      for _s2 in ['source1_2', 'source2_2']:
+        if not defined('monthly_income.' + _s2):
+          setattr(monthly_income, _s2, '')
     # review_122 reads monthly_income.median_dependents. Collect the
     # median-income screen (state / household size / median income) HERE, before
     # `reviewed`, so they resolve in order. Previously the median_dependents =1

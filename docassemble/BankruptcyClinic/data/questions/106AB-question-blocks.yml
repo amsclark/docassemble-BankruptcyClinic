@@ -3861,6 +3861,29 @@ code: |
   else:
     ab['noOther'] = True
 
+  # Personal-property categories are show-if gated with no default, so a filer
+  # who skips a category leaves its *_value/*_amount undefined — which would
+  # crash the grand-total sums below (and on the Final copies) at assembly.
+  # Default any that weren't collected. This is additive: `if not defined` never
+  # overrides a real answer, and the parent objects are declared in `objects:`.
+  for _a in ['household_goods_value', 'electronics_value', 'collectibles_value',
+             'hobby_equipment_value', 'firearms_value', 'clothes_value',
+             'jewelry_value', 'animal_value', 'other_household_items_value',
+             'other_prop_value', 'other_prop_value2', 'other_prop_value3']:
+    if not defined('prop.' + _a):
+      define('prop.' + _a, 0)
+  for _a in ['cash_value', 'future_property_interest_value', 'ip_interest_value', 'intangible_interest_value']:
+    if not defined('prop.financial_assets.' + _a):
+      define('prop.financial_assets.' + _a, 0)
+  for _a in ['tax_refund_federal', 'tax_refund_state', 'tax_refund_local', 'family_support_alimony', 'family_support_maintenance', 'family_support_support', 'family_support_divorce', 'family_support_settlement', 'other_amounts_value', 'first_insurance_interest_amount', 'second_insurance_interest_amount', 'third_insurance_interest_amount', 'trust_amount', 'third_party_amount']:
+    if not defined('prop.owed_property.' + _a):
+      define('prop.owed_property.' + _a, 0)
+  for _a in ['ar_amount', 'equipment_amount', 'machinery_amount', 'inventory_amount', 'partnershipValue1', 'partnershipValue2', 'partnershipValue3', 'lists_amount', 'otherPropertyAmount1', 'otherPropertyAmount2', 'otherPropertyAmount3', 'otherPropertyAmount4', 'otherPropertyAmount5', 'otherPropertyAmount6']:
+    if not defined('prop.business_property.' + _a):
+      define('prop.business_property.' + _a, 0)
+  for _a in ['animal_amount', 'crop_amount', 'equipment_amount', 'supplies_amount', 'commercial_amount']:
+    if not defined('prop.farming_property.' + _a):
+      define('prop.farming_property.' + _a, 0)
   ab['p3TotalAmt'] = currency(prop.household_goods_value + prop.electronics_value + prop.collectibles_value + prop.hobby_equipment_value + prop.firearms_value + prop.clothes_value + prop.jewelry_value + prop.animal_value + prop.other_household_items_value)
 
   #
