@@ -61,6 +61,12 @@ happy-path Playwright runs (which mask these bugs — see `tests/navigation-help
 
 Both are static and approximate — treat output as high-signal review lists.
 
+These run as **burn-down gates** in `npm run lint` / `pretest`:
+- `npm run lint:flow` (`scripts/lint-flow-gaps.sh`) — fails on any NEW never-defined
+  / show-if gap vs `scripts/form-variables-baseline.txt`. After fixing one, tighten
+  with `./scripts/lint-flow-gaps.sh --update`.
+- `npm run lint:test-complete` (`scripts/lint-test-completeness.sh`) — see Testing.
+
 ## Testing
 
 See `tests/navigation-helpers.ts`. The section helpers drive the **happy path**
@@ -69,6 +75,22 @@ and therefore skip the failing branches (e.g. `navigateMeansTest` sets
 crashes live). When testing a fix, drive the *actual failing branch*. Deploy
 locally with `./deploy.sh` (installs into the `docassemble` Docker container);
 read real tracebacks from `docker exec docassemble tail /usr/share/docassemble/log/docassemble.log`.
+
+**Every scenario/regression test must run ALL THE WAY THROUGH to PDF assembly.**
+A passing mid-interview screen proves a screen, not the deliverable; crashes
+like the 106AB grand-total sum surface only at assembly, and a mid-interview fix
+can introduce a *later* failure. End such tests with:
+
+```ts
+import { finishAndAssertAllPdfs } from './assert-helpers';
+await finishAndAssertAllPdfs(page);  // asserts conclusion + all PDFs, no error page
+```
+
+`npm run lint:test-complete` (`scripts/lint-test-completeness.sh`) is a burn-down
+gate: new specs that stop mid-interview fail unless explicitly exempted
+(`--update`). Coverage should span the show-if branches the manifest flags
+(missing property categories, consumer vs non-consumer debts, single vs joint) —
+that's where assembly-time gaps hide.
 
 ## Workflow
 

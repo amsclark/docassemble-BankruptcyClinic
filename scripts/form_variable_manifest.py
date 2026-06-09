@@ -371,10 +371,26 @@ def analyze(path, def_index):
     return out
 
 
+def findings_lines(def_index, targets):
+    """Stable, diffable lines: '<file>\t<FORM>\t<TYPE>\t<leaf>' for each gap."""
+    lines = []
+    for path in targets:
+        for name, dv, leaves, lists, missing, showif in analyze(path, def_index):
+            for g in missing:
+                lines.append(f"{path.name}\t{name}\tNEVER_DEFINED\t{g}")
+            for g in showif:
+                lines.append(f"{path.name}\t{name}\tSHOWIF_GAP\t{g}")
+    return sorted(lines)
+
+
 def main(argv):
+    def_index = build_def_index(interview_roots())
+    if "--findings" in argv:
+        targets = sorted(QDIR.glob("*.yml"))
+        print("\n".join(findings_lines(def_index, targets)))
+        return
     verbose = "-v" in argv
     argv = [a for a in argv if a != "-v"]
-    def_index = build_def_index(interview_roots())
     targets = [QDIR / a for a in argv[1:]] if len(argv) > 1 else sorted(QDIR.glob("*.yml"))
     tm = ts = 0
     for path in targets:

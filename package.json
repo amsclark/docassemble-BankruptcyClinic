@@ -21,7 +21,10 @@
     "test:video-analysis": "playwright test --headed && npm run test:report",
     "lint:selectors": "./scripts/lint-test-selectors.sh",
     "lint:yaml-ids": "./scripts/yaml-question-ids-snapshot.sh",
-    "pretest": "npm run lint:selectors && npm run lint:yaml-ids"
+    "lint:flow": "./scripts/lint-flow-gaps.sh",
+    "lint:test-complete": "./scripts/lint-test-completeness.sh",
+    "lint": "npm run lint:selectors && npm run lint:yaml-ids && npm run lint:flow && npm run lint:test-complete",
+    "pretest": "npm run lint:selectors && npm run lint:yaml-ids && npm run lint:flow && npm run lint:test-complete"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
