@@ -32,6 +32,7 @@ import { finishAndAssertAllPdfs } from './assert-helpers';
 import {
   getHeading, fillVisibleRequiredFields, clickContinueStrict,
   pageHasContinueButton, clickYesNoButtonPage, mulberry32, dumpPageState,
+  waitForAdvance,
 } from './walker-helpers';
 
 const SEEDS = (process.env.FUZZ_SEEDS || '20260609,71077345')
@@ -126,28 +127,23 @@ test.describe('Seeded-random fuzz walker', () => {
         // nothing new appears, like a real user answering what they see.
         let handled = await fillVisibleRequiredFields(page, { rngValue: rng(), yesBias });
         for (let pass = 0; handled && pass < 3; pass++) {
-          await page.waitForTimeout(400);
+          await page.waitForTimeout(150);   // DOM show-if reveal only, no server roundtrip
           handled = await fillVisibleRequiredFields(page, { rngValue: rng(), yesBias });
         }
 
         trail[trail.length - 1] += ' -> filled+Continue';
         await clickContinueStrict(page);
-        await page.waitForTimeout(800);
+        // Event-driven: returns as soon as tracker/heading change (typ.
+        // 100-300ms); the 12s ceiling covers lock-contended POSTs that used
+        // to read as false silent blocks. Validation rejections leave both
+        // unchanged and simply wait out the ceiling once before the
+        // same-heading logic below records them.
+        await waitForAdvance(page, trackerBefore, h, 12000);
 
-        let h2 = (await getHeading(page)).toLowerCase();
-        let trackerAfter = await page.locator('input[name="_tracker"]').first().getAttribute('value').catch(() => null);
-        let headingSame = (h2 === hLow);
-        let trackerAdvanced = (trackerBefore !== null && trackerAfter !== null && trackerBefore !== trackerAfter);
-        // Under server lock contention a legitimate POST can take many seconds;
-        // judging "didn't advance" after one short wait turns slow pages into
-        // false silent blocks. Re-check the tracker for up to 10s first.
-        for (let settle = 0; settle < 10 && headingSame && !trackerAdvanced; settle++) {
-          await page.waitForTimeout(1000);
-          h2 = (await getHeading(page)).toLowerCase();
-          trackerAfter = await page.locator('input[name="_tracker"]').first().getAttribute('value').catch(() => null);
-          headingSame = (h2 === hLow);
-          trackerAdvanced = (trackerBefore !== null && trackerAfter !== null && trackerBefore !== trackerAfter);
-        }
+        const h2 = (await getHeading(page)).toLowerCase();
+        const trackerAfter = await page.locator('input[name="_tracker"]').first().getAttribute('value').catch(() => null);
+        const headingSame = (h2 === hLow);
+        const trackerAdvanced = (trackerBefore !== null && trackerAfter !== null && trackerBefore !== trackerAfter);
         if (headingSame && !trackerAdvanced) {
           sameHeadingStreak += 1;
           if (sameHeadingStreak === 1) {

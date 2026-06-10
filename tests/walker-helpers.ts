@@ -46,10 +46,19 @@ export async function fillVisibleRequiredFields(
     const random = rngValue !== undefined;
     let touched = false;
 
-    // 1) selects (dropdowns) — pick first non-empty option (or a random one)
+    // 1) selects (dropdowns) — pick first non-empty option (or a random one).
+    //    Includes combobox-backed selects: `datatype: combobox` hides the
+    //    original <select> behind a bootstrap-combobox text input, and typing
+    //    into that input does NOT commit a value — the validator checks the
+    //    hidden select ("You need to select one or type in a new value").
     document.querySelectorAll('select').forEach((sel) => {
       const sl = sel as HTMLSelectElement;
-      if (sl.offsetParent === null) return;
+      if (sl.offsetParent === null) {
+        const comboboxBacked = !!(sl.closest('.combobox-container')
+          || sl.parentElement?.querySelector('input.combobox')
+          || (sl.nextElementSibling as HTMLElement | null)?.querySelector?.('input.combobox'));
+        if (!comboboxBacked) return;
+      }
       if (sl.value && sl.value !== '') return;
       const opts2 = Array.from(sl.options).filter(o => o.value && o.value !== '');
       if (opts2.length === 0) return;
@@ -187,6 +196,27 @@ export async function clickContinueStrict(p: Page) {
   // Plain click — no validator override. Real-user click path.
   await p.locator('#da-continue-button').click({ timeout: 5000 }).catch(() => {});
   await p.waitForLoadState('networkidle').catch(() => {});
+}
+
+/**
+ * Event-driven page-advance wait: returns as soon as the _tracker value or
+ * the h1 text differs from the supplied pre-click snapshot, or after
+ * timeoutMs (validation rejections legitimately leave both unchanged — the
+ * caller's same-heading logic handles that case). Replaces fixed sleeps;
+ * typical advance is detected in 100-300ms instead of a flat 800ms+.
+ */
+export async function waitForAdvance(
+  p: Page, trackerBefore: string | null, headingBefore: string, timeoutMs = 3000,
+): Promise<void> {
+  await p.waitForFunction(
+    ({ t0, h0 }) => {
+      const t = (document.querySelector('input[name="_tracker"]') as HTMLInputElement | null)?.value ?? null;
+      const h = document.querySelector('h1')?.textContent?.trim() ?? '';
+      return (t0 !== null && t !== null && t !== t0) || (h !== '' && h !== h0);
+    },
+    { t0: trackerBefore, h0: headingBefore },
+    { timeout: timeoutMs, polling: 100 },
+  ).catch(() => {});
 }
 
 export async function pageHasContinueButton(p: Page): Promise<boolean> {
