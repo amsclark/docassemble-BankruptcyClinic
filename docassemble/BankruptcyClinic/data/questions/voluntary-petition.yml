@@ -453,6 +453,14 @@ code: |
   prop.nonpriority_claims.gather()
   prop.contracts_and_leases.gather()
   codebtor_auto_populated
+  # codebtor_auto_populated only marks the list gathered when a creditor had
+  # has_codebtor=True. Without this explicit gather(), a filer with NO
+  # creditor co-signers is first asked "Do you have any co-signers?" during
+  # PDF assembly (the 106H builder's len(debtors.codebtors) seek) — an
+  # out-of-order screen that, raced against the counseling_final event
+  # screen, ping-ponged the browser between the two. gather() here is a
+  # no-op when auto-population already ran (rule 1: flow order lives here).
+  debtors.codebtors.gather()
   debtors.community_property
   if not debtors.community_property:
     debtors.had_spouse = False
@@ -1231,7 +1239,10 @@ code: |
   if not hasattr(prop.priority_claims[i], 'who'):
     prop.priority_claims[i].who = 'Debtor 1 only'
   prop.priority_claims[i].account_number
-  prop.priority_claims[i].date_incurred
+  # date_incurred is required:False (a blank date stays UNDEFINED) — a bare
+  # reference here re-seeks the claim question forever when it's left blank
+  # (the lease_assumed loop class). Defended read: blank stays blank.
+  getattr(prop.priority_claims[i], 'date_incurred', None)
   prop.priority_claims[i].contingent
   prop.priority_claims[i].unliquidated
   prop.priority_claims[i].disputed
@@ -1250,7 +1261,8 @@ code: |
   if not hasattr(prop.nonpriority_claims[i], 'who'):
     prop.nonpriority_claims[i].who = 'Debtor 1 only'
   prop.nonpriority_claims[i].account_number
-  prop.nonpriority_claims[i].date_incurred
+  # see priority_claims note: defended read of the optional date (loop class)
+  getattr(prop.nonpriority_claims[i], 'date_incurred', None)
   prop.nonpriority_claims[i].contingent
   prop.nonpriority_claims[i].unliquidated
   prop.nonpriority_claims[i].disputed
@@ -1278,7 +1290,12 @@ code: |
     prop.contracts_and_leases[i].codebtor_zip
   prop.contracts_and_leases[i].unexpired_lease
   if prop.contracts_and_leases[i].unexpired_lease:
-    prop.contracts_and_leases[i].lease_assumed
+    # lease_assumed is required-when-visible, but the client validator does
+    # NOT enforce required on show-if-revealed fields inside this `list
+    # collect` question — a bare reference here loops the gather forever on
+    # an empty submit (the 2026-06-05 prod "Infinite loop: x.gathered").
+    # Defended read; the 106G builder tolerates absence the same way.
+    getattr(prop.contracts_and_leases[i], 'lease_assumed', None)
   prop.contracts_and_leases[i].complete = True
 ---
 code: |

@@ -142,6 +142,21 @@ export interface ExpenseData {
   alimony?: string;
 }
 
+/** Drives the 122A means-test branch. Omit (or consumerDebts: false) for the
+ *  non-consumer short-circuit the happy-path helpers always took. */
+export interface MeansTestOptions {
+  /** Answer "are your debts primarily NON-consumer?" with No → full means test. */
+  consumerDebts?: boolean;
+  /** Index into the filing_status choices:
+   *  0 = Not married, 1 = Married filing jointly, 2 = Married NOT filing. */
+  filingStatusIndex?: 0 | 1 | 2;
+  /** Index into separated_status (only shown for filingStatusIndex 2):
+   *  0 = same household, 1 = living separately / legally separated. */
+  separatedStatusIndex?: 0 | 1;
+  /** Median family income figure to enter (the screen has no default). */
+  medianIncome?: string;
+}
+
 export interface TestScenario {
   name: string;
   district: string;
@@ -159,6 +174,7 @@ export interface TestScenario {
   hasCodebtor?: boolean;
   hasContracts?: boolean;
   dependents?: number;
+  meansTest?: MeansTestOptions;
 }
 
 // ════════════════════════════════════════════════════════════════════

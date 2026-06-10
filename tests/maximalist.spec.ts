@@ -219,6 +219,7 @@ const STATE_BY_ABBR: Record<string, string> = {
   OK: 'Oklahoma', OR: 'Oregon', PA: 'Pennsylvania', RI: 'Rhode Island', SC: 'South Carolina',
   SD: 'South Dakota', TN: 'Tennessee', TX: 'Texas', UT: 'Utah', VT: 'Vermont',
   VA: 'Virginia', WA: 'Washington', WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming',
+  DC: 'District of Columbia',
 };
 
 async function fillRealProperty(page: Page, rp: any, index: number) {
@@ -379,10 +380,14 @@ async function navigatePropertySectionMulti(page: Page) {
     const heading = await page.locator('h1').first().textContent().catch(() => '');
     console.log(`  [property] post-deposit page ${pageNum}: "${heading?.trim()}"`);
 
-    // Check if we've left property section (exemption page has a select for exemption_type)
+    // Hand off at the exemption boundary: the caller runs navigateExemptionSection
+    // next, so just BREAK when we reach it — don't touch the gate. NE/SD skip the
+    // exemption_type select, so detect the "Do you have any property to claim as
+    // exempt?" gate (a yesno-button screen) directly.
     const exemptionSelect = page.locator(`select[name="${b64('prop.exempt_property.exemption_type')}"]`);
-    if (await exemptionSelect.count() > 0) {
-      console.log('  [property] Reached exemption section, done with property');
+    const exemptGate = page.locator(`[name="${b64('prop.exempt_property.properties.there_are_any')}"]`);
+    if ((await exemptionSelect.count()) > 0 || (await exemptGate.count()) > 0 || /claim as exempt/i.test(heading || '')) {
+      console.log('  [property] Reached exemption boundary, handing off to navigateExemptionSection');
       break;
     }
 
@@ -573,7 +578,39 @@ async function navigateIncomeMaximalist(page: Page) {
 // ════════════════════════════════════════════════════════════════════
 
 async function navigateExpensesMaximalist(page: Page) {
-  // The mandatory flow goes directly to monthly_expenses_details (household_description is not sought)
+  console.log('  [expenses] Household description page');
+  await waitForDaPageLoad(page);
+
+  // Schedule J opens with "Describe your household" (Roxanne feedback: the
+  // dependents menu used to be reachable only via the fee-waiver application).
+  // Maximalist: exercise the dependents list with 2 entries.
+  const householdGate = page.locator(`[name="${b64('debtor[0].expenses.dependents.there_are_any')}"]`);
+  if (await householdGate.count() > 0) {
+    // "Does debtor 2 live in a separate household?" renders for joint cases.
+    const otherHousehold = page.locator(`[name="${b64('debtor[0].expenses.other_household')}"]`);
+    if (await otherHousehold.count() > 0) {
+      await selectYesNoRadio(page, 'debtor[0].expenses.other_household', true);
+    }
+    await selectYesNoRadio(page, 'debtor[0].expenses.dependents.there_are_any', true);
+    await selectYesNoRadio(page, 'debtor[0].expenses.other_people_expenses', true);
+    await clickContinue(page);
+    await waitForDaPageLoad(page);
+
+    // Generic-index detail screen — field ids use a literal `[i]`, one
+    // dependent at a time, so the same selectors apply each iteration.
+    const DEPENDENTS = 2;
+    for (let k = 0; k < DEPENDENTS; k++) {
+      console.log(`  [expenses] Dependent ${k + 1}/${DEPENDENTS}`);
+      await fillById(page, b64('debtor[0].expenses.dependents[i].relationship'), k === 0 ? 'Son' : 'Daughter');
+      await fillById(page, b64('debtor[0].expenses.dependents[i].age'), k === 0 ? '10' : '7');
+      await selectYesNoRadio(page, 'debtor[0].expenses.dependents[i].same_residence', true);
+      await clickContinue(page);
+      await waitForDaPageLoad(page);
+      await clickYesNoButton(page, 'debtor[0].expenses.dependents.there_is_another', k < DEPENDENTS - 1);
+      await waitForDaPageLoad(page);
+    }
+  }
+
   console.log('  [expenses] Monthly expenses page');
   await waitForDaPageLoad(page);
 
@@ -1077,10 +1114,17 @@ async function navigateUnsecuredCreditorsMulti(page: Page) {
   const priorityList = MAXIMALIST.creditors.priorityList || [];
   const nonpriorityList = MAXIMALIST.creditors.nonpriorityList || [];
 
-  // Priority claims
+  // Priority claims. The there_are_any gate only exists on some flow shapes —
+  // since the duplicate-gather removal, list collect can show the first entry
+  // form directly. Click the gate only if it's actually on the page.
   await waitForDaPageLoad(page);
-  console.log('  [unsecured] Priority claims: Yes');
-  await clickYesNoButton(page, 'prop.priority_claims.there_are_any', true);
+  const prGate = page.locator(`[name="${b64('prop.priority_claims.there_are_any')}"]`);
+  if (await prGate.count() > 0) {
+    console.log('  [unsecured] Priority claims: Yes');
+    await clickYesNoButton(page, 'prop.priority_claims.there_are_any', true);
+  } else {
+    console.log('  [unsecured] Priority entry form shown directly (list collect)');
+  }
 
   for (let i = 0; i < priorityList.length; i++) {
     await waitForDaPageLoad(page);
@@ -1096,10 +1140,15 @@ async function navigateUnsecuredCreditorsMulti(page: Page) {
     }
   }
 
-  // Nonpriority claims
+  // Nonpriority claims — same conditional-gate handling as priority above.
   await waitForDaPageLoad(page);
-  console.log('  [unsecured] Nonpriority claims: Yes');
-  await clickYesNoButton(page, 'prop.nonpriority_claims.there_are_any', true);
+  const npGate = page.locator(`[name="${b64('prop.nonpriority_claims.there_are_any')}"]`);
+  if (await npGate.count() > 0) {
+    console.log('  [unsecured] Nonpriority claims: Yes');
+    await clickYesNoButton(page, 'prop.nonpriority_claims.there_are_any', true);
+  } else {
+    console.log('  [unsecured] Nonpriority entry form shown directly (list collect)');
+  }
 
   for (let i = 0; i < nonpriorityList.length; i++) {
     await waitForDaPageLoad(page);
@@ -1190,6 +1239,19 @@ async function navigateContractsLeasesMaximalist(page: Page) {
 
 async function navigateCommunityPropertyMaximalist(page: Page) {
   await waitForDaPageLoad(page);
+
+  // The mandatory block now gathers debtors.codebtors explicitly before
+  // community property (vp's `debtors.codebtors.gather()`). The maximalist
+  // sets has_codebtor=false on every creditor, so auto-population never marks
+  // the list gathered and the "co-signers" question is asked here. Answer No
+  // (matching the per-creditor answers) and move on to community property.
+  const cpHeading = (await page.locator('h1').first().textContent().catch(() => '')) ?? '';
+  if (cpHeading.includes('co-signers')) {
+    console.log('  [communityProperty] co-signers (codebtors) = No');
+    await clickYesNoButton(page, 'debtors.codebtors.there_are_any', false);
+    await waitForDaPageLoad(page);
+  }
+
   console.log('  [communityProperty] community_property = Yes');
 
   await logHeading(page, 'community property');
@@ -1280,6 +1342,17 @@ async function navigateMeansTestMaximalist(page: Page) {
   console.log('  [meansTest] Review/results');
   await waitForDaPageLoad(page);
   heading = await logHeading(page, 'means test review');
+
+  // "Calculate the median family income" — the real (non-consumer-debts=No)
+  // means-test branch asks the filer to look up and TYPE the median income;
+  // the field has no default, so Continue alone fails validation. 105000 keeps
+  // the joint fixture income below the median (no presumption of abuse).
+  const medianField = page.locator(`#${b64('monthly_income.median_income')}`);
+  if (await medianField.count() > 0) {
+    console.log('  [meansTest] Filling median family income');
+    await medianField.fill('105000');
+  }
+
   // Click continue to accept the results
   const continueBtn = page.locator('#da-continue-button');
   if (await continueBtn.count() > 0) {
@@ -1287,6 +1360,14 @@ async function navigateMeansTestMaximalist(page: Page) {
   }
 
   await waitForDaPageLoad(page);
+
+  // "Review Monthly Income Answers" (monthly_income.reviewed) follows the
+  // median screen on the real means-test branch — a review gate, Continue.
+  heading = await logHeading(page, 'means test post-review');
+  if (heading.toLowerCase().includes('review monthly income')) {
+    await clickContinue(page);
+    await waitForDaPageLoad(page);
+  }
 }
 
 // ════════════════════════════════════════════════════════════════════

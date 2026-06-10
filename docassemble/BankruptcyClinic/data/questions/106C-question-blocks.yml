@@ -146,7 +146,6 @@ fields:
     datatype: yesnoradio
   - Did you acquire the property within 1,215 days?: prop.exempt_property.homestead_within_timeframe
     datatype: yesnoradio
-    required: False
     show if: prop.exempt_property.claim_homestead_exemption
 ---
 id: schedule_c_review
@@ -286,9 +285,14 @@ code: |
     sc['desc'+str(i)] = pro.description
     sc['currOwnedVal'+str(i)] = currency(pro.value)
     sc['isCustExempt'+str(i)] = pro.not_full_exemption
-    sc['custExemptVal'+str(i)] = pro.exemption
+    # `exemption` is show-if gated on not_full_exemption — mirror the gate
+    # (an unguarded read seeks the hidden field forever at assembly).
+    sc['custExemptVal'+str(i)] = getattr(pro, 'exemption', None) if pro.not_full_exemption == True else None
     sc['laws'+str(i)] = pro.laws
-    sc['isFairMarket'+str(i)] = True if pro.not_full_exemption == True else False
+    # Match the 106AB builder's convention for these same Schedule C PDF
+    # fields: specific-dollar-amount claim checks isCustExempt; otherwise the
+    # "100% of fair market value" box is checked.
+    sc['isFairMarket'+str(i)] = False if pro.not_full_exemption == True else True
     sc['line'+str(i)] = pro.line
     
     i += 1

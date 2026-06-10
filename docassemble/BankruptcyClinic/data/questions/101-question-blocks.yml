@@ -767,11 +767,14 @@ rows: hazardous_property.property
 columns:
   - Hazard: row_item.hazard
   - Reason: row_item.immediate_attention_reason
-  - Address Number: row_item.number
+  # row_item.number was never defined by the item question (it collects
+  # street/city/state/zip) — rendering this table dead-ended every filer who
+  # reported hazardous property ("variable could not be looked up").
+  - Address: row_item.street
 edit:
   - hazard
   - immediate_attention_reason
-  - number
+  - street
 ---
 id: hazardous_property
 question: |

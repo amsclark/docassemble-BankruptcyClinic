@@ -64,13 +64,13 @@ review:
   - note: |
      <br>
 
-     % if len(prop.creditors) > 0:
+     % if defined('prop.creditors') and prop.creditors.gathered and len(prop.creditors) > 0:
       ${ secured_claims_table }
      % else:
       No Secured Claims Listed
      % endif
   - note: |
-     % if len(personal_leases) > 0:
+     % if defined('personal_leases') and personal_leases.gathered and len(personal_leases) > 0:
       ${ personal_leases_table }
       ${ personal_leases.add_action() }
      % else:

@@ -14,10 +14,16 @@ id: household_description
 section: schedule_j
 question: Describe your household
 fields:
+  # `show if: <var>` naming a variable that is NOT a field on this screen is a
+  # same-page JS toggle that never fires -- the field stays hidden forever.
+  # Harmless while optional; once required-when-visible, the hidden required
+  # radio silently rejected every submit (fuzz seed 71077345, "Describe your
+  # household"). `code:` makes it a server-side render decision instead.
   - Does debtor 2 live in a separate household: debtor[0].expenses.other_household
     datatype: yesnoradio
-    show if: debtor[0].expenses.joint_case
-    required: False
+    show if:
+      code: |
+        debtor[0].expenses.joint_case
   - Do you have dependents?: debtor[0].expenses.dependents.there_are_any
     datatype: yesnoradio
   - Do your expenses include expenses of people other than yourself and your dependents?: debtor[0].expenses.other_people_expenses
@@ -119,7 +125,6 @@ fields:
     required: False
   - Do you have other insurance?: debtor[0].expenses.other_insurance
     datatype: yesnoradio
-    required: False
   - Specify: debtor[0].expenses.other_insurance_specify
     show if: debtor[0].expenses.other_insurance
     required: False

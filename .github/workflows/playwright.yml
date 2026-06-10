@@ -20,6 +20,7 @@ jobs:
         chmod +x scripts/*.sh
         ./scripts/lint-flow-gaps.sh
         ./scripts/lint-test-completeness.sh
+        python3 scripts/lint_caps_sync.py
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests

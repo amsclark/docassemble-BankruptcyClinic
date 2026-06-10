@@ -21,12 +21,13 @@ import {
   clickYesNoButton,
   selectYesNoRadio,
   fillYesNoRadio,
+  selectChoiceRadio,
   fillAllVisibleRadiosAsNo,
   handleCaseNumberIfPresent,
   setCheckbox,
   handleAnotherPage,
 } from './helpers';
-import { TestScenario, DebtorProfile, RealPropertyData, VehicleData, DepositData } from './fixtures';
+import { TestScenario, MeansTestOptions, DebtorProfile, RealPropertyData, VehicleData, DepositData } from './fixtures';
 
 // ════════════════════════════════════════════════════════════════════
 //  INTRO → DEBTOR PAGE
@@ -744,30 +745,53 @@ export async function navigateUnsecuredCreditors(page: Page, scenario: TestScena
   // to the first claim. Always fill one; use a default for scenarios that don't
   // specify a nonpriority creditor.
   await waitForDaPageLoad(page);
-  const np = scenario.creditors.nonpriority || {
-    name: 'General Unsecured Creditor', street: '1 Market St', city: 'Omaha',
-    state: 'Nebraska', zip: '68102', totalClaim: '1000', type: 'Credit Card',
-  };
-  await page.locator(`#${b64('prop.nonpriority_claims[0].name')}`).fill(np.name);
-  await page.locator(`#${b64('prop.nonpriority_claims[0].street')}`).fill(np.street);
-  await page.locator(`#${b64('prop.nonpriority_claims[0].city')}`).fill(np.city);
-  await page.locator(`select#${b64('prop.nonpriority_claims[0].state')}`).selectOption(np.state);
-  await page.locator(`#${b64('prop.nonpriority_claims[0].zip')}`).fill(np.zip);
-  // 'who' dropdown — always visible (code-generated choices)
-  const npWhoSelect = page.locator(`select#${b64('prop.nonpriority_claims[0].who')}`);
-  if (await npWhoSelect.count() > 0) await npWhoSelect.selectOption('Debtor 1 only');
+  // Drive EVERY claim in nonpriorityList when the scenario provides one — the
+  // PDF content assertions sum the list, and the multi-claim "any more?" loop
+  // is coverage nothing else exercises. Fall back to the singular fixture.
+  const npClaims = scenario.creditors.nonpriorityList?.length
+    ? scenario.creditors.nonpriorityList
+    : [scenario.creditors.nonpriority || {
+        name: 'General Unsecured Creditor', street: '1 Market St', city: 'Omaha',
+        state: 'Nebraska', zip: '68102', totalClaim: '1000', type: 'Credit Card',
+      }];
+  // The claim question is `list collect: True` — every claim lives on ONE
+  // page with concrete [0]/[1]/... ids and a built-in "Add another" button;
+  // submitting the page marks the list gathered (the standalone
+  // there_is_another question is never asked on this path). Same pattern as
+  // the maximalist's navigateUnsecuredCreditorsMulti.
+  for (let ci = 0; ci < npClaims.length; ci++) {
+    const np = npClaims[ci];
+    const P = `prop.nonpriority_claims[${ci}]`;
+    await waitForDaPageLoad(page);
+    await page.locator(`#${b64(`${P}.name`)}`).fill(np.name);
+    await page.locator(`#${b64(`${P}.street`)}`).fill(np.street);
+    await page.locator(`#${b64(`${P}.city`)}`).fill(np.city);
+    await page.locator(`select#${b64(`${P}.state`)}`).selectOption(np.state);
+    await page.locator(`#${b64(`${P}.zip`)}`).fill(np.zip);
+    // 'who' dropdown — always visible (code-generated choices)
+    const npWhoSelect = page.locator(`select#${b64(`${P}.who`)}`);
+    if (await npWhoSelect.count() > 0) await npWhoSelect.selectOption('Debtor 1 only');
 
-  // Claim type dropdown (required)
-  const npTypeSelect = page.locator(`select#${b64('prop.nonpriority_claims[0].type')}`);
-  if (await npTypeSelect.count() > 0) await npTypeSelect.selectOption(np.type);
+    // Claim type dropdown (required)
+    const npTypeSelect = page.locator(`select#${b64(`${P}.type`)}`);
+    if (await npTypeSelect.count() > 0) await npTypeSelect.selectOption(np.type);
 
-  await page.locator(`#${b64('prop.nonpriority_claims[0].total_claim')}`).fill(np.totalClaim);
-  await fillYesNoRadio(page, 'prop.nonpriority_claims[0].save_to_library', false);
-  await fillYesNoRadio(page, 'prop.nonpriority_claims[0].has_codebtor', false);
-  await fillYesNoRadio(page, 'prop.nonpriority_claims[0].has_notify', false);
+    await page.locator(`#${b64(`${P}.total_claim`)}`).fill(np.totalClaim);
+    await fillYesNoRadio(page, `${P}.save_to_library`, false);
+    await fillYesNoRadio(page, `${P}.has_codebtor`, false);
+    await fillYesNoRadio(page, `${P}.has_notify`, false);
 
-  await clickContinue(page);
-  await handleAnotherPage(page, 'prop.nonpriority_claims.there_is_another');
+    if (ci < npClaims.length - 1) {
+      await page.evaluate(() => {
+        const btns = Array.from(document.querySelectorAll('button'))
+          .filter((b) => b.textContent?.includes('Add another') && (b as HTMLElement).offsetParent !== null);
+        if (btns.length > 0) btns[btns.length - 1].click();
+      });
+      await page.waitForLoadState('networkidle');
+    } else {
+      await clickContinue(page);
+    }
+  }
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -792,6 +816,16 @@ export async function navigatePersonalLeases(page: Page) {
 
 export async function navigateCommunityProperty(page: Page) {
   await waitForDaPageLoad(page);
+  // Schedule H: when no creditor had has_codebtor=True, codebtor_auto_populated
+  // leaves the list ungathered and the mandatory block's explicit
+  // debtors.codebtors.gather() asks "Do you have any co-signers?" here
+  // (previously this leaked all the way to PDF assembly). Auto-populated
+  // scenarios skip the screen, so handle it conditionally.
+  const heading = (await page.locator('h1').first().textContent().catch(() => '')) ?? '';
+  if (heading.includes('co-signers')) {
+    await clickYesNoButton(page, 'debtors.codebtors.there_are_any', false);
+    await waitForDaPageLoad(page);
+  }
   await fillYesNoRadio(page, 'debtors.community_property', false);
   await clickContinue(page);
 }
@@ -801,20 +835,53 @@ export async function navigateCommunityProperty(page: Page) {
 // ════════════════════════════════════════════════════════════════════
 
 export async function navigateIncome(page: Page, scenario: TestScenario) {
-  // Debtor 1 employment
+  // Debtor 1 employment — honor the fixture (the helper hardcoded
+  // 'Not employed' for every scenario until June 2026, so the 106I
+  // employed/wage/deduction fields were NEVER exercised and the PDF content
+  // assertions caught blank isEmployed1/wages on a fixture that says
+  // Employed).
+  const inc = scenario.income;
+  const d1Employment = inc?.employment ?? 'Not employed';
   await waitForDaPageLoad(page);
-  await selectByName(page, b64('debtor[0].income.employment'), 'Not employed');
-  await clickContinue(page);
+  await selectByName(page, b64('debtor[0].income.employment'), d1Employment);
+  if (d1Employment === 'Employed') {
+    await page.waitForTimeout(400);
+    // show-if'd fields get renamed _field_N inputs — drive by visible label.
+    if (inc?.employer) {
+      await page.getByLabel('Employer Name').fill(inc.employer);
+    }
+    await clickContinue(page);
 
-  // 'Not employed' skips payroll pages (wages, deductions) — go straight to non-employment income
+    // Schedule I wage details (Check 1 required; checks 2-6 optional).
+    await waitForDaPageLoad(page);
+    await fillById(page, b64('debtor[0].income.income_amount_1'), inc?.grossWages ?? '0');
+    await fillById(page, b64('debtor[0].income.overtime_pay_1'), inc?.overtimePay ?? '0');
+    await clickContinue(page);
+
+    // Payroll deductions (all optional).
+    await waitForDaPageLoad(page);
+    if (inc?.taxDeduction) {
+      await fillById(page, b64('debtor[0].income.tax_deduction'), inc.taxDeduction);
+    }
+    await clickContinue(page);
+
+    // "Do you have any deductions to claim?" (employed path only).
+    await waitForDaPageLoad(page);
+    await fillYesNoRadio(page, 'debtor[0].income.other_deduction', false);
+    await clickContinue(page);
+  } else {
+    await clickContinue(page);
+  }
+
+  // Non-employment income (asked for employed and not-employed alike).
   await waitForDaPageLoad(page);
-  await fillById(page, b64('debtor[0].income.net_rental_business'), '0');
-  await fillById(page, b64('debtor[0].income.interest_and_dividends'), '0');
-  await fillById(page, b64('debtor[0].income.family_support'), '0');
-  await fillById(page, b64('debtor[0].income.unemployment'), '0');
-  await fillById(page, b64('debtor[0].income.social_security'), '0');
-  await fillById(page, b64('debtor[0].income.other_govt_assist'), '0');
-  await fillById(page, b64('debtor[0].income.pension'), '0');
+  await fillById(page, b64('debtor[0].income.net_rental_business'), inc?.netRentalBusiness ?? '0');
+  await fillById(page, b64('debtor[0].income.interest_and_dividends'), inc?.interestAndDividends ?? '0');
+  await fillById(page, b64('debtor[0].income.family_support'), inc?.familySupport ?? '0');
+  await fillById(page, b64('debtor[0].income.unemployment'), inc?.unemployment ?? '0');
+  await fillById(page, b64('debtor[0].income.social_security'), inc?.socialSecurity ?? '0');
+  await fillById(page, b64('debtor[0].income.other_govt_assist'), inc?.otherGovtAssist ?? '0');
+  await fillById(page, b64('debtor[0].income.pension'), inc?.pension ?? '0');
   await fillYesNoRadio(page, 'debtor[0].income.other_monthly_income', false);
   await clickContinue(page);
 
@@ -907,13 +974,15 @@ export async function navigateExpenses(page: Page, rentAmount: string, dependent
 //  MEANS TEST (Form 122A)
 // ════════════════════════════════════════════════════════════════════
 
-export async function navigateMeansTest(page: Page) {
+export async function navigateMeansTest(page: Page, opts: MeansTestOptions = {}) {
   await waitForDaPageLoad(page);
   await selectByName(page, b64('monthly_income.means_type'), 'There is no presumption of abuse.');
   await clickContinue(page);
 
   await waitForDaPageLoad(page);
-  await selectYesNoRadio(page, 'monthly_income.non_consumer_debts', true);
+  // non_consumer_debts=true short-circuits the means test (the happy path the
+  // helpers always took — which is why the consumer-branch crashes hid there).
+  await selectYesNoRadio(page, 'monthly_income.non_consumer_debts', !opts.consumerDebts);
   await page.waitForTimeout(300);
   await selectYesNoRadio(page, 'monthly_income.disabled_veteran', false);
   await page.waitForTimeout(300);
@@ -921,6 +990,55 @@ export async function navigateMeansTest(page: Page) {
   await page.waitForTimeout(300);
   await clickContinue(page);
 
+  await waitForDaPageLoad(page);
+  if (!opts.consumerDebts) return;
+
+  // ── consumer-debts branch: full Form 122A means test ──
+  // household_and_dependents_info: filing status (+ separated_status when
+  // married-NOT-filing); dependents is defaulted. Both are bare `choices`
+  // fields (no datatype) — docassemble renders those as <select> dropdowns,
+  // NOT radios.
+  const FILING_STATUS_CHOICES = [
+    'Not married',
+    'Married and your spouse is filing with you.',
+    'Married and your spouse is NOT filing with you.',
+  ] as const;
+  const SEPARATED_STATUS_CHOICES = [
+    'Living in the same household and not legally separated.',
+    'Living separately or are legally separated',
+  ] as const;
+  const filingIdx = opts.filingStatusIndex ?? 0;
+  await selectByName(page, b64('monthly_income.filing_status'), FILING_STATUS_CHOICES[filingIdx]);
+  await page.waitForTimeout(300);
+  if (filingIdx === 2) {
+    // separated_status only appears (show-if) once married-NOT-filing is
+    // picked — and show-if'd fields get renamed `_field_N` inputs, so the
+    // b64(varname) selector does NOT match. Drive it by its visible label.
+    await page.getByRole('combobox', { name: /You and your spouse are/i })
+      .selectOption(SEPARATED_STATUS_CHOICES[opts.separatedStatusIndex ?? 0]);
+    await page.waitForTimeout(300);
+  }
+  await clickContinue(page);
+
+  // debtor1_current_monthly_income — all fields defaulted from Schedule I.
+  await waitForDaPageLoad(page);
+  await clickContinue(page);
+
+  // debtor2_current_monthly_income — only for married-filing-jointly.
+  if (filingIdx === 1) {
+    await waitForDaPageLoad(page);
+    await clickContinue(page);
+  }
+
+  // Median family income screen: state + household size are defaulted,
+  // median_income has NO default and is required.
+  await waitForDaPageLoad(page);
+  await fillById(page, b64('monthly_income.median_income'), opts.medianIncome ?? '85000');
+  await clickContinue(page);
+
+  // review_122 (event + continue button field: monthly_income.reviewed).
+  await waitForDaPageLoad(page);
+  await clickNthByName(page, b64('monthly_income.reviewed'), 0);
   await waitForDaPageLoad(page);
 }
 
@@ -1054,10 +1172,33 @@ export async function navigateFinalReview(page: Page) {
 export async function navigateDynamicPhase(page: Page, scenario: TestScenario) {
   await waitForDaPageLoad(page);
 
+  // ── DEBUG instrumentation: log every /interview POST response (size + returned question) ──
+  if (process.env.DEBUG_DYNAMIC) {
+    page.on('response', async (resp) => {
+      if (resp.request().method() !== 'POST' || !resp.url().includes('/interview')) return;
+      try {
+        const body = await resp.text();
+        const qn = body.match(/name="_question_name"\s+value="([^"]*)"/)?.[1]
+          ?? body.match(/"questionText":\s*"([^"]{0,60})/)?.[1] ?? '?';
+        const h1 = body.match(/<h1[^>]*>([^<]{0,80})/)?.[1] ?? '?';
+        console.log(`    [resp] ${body.length}B question_name=${qn} h1="${h1.trim()}"`);
+      } catch { /* response body unavailable */ }
+    });
+  }
+
   let maxSteps = 60;
   while (maxSteps-- > 0) {
     await page.waitForTimeout(300);
     const heading = await page.locator('h1, h2').first().textContent().catch(() => '');
+    if (process.env.DEBUG_DYNAMIC) {
+      const dbg = await page.evaluate(() => {
+        const qn = (document.querySelector('input[name="_question_name"]') as HTMLInputElement)?.value;
+        const tracker = (document.querySelector('input[name="_tracker"]') as HTMLInputElement)?.value;
+        const btn = document.getElementById('da-continue-button') as HTMLButtonElement | null;
+        return { qn, tracker, btnDisabled: btn ? btn.disabled : null, btnName: btn?.getAttribute('name') };
+      }).catch(() => null);
+      console.log(`    [dom] question_name=${dbg?.qn} tracker=${dbg?.tracker} continueDisabled=${dbg?.btnDisabled} btnName=${dbg?.btnName?.slice(0, 30)}`);
+    }
     console.log(`  [dynamicPhase step ${60 - maxSteps}] heading: "${heading}"`);
 
     // Check for conclusion — text OR presence of MANY PDF download links
@@ -1372,13 +1513,20 @@ export async function navigateDynamicPhase(page: Page, scenario: TestScenario) {
     if (await continueBtn.count() > 0) {
       try {
         await continueBtn.waitFor({ state: 'attached', timeout: 2000 });
+        // A disabled Continue means a submit is ALREADY in flight (docassemble
+        // disables it client-side on submit). Force-enabling and re-clicking
+        // fires a second POST with a stale _tracker; the server discards it
+        // and — on event screens like counseling_final — re-renders the old
+        // screen, ping-ponging the browser forever. Wait for the in-flight
+        // response (slow during PDF assembly) to swap the page instead.
         const isDisabled = await continueBtn.getAttribute('disabled');
         if (isDisabled !== null) {
-          await page.evaluate(() => {
-            const btn = document.getElementById('da-continue-button') as HTMLButtonElement;
-            if (btn) { btn.disabled = false; btn.classList.remove('btn-secondary'); btn.classList.add('btn-primary'); }
-          });
-          await page.waitForTimeout(200);
+          await page.waitForFunction(() => {
+            const btn = document.getElementById('da-continue-button') as HTMLButtonElement | null;
+            return !btn || !btn.disabled;
+          }, { timeout: 30000 });
+          await waitForDaPageLoad(page);
+          continue;  // re-evaluate the (likely new) page from the top
         }
         await clickContinue(page);
         await waitForDaPageLoad(page);
@@ -1439,7 +1587,7 @@ export async function runFullInterview(page: Page, scenario: TestScenario) {
   log('reporting'); await navigateReporting(page);
   // Personal-property leases (form 108) now gather in their own step, after SOFA.
   log('personalLeases'); await navigatePersonalLeases(page);
-  log('meansTest'); await navigateMeansTest(page);
+  log('meansTest'); await navigateMeansTest(page, scenario.meansTest ?? {});
   log('caseDetails'); await navigateCaseDetails(page);
   log('business'); await navigateBusiness(page);
   log('hazardousProperty'); await navigateHazardousProperty(page);
@@ -1505,7 +1653,7 @@ export async function walkToMeansTestStart(page: Page, scenario: TestScenario) {
  */
 export async function walkToFinalReview(page: Page, scenario: TestScenario) {
   await walkToMeansTestStart(page, scenario);
-  await navigateMeansTest(page);
+  await navigateMeansTest(page, scenario.meansTest ?? {});
   await navigateCaseDetails(page);
   await navigateBusiness(page);
   await navigateHazardousProperty(page);

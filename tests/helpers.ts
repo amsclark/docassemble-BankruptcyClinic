@@ -634,6 +634,13 @@ export async function selectYesNoRadio(page: Page, varName: string, yes: boolean
 /** Alias for selectYesNoRadio. */
 export const fillYesNoRadio = selectYesNoRadio;
 
+/** Click the nth choice label of a `choices:` radio field (docassemble renders
+ *  option ids as `${b64(varName)}_<index>` with hidden inputs + labels). */
+export async function selectChoiceRadio(page: Page, varName: string, choiceIndex: number) {
+  const fieldId = b64(varName);
+  await page.locator(`label[for="${fieldId}_${choiceIndex}"]`).click();
+}
+
 /** Click the "No" label on every visible radio that has value="False". */
 export async function fillAllVisibleRadiosAsNo(page: Page) {
   await page.evaluate(() => {

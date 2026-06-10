@@ -120,7 +120,6 @@ fields:
     datatype: yesnoradio
   - Did your spouse live with you at the time?: debtors.had_spouse
     datatype: yesnoradio
-    required: False
     show if: debtors.community_property
   - What state or territory did you live in?: debtors.spouse_state
     show if: debtors.had_spouse

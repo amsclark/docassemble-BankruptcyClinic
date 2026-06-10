@@ -1822,7 +1822,6 @@ fields:
   - Do you still have it?: financial_affairs.deposit_box.still_owns
     datatype: yesnoradio
     show if: financial_affairs.has_deposit_box
-    required: False
 ---
 question: |
   Storage Unit
@@ -1878,7 +1877,6 @@ fields:
   - Do you still have it?: financial_affairs.storage_unit.still_owns
     datatype: yesnoradio
     show if: financial_affairs.has_storage_unit
-    required: False
 ---
 question: |
   Borrowed Property
@@ -2287,8 +2285,8 @@ code: |
   fin['yesLivedElsewhere'] = True if financial_affairs.lived_elsewhere == True else False
   if financial_affairs.lived_elsewhere:
     fin['add1_D1_address'] = financial_affairs.address_street_1
-    fin['add1_D1_from'] = format_date(financial_affairs.address_from_1, format='MM/dd/yyyy')
-    fin['add1_D1_to'] = format_date(financial_affairs.address_to_1, format='MM/dd/yyyy')
+    fin['add1_D1_from'] = format_date(financial_affairs.address_from_1, format='MM/dd/yyyy') if getattr(financial_affairs, 'address_from_1', None) else None
+    fin['add1_D1_to'] = format_date(financial_affairs.address_to_1, format='MM/dd/yyyy') if getattr(financial_affairs, 'address_to_1', None) else None
     fin['add1_D1_city'] = financial_affairs.address_city_1
     fin['add1_D1_state'] = financial_affairs.address_state_1
     fin['add1_D1_zip'] = financial_affairs.address_zip_1
@@ -2352,17 +2350,24 @@ code: |
   fin['noRegularIncome'] = True if financial_affairs.employed == False else False
   fin['yesRegularIncome'] = True if financial_affairs.employed == True else False
   if financial_affairs.employed:
-    fin['curr_D1_HasWages'] = True if financial_affairs.current_income_sources == 'Wages, commissions, bonuses, tips' else False
+    # *_income_sources use `datatype: checkbox` (singular) + choices, which
+    # docassemble renders as a SINGLE-select storing the chosen label as a
+    # plain str — NOT the DADict that `datatype: checkboxes` (plural) gives.
+    # So string equality is correct here; .get() crashes (str has no .get).
+    # Form-fidelity caveat: official 107 Q4 is "check all that apply" — a
+    # debtor with both wages AND a business can only record one. Flagged for
+    # attorney review; changing the datatype is a UI/semantics change.
+    fin['curr_D1_HasWages'] = financial_affairs.current_income_sources == 'Wages, commissions, bonuses, tips'
     fin['curr_D1_GrossIncome'] = currency(financial_affairs.current_gross_income)
-    fin['curr_D1_HasBus'] = True if financial_affairs.current_income_sources == 'Operating a business' else False
+    fin['curr_D1_HasBus'] = financial_affairs.current_income_sources == 'Operating a business'
     fin['lastYear'] = financial_affairs.last_year
-    fin['last_D1_HasWages'] = True if financial_affairs.last_income_sources == 'Wages, commissions, bonuses, tips' else False
+    fin['last_D1_HasWages'] = financial_affairs.last_income_sources == 'Wages, commissions, bonuses, tips'
     fin['last_D1_GrossIncome'] = currency(financial_affairs.last_gross_income)
-    fin['last_D1_HasBus'] = True if financial_affairs.last_income_sources == 'Operating a business' else False
+    fin['last_D1_HasBus'] = financial_affairs.last_income_sources == 'Operating a business'
     fin['beforeYear'] = financial_affairs.before_year
-    fin['before_D1_HasWages'] = True if financial_affairs.before_income_sources == 'Wages, commissions, bonuses, tips' else False
+    fin['before_D1_HasWages'] = financial_affairs.before_income_sources == 'Wages, commissions, bonuses, tips'
     fin['before_D1_GrossIncome'] = currency(financial_affairs.before_gross_income)
-    fin['before_D1_HasBus'] = True if financial_affairs.before_income_sources == 'Operating a business' else False
+    fin['before_D1_HasBus'] = financial_affairs.before_income_sources == 'Operating a business'
 
   fin['noOtherIncome'] = True if financial_affairs.had_other_income == False else False
   fin['yesOtherIncome'] = True if financial_affairs.had_other_income == True else False
@@ -2391,110 +2396,72 @@ code: |
     fin['before_D1_Amt3'] = currency(financial_affairs.before_other_source_amount_3)
 
   if len(debtor) > 1 and financial_affairs.lived_elsewhere:
-    fin['add1_D2_SameAddress'] = True if financial_affairs.address_same_1 == True else False
-    if financial_affairs.address_same_1 == True:
-      fin['add1_D2_SameTime'] = True if financial_affairs.address_same_dates_1 == True else False
-      if financial_affairs.address_same_dates_1 == False:
-        fin['add1_D2_from'] = format_date(financial_affairs.debtor2_address_from_1, format='MM/dd/yyyy')
-        fin['add1_D2_to'] = format_date(financial_affairs.debtor2_address_to_1, format='MM/dd/yyyy')
+    # Debtor 2 address overlap. Addresses 2-6 exist only behind their
+    # has_<ordinal>_address gates, and the per-address debtor-2 fields are
+    # js-show-if'd on address_same_N / address_same_dates_N (and may be None
+    # when the yesnoradio was skipped, required: False) -- mirror those
+    # conditions here (CLAUDE.md rule 3) instead of reading unconditionally.
+    _addr_gates = {1: None, 2: 'has_second_address', 3: 'has_third_address', 4: 'has_fourth_address', 5: 'has_fifth_address', 6: 'has_sixth_address'}
+    for _n in range(1, 7):
+      if _addr_gates[_n] and not getattr(financial_affairs, _addr_gates[_n], False):
+        continue
+      _pfx = 'add' + str(_n) + '_D2_'
+      _same = getattr(financial_affairs, 'address_same_' + str(_n), None)
+      fin[_pfx + 'SameAddress'] = True if _same == True else False
+      if _same == True:
+        _same_dates = getattr(financial_affairs, 'address_same_dates_' + str(_n), None)
+        fin[_pfx + 'SameTime'] = True if _same_dates == True else False
+        if _same_dates == False:
+          _d2_from = getattr(financial_affairs, 'debtor2_address_from_' + str(_n), None)
+          _d2_to = getattr(financial_affairs, 'debtor2_address_to_' + str(_n), None)
+          if _d2_from:
+            fin[_pfx + 'from'] = format_date(_d2_from, format='MM/dd/yyyy')
+          if _d2_to:
+            fin[_pfx + 'to'] = format_date(_d2_to, format='MM/dd/yyyy')
+      else:
+        fin[_pfx + 'address'] = getattr(financial_affairs, 'debtor2_address_street_' + str(_n), '') or ''
+        fin[_pfx + 'city'] = getattr(financial_affairs, 'debtor2_address_city_' + str(_n), '') or ''
+        fin[_pfx + 'state'] = getattr(financial_affairs, 'debtor2_address_state_' + str(_n), '') or ''
+        fin[_pfx + 'zip'] = getattr(financial_affairs, 'debtor2_address_zip_' + str(_n), '') or ''
+      if _n in (2, 4, 6):
+        fin['add' + str(_n) + '_D1_address'] = getattr(financial_affairs, 'address_street_' + str(_n), '') or ''
 
-    else:
-      fin['add1_D2_address'] = financial_affairs.debtor2_address_street_1
-      fin['add1_D2_city'] = financial_affairs.debtor2_address_city_1
-      fin['add1_D2_state'] = financial_affairs.debtor2_address_state_1
-      fin['add1_D2_zip'] = financial_affairs.debtor2_address_zip_1
-    fin['add2_D2_SameAddress'] = True if financial_affairs.address_same_2 == True else False
-    if financial_affairs.address_same_2 == True:
-      fin['add2_D2_SameTime'] = True if financial_affairs.address_same_dates_2 == True else False
-      if financial_affairs.address_same_dates_2 == False:
-        fin['add2_D2_from'] = format_date(financial_affairs.debtor2_address_from_2, format='MM/dd/yyyy')
-        fin['add2_D2_to'] = format_date(financial_affairs.debtor2_address_to_2, format='MM/dd/yyyy')
-    else:
-      fin['add2_D2_address'] = financial_affairs.debtor2_address_street_2
-      fin['add2_D2_city'] = financial_affairs.debtor2_address_city_2
-      fin['add2_D2_state'] = financial_affairs.debtor2_address_state_2
-      fin['add2_D2_zip'] = financial_affairs.debtor2_address_zip_2
-    fin['add2_D1_address'] = financial_affairs.address_street_2
-    #end first
-    fin['add3_D2_SameAddress'] = True if financial_affairs.address_same_3 == True else False
-    if financial_affairs.address_same_3 == True:
-      fin['add3_D2_SameTime'] = True if financial_affairs.address_same_dates_3 == True else False
-      if financial_affairs.address_same_dates_3 == False:
-        fin['add3_D2_from'] = format_date(financial_affairs.debtor2_address_from_3, format='MM/dd/yyyy')
-        fin['add3_D2_to'] = format_date(financial_affairs.debtor2_address_to_3, format='MM/dd/yyyy')
-
-    else:
-      fin['add3_D2_address'] = financial_affairs.debtor2_address_street_3
-      fin['add3_D2_city'] = financial_affairs.debtor2_address_city_3
-      fin['add3_D2_state'] = financial_affairs.debtor2_address_state_3
-      fin['add3_D2_zip'] = financial_affairs.debtor2_address_zip_3
-    fin['add4_D2_SameAddress'] = True if financial_affairs.address_same_4 == True else False
-    if financial_affairs.address_same_4 == True:
-      fin['add4_D2_SameTime'] = True if financial_affairs.address_same_dates_4 == True else False
-      if financial_affairs.address_same_dates_4 == False:
-        fin['add4_D2_from'] = format_date(financial_affairs.debtor2_address_from_4, format='MM/dd/yyyy')
-        fin['add4_D2_to'] = format_date(financial_affairs.debtor2_address_to_4, format='MM/dd/yyyy')
-    else:
-      fin['add4_D2_address'] = financial_affairs.debtor2_address_street_4
-      fin['add4_D2_city'] = financial_affairs.debtor2_address_city_4
-      fin['add4_D2_state'] = financial_affairs.debtor2_address_state_4
-      fin['add4_D2_zip'] = financial_affairs.debtor2_address_zip_4
-    fin['add4_D1_address'] = financial_affairs.address_street_4
-   #end set 2
-    fin['add5_D2_SameAddress'] = True if financial_affairs.address_same_5 == True else False
-    if financial_affairs.address_same_5 == True:
-      fin['add5_D2_SameTime'] = True if financial_affairs.address_same_dates_5 == True else False
-      if financial_affairs.address_same_dates_5 == False:
-        fin['add5_D2_from'] = format_date(financial_affairs.debtor2_address_from_5, format='MM/dd/yyyy')
-        fin['add5_D2_to'] = format_date(financial_affairs.debtor2_address_to_5, format='MM/dd/yyyy')
-
-    else:
-      fin['add5_D2_address'] = financial_affairs.debtor2_address_street_5
-      fin['add5_D2_city'] = financial_affairs.debtor2_address_city_5
-      fin['add5_D2_state'] = financial_affairs.debtor2_address_state_5
-      fin['add5_D2_zip'] = financial_affairs.debtor2_address_zip_5
-    fin['add6_D2_SameAddress'] = True if financial_affairs.address_same_6 == True else False
-    if financial_affairs.address_same_6 == True:
-      fin['add6_D2_SameTime'] = True if financial_affairs.address_same_dates_6 == True else False
-      if financial_affairs.address_same_dates_6 == False:
-        fin['add6_D2_from'] = format_date(financial_affairs.debtor2_address_from_6, format='MM/dd/yyyy')
-        fin['add6_D2_to'] = format_date(financial_affairs.debtor2_address_to_6, format='MM/dd/yyyy')
-    else:
-      fin['add6_D2_address'] = financial_affairs.debtor2_address_street_6
-      fin['add6_D2_city'] = financial_affairs.debtor2_address_city_6
-      fin['add6_D2_state'] = financial_affairs.debtor2_address_state_6
-      fin['add6_D2_zip'] = financial_affairs.debtor2_address_zip_6
-    fin['add6_D1_address'] = financial_affairs.address_street_6
-
-    fin['curr_D2_HasWages'] = True if 'Wages, commissions, bonuses, tips' in financial_affairs.debtor2_current_income_sources else False
-    fin['curr_D2_GrossIncome'] = currency(financial_affairs.debtor2_current_gross_income)
-    fin['curr_D2_HasBus'] = True if financial_affairs.debtor2_current_income_sources == 'Operating a business' else False
-    fin['last_D2_HasWages'] = True if financial_affairs.debtor2_last_income_sources == 'Wages, commissions, bonuses, tips' else False
-    fin['last_D2_GrossIncome'] = currency(financial_affairs.debtor2_last_gross_income)
-    fin['before_D2_HasWages'] = True if financial_affairs.debtor2_before_income_sources == 'Wages, commissions, bonuses, tips' else False
-    fin['before_D2_GrossIncome'] = currency(financial_affairs.debtor2_before_gross_income)
-    fin['last_D2_HasBus'] = True if financial_affairs.debtor2_last_income_sources == 'Operating a business' else False
-    fin['before_D2_HasWages'] = True if financial_affairs.debtor2_before_income_sources == 'Wages, commissions, bonuses, tips' else False
-    fin['before_D2_Gross_income'] = currency(financial_affairs.debtor2_before_gross_income)
-    fin['before_D2_HasBus'] = True if financial_affairs.debtor2_before_income_sources == 'Operating a business' else False
-    fin['curr_D2_Source1'] = financial_affairs.debtor2_current_other_source_1
-    fin['curr_D2_Amt1'] = currency(financial_affairs.debtor2_current_other_source_amount_1)
-    fin['curr_D2_Source2'] = financial_affairs.debtor2_current_other_source_2
-    fin['curr_D2_Amt2'] = currency(financial_affairs.debtor2_current_other_source_amount_2)
-    fin['curr_D2_Source3'] = financial_affairs.debtor2_current_other_source_3
-    fin['curr_D2_Amt3'] = currency(financial_affairs.debtor2_current_other_source_amount_3)
-    fin['last_D2_Source1'] = financial_affairs.debtor2_last_other_source_1
-    fin['last_D2_Amt1'] = currency(financial_affairs.debtor2_last_other_source_amount_1)
-    fin['last_D2_Source2'] = financial_affairs.debtor2_last_other_source_2
-    fin['last_D2_Amt2'] = currency(financial_affairs.debtor2_last_other_source_amount_2)
-    fin['last_D2_Source3'] = financial_affairs.debtor2_last_other_source_3
-    fin['last_D2_Amt3'] = currency(financial_affairs.debtor2_last_other_source_amount_3)
-    fin['before_D2_Source1'] = financial_affairs.debtor2_before_other_source_1
-    fin['before_D2_Amt1'] = currency(financial_affairs.debtor2_before_other_source_amount_1)
-    fin['before_D2_Source2'] = financial_affairs.debtor2_before_other_source_2
-    fin['before_D2_Amt2'] = currency(financial_affairs.debtor2_before_other_source_amount_2)
-    fin['before_D2_Source3'] = financial_affairs.debtor2_before_other_source_3
-    fin['before_D2_Amt3'] = currency(financial_affairs.debtor2_before_other_source_amount_3)
+  # Debtor 2 income is collected for every joint filer (voluntary-petition.yml
+  # asks debtor2_employed / debtor2_had_other_income under `if len(debtor) > 1`),
+  # so it must NOT be coupled to lived_elsewhere -- a joint filer who never
+  # lived elsewhere would otherwise ship a blank Part 2 for debtor 2.
+  # *_income_sources use `datatype: checkbox` (singular) — single-select str,
+  # not a DADict; string equality is correct (see the D1 block note above).
+  if len(debtor) > 1:
+    if financial_affairs.debtor2_employed:
+      fin['curr_D2_HasWages'] = financial_affairs.debtor2_current_income_sources == 'Wages, commissions, bonuses, tips'
+      fin['curr_D2_GrossIncome'] = currency(financial_affairs.debtor2_current_gross_income)
+      fin['curr_D2_HasBus'] = financial_affairs.debtor2_current_income_sources == 'Operating a business'
+      fin['last_D2_HasWages'] = financial_affairs.debtor2_last_income_sources == 'Wages, commissions, bonuses, tips'
+      fin['last_D2_GrossIncome'] = currency(financial_affairs.debtor2_last_gross_income)
+      fin['last_D2_HasBus'] = financial_affairs.debtor2_last_income_sources == 'Operating a business'
+      fin['before_D2_HasWages'] = financial_affairs.debtor2_before_income_sources == 'Wages, commissions, bonuses, tips'
+      fin['before_D2_GrossIncome'] = currency(financial_affairs.debtor2_before_gross_income)
+      fin['before_D2_HasBus'] = financial_affairs.debtor2_before_income_sources == 'Operating a business'
+    if financial_affairs.debtor2_had_other_income:
+      fin['curr_D2_Source1'] = financial_affairs.debtor2_current_other_source_1
+      fin['curr_D2_Amt1'] = currency(financial_affairs.debtor2_current_other_source_amount_1)
+      fin['curr_D2_Source2'] = financial_affairs.debtor2_current_other_source_2
+      fin['curr_D2_Amt2'] = currency(financial_affairs.debtor2_current_other_source_amount_2)
+      fin['curr_D2_Source3'] = financial_affairs.debtor2_current_other_source_3
+      fin['curr_D2_Amt3'] = currency(financial_affairs.debtor2_current_other_source_amount_3)
+      fin['last_D2_Source1'] = financial_affairs.debtor2_last_other_source_1
+      fin['last_D2_Amt1'] = currency(financial_affairs.debtor2_last_other_source_amount_1)
+      fin['last_D2_Source2'] = financial_affairs.debtor2_last_other_source_2
+      fin['last_D2_Amt2'] = currency(financial_affairs.debtor2_last_other_source_amount_2)
+      fin['last_D2_Source3'] = financial_affairs.debtor2_last_other_source_3
+      fin['last_D2_Amt3'] = currency(financial_affairs.debtor2_last_other_source_amount_3)
+      fin['before_D2_Source1'] = financial_affairs.debtor2_before_other_source_1
+      fin['before_D2_Amt1'] = currency(financial_affairs.debtor2_before_other_source_amount_1)
+      fin['before_D2_Source2'] = financial_affairs.debtor2_before_other_source_2
+      fin['before_D2_Amt2'] = currency(financial_affairs.debtor2_before_other_source_amount_2)
+      fin['before_D2_Source3'] = financial_affairs.debtor2_before_other_source_3
+      fin['before_D2_Amt3'] = currency(financial_affairs.debtor2_before_other_source_amount_3)
 
   if financial_affairs.primarily_consumer_debts == True:
     fin['yesBothConsumerDebts'] = True
@@ -2591,7 +2558,7 @@ code: |
     if levy.date_in_description:
       fin['seized_date'+str(x)] = 'Various'
     else:
-      fin['seized_date'+str(x)] = format_date(levy.date, format='MM/dd/yyyy')
+      fin['seized_date'+str(x)] = format_date(levy.date, format='MM/dd/yyyy') if getattr(levy, 'date', None) else None
     fin['seized_value'+str(x)] = currency(levy.property_value)
     fin['seized_isRepossessed'+str(x)] = True if levy.property_action == 'Property was repossessed' else False
     fin['seized_isForeclosed'+str(x)] = True if levy.property_action == 'Property was foreclosed' else False
@@ -2609,7 +2576,7 @@ code: |
     fin['bank_state1'] = financial_affairs.refusal_creditor_state
     fin['bank_zip1'] = financial_affairs.refusal_creditor_zip
     fin['bank_action1'] = financial_affairs.refusal_description
-    fin['bank_date1'] = format_date(financial_affairs.refusal_date, format='MM/dd/yyyy')
+    fin['bank_date1'] = format_date(financial_affairs.refusal_date, format='MM/dd/yyyy') if getattr(financial_affairs, 'refusal_date', None) else None
     fin['bank_amount1'] = currency(financial_affairs.refusal_amount)
     fin['bank_acct1'] = financial_affairs.refusal_account_number
 
@@ -2667,7 +2634,7 @@ code: |
     fin['consult_date1-'+str(x)] = format_date(payment.date_1, format='MM/dd/yyyy')
     fin['consult_amt1-'+str(x)] = currency(payment.value_1)
     if payment.value_2 > 0:
-      fin['consult_date2-'+str(x)] = format_date(payment.date_2, format='MM/dd/yyyy')
+      fin['consult_date2-'+str(x)] = format_date(payment.date_2, format='MM/dd/yyyy') if getattr(payment, 'date_2', None) else None
       fin['consult_amt2-'+str(x)] = currency(payment.value_2)
     fin['consult_who'+str(x)] = payment.payment_person
     fin['consult_describe'+str(x)] = payment.property_description
@@ -2683,10 +2650,10 @@ code: |
     fin['aid_city1'] = financial_affairs.creditor_help.city
     fin['aid_state1'] = financial_affairs.creditor_help.state
     fin['aid_zip1'] = financial_affairs.creditor_help.zip
-    fin['aid_date1-1'] = format_date(financial_affairs.creditor_help.date_1, format='MM/dd/yyyy')
+    fin['aid_date1-1'] = format_date(financial_affairs.creditor_help.date_1, format='MM/dd/yyyy') if getattr(financial_affairs.creditor_help, 'date_1', None) else None
     fin['aid_amt1-1'] = currency(financial_affairs.creditor_help.value_1)
     if financial_affairs.creditor_help.value_2 > 0:
-      fin['aid_date2-1'] = format_date(financial_affairs.creditor_help.date_2, format='MM/dd/yyyy')
+      fin['aid_date2-1'] = format_date(financial_affairs.creditor_help.date_2, format='MM/dd/yyyy') if getattr(financial_affairs.creditor_help, 'date_2', None) else None
       fin['aid_amt2-1'] = currency(financial_affairs.creditor_help.value_2)
 
   fin['noOrdinary'] = True if financial_affairs.other_transfers.there_are_any == False else False
@@ -2710,7 +2677,7 @@ code: |
   if financial_affairs.has_self_settled_trust:
     fin['trust_describe'] = financial_affairs.self_settled_trust.description
     fin['trust_name'] = financial_affairs.self_settled_trust.name
-    fin['trust_date'] = format_date(financial_affairs.self_settled_trust.date, format='MM/dd/yyyy')
+    fin['trust_date'] = format_date(financial_affairs.self_settled_trust.date, format='MM/dd/yyyy') if getattr(financial_affairs.self_settled_trust, 'date', None) else None
 
   fin['noAccounts'] = True if financial_affairs.instruments.there_are_any == False else False
   fin['yesAccounts'] = True if financial_affairs.instruments.there_are_any == True else False
@@ -2788,7 +2755,7 @@ code: |
   fin['yesLiability'] = True if financial_affairs.environment.has_liability == True else False
   if financial_affairs.environment.has_liability:
     fin['liability_describe'] = financial_affairs.environment.liability_law
-    fin['liability_date'] = format_date(financial_affairs.environment.liability_date, format='MM/dd/yyyy')
+    fin['liability_date'] = format_date(financial_affairs.environment.liability_date, format='MM/dd/yyyy') if getattr(financial_affairs.environment, 'liability_date', None) else None
     fin['liability_site'] = financial_affairs.environment.liability_name
     fin['liability_site_address'] = financial_affairs.environment.liability_street
     fin['liability_site_city'] = financial_affairs.environment.liability_city
@@ -2806,7 +2773,7 @@ code: |
     fin['hazard_site'] = financial_affairs.environment.release_name
     fin['hazard_unit'] = financial_affairs.environment.release_unit_name
     fin['hazard_describe'] = financial_affairs.environment.release_law
-    fin['hazard_date'] = format_date(financial_affairs.environment.release_date, format='MM/dd/yyyy')
+    fin['hazard_date'] = format_date(financial_affairs.environment.release_date, format='MM/dd/yyyy') if getattr(financial_affairs.environment, 'release_date', None) else None
     fin['hazard_address'] = financial_affairs.environment.release_street
     fin['hazard_city'] = financial_affairs.environment.release_city
     fin['hazard_state'] = financial_affairs.environment.release_state
@@ -2861,7 +2828,7 @@ code: |
   fin['yesFinancials'] = True if financial_affairs.has_statement == True else False
   if financial_affairs.has_statement:
     fin['financials_name'] = financial_affairs.statement_name
-    fin['financials_date'] = format_date(financial_affairs.statement_date, format='MM/dd/yyyy')
+    fin['financials_date'] = format_date(financial_affairs.statement_date, format='MM/dd/yyyy') if getattr(financial_affairs, 'statement_date', None) else None
     fin['financials_address'] = financial_affairs.statement_street
     fin['financials_state'] = financial_affairs.statement_state
     fin['financials_city'] = financial_affairs.statement_city
