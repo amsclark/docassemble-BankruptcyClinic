@@ -90,7 +90,11 @@ code: |
         _claim.name = _data['name']
         _claim.street = _data.get('street', '')
         _claim.city = _data.get('city', '')
-        _claim.state = _data.get('state', '')
+        # The library stores states as 2-letter abbreviations ('NE'/'PA') but the
+        # claim-detail dropdown uses full names (get_all_us_states()). Convert so
+        # the value matches an option — otherwise the dropdown shows blank and the
+        # user is forced to re-select the state (Roxanne feedback).
+        _claim.state = state_name(_data.get('state', ''))
         _claim.zip = _data.get('zip', '')
         _claim.who = 'Debtor 1 only'
         _claim.account_number = _data.get('account_suffix', '')

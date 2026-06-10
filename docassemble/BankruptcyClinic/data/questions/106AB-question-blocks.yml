@@ -288,19 +288,38 @@ validation code: |
     prop.ab_vehicles[i].current_owned_value = prop.ab_vehicles[i].current_value - prop.ab_vehicles[i].current_owed_amount
   else:
     prop.ab_vehicles[i].current_owned_value = prop.ab_vehicles[i].current_value
-  # Issue #53: limit Motor Vehicle exemption to one vehicle
+  # Issue #53: limit the Motor Vehicle exemption to one vehicle PER DEBTOR.
+  # In a joint case each spouse is entitled to their own motor-vehicle
+  # exemption (11 U.S.C. 522(m)), so only block a second claim when it is the
+  # SAME debtor's vehicle. Jointly-owned / third-party vehicles are not blocked.
   def _claims_motor_vehicle(v):
     for attr in ('exemption_laws', 'exemption_laws_2'):
       val = getattr(v, attr, None)
       if val and 'motor vehicle' in str(val).lower():
         return True
     return False
+  def _mv_owner(v):
+    w = getattr(v, 'who', 'Debtor 1 only')
+    if w == 'Debtor 1 only':
+      return 'D1'
+    if w == 'Debtor 2 only':
+      return 'D2'
+    return None  # shared or third-party ownership: do not enforce the limit
+  def _vehicle_label(v, idx):
+    _yr = getattr(v, 'year', '')
+    try:
+      _yr = str(int(float(_yr)))
+    except (TypeError, ValueError):
+      _yr = str(_yr or '')
+    parts = [p for p in (_yr, str(getattr(v, 'make', '') or ''), str(getattr(v, 'model', '') or '')) if p]
+    return ' '.join(parts).strip() or ('Vehicle #' + str(idx + 1))
   if prop.ab_vehicles[i].is_claiming_exemption and _claims_motor_vehicle(prop.ab_vehicles[i]):
-    for j in range(i):
-      prev = prop.ab_vehicles[j]
-      if getattr(prev, 'is_claiming_exemption', False) and _claims_motor_vehicle(prev):
-        prev_name = ' '.join(str(getattr(prev, a, '')) for a in ('year', 'make', 'model')).strip() or f'Vehicle #{j+1}'
-        validation_error("The Motor Vehicle exemption may only be claimed for one vehicle. You already claimed it for " + prev_name + ". Please choose a different exemption (for example, Wildcard) for this vehicle.")
+    _cur_owner = _mv_owner(prop.ab_vehicles[i])
+    if _cur_owner is not None:
+      for j in range(i):
+        prev = prop.ab_vehicles[j]
+        if getattr(prev, 'is_claiming_exemption', False) and _claims_motor_vehicle(prev) and _mv_owner(prev) == _cur_owner:
+          validation_error("The Motor Vehicle exemption may only be claimed for one vehicle per debtor. You already claimed it for " + _vehicle_label(prev, j) + ". Please choose a different exemption (for example, Wildcard) for this vehicle.")
 fields:
   - Make: prop.ab_vehicles[i].make
   - Model: prop.ab_vehicles[i].model
@@ -3842,6 +3861,29 @@ code: |
   else:
     ab['noOther'] = True
 
+  # Personal-property categories are show-if gated with no default, so a filer
+  # who skips a category leaves its *_value/*_amount undefined — which would
+  # crash the grand-total sums below (and on the Final copies) at assembly.
+  # Default any that weren't collected. This is additive: `if not defined` never
+  # overrides a real answer, and the parent objects are declared in `objects:`.
+  for _a in ['household_goods_value', 'electronics_value', 'collectibles_value',
+             'hobby_equipment_value', 'firearms_value', 'clothes_value',
+             'jewelry_value', 'animal_value', 'other_household_items_value',
+             'other_prop_value', 'other_prop_value2', 'other_prop_value3']:
+    if not defined('prop.' + _a):
+      define('prop.' + _a, 0)
+  for _a in ['cash_value', 'future_property_interest_value', 'ip_interest_value', 'intangible_interest_value']:
+    if not defined('prop.financial_assets.' + _a):
+      define('prop.financial_assets.' + _a, 0)
+  for _a in ['tax_refund_federal', 'tax_refund_state', 'tax_refund_local', 'family_support_alimony', 'family_support_maintenance', 'family_support_support', 'family_support_divorce', 'family_support_settlement', 'other_amounts_value', 'first_insurance_interest_amount', 'second_insurance_interest_amount', 'third_insurance_interest_amount', 'trust_amount', 'third_party_amount']:
+    if not defined('prop.owed_property.' + _a):
+      define('prop.owed_property.' + _a, 0)
+  for _a in ['ar_amount', 'equipment_amount', 'machinery_amount', 'inventory_amount', 'partnershipValue1', 'partnershipValue2', 'partnershipValue3', 'lists_amount', 'otherPropertyAmount1', 'otherPropertyAmount2', 'otherPropertyAmount3', 'otherPropertyAmount4', 'otherPropertyAmount5', 'otherPropertyAmount6']:
+    if not defined('prop.business_property.' + _a):
+      define('prop.business_property.' + _a, 0)
+  for _a in ['animal_amount', 'crop_amount', 'equipment_amount', 'supplies_amount', 'commercial_amount']:
+    if not defined('prop.farming_property.' + _a):
+      define('prop.farming_property.' + _a, 0)
   ab['p3TotalAmt'] = currency(prop.household_goods_value + prop.electronics_value + prop.collectibles_value + prop.hobby_equipment_value + prop.firearms_value + prop.clothes_value + prop.jewelry_value + prop.animal_value + prop.other_household_items_value)
 
   #

@@ -61,7 +61,7 @@ fields:
       % endif
   - Your gross wages, salary, tips, bonuses, overtime, and commissions: monthly_income.gross_wages1
     datatype: currency
-    default: ${ debtor[0].income.income_amount_1 + debtor[0].income.overtime_pay_1 }
+    default: ${ getattr(debtor[0].income, 'income_amount_1', 0) + getattr(debtor[0].income, 'overtime_pay_1', 0) }
   - Alimony and maintenance payments: monthly_income.alimony1
     datatype: currency
     default: ${ debtor[0].income.family_support }
@@ -126,7 +126,7 @@ fields:
   - note: Income calculation Debtor 2
   - Your gross wages, salary, tips, bonuses, overtime, and commissions: monthly_income.gross_wages2
     datatype: currency
-    default: ${ debtor[1].income.income_amount_1 + debtor[1].income.overtime_pay_1 if len(debtor) > 1 else 0 }
+    default: ${ (getattr(debtor[1].income, 'income_amount_1', 0) + getattr(debtor[1].income, 'overtime_pay_1', 0)) if len(debtor) > 1 else 0 }
   - Alimony and maintenance payments: monthly_income.alimony2
     datatype: currency
     default: ${ debtor[1].income.family_support if len(debtor) > 1 else 0 }
@@ -337,7 +337,7 @@ code: |
     income['marriedFiling'] = True if monthly_income.filing_status == 'Married and your spouse is filing with you.' else False
     income['marriedNotFiling'] = True if monthly_income.filing_status == 'Married and your spouse is NOT filing with you.' else False
     income['sameHouse'] = True if monthly_income.filing_status == 'Married and your spouse is NOT filing with you.' and monthly_income.separated_status == 'Living in the same household and not legally separated.' else False
-    income['separateHouse'] = True if monthly_income.separated_status == 'Living separately or are legally separated' else False
+    income['separateHouse'] = True if getattr(monthly_income, 'separated_status', '') == 'Living separately or are legally separated' else False
 
     income['wages1'] = currency(monthly_income.gross_wages1)
     income['alimony1'] = currency(monthly_income.alimony1)

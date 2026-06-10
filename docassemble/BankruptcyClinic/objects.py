@@ -161,6 +161,22 @@ def state_abbr(value):
     return _STATE_TO_ABBR.get(s.lower(), s)
 
 
+_ABBR_TO_STATE = {abbr: name.title() for name, abbr in _STATE_TO_ABBR.items()}
+
+
+def state_name(value):
+    """Return the full state name for a 2-letter abbreviation; pass through if
+    already a full name or unrecognized. Inverse of state_abbr(). Used when
+    pre-filling a question whose dropdown stores full names (get_all_us_states())
+    from data kept in 'NE' / 'SD' abbreviation form (e.g. the creditor library)."""
+    if value is None or value == '':
+        return ''
+    s = str(value).strip()
+    if len(s) == 2 and s.upper() == s:
+        return _ABBR_TO_STATE.get(s.upper(), s)
+    return s
+
+
 def get_exemption_choices(user_state, property_type='all'):
     """
     Returns a list of exemption law choices based on the user's state and property type.

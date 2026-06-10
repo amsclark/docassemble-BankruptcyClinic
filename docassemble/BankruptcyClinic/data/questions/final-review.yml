@@ -65,9 +65,9 @@ subquestion: |
 
   ### Secured Creditors (Schedule D)
 
-  **Number of secured creditors:** ${ len(prop.creditors) }
+  **Number of secured creditors:** ${ len(prop.creditors) if defined('prop.creditors') and prop.creditors.gathered else 0 }
 
-  % if len(prop.creditors) > 0:
+  % if defined('prop.creditors') and prop.creditors.gathered and len(prop.creditors) > 0:
   **Total secured claims:** ${ currency(sum(c.claim_amount for c in prop.creditors)) }
   % endif
 
@@ -77,11 +77,11 @@ subquestion: |
 
   ### Unsecured Creditors (Schedules E/F)
 
-  **Priority claims:** ${ len(prop.priority_claims) }
+  **Priority claims:** ${ len(prop.priority_claims) if defined('prop.priority_claims') and prop.priority_claims.gathered else 0 }
 
-  **Nonpriority claims:** ${ len(prop.nonpriority_claims) }
+  **Nonpriority claims:** ${ len(prop.nonpriority_claims) if defined('prop.nonpriority_claims') and prop.nonpriority_claims.gathered else 0 }
 
-  % if len(prop.priority_claims) > 0 or len(prop.nonpriority_claims) > 0:
+  % if (defined('prop.priority_claims') and prop.priority_claims.gathered and len(prop.priority_claims) > 0) or (defined('prop.nonpriority_claims') and prop.nonpriority_claims.gathered and len(prop.nonpriority_claims) > 0):
   **Total unsecured claims:** ${ currency(sum(c.total_claim for c in prop.priority_claims) + sum(c.total_claim for c in prop.nonpriority_claims)) }
   % endif
 
