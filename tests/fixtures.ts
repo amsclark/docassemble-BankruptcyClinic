@@ -48,6 +48,12 @@ export interface VehicleData {
   hasLoan: boolean;
   loanAmount?: string;
   otherInfo?: string;
+  /** 'Debtor 1 only' (default) / 'Debtor 2 only' / etc. — drives the
+   *  per-debtor motor-vehicle exemption rule (Phil's June 2026 scenario). */
+  owner?: string;
+  /** Claim the Motor Vehicle exemption on this vehicle. No prior test
+   *  exercised the vehicle-exemption path. */
+  claimMotorVehicle?: boolean;
 }
 
 export interface DepositData {

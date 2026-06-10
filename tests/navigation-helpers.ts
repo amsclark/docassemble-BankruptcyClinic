@@ -217,13 +217,15 @@ async function fillVehicle(page: Page, v: VehicleData, index: number) {
   await page.locator(`#${b64(`prop.ab_vehicles[${index}].milage`)}`).fill(v.mileage);
   // 'who' field — select "Debtor 1 only" (code-generated choices, always visible now)
   // On list-collect pages, field IDs use _field_X_Y format, so find by label text
+  const ownerChoice = v.owner ?? 'Debtor 1 only';
   const vehWhoSelect = page.locator(`select#${b64(`prop.ab_vehicles[${index}].who`)}`);
   if (await vehWhoSelect.count() > 0) {
-    await vehWhoSelect.selectOption('Debtor 1 only');
+    await vehWhoSelect.selectOption(ownerChoice);
   } else {
-    // List-collect: field is a radio rendered with encoded names — click first option by text
-    const debtorOnlyLabel = page.locator('label').filter({ hasText: 'Debtor 1 only' }).first();
-    if (await debtorOnlyLabel.count() > 0) await debtorOnlyLabel.click();
+    // List-collect: 'who' is a radio rendered with encoded names — click the
+    // matching option by its label text.
+    const ownerLabel = page.locator('label').filter({ hasText: ownerChoice }).first();
+    if (await ownerLabel.count() > 0) await ownerLabel.click();
   }
   await page.locator(`#${b64(`prop.ab_vehicles[${index}].current_value`)}`).fill(v.value);
   await page.locator(`#${b64(`prop.ab_vehicles[${index}].state`)}`).fill(v.state);
@@ -242,7 +244,19 @@ async function fillVehicle(page: Page, v: VehicleData, index: number) {
   if (await otherInfoField.count() > 0) {
     await otherInfoField.fill(v.otherInfo || 'N/A');
   }
-  await fillYesNoRadio(page, `prop.ab_vehicles[${index}].is_claiming_exemption`, false);
+  if (v.claimMotorVehicle) {
+    await fillYesNoRadio(page, `prop.ab_vehicles[${index}].is_claiming_exemption`, true);
+    await page.waitForTimeout(600);  // reveal show-if'd exemption fields
+    await fillById(page, b64(`prop.ab_vehicles[${index}].exemption_value`), v.value);
+    // exemption_laws is a show-if'd select with renamed _field_N id — drive by label.
+    const lawSel = page.getByLabel('Specific laws that allow exemption', { exact: true }).first();
+    const mvOption = (await lawSel.locator('option').allTextContents())
+      .find((o) => /motor vehicle/i.test(o));
+    if (!mvOption) throw new Error('Motor Vehicle option not in exemption_laws dropdown');
+    await lawSel.selectOption({ label: mvOption });
+  } else {
+    await fillYesNoRadio(page, `prop.ab_vehicles[${index}].is_claiming_exemption`, false);
+  }
 }
 
 async function fillDeposit(page: Page, dep: DepositData, index: number) {
@@ -274,17 +288,32 @@ export async function navigatePropertySection(page: Page, scenario: TestScenario
     await clickYesNoButton(page, 'prop.interests.there_are_any', false);
   }
 
-  // ── Vehicles ──
+  // ── Vehicles ── prop.vehicles (array) drives the multi-vehicle list-collect
+  // flow; prop.vehicle (single) is the legacy one-car shorthand.
+  const vehicleList = prop.vehicles ?? (prop.vehicle ? [prop.vehicle] : []);
   await waitForDaPageLoad(page);
-  if (prop.vehicle) {
+  if (vehicleList.length > 0) {
     await clickYesNoButton(page, 'prop.ab_vehicles.there_are_any', true);
-
-    await waitForDaPageLoad(page);
-    await fillVehicle(page, prop.vehicle, 0);
-    await clickContinue(page);
-    await waitForDaPageLoad(page);
-    await handleAnotherPage(page, 'prop.ab_vehicles.there_is_another');
-    await waitForDaPageLoad(page);
+    for (let vi = 0; vi < vehicleList.length; vi++) {
+      await waitForDaPageLoad(page);
+      await fillVehicle(page, vehicleList[vi], vi);
+      const isLast = vi === vehicleList.length - 1;
+      if (isLast) {
+        await clickContinue(page);
+        await waitForDaPageLoad(page);
+        await handleAnotherPage(page, 'prop.ab_vehicles.there_is_another');
+      } else {
+        // list-collect "Add another" — same idiom as the claims loop.
+        await page.evaluate(() => {
+          const btns = Array.from(document.querySelectorAll('button'))
+            .filter((b) => b.textContent?.includes('Add another') && (b as HTMLElement).offsetParent !== null);
+          if (btns.length > 0) btns[btns.length - 1].click();
+          else (document.getElementById('da-continue-button') as HTMLButtonElement | null)?.click();
+        });
+        await page.waitForLoadState('networkidle');
+      }
+      await waitForDaPageLoad(page);
+    }
   } else {
     await clickYesNoButton(page, 'prop.ab_vehicles.there_are_any', false);
   }
