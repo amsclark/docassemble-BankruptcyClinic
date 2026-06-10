@@ -181,6 +181,47 @@ def test_mv_under_cap_ok():
     assert get_motor_vehicle_violations(p, 'Nebraska', 1) == []
 
 
+def test_mv_one_joint_car_combines_to_11940():
+    """Roxanne's rule: joint debtors with ONE jointly-owned vehicle may
+    combine both exemptions onto it ($11,940). $11,000 full claim → OK."""
+    p = _vprop(_vehicle('Debtor 1 and Debtor 2 only', 11000))
+    assert get_motor_vehicle_violations(p, 'Nebraska', 2) == [], \
+        get_motor_vehicle_violations(p, 'Nebraska', 2)
+
+
+def test_mv_one_joint_car_over_combined_cap_blocked():
+    """A jointly-owned car over the combined $11,940 → violation."""
+    p = _vprop(_vehicle('Debtor 1 and Debtor 2 only', 13000))
+    v = get_motor_vehicle_violations(p, 'Nebraska', 2)
+    assert any('over the $11,940' in s for s in v), v
+
+
+def test_mv_sole_car_capped_at_one_slot_even_joint_case():
+    """A SOLE-owned car in a joint case is still capped at one slot ($5,970),
+    not the combined $11,940."""
+    p = _vprop(_vehicle('Debtor 1 only', 9000))
+    v = get_motor_vehicle_violations(p, 'Nebraska', 2)
+    assert any('over the $5,970' in s for s in v), v
+
+
+def test_mv_joint_car_plus_sole_car_splits_slot_blocked():
+    """A joint MV car AND Debtor 1's own sole MV car uses Debtor 1's slot
+    twice → violation (slot may not be split across vehicles)."""
+    p = _vprop(_vehicle('Debtor 1 and Debtor 2 only', 8000),
+               _vehicle('Debtor 1 only', 3000))
+    v = get_motor_vehicle_violations(p, 'Nebraska', 2)
+    assert any("Debtor 1's Motor Vehicle exemption is applied to more than one" in s
+               for s in v), v
+
+
+def test_mv_joint_car_single_filer_capped_at_one_slot():
+    """Defensive: a 'both debtors' owner in a single-debtor case caps at one
+    slot (no phantom second debtor)."""
+    p = _vprop(_vehicle('Debtor 1 and Debtor 2 only', 9000))
+    v = get_motor_vehicle_violations(p, 'Nebraska', 1)
+    assert any('over the $5,970' in s for s in v), v
+
+
 def test_mv_non_mv_claim_ignored():
     """A vehicle claiming a non-MV exemption is not counted by the MV rule."""
     p = _vprop(_vehicle('Debtor 1 only', 9000, claims_mv=False))
@@ -212,4 +253,9 @@ if __name__ == '__main__':
     test_mv_under_cap_ok()
     test_mv_non_mv_claim_ignored()
     test_mv_shared_owner_not_counted_for_one_per_debtor()
+    test_mv_one_joint_car_combines_to_11940()
+    test_mv_one_joint_car_over_combined_cap_blocked()
+    test_mv_sole_car_capped_at_one_slot_even_joint_case()
+    test_mv_joint_car_plus_sole_car_splits_slot_blocked()
+    test_mv_joint_car_single_filer_capped_at_one_slot()
     print('OK: all exemption-totals unit tests passed')
