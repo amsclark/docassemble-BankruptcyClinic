@@ -38,6 +38,18 @@ screens out of order, asks unexpected questions, or loops. Make seeking
    item's question *and* every downstream consumer (PDFs, tables) read — match
    the working creditor pattern in `voluntary-petition.yml`. A field the gather
    forgets but the PDF reads loops or crashes.
+8. **Never read `<list>.gathered` raw in a code block** — it is the gather
+   sentinel; the read SEEKS the gather, which can re-enter the reading block
+   mid-seek (`Infinite loop: x.gathered` — the 106H codebtor auto-populate
+   bug). Use `getattr(<list>, 'gathered', False)`. The `GATHERED_READ` gate
+   enforces this.
+9. **Inside `list collect` questions, `required` is NOT enforced on
+   show-if-revealed fields** (client validator gap, verified empirically) —
+   treat every show-if'd field there as skippable: downstream readers need
+   defended access even if the field is required. And `show if: <var>` naming
+   a variable that is not a field on the same screen is a JS toggle that
+   never fires (field permanently hidden); use `show if: code:` for off-page
+   conditions.
 
 ## Static analysis tools (run before shipping interview-flow changes)
 
