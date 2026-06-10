@@ -143,9 +143,23 @@ export async function fillVisibleRequiredFields(
       else if (labelText.includes('name')) v = 'Test Person';
       else if (labelText.includes('street') || labelText.includes('address')) v = '123 Test St';
       else if (labelText.includes('city')) v = 'Lincoln';
+      // datatype: combobox renders a text input with a JS dropdown; a value
+      // that isn't committed through the widget fails its "select one or
+      // type in a new value" rule. Prefer a real option when one is exposed
+      // (datalist or the combobox menu), and always blur to commit.
+      const dl = (i as HTMLInputElement).list;
+      if (dl && dl.options.length > 0) {
+        const pick = random ? dl.options[Math.floor(rnd() * dl.options.length)] : dl.options[0];
+        v = pick.value || pick.textContent || v;
+      } else if (i.classList.contains('combobox') || i.closest('.combobox-container')) {
+        const menuOpt = i.closest('.combobox-container, .da-field-container')
+          ?.querySelector('.dropdown-menu li a, .dropdown-menu .dropdown-item');
+        if (menuOpt?.textContent?.trim()) v = menuOpt.textContent.trim();
+      }
       i.value = v;
       i.dispatchEvent(new Event('input', { bubbles: true }));
       i.dispatchEvent(new Event('change', { bubbles: true }));
+      i.dispatchEvent(new Event('blur', { bubbles: true }));
       touched = true;
     });
 
