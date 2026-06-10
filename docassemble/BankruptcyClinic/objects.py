@@ -434,6 +434,88 @@ def compute_exemption_totals(prop, debtor_state, num_debtors=1):
     return result
 
 
+def get_motor_vehicle_violations(prop, debtor_state, num_debtors=1):
+    """Return a list of human-readable motor-vehicle exemption violations
+    (empty list == OK).
+
+    Per Neb. Rev. Stat. § 25-1556(1)(e) as applied (confirmed by Phil Martin,
+    Legal Aid of Nebraska, June 2026): EACH debtor may claim the motor-vehicle
+    exemption on ONE vehicle, up to the per-vehicle equity cap ($5,970 in NE).
+    It does NOT pool — one spouse's exemption cannot apply to the other's car,
+    and two cars cannot share a single debtor's exemption. (This is finer-
+    grained than the aggregate category cap in compute_exemption_totals, which
+    correctly "stacks" to $11,940 for the two debtors combined per Roxanne
+    Alhejaj, May 2026 — both constraints hold at once.)
+
+    Enforced here, post-gather, rather than in the vehicle question's per-item
+    `validation code`: under `list collect` the `who` owner radio (a code:-
+    choice field) is committed AFTER per-item validation fires, so sibling-item
+    reads there returned undefined and the original guard (issue #53) silently
+    passed. At this point prop.ab_vehicles is fully gathered and every field
+    reads correctly.
+    """
+    cap = get_exemption_limits(debtor_state).get('motor_vehicle', 0)
+    vehicles = getattr(prop, 'ab_vehicles', None)
+    if vehicles is None:
+        return []
+
+    def _amt(val):
+        try:
+            return float(str(val).replace('$', '').replace(',', '').strip())
+        except (ValueError, TypeError):
+            return 0.0
+
+    def _label(v, idx):
+        parts = [str(getattr(v, a, '') or '').strip()
+                 for a in ('year', 'make', 'model')]
+        parts = [p for p in parts if p]
+        return ' '.join(parts).strip() or ('Vehicle #' + str(idx + 1))
+
+    violations = []
+    by_owner = {}
+    for idx in range(len(vehicles)):
+        v = vehicles[idx]
+        if not getattr(v, 'is_claiming_exemption', False):
+            continue
+        claims_mv = False
+        mv_amount = 0.0
+        for law_attr, val_attr in (('exemption_laws', 'exemption_value'),
+                                   ('exemption_laws_2', 'exemption_value_2')):
+            law = getattr(v, law_attr, None)
+            if law and 'motor vehicle' in str(law).lower():
+                claims_mv = True
+                mv_amount += _amt(getattr(v, val_attr, 0))
+        if not claims_mv:
+            continue
+        # Full (100%) claims capture no explicit value — fall back to equity.
+        if mv_amount == 0:
+            mv_amount = _amt(getattr(v, 'current_owned_value',
+                                    getattr(v, 'current_value', 0)))
+        label = _label(v, idx)
+        # Per-vehicle dollar cap applies regardless of who owns it.
+        if cap and mv_amount > cap:
+            violations.append(
+                label + ": the Motor Vehicle exemption claimed ("
+                + '${:,.0f}'.format(mv_amount) + ") is over the ${:,.0f}".format(cap)
+                + " limit. Reduce it to ${:,.0f}".format(cap)
+                + " and claim the remainder under Wildcard.")
+        # One-vehicle-per-debtor count — only for sole-owned vehicles
+        # ('Debtor 1 only' / 'Debtor 2 only'); shared / third-party ownership
+        # is not counted against a single debtor's one-vehicle limit.
+        owner = getattr(v, 'who', 'Debtor 1 only')
+        if owner in ('Debtor 1 only', 'Debtor 2 only'):
+            by_owner.setdefault(owner, []).append(label)
+    for owner, labels in by_owner.items():
+        if len(labels) > 1:
+            who = owner.replace(' only', '')
+            violations.append(
+                who + " has claimed the Motor Vehicle exemption on more than one "
+                "vehicle (" + ', '.join(labels) + "). Each debtor may claim it on "
+                "only ONE vehicle — change the others to a different exemption "
+                "(for example, Wildcard).")
+    return violations
+
+
 class Debtor(Individual):
   def init(self, *pargs, **kwargs):
     self.aliases = []

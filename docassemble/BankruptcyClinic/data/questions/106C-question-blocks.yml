@@ -241,7 +241,24 @@ subquestion: |
     before continuing.
   </div>
   % endif
+
+  % if motor_vehicle_violations:
+  <div class="alert alert-danger">
+    <strong>The Motor Vehicle exemption needs to be corrected before you can continue:</strong>
+    <ul>
+    % for _mv in motor_vehicle_violations:
+      <li>${ _mv }</li>
+    % endfor
+    </ul>
+    Go back to the <strong>Vehicles</strong> page (Schedule A/B) to fix this.
+  </div>
+  % endif
 continue button field: exemption_summary_acknowledged
+# Hard-block progression on a motor-vehicle violation (restores the issue #53
+# enforcement intent that the per-item list-collect validator silently lost).
+validation code: |
+  if motor_vehicle_violations:
+    validation_error("Please fix the Motor Vehicle exemption issue shown above before continuing. " + " ".join(motor_vehicle_violations))
 ---
 # Code block that builds exemption_totals_summary in the form the overview
 # screen above renders. Uses the existing compute_exemption_totals helper.
@@ -260,6 +277,10 @@ code: |
       'limit': _limit,
       'over': bool(_limit > 0 and _claimed > _limit),
     }
+  # Per-debtor motor-vehicle rule (one vehicle per debtor, <= cap each — Phil
+  # Martin, June 2026). Enforced here, post-gather: the vehicle question's
+  # per-item validation can't read sibling items' owner under list collect.
+  motor_vehicle_violations = get_motor_vehicle_violations(prop, _state, _num_debtors)
 ---
 code: |
   debtor_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last

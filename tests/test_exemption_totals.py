@@ -16,7 +16,7 @@ Run inside the docassemble container (it needs docassemble.base.util):
 import types
 from docassemble.BankruptcyClinic.objects import (
     compute_exemption_totals, NEBRASKA_EXEMPTIONS, claiming_less_than_full,
-    get_exemption_limits)
+    get_exemption_limits, get_motor_vehicle_violations)
 
 WILD = NEBRASKA_EXEMPTIONS['wildcard']
 VEHICLE = NEBRASKA_EXEMPTIONS['motor_vehicle']
@@ -120,6 +120,81 @@ def test_num_debtors_defaults_and_bad_input():
     assert compute_exemption_totals(_prop(item), 'Nebraska', 0)[VEHICLE]['limit'] == 5970
 
 
+# ── Motor-vehicle per-debtor exemption rule (Phil Martin, June 2026) ──
+# Each debtor may claim the Motor Vehicle exemption on ONE vehicle, up to the
+# per-vehicle cap ($5,970 in NE); it does not pool across debtors or vehicles.
+# get_motor_vehicle_violations is the post-gather enforcement (the vehicle
+# question's per-item list-collect validation can't read sibling items'
+# owner reliably). Unit-tested here because driving two vehicles' show-if'd
+# owner/exemption fields through the list-collect UI is harness-fragile.
+
+VEHICLE_LAW = NEBRASKA_EXEMPTIONS['motor_vehicle']
+
+
+def _vehicle(who, value, claims_mv=True, exemption_value=0, owned=None):
+    return types.SimpleNamespace(
+        is_claiming_exemption=True,
+        who=who,
+        year='2020', make='Test', model='Car',
+        current_value=value,
+        current_owned_value=value if owned is None else owned,
+        exemption_laws=(VEHICLE_LAW if claims_mv else 'Wildcard (Neb. Rev. Stat. § 25-1552)'),
+        exemption_value=exemption_value,
+        exemption_laws_2='', exemption_value_2=0)
+
+
+def _vprop(*vehicles):
+    return types.SimpleNamespace(ab_vehicles=list(vehicles))
+
+
+def test_mv_two_same_debtor_blocked():
+    """Same debtor claiming MV on two cars → one-per-debtor violation."""
+    p = _vprop(_vehicle('Debtor 1 only', 2000), _vehicle('Debtor 1 only', 5000))
+    v = get_motor_vehicle_violations(p, 'Nebraska', 2)
+    assert any('only ONE vehicle' in s for s in v), v
+
+
+def test_mv_each_debtor_own_car_ok():
+    """Phil's scenario: each spouse claims MV on their own car → no violation."""
+    p = _vprop(_vehicle('Debtor 1 only', 2000), _vehicle('Debtor 2 only', 5000))
+    assert get_motor_vehicle_violations(p, 'Nebraska', 2) == [], \
+        get_motor_vehicle_violations(p, 'Nebraska', 2)
+
+
+def test_mv_over_cap_blocked():
+    """A single MV claim over $5,970 (by equity, full claim) → violation."""
+    p = _vprop(_vehicle('Debtor 1 only', 9000))  # full claim, equity 9000
+    v = get_motor_vehicle_violations(p, 'Nebraska', 1)
+    assert any('over the $5,970' in s for s in v), v
+
+
+def test_mv_explicit_value_over_cap_blocked():
+    """An explicit exemption_value over the cap → violation."""
+    p = _vprop(_vehicle('Debtor 1 only', 20000, exemption_value=8000))
+    v = get_motor_vehicle_violations(p, 'Nebraska', 1)
+    assert any('over the $5,970' in s for s in v), v
+
+
+def test_mv_under_cap_ok():
+    """An MV claim at/under the cap → no violation."""
+    p = _vprop(_vehicle('Debtor 1 only', 5970))
+    assert get_motor_vehicle_violations(p, 'Nebraska', 1) == []
+
+
+def test_mv_non_mv_claim_ignored():
+    """A vehicle claiming a non-MV exemption is not counted by the MV rule."""
+    p = _vprop(_vehicle('Debtor 1 only', 9000, claims_mv=False))
+    assert get_motor_vehicle_violations(p, 'Nebraska', 1) == []
+
+
+def test_mv_shared_owner_not_counted_for_one_per_debtor():
+    """Jointly/third-party owned vehicles don't count against a single
+    debtor's one-vehicle limit, but the per-vehicle cap still applies."""
+    p = _vprop(_vehicle('Debtor 1 and Debtor 2 only', 3000),
+               _vehicle('At least one of the debtors and another', 4000))
+    assert get_motor_vehicle_violations(p, 'Nebraska', 2) == []
+
+
 if __name__ == '__main__':
     test_full_claim_counts_owned_value()
     test_partial_claim_uses_explicit_value()
@@ -130,4 +205,11 @@ if __name__ == '__main__':
     test_joint_filing_stacks_caps()
     test_homestead_stacks_to_240k()
     test_num_debtors_defaults_and_bad_input()
+    test_mv_two_same_debtor_blocked()
+    test_mv_each_debtor_own_car_ok()
+    test_mv_over_cap_blocked()
+    test_mv_explicit_value_over_cap_blocked()
+    test_mv_under_cap_ok()
+    test_mv_non_mv_claim_ignored()
+    test_mv_shared_owner_not_counted_for_one_per_debtor()
     print('OK: all exemption-totals unit tests passed')
