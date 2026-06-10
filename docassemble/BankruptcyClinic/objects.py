@@ -301,7 +301,7 @@ def get_exemption_limits(user_state):
             'homestead_proceeds': 60000,
             'motor_vehicle': 5970,    # § 25-1556(1)(e), 2023 CPI-adjusted
             'household_goods': 3582,  # § 25-1556(1)(c), 2023 CPI-adjusted
-            'wildcard': 5000,
+            'wildcard': 5970,    # § 25-1552, 2023 CPI-adjusted (Phil Martin, Legal Aid of NE, June 2026)
             'clothing': 0,            # Unlimited
             'personal_possessions': 0, # Unlimited
             'health_aids': 0,         # Unlimited
