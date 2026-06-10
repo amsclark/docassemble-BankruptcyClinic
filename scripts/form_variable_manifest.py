@@ -664,8 +664,11 @@ _RISKY_OPTIONAL_DATATYPES = {"yesnoradio", "noyesradio", "yesnomaybe", "date"}
 
 def optional_risky_fields(roots):
     """Map of field var -> defining file for fields that are `required: False`
-    with a skippable datatype. Such a variable is NOT guaranteed defined even
-    after its question runs."""
+    with a skippable rendering. Such a variable is NOT guaranteed defined even
+    after its question runs. Skippable: unclicked radios, blank dates, AND
+    unselected dropdowns / bare-choices selects (a select left on the
+    "Select..." placeholder submits nothing — the 106D notify other_state
+    class). Comboboxes commit typed text, so they are NOT in this class."""
     rootalt = "|".join(sorted(map(re.escape, roots), key=len, reverse=True))
     PATH = rf"(?:{rootalt})(?:\.\w+|\[[^\]]*\])*"
     field_re = re.compile(rf"^(\s*)-\s*(?:[^:#]+:\s*)?({PATH})\s*$")
@@ -678,7 +681,7 @@ def optional_risky_fields(roots):
                 continue
             indent = len(m.group(1))
             var = norm(m.group(2))
-            dt, req_false = None, False
+            dt, req_false, dropdownish = None, False, False
             for la in lines[idx + 1: idx + 16]:
                 lai = len(la) - len(la.lstrip())
                 if la.strip() and lai <= indent:
@@ -686,11 +689,43 @@ def optional_risky_fields(roots):
                 md = re.match(r"\s*datatype:\s*(\S+)", la)
                 if md:
                     dt = md.group(1)
+                if re.match(r"\s*input type:\s*(dropdown|radio)\b", la) \
+                        or re.match(r"\s*choices:\s*$", la):
+                    dropdownish = True
                 if re.match(r"\s*required:\s*[Ff]alse", la):
                     req_false = True
-            if req_false and dt in _RISKY_OPTIONAL_DATATYPES:
+            risky = (dt in _RISKY_OPTIONAL_DATATYPES) or (dropdownish and dt is None)
+            if req_false and risky:
                 out[var] = f.name
     return out
+
+
+# ---------- raw .gathered reads (self-seeking gather guards) -------------------
+
+def gathered_read_gaps():
+    """Raw `<list>.gathered` reads in code blocks. Reading .gathered on an
+    ungathered DAList SEEKS the gather (it is the sentinel attribute) — inside
+    auto-populate/guard code that runs mid-flow this re-enters the seeking
+    machinery: 'Infinite loop: x.gathered' (the 106H codebtor auto-populate
+    bug; LOOPDEBUG-confirmed orig=debtors.codebtors.gathered). Guard idiom:
+    getattr(<list>, 'gathered', False). Lines with getattr/defined/hasattr or
+    assignments to .gathered are fine."""
+    gaps = []
+    read_re = re.compile(r"([\w\.\[\]]+)\.gathered\b(?!\s*=)")
+    for f in sorted(QDIR.glob("*.yml")):
+        for doc in split_blocks(f):
+            code = get_code(doc)
+            if not code:
+                continue
+            for ln in code.splitlines():
+                s = ln.strip()
+                if s.startswith("#"):
+                    continue
+                if "getattr(" in ln or "defined(" in ln or "hasattr(" in ln:
+                    continue
+                for mm in read_re.finditer(ln):
+                    gaps.append((f.name, f"{mm.group(1)}.gathered"))
+    return sorted(set(gaps))
 
 
 def optional_gaps(def_index, mand, roots):
@@ -927,6 +962,8 @@ def findings_lines(def_index, mand, targets):
         lines.append(f"{fname}\t-\tTABLE_GAP\t{cand}")
     for v, fname, readers in optional_gaps(def_index, mand, interview_roots()):
         lines.append(f"{fname}\t-\tOPTIONAL_GAP\t{v} (required:False {'/'.join(sorted(_RISKY_OPTIONAL_DATATYPES))}-class; unguarded readers: {', '.join(readers)})")
+    for fname, expr in gathered_read_gaps():
+        lines.append(f"{fname}\t-\tGATHERED_READ\t{expr}")
     return sorted(lines)
 
 
