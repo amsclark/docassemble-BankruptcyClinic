@@ -132,6 +132,8 @@ export async function fillVisibleRequiredFields(
       else if (labelText.includes('date')) v = '01/01/2024';
       else if (isCurrency || t === 'number' || t === 'tel') v = money();
       else if (labelText.includes('zip')) v = '68508';
+      // "Schedule A/B line" is number-validated ('N/A' silently blocks)
+      else if (labelText.includes('line')) v = random ? String(1 + Math.floor(rnd() * 50)) : '1';
       else if (
         labelText.includes('amount') || labelText.includes('income') ||
         labelText.includes('value') || labelText.includes('pay') ||

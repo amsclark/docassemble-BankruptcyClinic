@@ -103,6 +103,7 @@ test.describe('Seeded-random fuzz walker', () => {
         if (!(await pageHasContinueButton(page))) {
           const sayYes = rng() < yesBias;
           trail[trail.length - 1] += ` -> clicked ${sayYes ? 'YES' : 'NO'}`;
+          const gateTracker = await page.locator('input[name="_tracker"]').first().getAttribute('value').catch(() => null);
           let advanced = await clickYesNoButtonPage(page, sayYes);
           if (!advanced) {
             // Mid-transition pages briefly show neither Continue nor Yes/No —
@@ -113,6 +114,12 @@ test.describe('Seeded-random fuzz walker', () => {
             advanced = await clickYesNoButtonPage(page, sayYes);
           }
           if (advanced) {
+            // Wait for the POST to land before re-reading the page: clicking
+            // a gate and immediately looping re-answered slow gates with a
+            // second (stale, sometimes contradictory) submit — corrupting
+            // gather state into "Infinite loop: x.gathered" (17/26 sweep
+            // failures clustered on the slower shard).
+            await waitForAdvance(page, gateTracker, h, 12000);
             sameHeadingStreak = 0;
             continue;
           }
