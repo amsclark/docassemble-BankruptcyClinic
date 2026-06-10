@@ -438,26 +438,39 @@ def get_motor_vehicle_violations(prop, debtor_state, num_debtors=1):
     """Return a list of human-readable motor-vehicle exemption violations
     (empty list == OK).
 
-    Per Neb. Rev. Stat. § 25-1556(1)(e) as applied (confirmed by Phil Martin,
-    Legal Aid of Nebraska, June 2026): EACH debtor may claim the motor-vehicle
-    exemption on ONE vehicle, up to the per-vehicle equity cap ($5,970 in NE).
-    It does NOT pool — one spouse's exemption cannot apply to the other's car,
-    and two cars cannot share a single debtor's exemption. (This is finer-
-    grained than the aggregate category cap in compute_exemption_totals, which
-    correctly "stacks" to $11,940 for the two debtors combined per Roxanne
-    Alhejaj, May 2026 — both constraints hold at once.)
+    Per Neb. Rev. Stat. § 25-1556(1)(e) as applied (Phil Martin + Roxanne
+    Alhejaj, Legal Aid of Nebraska, June 2026), model each debtor as having ONE
+    motor-vehicle exemption "slot" worth the per-vehicle cap ($5,970 in NE):
+
+      * Each slot may be applied to at most one vehicle (Phil: "each debtor can
+        claim one vehicle").
+      * A SOLE-owned vehicle ('Debtor 1 only' / 'Debtor 2 only') draws that one
+        debtor's slot, so its MV exemption is capped at one slot ($5,970).
+      * A JOINTLY-owned vehicle ('Debtor 1 and Debtor 2 only') draws BOTH
+        debtors' slots, so in a joint case its cap is two slots ($11,940) —
+        Roxanne's rule: "if joint debtors only have one vehicle they can both
+        combine their exemptions ... for a total of $11,940 towards one
+        vehicle."
+      * No debtor's slot may be split across two vehicles — e.g. a joint MV car
+        AND that debtor's own sole MV car would use Debtor 1's slot twice.
+
+    The aggregate category cap in compute_exemption_totals ($5,970 x
+    num_debtors) still bounds the total independently; both hold at once.
 
     Enforced here, post-gather, rather than in the vehicle question's per-item
     `validation code`: under `list collect` the `who` owner radio (a code:-
-    choice field) is committed AFTER per-item validation fires, so sibling-item
+    choice field) commits AFTER per-item validation fires, so sibling-item
     reads there returned undefined and the original guard (issue #53) silently
-    passed. At this point prop.ab_vehicles is fully gathered and every field
-    reads correctly.
+    passed. At this point prop.ab_vehicles is fully gathered and reads reliably.
     """
     cap = get_exemption_limits(debtor_state).get('motor_vehicle', 0)
     vehicles = getattr(prop, 'ab_vehicles', None)
     if vehicles is None:
         return []
+    try:
+        n = max(1, int(num_debtors))
+    except (TypeError, ValueError):
+        n = 1
 
     def _amt(val):
         try:
@@ -471,8 +484,12 @@ def get_motor_vehicle_violations(prop, debtor_state, num_debtors=1):
         parts = [p for p in parts if p]
         return ' '.join(parts).strip() or ('Vehicle #' + str(idx + 1))
 
+    def _money(x):
+        return '${:,.0f}'.format(x)
+
     violations = []
-    by_owner = {}
+    d1_slot_labels = []   # vehicles drawing Debtor 1's MV slot
+    d2_slot_labels = []   # vehicles drawing Debtor 2's MV slot
     for idx in range(len(vehicles)):
         v = vehicles[idx]
         if not getattr(v, 'is_claiming_exemption', False):
@@ -492,27 +509,46 @@ def get_motor_vehicle_violations(prop, debtor_state, num_debtors=1):
             mv_amount = _amt(getattr(v, 'current_owned_value',
                                     getattr(v, 'current_value', 0)))
         label = _label(v, idx)
-        # Per-vehicle dollar cap applies regardless of who owns it.
-        if cap and mv_amount > cap:
-            violations.append(
-                label + ": the Motor Vehicle exemption claimed ("
-                + '${:,.0f}'.format(mv_amount) + ") is over the ${:,.0f}".format(cap)
-                + " limit. Reduce it to ${:,.0f}".format(cap)
-                + " and claim the remainder under Wildcard.")
-        # One-vehicle-per-debtor count — only for sole-owned vehicles
-        # ('Debtor 1 only' / 'Debtor 2 only'); shared / third-party ownership
-        # is not counted against a single debtor's one-vehicle limit.
         owner = getattr(v, 'who', 'Debtor 1 only')
-        if owner in ('Debtor 1 only', 'Debtor 2 only'):
-            by_owner.setdefault(owner, []).append(label)
-    for owner, labels in by_owner.items():
-        if len(labels) > 1:
-            who = owner.replace(' only', '')
+        # How many debtor slots this vehicle draws (and from whom).
+        if owner == 'Debtor 1 only':
+            slots = 1
+            d1_slot_labels.append(label)
+        elif owner == 'Debtor 2 only':
+            slots = 1
+            d2_slot_labels.append(label)
+        elif owner == 'Debtor 1 and Debtor 2 only':
+            slots = min(n, 2)
+            d1_slot_labels.append(label)
+            if n >= 2:
+                d2_slot_labels.append(label)
+        else:
+            # Jointly owned with a non-filer / unclear: allow the debtors'
+            # combined slots for the dollar cap, but don't pin it to a specific
+            # debtor's one-vehicle limit (ownership is ambiguous). The
+            # aggregate cap still bounds the total.
+            slots = min(n, 2)
+        per_vehicle_cap = cap * slots if cap else 0
+        if cap and mv_amount > per_vehicle_cap:
+            extra = ("" if slots == 1 else
+                     " (two debtors may combine their exemptions on one shared vehicle)")
             violations.append(
-                who + " has claimed the Motor Vehicle exemption on more than one "
-                "vehicle (" + ', '.join(labels) + "). Each debtor may claim it on "
-                "only ONE vehicle — change the others to a different exemption "
-                "(for example, Wildcard).")
+                label + ": the Motor Vehicle exemption claimed (" + _money(mv_amount)
+                + ") is over the " + _money(per_vehicle_cap) + " limit for this vehicle"
+                + extra + ". Reduce it to " + _money(per_vehicle_cap)
+                + " and claim the remainder under Wildcard.")
+    if len(d1_slot_labels) > 1:
+        violations.append(
+            "Debtor 1's Motor Vehicle exemption is applied to more than one "
+            "vehicle (" + ', '.join(d1_slot_labels) + "). Each debtor may apply it "
+            "to only ONE vehicle — change the others to a different exemption "
+            "(for example, Wildcard).")
+    if len(d2_slot_labels) > 1:
+        violations.append(
+            "Debtor 2's Motor Vehicle exemption is applied to more than one "
+            "vehicle (" + ', '.join(d2_slot_labels) + "). Each debtor may apply it "
+            "to only ONE vehicle — change the others to a different exemption "
+            "(for example, Wildcard).")
     return violations
 
 
