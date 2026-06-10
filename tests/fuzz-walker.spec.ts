@@ -86,6 +86,10 @@ test.describe('Seeded-random fuzz walker', () => {
           await page.locator('button[title="Information for the developer"], #da-show-debug, .da-debug-button')
             .first().click({ timeout: 2000 }).catch(() => {});
           await page.waitForTimeout(500);
+          // debug:true embeds the real traceback in HTML comments innerText
+          // can't see — save the full page for post-mortem.
+          const html = await page.content().catch(() => '');
+          require('fs').writeFileSync(`/tmp/fuzz-sweep/error-seed${seed}-step${step}.html`, html);
           const body = (await page.locator('body').innerText().catch(() => '')).slice(0, 3000);
           expect(false, `${tag} docassemble ERROR page at step ${step}.\nReplay: FUZZ_SEEDS=${seed}\n${body}`).toBe(true);
         }
