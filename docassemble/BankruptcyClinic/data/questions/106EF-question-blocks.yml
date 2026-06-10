@@ -611,8 +611,12 @@ code: |
     unsecured_claims['isSubjectToOffset'+str(clm)] = False
     clm += 1
 
-  unsecured_claims['noNonpriorityUnsecuredCreditors'] = True if len(prop.nonpriority_claims) == 0 else False
-  unsecured_claims['hasNonpriorityUnsecuredCreditors'] = True if len(prop.nonpriority_claims) > 0 else False
+  # The template's Part 2 yes/no pair is named hasNonPriorityClaims /
+  # noNonpriorityClaims — the *UnsecuredCreditors names below don't exist in
+  # form_b106ef.pdf, so the question shipped UNANSWERED for every filer until
+  # the PDF content assertions caught it (June 2026).
+  unsecured_claims['noNonpriorityClaims'] = True if len(prop.nonpriority_claims) == 0 else False
+  unsecured_claims['hasNonPriorityClaims'] = True if len(prop.nonpriority_claims) > 0 else False
   clm = 1
   for claim in prop.nonpriority_claims:
     unsecured_claims['nonName'+str(clm)] = claim.name

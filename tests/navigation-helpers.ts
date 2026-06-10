@@ -754,6 +754,11 @@ export async function navigateUnsecuredCreditors(page: Page, scenario: TestScena
         name: 'General Unsecured Creditor', street: '1 Market St', city: 'Omaha',
         state: 'Nebraska', zip: '68102', totalClaim: '1000', type: 'Credit Card',
       }];
+  // The claim question is `list collect: True` — every claim lives on ONE
+  // page with concrete [0]/[1]/... ids and a built-in "Add another" button;
+  // submitting the page marks the list gathered (the standalone
+  // there_is_another question is never asked on this path). Same pattern as
+  // the maximalist's navigateUnsecuredCreditorsMulti.
   for (let ci = 0; ci < npClaims.length; ci++) {
     const np = npClaims[ci];
     const P = `prop.nonpriority_claims[${ci}]`;
@@ -775,14 +780,18 @@ export async function navigateUnsecuredCreditors(page: Page, scenario: TestScena
     await fillYesNoRadio(page, `${P}.save_to_library`, false);
     await fillYesNoRadio(page, `${P}.has_codebtor`, false);
     await fillYesNoRadio(page, `${P}.has_notify`, false);
-    await clickContinue(page);
 
     if (ci < npClaims.length - 1) {
-      await waitForDaPageLoad(page);
-      await clickYesNoButton(page, 'prop.nonpriority_claims.there_is_another', true);
+      await page.evaluate(() => {
+        const btns = Array.from(document.querySelectorAll('button'))
+          .filter((b) => b.textContent?.includes('Add another') && (b as HTMLElement).offsetParent !== null);
+        if (btns.length > 0) btns[btns.length - 1].click();
+      });
+      await page.waitForLoadState('networkidle');
+    } else {
+      await clickContinue(page);
     }
   }
-  await handleAnotherPage(page, 'prop.nonpriority_claims.there_is_another');
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -826,20 +835,53 @@ export async function navigateCommunityProperty(page: Page) {
 // ════════════════════════════════════════════════════════════════════
 
 export async function navigateIncome(page: Page, scenario: TestScenario) {
-  // Debtor 1 employment
+  // Debtor 1 employment — honor the fixture (the helper hardcoded
+  // 'Not employed' for every scenario until June 2026, so the 106I
+  // employed/wage/deduction fields were NEVER exercised and the PDF content
+  // assertions caught blank isEmployed1/wages on a fixture that says
+  // Employed).
+  const inc = scenario.income;
+  const d1Employment = inc?.employment ?? 'Not employed';
   await waitForDaPageLoad(page);
-  await selectByName(page, b64('debtor[0].income.employment'), 'Not employed');
-  await clickContinue(page);
+  await selectByName(page, b64('debtor[0].income.employment'), d1Employment);
+  if (d1Employment === 'Employed') {
+    await page.waitForTimeout(400);
+    // show-if'd fields get renamed _field_N inputs — drive by visible label.
+    if (inc?.employer) {
+      await page.getByLabel('Employer Name').fill(inc.employer);
+    }
+    await clickContinue(page);
 
-  // 'Not employed' skips payroll pages (wages, deductions) — go straight to non-employment income
+    // Schedule I wage details (Check 1 required; checks 2-6 optional).
+    await waitForDaPageLoad(page);
+    await fillById(page, b64('debtor[0].income.income_amount_1'), inc?.grossWages ?? '0');
+    await fillById(page, b64('debtor[0].income.overtime_pay_1'), inc?.overtimePay ?? '0');
+    await clickContinue(page);
+
+    // Payroll deductions (all optional).
+    await waitForDaPageLoad(page);
+    if (inc?.taxDeduction) {
+      await fillById(page, b64('debtor[0].income.tax_deduction'), inc.taxDeduction);
+    }
+    await clickContinue(page);
+
+    // "Do you have any deductions to claim?" (employed path only).
+    await waitForDaPageLoad(page);
+    await fillYesNoRadio(page, 'debtor[0].income.other_deduction', false);
+    await clickContinue(page);
+  } else {
+    await clickContinue(page);
+  }
+
+  // Non-employment income (asked for employed and not-employed alike).
   await waitForDaPageLoad(page);
-  await fillById(page, b64('debtor[0].income.net_rental_business'), '0');
-  await fillById(page, b64('debtor[0].income.interest_and_dividends'), '0');
-  await fillById(page, b64('debtor[0].income.family_support'), '0');
-  await fillById(page, b64('debtor[0].income.unemployment'), '0');
-  await fillById(page, b64('debtor[0].income.social_security'), '0');
-  await fillById(page, b64('debtor[0].income.other_govt_assist'), '0');
-  await fillById(page, b64('debtor[0].income.pension'), '0');
+  await fillById(page, b64('debtor[0].income.net_rental_business'), inc?.netRentalBusiness ?? '0');
+  await fillById(page, b64('debtor[0].income.interest_and_dividends'), inc?.interestAndDividends ?? '0');
+  await fillById(page, b64('debtor[0].income.family_support'), inc?.familySupport ?? '0');
+  await fillById(page, b64('debtor[0].income.unemployment'), inc?.unemployment ?? '0');
+  await fillById(page, b64('debtor[0].income.social_security'), inc?.socialSecurity ?? '0');
+  await fillById(page, b64('debtor[0].income.other_govt_assist'), inc?.otherGovtAssist ?? '0');
+  await fillById(page, b64('debtor[0].income.pension'), inc?.pension ?? '0');
   await fillYesNoRadio(page, 'debtor[0].income.other_monthly_income', false);
   await clickContinue(page);
 

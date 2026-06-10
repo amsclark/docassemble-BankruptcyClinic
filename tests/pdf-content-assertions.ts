@@ -191,7 +191,10 @@ export function assertScenarioPdfValues(pdfs: PdfInfo[], scenario: TestScenario)
     const expected = npList.reduce((s, c) => s + parseFloat(c.totalClaim), 0);
     expectCurrencyEqual(getField(ef.fields, 'p2Total'), fmt(expected),
       `106EF nonpriority total vs fixture's ${npList.length} claims`);
-    expect(ef.fields['hasNonpriorityUnsecuredCreditors'], '106EF has-nonpriority checkbox').toBe(true);
+    // NB: the template's checkbox is hasNonPriorityClaims (the builder wrote a
+    // nonexistent *UnsecuredCreditors name until June 2026 — this assertion is
+    // what caught it).
+    expect(ef.fields['hasNonPriorityClaims'], '106EF has-nonpriority checkbox').toBe(true);
   }
 
   // ── Form 106I: employment + wage lines ──
