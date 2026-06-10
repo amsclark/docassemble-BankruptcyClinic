@@ -1290,7 +1290,12 @@ code: |
     prop.contracts_and_leases[i].codebtor_zip
   prop.contracts_and_leases[i].unexpired_lease
   if prop.contracts_and_leases[i].unexpired_lease:
-    prop.contracts_and_leases[i].lease_assumed
+    # lease_assumed is required-when-visible, but the client validator does
+    # NOT enforce required on show-if-revealed fields inside this `list
+    # collect` question — a bare reference here loops the gather forever on
+    # an empty submit (the 2026-06-05 prod "Infinite loop: x.gathered").
+    # Defended read; the 106G builder tolerates absence the same way.
+    getattr(prop.contracts_and_leases[i], 'lease_assumed', None)
   prop.contracts_and_leases[i].complete = True
 ---
 code: |

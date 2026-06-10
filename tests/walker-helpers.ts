@@ -193,6 +193,38 @@ export async function pageHasContinueButton(p: Page): Promise<boolean> {
   return (await p.locator('#da-continue-button').count()) > 0;
 }
 
+/** Diagnostic snapshot of the form state when a walker records a silent
+ *  block: every visible field (id/type/required/value/checked) plus any
+ *  visible validation messages — enough to see WHICH field the validator
+ *  rejected without reproducing under a debugger. */
+export async function dumpPageState(p: Page): Promise<string> {
+  return await p.evaluate(() => {
+    const fields: string[] = [];
+    document.querySelectorAll('input, select, textarea').forEach((el) => {
+      const f = el as HTMLInputElement;
+      if (['hidden', 'submit', 'button', 'reset'].includes(f.type)) return;
+      if (f.offsetParent === null) return;
+      const lab = f.id ? document.querySelector(`label[for="${CSS.escape(f.id)}"]`)?.textContent?.trim() : '';
+      fields.push(`${f.tagName.toLowerCase()}[${f.type}] id=${f.id} req=${f.required} ` +
+        (f.type === 'radio' || f.type === 'checkbox' ? `checked=${f.checked}` : `value=${JSON.stringify((f.value || '').slice(0, 30))}`) +
+        (lab ? ` label=${JSON.stringify(lab.slice(0, 50))}` : ''));
+    });
+    const errs: string[] = [];
+    document.querySelectorAll('.invalid-feedback, .da-has-error, .alert-danger, label.error').forEach((e) => {
+      const el = e as HTMLElement;
+      if (el.offsetParent !== null && el.textContent?.trim()) errs.push(el.textContent.trim().slice(0, 100));
+    });
+    const allInputs = document.querySelectorAll('input, select, textarea').length;
+    const buttons = Array.from(document.querySelectorAll('button'))
+      .filter((b) => (b as HTMLElement).offsetParent !== null)
+      .map((b) => `${b.id || b.getAttribute('name') || '?'}:"${(b.textContent || '').trim().slice(0, 20)}"`);
+    const form = document.querySelector('form#daform');
+    return `VALIDATION: ${errs.length ? errs.join(' | ') : '(none visible)'}\n` +
+      `inputs total=${allInputs} visible=${fields.length}; form html len=${form ? form.innerHTML.length : -1}\n` +
+      `visible buttons: ${buttons.join(', ')}\n` + fields.join('\n');
+  }).catch((e) => `dump failed: ${e}`);
+}
+
 /**
  * Pages whose ONLY field is a single yesno render Yes/No as docassemble
  * buttons (with a `name=<base64>` attribute) that auto-submit; there's no

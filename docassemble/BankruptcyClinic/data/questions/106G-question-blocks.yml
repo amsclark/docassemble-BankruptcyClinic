@@ -136,8 +136,14 @@ code: |
     if contract.unexpired_lease:
       leases_106g['lessor'+str(i)] = contract.name
       leases_106g['leaseDesc'+str(i)] = contract.description
-      leases_106g['noLease'+str(i)] = True if contract.lease_assumed == False else False
-      leases_106g['yesLease'+str(i)] = True if contract.lease_assumed == True else False
+      # lease_assumed is required-when-visible, but docassemble's client
+      # validator does NOT enforce required on show-if-revealed fields inside
+      # a `list collect` item — an empty submit leaves it undefined and a bare
+      # read here loops the gather forever. Defended read: an (unreachable in
+      # normal UX) skip ships both boxes unchecked rather than a stuck filer.
+      _assumed = getattr(contract, 'lease_assumed', None)
+      leases_106g['noLease'+str(i)] = True if _assumed == False else False
+      leases_106g['yesLease'+str(i)] = True if _assumed == True else False
 
     i += 1
 

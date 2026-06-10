@@ -31,7 +31,7 @@ import { navigateToDebtorPage, fillDebtorAndAdvance } from './navigation-helpers
 import { finishAndAssertAllPdfs } from './assert-helpers';
 import {
   getHeading, fillVisibleRequiredFields, clickContinueStrict,
-  pageHasContinueButton, clickYesNoButtonPage, mulberry32,
+  pageHasContinueButton, clickYesNoButtonPage, mulberry32, dumpPageState,
 } from './walker-helpers';
 
 const SEEDS = (process.env.FUZZ_SEEDS || '20260609,71077345')
@@ -51,6 +51,7 @@ test.describe('Seeded-random fuzz walker', () => {
       await fillDebtorAndAdvance(page, SIMPLE_SINGLE.debtor);
 
       const silentlyBlocked: string[] = [];
+      const trail: string[] = [];
       const headingVisits = new Map<string, number>();
       let sameHeadingStreak = 0;
       let reachedEnd = false;
@@ -78,9 +79,17 @@ test.describe('Seeded-random fuzz walker', () => {
         if (hLow === 'error') {
           // A docassemble Error on a random-but-valid path is exactly the
           // bug class this walker hunts. Hard fail, replay with this seed.
-          const body = (await page.locator('body').innerText().catch(() => '')).slice(0, 600);
+          console.log(`${tag} TRAIL before ERROR:\n${trail.join('\n')}`);
+          // With `debug: true` the variable/seek detail hides behind the
+          // collapsed "Information for the developer" panel — expand it.
+          await page.locator('button[title="Information for the developer"], #da-show-debug, .da-debug-button')
+            .first().click({ timeout: 2000 }).catch(() => {});
+          await page.waitForTimeout(500);
+          const body = (await page.locator('body').innerText().catch(() => '')).slice(0, 3000);
           expect(false, `${tag} docassemble ERROR page at step ${step}.\nReplay: FUZZ_SEEDS=${seed}\n${body}`).toBe(true);
         }
+        trail.push(`step ${step}: "${h}"`);   // action appended below once known
+        if (trail.length > 8) trail.shift();
 
         const visits = (headingVisits.get(h) || 0) + 1;
         headingVisits.set(h, visits);
@@ -92,6 +101,7 @@ test.describe('Seeded-random fuzz walker', () => {
         // same damping.
         if (!(await pageHasContinueButton(page))) {
           const sayYes = rng() < yesBias;
+          trail[trail.length - 1] += ` -> clicked ${sayYes ? 'YES' : 'NO'}`;
           let advanced = await clickYesNoButtonPage(page, sayYes);
           if (!advanced) {
             // Mid-transition pages briefly show neither Continue nor Yes/No —
@@ -111,9 +121,16 @@ test.describe('Seeded-random fuzz walker', () => {
 
         // Normal Continue page: fill with seeded-random values, strict click.
         const trackerBefore = await page.locator('input[name="_tracker"]').first().getAttribute('value').catch(() => null);
-        const handled = await fillVisibleRequiredFields(page, { rngValue: rng(), yesBias });
-        if (handled) await page.waitForTimeout(400);
+        // Answering a same-page toggle (e.g. has_jewelry=Yes) REVEALS its
+        // show-if'd required follow-ups after the pass — fill again until
+        // nothing new appears, like a real user answering what they see.
+        let handled = await fillVisibleRequiredFields(page, { rngValue: rng(), yesBias });
+        for (let pass = 0; handled && pass < 3; pass++) {
+          await page.waitForTimeout(400);
+          handled = await fillVisibleRequiredFields(page, { rngValue: rng(), yesBias });
+        }
 
+        trail[trail.length - 1] += ' -> filled+Continue';
         await clickContinueStrict(page);
         await page.waitForTimeout(800);
 
@@ -140,6 +157,7 @@ test.describe('Seeded-random fuzz walker', () => {
           if (!silentlyBlocked.includes(h)) {
             silentlyBlocked.push(h);
             console.log(`${tag} SILENT BLOCK at step ${step}: "${h}"`);
+            console.log(`${tag} page state:\n${await dumpPageState(page)}`);
           }
           // Escape with the masked Continue so one blocker doesn't hide the
           // rest of the path; the block itself is already recorded above.
