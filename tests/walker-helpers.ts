@@ -46,10 +46,19 @@ export async function fillVisibleRequiredFields(
     const random = rngValue !== undefined;
     let touched = false;
 
-    // 1) selects (dropdowns) — pick first non-empty option (or a random one)
+    // 1) selects (dropdowns) — pick first non-empty option (or a random one).
+    //    Includes combobox-backed selects: `datatype: combobox` hides the
+    //    original <select> behind a bootstrap-combobox text input, and typing
+    //    into that input does NOT commit a value — the validator checks the
+    //    hidden select ("You need to select one or type in a new value").
     document.querySelectorAll('select').forEach((sel) => {
       const sl = sel as HTMLSelectElement;
-      if (sl.offsetParent === null) return;
+      if (sl.offsetParent === null) {
+        const comboboxBacked = !!(sl.closest('.combobox-container')
+          || sl.parentElement?.querySelector('input.combobox')
+          || (sl.nextElementSibling as HTMLElement | null)?.querySelector?.('input.combobox'));
+        if (!comboboxBacked) return;
+      }
       if (sl.value && sl.value !== '') return;
       const opts2 = Array.from(sl.options).filter(o => o.value && o.value !== '');
       if (opts2.length === 0) return;
@@ -123,6 +132,8 @@ export async function fillVisibleRequiredFields(
       else if (labelText.includes('date')) v = '01/01/2024';
       else if (isCurrency || t === 'number' || t === 'tel') v = money();
       else if (labelText.includes('zip')) v = '68508';
+      // "Schedule A/B line" is number-validated ('N/A' silently blocks)
+      else if (labelText.includes('line')) v = random ? String(1 + Math.floor(rnd() * 50)) : '1';
       else if (
         labelText.includes('amount') || labelText.includes('income') ||
         labelText.includes('value') || labelText.includes('pay') ||
@@ -134,9 +145,23 @@ export async function fillVisibleRequiredFields(
       else if (labelText.includes('name')) v = 'Test Person';
       else if (labelText.includes('street') || labelText.includes('address')) v = '123 Test St';
       else if (labelText.includes('city')) v = 'Lincoln';
+      // datatype: combobox renders a text input with a JS dropdown; a value
+      // that isn't committed through the widget fails its "select one or
+      // type in a new value" rule. Prefer a real option when one is exposed
+      // (datalist or the combobox menu), and always blur to commit.
+      const dl = (i as HTMLInputElement).list;
+      if (dl && dl.options.length > 0) {
+        const pick = random ? dl.options[Math.floor(rnd() * dl.options.length)] : dl.options[0];
+        v = pick.value || pick.textContent || v;
+      } else if (i.classList.contains('combobox') || i.closest('.combobox-container')) {
+        const menuOpt = i.closest('.combobox-container, .da-field-container')
+          ?.querySelector('.dropdown-menu li a, .dropdown-menu .dropdown-item');
+        if (menuOpt?.textContent?.trim()) v = menuOpt.textContent.trim();
+      }
       i.value = v;
       i.dispatchEvent(new Event('input', { bubbles: true }));
       i.dispatchEvent(new Event('change', { bubbles: true }));
+      i.dispatchEvent(new Event('blur', { bubbles: true }));
       touched = true;
     });
 
@@ -187,6 +212,27 @@ export async function clickContinueStrict(p: Page) {
   // Plain click — no validator override. Real-user click path.
   await p.locator('#da-continue-button').click({ timeout: 5000 }).catch(() => {});
   await p.waitForLoadState('networkidle').catch(() => {});
+}
+
+/**
+ * Event-driven page-advance wait: returns as soon as the _tracker value or
+ * the h1 text differs from the supplied pre-click snapshot, or after
+ * timeoutMs (validation rejections legitimately leave both unchanged — the
+ * caller's same-heading logic handles that case). Replaces fixed sleeps;
+ * typical advance is detected in 100-300ms instead of a flat 800ms+.
+ */
+export async function waitForAdvance(
+  p: Page, trackerBefore: string | null, headingBefore: string, timeoutMs = 3000,
+): Promise<void> {
+  await p.waitForFunction(
+    ({ t0, h0 }) => {
+      const t = (document.querySelector('input[name="_tracker"]') as HTMLInputElement | null)?.value ?? null;
+      const h = document.querySelector('h1')?.textContent?.trim() ?? '';
+      return (t0 !== null && t !== null && t !== t0) || (h !== '' && h !== h0);
+    },
+    { t0: trackerBefore, h0: headingBefore },
+    { timeout: timeoutMs, polling: 100 },
+  ).catch(() => {});
 }
 
 export async function pageHasContinueButton(p: Page): Promise<boolean> {
