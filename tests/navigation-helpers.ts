@@ -2,7 +2,7 @@
  * Reusable navigation functions for the bankruptcy interview.
  * Extracted from comprehensive-e2e.spec.ts and extended for multi-item support.
  */
-import { Page } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 import {
   INTERVIEW_URL,
   b64,
@@ -223,8 +223,12 @@ async function fillVehicle(page: Page, v: VehicleData, index: number) {
     await vehWhoSelect.selectOption(ownerChoice);
   } else {
     // List-collect: 'who' is a radio rendered with encoded names — click the
-    // matching option by its label text.
-    const ownerLabel = page.locator('label').filter({ hasText: ownerChoice }).first();
+    // matching option by its label text. Filter to VISIBLE: after "Add
+    // another", a prior item's same-text label can linger hidden in the DOM,
+    // and .first() would grab it instead of the current item's (this exact
+    // bug left the 2nd vehicle's owner/exemption unset → guard never fired).
+    const ownerLabel = page.locator('label').filter({ hasText: ownerChoice })
+      .filter({ visible: true }).first();
     if (await ownerLabel.count() > 0) await ownerLabel.click();
   }
   await page.locator(`#${b64(`prop.ab_vehicles[${index}].current_value`)}`).fill(v.value);
@@ -246,10 +250,22 @@ async function fillVehicle(page: Page, v: VehicleData, index: number) {
   }
   if (v.claimMotorVehicle) {
     await fillYesNoRadio(page, `prop.ab_vehicles[${index}].is_claiming_exemption`, true);
-    await page.waitForTimeout(600);  // reveal show-if'd exemption fields
-    await fillById(page, b64(`prop.ab_vehicles[${index}].exemption_value`), v.value);
-    // exemption_laws is a show-if'd select with renamed _field_N id — drive by label.
-    const lawSel = page.getByLabel('Specific laws that allow exemption', { exact: true }).first();
+    // exemption_laws is a show-if'd select with a renamed _field_N id — drive
+    // it by label, and WAIT for it to be visible + populated instead of a
+    // fixed sleep (a fixed 600ms raced the show-if reveal under parallel
+    // server-lock contention, intermittently leaving MV unclaimed → flaky).
+    // Filter to VISIBLE before .first(): in list collect a prior item's
+    // identically-labelled (but hidden) exemption dropdown lingers in the DOM,
+    // and a plain .first() selects THAT — leaving this vehicle's exemption
+    // unset (the bug that made the per-debtor guard never see a 2nd MV claim).
+    const lawSel = page.getByLabel('Specific laws that allow exemption', { exact: true })
+      .filter({ visible: true }).first();
+    await lawSel.waitFor({ state: 'visible', timeout: 15000 });
+    await expect.poll(async () => await lawSel.locator('option').count(), { timeout: 15000 })
+      .toBeGreaterThan(1);
+    const valField = page.getByLabel('Value of exemption being claimed', { exact: true })
+      .filter({ visible: true }).first();
+    if (await valField.count() > 0) await valField.fill(v.value).catch(() => {});
     const mvOption = (await lawSel.locator('option').allTextContents())
       .find((o) => /motor vehicle/i.test(o));
     if (!mvOption) throw new Error('Motor Vehicle option not in exemption_laws dropdown');
@@ -288,14 +304,24 @@ export async function navigatePropertySection(page: Page, scenario: TestScenario
     await clickYesNoButton(page, 'prop.interests.there_are_any', false);
   }
 
-  // ── Vehicles ── prop.vehicles (array) drives the multi-vehicle list-collect
-  // flow; prop.vehicle (single) is the legacy one-car shorthand.
-  const vehicleList = prop.vehicles ?? (prop.vehicle ? [prop.vehicle] : []);
+  // ── Vehicles ── prop.vehicle (single) is the established one-car path;
+  // prop.vehicles (array) drives the multi-vehicle list-collect flow. Prefer
+  // the singular when present so fixtures that set BOTH (e.g. JOINT_COUPLE has
+  // a `vehicle` plus a legacy unused `vehicles`) keep their original 1-car
+  // behavior; only fall back to the array when there is no singular `vehicle`.
+  const vehicleList = prop.vehicle ? [prop.vehicle] : (prop.vehicles ?? []);
   await waitForDaPageLoad(page);
   if (vehicleList.length > 0) {
     await clickYesNoButton(page, 'prop.ab_vehicles.there_are_any', true);
     for (let vi = 0; vi < vehicleList.length; vi++) {
       await waitForDaPageLoad(page);
+      // CRITICAL for list collect: after "Add another" the new blank item form
+      // can lag under load. Filling before it loads writes this item's data
+      // into the PREVIOUS item's still-present fields (the show-if'd exemption
+      // fields are matched by label, so .first() grabs the stale form). Wait
+      // for THIS index's make field to be present before filling.
+      await page.locator(`#${b64(`prop.ab_vehicles[${vi}].make`)}`)
+        .waitFor({ state: 'visible', timeout: 15000 });
       await fillVehicle(page, vehicleList[vi], vi);
       const isLast = vi === vehicleList.length - 1;
       if (isLast) {
@@ -303,7 +329,6 @@ export async function navigatePropertySection(page: Page, scenario: TestScenario
         await waitForDaPageLoad(page);
         await handleAnotherPage(page, 'prop.ab_vehicles.there_is_another');
       } else {
-        // list-collect "Add another" — same idiom as the claims loop.
         await page.evaluate(() => {
           const btns = Array.from(document.querySelectorAll('button'))
             .filter((b) => b.textContent?.includes('Add another') && (b as HTMLElement).offsetParent !== null);
