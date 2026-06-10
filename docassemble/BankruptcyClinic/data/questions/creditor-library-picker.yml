@@ -63,16 +63,17 @@ code: |
         if _ctype in PRIORITY_CREDITOR_TYPES:
           # Priority claim (Schedule E) — e.g. tax debt (IRS / NE Dept of
           # Revenue), domestic support. Route here, not to nonpriority.
-          _idx = len(prop.priority_claims)
-          prop.priority_claims.appendObject()
-          _claim = prop.priority_claims[_idx]
+          # appendObject() returns the new item and does NOT trigger
+          # gathering. len() on the ungathered list DID — selecting a
+          # priority-type library creditor (IRS / NE DoR) fired the
+          # "any PRIORITY unsecured debts?" gate right here, BEFORE secured
+          # creditors (Roxanne, June 4), instead of in the 106EF section.
+          _claim = prop.priority_claims.appendObject()
           _claim.type = _ctype
           prop.priority_claims.there_are_any = True
         else:
           # Nonpriority claim (Schedule F)
-          _idx = len(prop.nonpriority_claims)
-          prop.nonpriority_claims.appendObject()
-          _claim = prop.nonpriority_claims[_idx]
+          _claim = prop.nonpriority_claims.appendObject()  # no len(): see above
           if _ctype in [
             'Student loans',
             'Medical',
