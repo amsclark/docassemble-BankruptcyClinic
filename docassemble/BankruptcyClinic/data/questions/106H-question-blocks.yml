@@ -40,7 +40,13 @@ code: |
       })
     _line_ef += 1
 
-  if _auto_codebtors and not debtors.codebtors.gathered:
+  # getattr, NOT a raw .gathered read: on an ungathered DAList the raw read
+  # SEEKS the gather (it's the sentinel attribute), which re-enters this very
+  # block mid-seek -> "Infinite loop: x.gathered" (orig =
+  # debtors.codebtors.gathered, found via LOOPDEBUG) for any filer with a
+  # co-signed debt. The has_codebtor=False short-circuit hid it from every
+  # happy-path test.
+  if _auto_codebtors and not getattr(debtors.codebtors, 'gathered', False):
     debtors.codebtors.clear()
     for _entry in _auto_codebtors:
       _item = debtors.codebtors.appendObject()
