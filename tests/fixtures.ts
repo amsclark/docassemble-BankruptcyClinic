@@ -70,6 +70,9 @@ export interface PropertyData {
   realProperty?: RealPropertyData;
   vehicle?: VehicleData;
   deposit?: DepositData;
+  /** Claim jewelry on Schedule A/B line 12 (verifies the 106AB jewelry
+   *  template-field-name fix populates the assembled PDF). */
+  jewelry?: { description: string; value: string };
 }
 
 export interface SecuredCreditorData {
