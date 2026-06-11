@@ -3751,9 +3751,9 @@ code: |
   #
 
   if prop.has_jewelry == True:
-    ab['hasjewelry'] = True
-    ab['jewelryDescription'] = prop.jewelry_description
-    ab['jewelryAmt'] = currency(prop.jewelry_value)
+    ab['hasJewlery'] = True
+    ab['jewleryDescription'] = prop.jewelry_description
+    ab['jewleryAmt'] = currency(prop.jewelry_value)
     #exemption logic
     if prop.jewelry_is_claiming_exemption == True:
       sc['desc'+str(sc_i)] = "jewelry: " + prop.jewelry_description
@@ -3775,7 +3775,7 @@ code: |
       sc_i += 1
     ol_i += 1
   else:
-    ab['nojewelry'] = True
+    ab['noJewlery'] = True
 
   #
   # Animals
@@ -4535,7 +4535,7 @@ code: |
       sc_i += 1
       ol_i += 1
   else:
-    ab['noInsurance'] = True
+    ab['noInsurace'] = True
 
   #
   # Owed death claims

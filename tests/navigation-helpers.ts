@@ -353,6 +353,23 @@ export async function navigatePropertySection(page: Page, scenario: TestScenario
   await waitForDaPageLoad(page);
   await handleCaseNumberIfPresent(page);
   await fillAllVisibleRadiosAsNo(page);
+  // Optionally claim JEWELRY (Schedule A/B line 12). Drives the path that was
+  // silently dropped before the template-field-name fix (hasJewlery /
+  // jewleryAmt / jewleryDescription misspellings) — fills it so a PDF
+  // assertion can prove those 106AB fields now populate.
+  if (prop.jewelry) {
+    await selectYesNoRadio(page, 'prop.has_jewelry', true);
+    await page.waitForTimeout(500);
+    // The household page has a Describe / Total-owned-value pair per category;
+    // non-jewelry ones are show-if'd hidden. `.first()` grabbed a hidden
+    // sibling and filled nothing visible — must filter to the revealed field.
+    const desc = page.getByLabel('Describe', { exact: true }).filter({ visible: true }).first();
+    if (await desc.count() > 0) await desc.fill(prop.jewelry.description).catch(() => {});
+    const val = page.getByLabel('Total owned value', { exact: true }).filter({ visible: true }).first();
+    if (await val.count() > 0) await val.fill(prop.jewelry.value).catch(() => {});
+    // leave is_claiming_exemption at its default No (we only verify the
+    // description/value/has-jewelry fields populate).
+  }
   await clickContinue(page);
 
   // ── Financial assets – cash ──

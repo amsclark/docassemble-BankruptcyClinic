@@ -137,18 +137,18 @@ code: |
   else:
     debtor2_name = ''
   pymts = {}
-  pymts['debtor1_name_1'] = debtor_name
+  pymts['Debtor 1'] = debtor_name
   pymts['debtor1_name_2'] = debtor_name
-  pymts['debtor2_name_1'] = debtor2_name
+  pymts['Debtor 2'] = debtor2_name
   pymts['debtor2_name_2'] = debtor2_name
-  pymts['bankruptcy_district'] = current_district
+  pymts['Bankruptcy District Information'] = current_district
   pymts['bankruptcy_district_1'] = current_district
-  pymts['case_number_1'] = case_number
+  pymts['Case number'] = case_number
   pymts['case_number_2'] = case_number
-  pymts['isAmended'] = amended_filing
+  pymts['Check if this is an amended filing'] = amended_filing
   
   pymts['chapter7'] = True
-  pymts['chapter7_1'] = True
+  pymts['chapter7'] = True
   
   pymts['amt1WithFiling'] = True if payment.payment_on_petition == True else False
   pymts['amt1Date'] = True if payment.payment_on_petition == False else False

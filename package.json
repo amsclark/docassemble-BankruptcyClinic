@@ -25,10 +25,11 @@
     "lint:flow": "./scripts/lint-flow-gaps.sh",
     "lint:test-complete": "./scripts/lint-test-completeness.sh",
     "lint:caps-sync": "python3 scripts/lint_caps_sync.py",
-    "lint": "npm run lint:selectors && npm run lint:yaml-ids && npm run lint:flow && npm run lint:test-complete && npm run lint:caps-sync",
+    "lint:pdf-fields": "./scripts/lint-pdf-fields.sh",
+    "lint": "npm run lint:selectors && npm run lint:yaml-ids && npm run lint:flow && npm run lint:test-complete && npm run lint:caps-sync && npm run lint:pdf-fields",
     "graph": "python3 scripts/interview_graph.py",
     "graph:map": "python3 scripts/interview_graph.py --map",
-    "pretest": "npm run lint:selectors && npm run lint:yaml-ids && npm run lint:flow && npm run lint:test-complete && npm run lint:caps-sync"
+    "pretest": "npm run lint:selectors && npm run lint:yaml-ids && npm run lint:flow && npm run lint:test-complete && npm run lint:caps-sync && npm run lint:pdf-fields"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",

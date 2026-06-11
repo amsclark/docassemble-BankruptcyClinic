@@ -2455,7 +2455,7 @@ code: |
   if financial_affairs.primarily_consumer_debts == True:
     fin['yesBothConsumerDebts'] = True
   else:
-    fin['noBothConsumerDebts'] = True
+    fin['noConsumerDebts'] = True
     fin['yesConsumerPayments'] = True
 
 
@@ -2694,19 +2694,19 @@ code: |
   if financial_affairs.has_deposit_box:
     fin['safe_bank_name1'] = financial_affairs.deposit_box.name
     fin['safe_bank_address1'] = financial_affairs.deposit_box.street
-    fin['safe_bank_city1'] = financial_affairs.deposit_box.city
-    fin['safe_bank_state1'] = financial_affairs.deposit_box.state
-    fin['safe_bank_zip1'] = financial_affairs.deposit_box.zip
+    fin['safe_bank_city'] = financial_affairs.deposit_box.city
+    fin['safe_bank_state'] = financial_affairs.deposit_box.state
+    fin['safe_bank_zip'] = financial_affairs.deposit_box.zip
     fin['safe_who_name1'] = financial_affairs.deposit_box.other_name
     fin['safe_who_address1'] = financial_affairs.deposit_box.other_street
-    fin['safe_who_city1'] = financial_affairs.deposit_box.other_city
-    fin['safe_who_state1'] = financial_affairs.deposit_box.other_state
-    fin['safe_who_zip1'] = financial_affairs.deposit_box.other_zip
+    fin['safe_who_city'] = financial_affairs.deposit_box.other_city
+    fin['safe_who_state'] = financial_affairs.deposit_box.other_state
+    fin['safe_who_zip'] = financial_affairs.deposit_box.other_zip
     fin['safe_describe1'] = financial_affairs.deposit_box.contents
     if financial_affairs.deposit_box.still_owns == True:
       fin['safe_yesHave1'] = True
     else:
-      fin['save_noHave1'] = True
+      fin['safe_noHave1'] = True
 
   fin['noStorage'] = True if financial_affairs.has_storage_unit == False else False
   fin['yesStorage'] = True if financial_affairs.has_storage_unit == True else False
@@ -2722,8 +2722,8 @@ code: |
     fin['storage_who_state1'] = financial_affairs.storage_unit.other_state
     fin['storage_who_zip1'] = financial_affairs.storage_unit.other_zip
     fin['storage_describe1'] = financial_affairs.storage_unit.contents
-    fin['storage_noHave1'] = True if financial_affairs.storage_unit.still_owns == False else False
-    fin['storage_yesHave1'] = True if financial_affairs.storage_unit.still_owns == True else False
+    fin['storage_noHave'] = True if financial_affairs.storage_unit.still_owns == False else False
+    fin['storage_yesHave'] = True if financial_affairs.storage_unit.still_owns == True else False
 
   fin['noControl'] = True if financial_affairs.has_held_property == False else False
   fin['yesControl'] = True if financial_affairs.has_held_property == True else False
@@ -2746,15 +2746,15 @@ code: |
     fin['liability_describe'] = financial_affairs.environment.liability_law
     fin['liability_date'] = format_date(financial_affairs.environment.liability_date, format='MM/dd/yyyy') if getattr(financial_affairs.environment, 'liability_date', None) else None
     fin['liability_site'] = financial_affairs.environment.liability_name
-    fin['liability_site_address'] = financial_affairs.environment.liability_street
+    fin['libility_site_address'] = financial_affairs.environment.liability_street
     fin['liability_site_city'] = financial_affairs.environment.liability_city
     fin['liability_site_state'] = financial_affairs.environment.liability_state
     fin['liability_site_zip'] = financial_affairs.environment.liability_zip
     fin['liability_unit'] = financial_affairs.environment.liability_unit_name
-    fin['liability_unit_address'] = financial_affairs.environment.liability_unit_street
-    fin['liability_unit_city'] = financial_affairs.environment.liability_unit_city
-    fin['liability_unit_state'] = financial_affairs.environment.liability_unit_state
-    fin['liability_unit_zip'] = financial_affairs.environment.liability_unit_zip
+    fin['liability_address'] = financial_affairs.environment.liability_unit_street
+    fin['liability_city'] = financial_affairs.environment.liability_unit_city
+    fin['liability_state'] = financial_affairs.environment.liability_unit_state
+    fin['liability_zip'] = financial_affairs.environment.liability_unit_zip
 
   fin['noHazard'] = True if financial_affairs.environment.has_release == False else False
   fin['yesHazard'] = True if financial_affairs.environment.has_release == True else False
