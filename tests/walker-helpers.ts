@@ -167,24 +167,41 @@ export async function fillVisibleRequiredFields(
 
     // 4) checkbox GROUPS (datatype: checkboxes) — untouched groups fail the
     //    "check at least one option, or check None of the above" validator
-    //    (e.g. 107 "Business Connections"). Only groups (>=2 visible boxes):
-    //    a lone checkbox is a yesno whose unchecked state is a valid False,
-    //    and flipping it would change the strict walker's deterministic path.
-    const cbs = (Array.from(document.querySelectorAll('input[type="checkbox"]')) as HTMLInputElement[])
+    //    (e.g. 107 "Business Connections", 106AB property `type`).
+    //
+    //    A page can host SEVERAL independent checkbox controls at once: a real
+    //    `datatype: checkboxes` group (members share a base id, suffixed
+    //    `_0`,`_1`,… per choice), the group's separate "None of the above"
+    //    ignore box, AND lone `datatype: yesno` fields (also rendered as a
+    //    single checkbox). The old code pooled every visible checkbox and
+    //    ticked exactly ONE — so a random pick landing on a yesno (or another
+    //    group's box) left a required group empty and Continue was rejected
+    //    (the 106AB "Tell the court about the property interest" silent block,
+    //    fuzz seed 189). Fix: group by field identity (id minus the trailing
+    //    `_<choice-index>`) and satisfy EACH multi-member group independently;
+    //    leave lone checkboxes (yesno) alone — their unchecked False is valid.
+    const visibleCbs = (Array.from(document.querySelectorAll('input[type="checkbox"]')) as HTMLInputElement[])
       .filter((cb) => {
         if (!cb.id) return false;
         const lab = document.querySelector(`label[for="${CSS.escape(cb.id)}"]`) as HTMLElement | null;
         return !!lab && lab.offsetParent !== null;
       });
-    if (cbs.length >= 2 && !cbs.some((c) => c.checked)) {
+    const groups = new Map<string, HTMLInputElement[]>();
+    for (const cb of visibleCbs) {
+      const base = cb.id.replace(/_\d+$/, '');   // choice index -> group base
+      (groups.get(base) || groups.set(base, []).get(base)!).push(cb);
+    }
+    for (const members of groups.values()) {
+      // Only real choice groups (>=2 members); skip lone yesno checkboxes.
+      if (members.length < 2 || members.some((c) => c.checked)) continue;
       const labelOf = (c: HTMLInputElement) =>
         (document.querySelector(`label[for="${CSS.escape(c.id)}"]`)?.textContent || '');
-      const nota = cbs.find((c) => /none of the above/i.test(labelOf(c)));
+      const nota = members.find((c) => /none of the above/i.test(labelOf(c)));
       let target: HTMLInputElement;
       if (random) {
-        target = rnd() < (yesBias ?? 0.3) || !nota ? cbs[Math.floor(rnd() * cbs.length)] : nota;
+        target = rnd() < (yesBias ?? 0.3) || !nota ? members[Math.floor(rnd() * members.length)] : nota;
       } else {
-        target = nota || cbs[0];
+        target = nota || members[0];
       }
       (document.querySelector(`label[for="${CSS.escape(target.id)}"]`) as HTMLElement).click();
       touched = true;
