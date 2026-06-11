@@ -91,26 +91,33 @@ def find_attachments():
 
 
 class KeyCollector(ast.NodeVisitor):
-    """Collect static string-literal keys assigned to a target dict var, and
-    count dynamic (non-literal) subscript assignments to it."""
+    """Collect static string-literal keys assigned to a target dict var, the
+    static PREFIXES of dynamic keys (d['desc'+str(i)] -> prefix 'desc'), and a
+    count of fully-dynamic assignments."""
     def __init__(self, dictvar):
         self.dictvar = dictvar
         self.literal_keys = set()
+        self.prefixes = set()
         self.dynamic = 0
 
     def _is_target(self, node):
         return isinstance(node, ast.Name) and node.id == self.dictvar
 
+    def _record_key(self, sl):
+        if isinstance(sl, ast.Constant) and isinstance(sl.value, str):
+            self.literal_keys.add(sl.value)
+        elif isinstance(sl, ast.BinOp) and isinstance(sl.op, ast.Add) \
+                and isinstance(sl.left, ast.Constant) and isinstance(sl.left.value, str):
+            # 'prefix' + str(i) — covers prefix0, prefix1, ...
+            self.prefixes.add(sl.left.value)
+            self.dynamic += 1
+        else:
+            self.dynamic += 1
+
     def visit_Assign(self, node):
         for tgt in node.targets:
-            # d['key'] = ...
             if isinstance(tgt, ast.Subscript) and self._is_target(tgt.value):
-                sl = tgt.slice
-                if isinstance(sl, ast.Constant) and isinstance(sl.value, str):
-                    self.literal_keys.add(sl.value)
-                else:
-                    self.dynamic += 1
-            # d = {'k': ...}
+                self._record_key(tgt.slice)
             if self._is_target(tgt) and isinstance(node.value, ast.Dict):
                 for k in node.value.keys:
                     if isinstance(k, ast.Constant) and isinstance(k.value, str):
@@ -121,7 +128,7 @@ class KeyCollector(ast.NodeVisitor):
 
 
 def collect_keys(dictvar):
-    lits, dyn = set(), 0
+    lits, prefixes, dyn = set(), set(), 0
     for f in sorted(QDIR.glob("*.yml")):
         for doc in split_blocks(f.read_text()):
             code = get_code(doc)
@@ -134,8 +141,9 @@ def collect_keys(dictvar):
             kc = KeyCollector(dictvar)
             kc.visit(tree)
             lits |= kc.literal_keys
+            prefixes |= kc.prefixes
             dyn += kc.dynamic
-    return lits, dyn
+    return lits, prefixes, dyn
 
 
 _PDF_FIELD_JS = r"""
@@ -190,7 +198,7 @@ def main(argv):
             ok_templates.append(tpl)
         if not ok_templates:
             continue
-        lits, dyn = collect_keys(dictvar)
+        lits, prefixes, dyn = collect_keys(dictvar)
         nonexistent = sorted(k for k in lits if k not in union)
         forms = ",".join(sorted(e["forms"]))
         tpls = ",".join(ok_templates)
@@ -211,8 +219,14 @@ def main(argv):
             findings.append(f"{forms}\t{tpls}\tWROTE_NONEXISTENT\t{dictvar}['{k}']{hint}")
             stable.append(f"{forms}\tWROTE_NONEXISTENT\t{dictvar}['{k}']")
         if show_unfilled:
-            for fld in sorted(f for f in union if f not in lits):
-                findings.append(f"{forms}\t{tpls}\tUNFILLED?\t{fld}  (dynamic writes not modeled: {dyn})")
+            def _covered(fld):
+                if fld in lits:
+                    return True
+                # covered by a dynamic 'prefix'+str(i) write?
+                return any(fld.startswith(p) and fld[len(p):].lstrip("_").isdigit()
+                           for p in prefixes) or any(fld.startswith(p) for p in prefixes)
+            for fld in sorted(f for f in union if not _covered(f)):
+                findings.append(f"{forms}\t{tpls}\tUNFILLED\t{fld}")
     if findings_only:
         print("\n".join(sorted(stable)))
         return 0
