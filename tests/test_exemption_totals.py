@@ -236,6 +236,82 @@ def test_mv_shared_owner_not_counted_for_one_per_debtor():
     assert get_motor_vehicle_violations(p, 'Nebraska', 2) == []
 
 
+# ── Property-based tests: generate many random property/vehicle combos and
+#    assert invariants hold. Finds edge cases the example tests miss. Uses a
+#    small seeded LCG (no external deps) so failures are reproducible. ──
+
+class _Rng:
+    def __init__(self, seed): self.s = seed & 0xFFFFFFFF
+    def next(self):
+        self.s = (1103515245 * self.s + 12345) & 0x7FFFFFFF
+        return self.s
+    def pick(self, seq): return seq[self.next() % len(seq)]
+    def amt(self): return self.pick([0, 1000, 3000, 5970, 6000, 9000, 11940, 12000, 20000])
+
+
+_OWNERS = ['Debtor 1 only', 'Debtor 2 only', 'Debtor 1 and Debtor 2 only',
+           'At least one of the debtors and another']
+
+
+def _rand_vehicle(rng):
+    claims = rng.next() % 3 != 0   # ~2/3 claim MV
+    return _vehicle(rng.pick(_OWNERS), rng.amt(),
+                    claims_mv=claims, exemption_value=(rng.amt() if rng.next() % 2 else 0))
+
+
+def test_mv_property_invariants():
+    """1000 random vehicle sets: the function never crashes, always returns a
+    list[str], a set with NO motor-vehicle claims yields [], and adding a
+    non-MV vehicle never adds a violation."""
+    rng = _Rng(20260611)
+    cap = NEBRASKA_EXEMPTIONS_LIMIT_MV = get_exemption_limits('Nebraska')['motor_vehicle']
+    for i in range(1000):
+        n = 1 + (rng.next() % 2)
+        vehicles = [_rand_vehicle(rng) for _ in range(rng.next() % 5)]
+        p = _vprop(*vehicles)
+        out = get_motor_vehicle_violations(p, 'Nebraska', n)
+        assert isinstance(out, list) and all(isinstance(s, str) for s in out), (i, out)
+        # no MV claim anywhere -> no violation
+        if not any('motor vehicle' in str(getattr(v, 'exemption_laws', '')).lower()
+                   or 'motor vehicle' in str(getattr(v, 'exemption_laws_2', '')).lower()
+                   for v in vehicles):
+            assert out == [], (i, 'unexpected violation with no MV claim', out)
+        # adding a vehicle that does NOT claim MV must not introduce a violation
+        extra = _vehicle('Debtor 1 only', 9000, claims_mv=False)
+        out2 = get_motor_vehicle_violations(_vprop(*vehicles, extra), 'Nebraska', n)
+        assert len(out2) <= max(len(out), 0) + 0 or len(out2) == len(out), \
+            (i, 'non-MV vehicle changed violations', out, out2)
+
+
+def test_mv_property_sole_single_car_under_cap_never_blocks():
+    """For any single sole-owned car claiming MV at <= the per-vehicle cap,
+    there is never a violation (across many random amounts at/under cap)."""
+    rng = _Rng(7)
+    cap = get_exemption_limits('Nebraska')['motor_vehicle']
+    for _ in range(200):
+        amt = rng.next() % (cap + 1)   # 0..cap
+        for owner in ('Debtor 1 only', 'Debtor 2 only'):
+            p = _vprop(_vehicle(owner, amt, claims_mv=True, exemption_value=amt))
+            assert get_motor_vehicle_violations(p, 'Nebraska', 2) == [], (owner, amt)
+
+
+def test_totals_property_never_negative_and_limit_scales():
+    """compute_exemption_totals: claimed >= 0, and a finite cap scales exactly
+    by num_debtors."""
+    base = get_exemption_limits('Nebraska')['motor_vehicle']
+    for n in (1, 2):
+        item = types.SimpleNamespace(
+            is_claiming_exemption=True, claiming_sub_100=True, current_owned_value=3000,
+            exemption_laws=VEHICLE, exemption_value=3000, exemption_laws_2='', exemption_value_2=0)
+        res = compute_exemption_totals(_vprop_interests(item), 'Nebraska', n)
+        assert res[VEHICLE]['claimed'] >= 0
+        assert res[VEHICLE]['limit'] == base * n, (n, res[VEHICLE]['limit'])
+
+
+def _vprop_interests(*interests):
+    return types.SimpleNamespace(interests=list(interests), ab_vehicles=[], ab_other_vehicles=[])
+
+
 if __name__ == '__main__':
     test_full_claim_counts_owned_value()
     test_partial_claim_uses_explicit_value()
@@ -258,4 +334,7 @@ if __name__ == '__main__':
     test_mv_sole_car_capped_at_one_slot_even_joint_case()
     test_mv_joint_car_plus_sole_car_splits_slot_blocked()
     test_mv_joint_car_single_filer_capped_at_one_slot()
-    print('OK: all exemption-totals unit tests passed')
+    test_mv_property_invariants()
+    test_mv_property_sole_single_car_under_cap_never_blocks()
+    test_totals_property_never_negative_and_limit_scales()
+    print('OK: all exemption-totals unit tests passed (incl. property-based)')
