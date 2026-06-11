@@ -25,9 +25,9 @@
  * on repeats, so "add another?" list gates always exit; maxSteps backstops.
  */
 import { test, expect } from '@playwright/test';
-import { SIMPLE_SINGLE } from './fixtures';
+import { SIMPLE_SINGLE, JOINT_COUPLE, TestScenario } from './fixtures';
 import { clickContinue } from './helpers';
-import { navigateToDebtorPage, fillDebtorAndAdvance } from './navigation-helpers';
+import { navigateToDebtorPage, fillDebtorAndAdvance, passDebtorFinal } from './navigation-helpers';
 import { finishAndAssertAllPdfs } from './assert-helpers';
 import {
   getHeading, fillVisibleRequiredFields, clickContinueStrict,
@@ -38,18 +38,55 @@ import {
 const SEEDS = (process.env.FUZZ_SEEDS || '20260609,71077345')
   .split(',').map(s => parseInt(s.trim(), 10)).filter(n => Number.isFinite(n));
 
+// Four structural prologues so each seed explores a fundamentally different
+// interview SHAPE — not just a different path from one single-NE start. The
+// debtor identity (SSN/county/state coupling) can't be synthesized randomly,
+// so we drive it deterministically per structure, then walk randomly from the
+// debtor summary onward. Several recent bugs hid in specific shapes (the
+// gross_wages2 single-consumer crash, the joint-filer 122A income, the
+// co-signer loop), so shape coverage matters as much as path coverage.
+const NE_DEBTOR = SIMPLE_SINGLE.debtor;
+const SD_DEBTOR = JOINT_COUPLE.debtor;
+const SD_SPOUSE = JOINT_COUPLE.spouse!;
+// NE spouse: reuse NE debtor location with a distinct identity.
+const NE_SPOUSE = {
+  ...SIMPLE_SINGLE.debtor, first: 'Jordan', middle: 'R', last: 'Garcia',
+  taxId: '222-33-5555',
+};
+
+const STRUCTURES: { label: string; scenario: TestScenario; joint: boolean }[] = [
+  { label: 'single-NE', joint: false,
+    scenario: { ...SIMPLE_SINGLE, name: 'fuzz-single-ne' } },
+  { label: 'single-SD', joint: false,
+    scenario: { ...SIMPLE_SINGLE, name: 'fuzz-single-sd',
+      district: 'District of South Dakota', debtor: SD_DEBTOR, jointFiling: false } },
+  { label: 'joint-NE', joint: true,
+    scenario: { ...JOINT_COUPLE, name: 'fuzz-joint-ne',
+      district: 'District of Nebraska', debtor: NE_DEBTOR, spouse: NE_SPOUSE, jointFiling: true } },
+  { label: 'joint-SD', joint: true,
+    scenario: { ...JOINT_COUPLE, name: 'fuzz-joint-sd' } },
+];
+
 test.describe('Seeded-random fuzz walker', () => {
   test.setTimeout(1_200_000);
 
   for (const seed of SEEDS) {
     test(`seed ${seed}: random path reaches conclusion + PDFs, no silent blocks`, async ({ page }) => {
       const rng = mulberry32(seed);
-      const tag = `[fuzz ${seed}]`;
+      // Pick the structural shape from the seed (deterministic, replayable).
+      const struct = STRUCTURES[seed % STRUCTURES.length];
+      const tag = `[fuzz ${seed} ${struct.label}]`;
+      console.log(`${tag} structure: ${struct.label} (joint=${struct.joint})`);
 
-      // Prologue — district/debtor entry has SSN/county/state coupling the
-      // generic filler can't synthesize. Same fixed entry as the strict walker.
-      await navigateToDebtorPage(page, SIMPLE_SINGLE);
-      await fillDebtorAndAdvance(page, SIMPLE_SINGLE.debtor);
+      // Prologue — deterministic debtor entry for the chosen structure (the
+      // SSN/county/state coupling can't be randomized). The random walk starts
+      // at the debtor summary.
+      await navigateToDebtorPage(page, struct.scenario);
+      await fillDebtorAndAdvance(page, struct.scenario.debtor);
+      if (struct.joint && struct.scenario.spouse) {
+        await fillDebtorAndAdvance(page, struct.scenario.spouse);
+      }
+      await passDebtorFinal(page);
 
       const silentlyBlocked: string[] = [];
       const trail: string[] = [];
