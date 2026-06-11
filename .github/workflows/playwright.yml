@@ -21,6 +21,7 @@ jobs:
         ./scripts/lint-flow-gaps.sh
         ./scripts/lint-test-completeness.sh
         python3 scripts/lint_caps_sync.py
+        ./scripts/lint-pdf-fields.sh   # builder keys must exist in the PDF templates (needs pdf-lib from npm ci)
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests

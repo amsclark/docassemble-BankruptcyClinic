@@ -34,9 +34,9 @@ code: |
   declaration_fields['Executed on'] = format_date(today(), format='MM/dd/yyyy')
 
   # Signature fields (debtor typed names as signature placeholders)
-  declaration_fields['signature'] = '/s/ ' + _d1_name
-  declaration_fields['Debtor1'] = '/s/ ' + _d1_name
-  declaration_fields['Debtor2'] = '/s/ ' + _d2_name if _d2_name else ''
+  declaration_fields['Debtor1.signature'] = '/s/ ' + _d1_name
+  declaration_fields['Debtor 1'] = '/s/ ' + _d1_name
+  declaration_fields['Debtor 2'] = '/s/ ' + _d2_name if _d2_name else ''
 
   # Name of person paid to help (bankruptcy petition preparer, if any)
-  declaration_fields['Name of person payed to help'] = ''
+  declaration_fields['Name of person payed to help file'] = ''

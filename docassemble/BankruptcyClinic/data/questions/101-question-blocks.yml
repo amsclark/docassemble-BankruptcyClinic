@@ -1147,9 +1147,9 @@ code: |
   main["creditors_25000_50000"] = True if 25000 <= reporting.creditor_estimate <= 50000 else False
   main["creditors_50_99"] = True if 50 <= reporting.creditor_estimate <= 99 else False
   main["creditors_5001_10000"] = True if 5001 <= reporting.creditor_estimate <= 10000 else False
-  main["creditor_50000_100000"] = True if 50000 <= reporting.creditor_estimate <= 100000 else False
-  main["creditor_100_199"] = True if 100 <= reporting.creditor_estimate <= 199 else False
-  main["creditor_10000_25000"] = True if 10000 <= reporting.creditor_estimate <= 25000 else False
+  main["creditors_50000_100000"] = True if 50000 <= reporting.creditor_estimate <= 100000 else False
+  main["creditors_100_199"] = True if 100 <= reporting.creditor_estimate <= 199 else False
+  main["creditors_10000_25000"] = True if 10000 <= reporting.creditor_estimate <= 25000 else False
   main["creditors_more"] = True if reporting.creditor_estimate > 100000 else False
   main["creditors_200_999"] = True if 200 <= reporting.creditor_estimate <= 999 else False
 
