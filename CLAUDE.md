@@ -129,6 +129,29 @@ crashes live). When testing a fix, drive the *actual failing branch*. Deploy
 locally with `./deploy.sh` (installs into the `docassemble` Docker container);
 read real tracebacks from `docker exec docassemble tail /usr/share/docassemble/log/docassemble.log`.
 
+### Parallel runs: one container per worker
+
+A docassemble container is the **unit of concurrency**, not the host. Pointing
+several Playwright workers at ONE container overloads its single-process server
+(`processes = 1` in `docassemble.ini`) and its DB connections — manifesting as
+slow page renders (30s `locator.click` timeouts) or `psycopg2 SSL error:
+decryption failed` error pages. This is the *only* source of parallel-run
+flakiness; the product is unaffected (serial runs are 100% clean). **Bumping
+the container's `processes` does NOT fix it — it makes the DB errors worse.**
+
+The fix is **container-per-worker**: each worker gets its own container.
+- `./scripts/test-container-pool.sh up` clones the working `datest` container
+  (NOT a fresh `jhpyle/docassemble` pull — newer image, deploy.sh can't drive
+  it) into `datest2`/`datest3` (:8910/:8920) and deploys the package to each.
+- `npm run test:pool` runs the suite `--workers=4` with
+  `DA_CONTAINERS=<4 urls>`; `tests/helpers.ts` picks a base URL per worker by
+  `TEST_PARALLEL_INDEX`. Proven: specs that were flaky at workers=3-on-1 pass
+  clean first-try at workers=4-across-4.
+- `./scripts/test-container-pool.sh down` removes the clones.
+- After a code change, redeploy the **whole pool** (`./deploy.sh`,
+  `DA_CONTAINER=datest/datest2/datest3 ./deploy.sh`) or `… pool deploy`.
+Without `DA_CONTAINERS`, everything falls back to single-`BASE_URL` behavior.
+
 **Every scenario/regression test must run ALL THE WAY THROUGH to PDF assembly.**
 A passing mid-interview screen proves a screen, not the deliverable; crashes
 like the 106AB grand-total sum surface only at assembly, and a mid-interview fix

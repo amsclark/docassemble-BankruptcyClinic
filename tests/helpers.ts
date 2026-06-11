@@ -1,7 +1,20 @@
 import { Page } from '@playwright/test';
 
-/** Base URL for the docassemble interview */
-const BASE_URL = process.env.BASE_URL || 'http://localhost:8080';
+/** Base URL for the docassemble interview.
+ *
+ * A docassemble container is the unit of concurrency — pointing several
+ * Playwright workers at ONE container overloads its single-process server and
+ * its DB connections (slow renders / "SSL decryption failed" errors), which is
+ * the sole source of parallel-run flakiness (the product is unaffected; serial
+ * runs are 100% clean). The robust fix is container-per-worker: set
+ * DA_CONTAINERS to a comma-separated pool of base URLs and each worker picks
+ * one by its TEST_PARALLEL_INDEX, so no two workers share a container.
+ * Falls back to the single BASE_URL when DA_CONTAINERS is unset. */
+const _POOL = (process.env.DA_CONTAINERS || '').split(',').map(s => s.trim()).filter(Boolean);
+const _WORKER = parseInt(process.env.TEST_PARALLEL_INDEX || '0', 10) || 0;
+const BASE_URL = _POOL.length > 0
+  ? _POOL[_WORKER % _POOL.length]
+  : (process.env.BASE_URL || 'http://localhost:8080');
 const INTERVIEW_PACKAGE = process.env.INTERVIEW_PACKAGE || 'docassemble.BankruptcyClinic:data/questions/voluntary-petition.yml';
 export const INTERVIEW_URL =
   `${BASE_URL}/interview?i=${INTERVIEW_PACKAGE}#page1`;
