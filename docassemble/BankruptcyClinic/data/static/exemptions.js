@@ -120,10 +120,23 @@ function getAllExemptionLaws(userState) {
   return allLaws;
 }
 
+// Helper to get exemption law names for annuities — NE § 44-371 (shared
+// life-insurance/annuity cap) plus retirement for qualified retirement
+// annuities. Mirror of CATEGORY_KEYS['annuity'] in objects.py.
+function getAnnuityExemptionLaws(userState) {
+  const exemptions = getCurrentExemptions(userState);
+  const laws = [];
+  if (exemptions.life_insurance) laws.push(exemptions.life_insurance.law);
+  if (exemptions.retirement) laws.push(exemptions.retirement.law);
+  laws.push(exemptions.wildcard.law);
+  laws.push(exemptions.unknown.law);
+  return laws;
+}
+
 // Global function that can be called from Docassemble to populate dropdown choices
 window.getExemptionChoicesForState = function(userState, propertyType) {
   propertyType = propertyType || 'all';
-  
+
   switch(propertyType.toLowerCase()) {
     case 'real_property':
     case 'homestead':
@@ -131,6 +144,8 @@ window.getExemptionChoicesForState = function(userState, propertyType) {
     case 'vehicle':
     case 'motor_vehicle':
       return getVehicleExemptionLaws(userState);
+    case 'annuity':
+      return getAnnuityExemptionLaws(userState);
     case 'all':
     default:
       return getAllExemptionLaws(userState);
@@ -168,6 +183,7 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
       const key = String(exemption_laws || '').toLowerCase();
       if (key.includes('.ab_vehicles')) return 'vehicle';
       if (key.includes('.interests[')) return 'real_property';
+      if (key.includes('.annuities[')) return 'annuity';
       return 'all';
     }
 
