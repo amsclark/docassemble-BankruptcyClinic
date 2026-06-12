@@ -34,6 +34,8 @@ fields:
       is: Employed
     required: False
   - State: debtor[0].income.employer_state
+    input type: dropdown
+    code: get_all_us_states()
     show if:
       variable: debtor[0].income.employment
       is: Employed
@@ -314,6 +316,8 @@ fields:
       is: Employed
     required: False
   - State: debtor[1].income.employer_state
+    input type: dropdown
+    code: get_all_us_states()
     show if:
       variable: debtor[1].income.employment
       is: Employed

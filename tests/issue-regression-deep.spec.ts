@@ -248,7 +248,7 @@ test.describe('Property + vehicles (Schedule A/B)', () => {
     await fillById(page, b64('prop.ab_vehicles[0].milage'), '80000');
     await clickById(page, `${b64('prop.ab_vehicles[0].who')}_0`);
     await fillById(page, b64('prop.ab_vehicles[0].current_value'), '8000');
-    await fillById(page, b64('prop.ab_vehicles[0].state'), 'NE');
+    await page.locator(`#${b64('prop.ab_vehicles[0].state')}`).selectOption({ label: 'Nebraska' });
     // has_loan is `datatype: yesno` in a multi-field form, which docassemble
     // renders as a single checkbox; default-unchecked = "No" which is what we
     // want, so no action needed.
@@ -278,7 +278,7 @@ test.describe('Property + vehicles (Schedule A/B)', () => {
     await fillById(page, b64('prop.ab_vehicles[1].milage'), '40000');
     await clickById(page, `${b64('prop.ab_vehicles[1].who')}_0`);
     await fillById(page, b64('prop.ab_vehicles[1].current_value'), '12000');
-    await fillById(page, b64('prop.ab_vehicles[1].state'), 'NE');
+    await page.locator(`#${b64('prop.ab_vehicles[1].state')}`).selectOption({ label: 'Nebraska' });
     // has_loan default-unchecked = No, no action needed.
     await fillYesNoRadio(page, 'prop.ab_vehicles[1].is_community_property', false);
     await page.waitForTimeout(400);
@@ -675,7 +675,7 @@ test.describe('Retry — Motor Vehicle exemption multi-claim (#53)', () => {
       set(b64make.year, '2018');
       set(b64make.mileage, '80000');
       set(b64make.value, '8000');
-      set(b64make.state, 'NE');
+      set(b64make.state, 'Nebraska');  // state is a dropdown of full names now
       // Click the "Debtor 1 only" radio for who
       const whoLabel = document.querySelector(`label[for="${b64make.who}_0"]`) as HTMLElement;
       if (whoLabel) whoLabel.click();

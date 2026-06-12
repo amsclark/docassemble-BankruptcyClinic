@@ -237,7 +237,9 @@ async function fillRealProperty(page: Page, rp: any, index: number) {
     await stateLoc.fill(rp.stateAbbr);
   }
   await page.locator(`#${b64(`prop.interests[${index}].zip`)}`).fill(rp.zip);
-  await page.locator(`#${b64(`prop.interests[${index}].county`)}`).fill(rp.county);
+  // Real-property county is a NE+SD dropdown now (William/ERLS, June 2026);
+  // the option labels carry a " County" suffix.
+  await page.locator(`#${b64(`prop.interests[${index}].county`)}`).selectOption({ label: rp.county.endsWith(' County') ? rp.county : rp.county + ' County' });
   await page.locator(`label[for="${b64(`prop.interests[${index}].type`)}_${rp.typeIndex}"]`).click();
   // 'who' field
   const propWhoSelect = page.locator(`select#${b64(`prop.interests[${index}].who`)}`);
@@ -267,7 +269,7 @@ async function fillVehicle(page: Page, v: any, index: number) {
     if (await debtorOnlyLabel.count() > 0) await debtorOnlyLabel.click();
   }
   await page.locator(`#${b64(`prop.ab_vehicles[${index}].current_value`)}`).fill(v.value);
-  await page.locator(`#${b64(`prop.ab_vehicles[${index}].state`)}`).fill(v.state);
+  await page.locator(`#${b64(`prop.ab_vehicles[${index}].state`)}`).selectOption({ label: v.state });
 
   if (v.hasLoan) {
     await setCheckbox(page, `prop.ab_vehicles[${index}].has_loan`, true);
@@ -449,7 +451,7 @@ async function fillIncomeForDebtor(page: Page, debtorIdx: number, data: {
         await page.getByLabel('Employer Name').fill(data.employer);
         await page.getByLabel('Address/PO Box').first().fill(data.employer_street);
         await page.getByLabel('City').first().fill(data.employer_city);
-        await page.getByLabel('State').first().fill(data.employer_state);
+        await page.getByLabel('State').first().selectOption({ label: data.employer_state });
         await page.getByLabel('Zip').first().fill(data.employer_zip);
         await page.getByLabel('How long employed there?').fill(data.employment_length);
       }

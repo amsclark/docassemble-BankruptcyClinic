@@ -144,6 +144,8 @@ fields:
     show if: financial_affairs.has_second_address
     required: False
   - State: financial_affairs.address_state_2
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.has_second_address
     required: False
   - Zip: financial_affairs.address_zip_2
@@ -195,6 +197,8 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - State: financial_affairs.debtor2_address_state_2
+    input type: dropdown
+    code: get_all_us_states()
     js show if:
       val("financial_affairs.has_second_address") === true && val("financial_affairs.address_same_2") === false
     hide if:
@@ -249,6 +253,8 @@ fields:
     show if: financial_affairs.has_third_address
     required: False
   - State: financial_affairs.address_state_3
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.has_third_address
     required: False
   - Zip: financial_affairs.address_zip_3
@@ -300,6 +306,8 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - State: financial_affairs.debtor2_address_state_3
+    input type: dropdown
+    code: get_all_us_states()
     js show if:
       val("financial_affairs.has_third_address") === true && val("financial_affairs.address_same_3") === false
     hide if:
@@ -354,6 +362,8 @@ fields:
     show if: financial_affairs.has_fourth_address
     required: False
   - State: financial_affairs.address_state_4
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.has_fourth_address
     required: False
   - Zip: financial_affairs.address_zip_4
@@ -405,6 +415,8 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - State: financial_affairs.debtor2_address_state_4
+    input type: dropdown
+    code: get_all_us_states()
     js show if:
       val("financial_affairs.has_fourth_address") === true && val("financial_affairs.address_same_4") === false
     hide if:
@@ -459,6 +471,8 @@ fields:
     show if: financial_affairs.has_fifth_address
     required: False
   - State: financial_affairs.address_state_5
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.has_fifth_address
     required: False
   - Zip: financial_affairs.address_zip_5
@@ -510,6 +524,8 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - State: financial_affairs.debtor2_address_state_5
+    input type: dropdown
+    code: get_all_us_states()
     js show if:
       val("financial_affairs.has_fifth_address") === true && val("financial_affairs.address_same_5") === false
     hide if:
@@ -564,6 +580,8 @@ fields:
     show if: financial_affairs.has_sixth_address
     required: False
   - State: financial_affairs.address_state_6
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.has_sixth_address
     required: False
   - Zip: financial_affairs.address_zip_6
@@ -615,6 +633,8 @@ fields:
         financial_affairs.debtor_count < 2
     required: False
   - State: financial_affairs.debtor2_address_state_6
+    input type: dropdown
+    code: get_all_us_states()
     js show if:
       val("financial_affairs.has_sixth_address") === true && val("financial_affairs.address_same_6") === false
     hide if:
@@ -664,6 +684,8 @@ fields:
     show if: financial_affairs.has_more_addresses
     required: False
   - State: financial_affairs.address_state_7
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.has_more_addresses
     required: False
   - Zip: financial_affairs.address_zip_7
@@ -689,6 +711,8 @@ fields:
     show if: financial_affairs.has_more_addresses
     required: False
   - State: financial_affairs.address_state_8
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.has_more_addresses
     required: False
   - Zip: financial_affairs.address_zip_8
@@ -714,6 +738,8 @@ fields:
     show if: financial_affairs.has_more_addresses
     required: False
   - State: financial_affairs.address_state_9
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.has_more_addresses
     required: False
   - Zip: financial_affairs.address_zip_9
@@ -739,6 +765,8 @@ fields:
     show if: financial_affairs.has_more_addresses
     required: False
   - State: financial_affairs.address_state_10
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.has_more_addresses
     required: False
   - Zip: financial_affairs.address_zip_10
@@ -1075,6 +1103,8 @@ fields:
   - Address/PO Box: financial_affairs.consumer_debt_payments[i].creditor_street
   - City: financial_affairs.consumer_debt_payments[i].creditor_city
   - State: financial_affairs.consumer_debt_payments[i].creditor_state
+    input type: dropdown
+    code: get_all_us_states()
   - Zip: financial_affairs.consumer_debt_payments[i].creditor_zip
     datatype: text
     minlength: 5
@@ -1144,6 +1174,8 @@ fields:
   - Address/PO Box: financial_affairs.insider_payments[i].street
   - City: financial_affairs.insider_payments[i].city
   - State: financial_affairs.insider_payments[i].state
+    input type: dropdown
+    code: get_all_us_states()
   - Zip: financial_affairs.insider_payments[i].zip
     datatype: text
     minlength: 5
@@ -1198,6 +1230,8 @@ fields:
   - Address/PO Box: financial_affairs.insider_benefits[i].street
   - City: financial_affairs.insider_benefits[i].city
   - State: financial_affairs.insider_benefits[i].state
+    input type: dropdown
+    code: get_all_us_states()
   - Zip: financial_affairs.insider_benefits[i].zip
     datatype: text
     minlength: 5
@@ -1370,6 +1404,8 @@ fields:
     show if: financial_affairs.has_refusal
     required: False
   - State: financial_affairs.refusal_creditor_state
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.has_refusal
     required: False
   - Zip: financial_affairs.refusal_creditor_zip
@@ -1434,6 +1470,8 @@ fields:
   - Address/PO Box: financial_affairs.gifts[i].street
   - City: financial_affairs.gifts[i].city
   - State: financial_affairs.gifts[i].state
+    input type: dropdown
+    code: get_all_us_states()
   - Zip: financial_affairs.gifts[i].zip
     datatype: text
     minlength: 5
@@ -1470,6 +1508,8 @@ fields:
     show if: financial_affairs.has_charity
     required: False
   - State: financial_affairs.charity_state
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.has_charity
     required: False
   - Zip: financial_affairs.charity_zip
@@ -1557,6 +1597,8 @@ fields:
   - Address/PO Box: financial_affairs.bankruptcy_payments[i].street
   - City: financial_affairs.bankruptcy_payments[i].city
   - State: financial_affairs.bankruptcy_payments[i].state
+    input type: dropdown
+    code: get_all_us_states()
   - Zip: financial_affairs.bankruptcy_payments[i].zip
     datatype: text
     minlength: 5
@@ -1599,6 +1641,8 @@ fields:
     show if: financial_affairs.has_creditor_help
     required: False
   - State: financial_affairs.creditor_help.state
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.has_creditor_help
     required: False
   - Zip: financial_affairs.creditor_help.zip
@@ -1666,6 +1710,8 @@ fields:
   - Address/PO Box: financial_affairs.other_transfers[i].street
   - City: financial_affairs.other_transfers[i].city
   - State: financial_affairs.other_transfers[i].state
+    input type: dropdown
+    code: get_all_us_states()
   - Zip: financial_affairs.other_transfers[i].zip
     datatype: text
     minlength: 5
@@ -1734,6 +1780,8 @@ fields:
   - Address/PO Box: financial_affairs.instruments[i].street
   - City: financial_affairs.instruments[i].city
   - State: financial_affairs.instruments[i].state
+    input type: dropdown
+    code: get_all_us_states()
   - Zip: financial_affairs.instruments[i].zip
     datatype: text
     minlength: 5
@@ -1779,6 +1827,8 @@ fields:
     show if: financial_affairs.has_deposit_box
     required: False
   - State: financial_affairs.deposit_box.state
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.has_deposit_box
     required: False
   - Zip: financial_affairs.deposit_box.zip
@@ -1799,6 +1849,8 @@ fields:
     required: False
     show if: financial_affairs.has_deposit_box
   - State: financial_affairs.deposit_box.other_state
+    input type: dropdown
+    code: get_all_us_states()
     required: False
     show if: financial_affairs.has_deposit_box
   - Zip: financial_affairs.deposit_box.other_zip
@@ -1834,6 +1886,8 @@ fields:
     show if: financial_affairs.has_storage_unit
     required: False
   - State: financial_affairs.storage_unit.state
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.has_storage_unit
     required: False
   - Zip: financial_affairs.storage_unit.zip
@@ -1854,6 +1908,8 @@ fields:
     required: False
     show if: financial_affairs.has_storage_unit
   - State: financial_affairs.storage_unit.other_state
+    input type: dropdown
+    code: get_all_us_states()
     required: False
     show if: financial_affairs.has_storage_unit
   - Zip: financial_affairs.storage_unit.other_zip
@@ -1889,6 +1945,8 @@ fields:
     show if: financial_affairs.has_held_property
     required: False
   - State: financial_affairs.held_property.state
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.has_held_property
     required: False
   - Zip: financial_affairs.held_property.zip
@@ -1906,6 +1964,8 @@ fields:
     show if: financial_affairs.has_held_property
     required: False
   - State: financial_affairs.held_property.prop_state
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.has_held_property
     required: False
   - Zip: financial_affairs.held_property.prop_zip
@@ -1960,6 +2020,8 @@ fields:
     show if: financial_affairs.environment.has_liability
     required: False
   - State: financial_affairs.environment.liability_state
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.environment.has_liability
     required: False
   - Zip: financial_affairs.environment.liability_zip
@@ -1980,6 +2042,8 @@ fields:
     show if: financial_affairs.environment.has_liability
     required: False
   - State: financial_affairs.environment.liability_unit_state
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.environment.has_liability
     required: False
   - Zip: financial_affairs.environment.liability_unit_zip
@@ -2019,6 +2083,8 @@ fields:
     show if: financial_affairs.environment.has_release
     required: False
   - State: financial_affairs.environment.release_state
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.environment.has_release
     required: False
   - Zip: financial_affairs.environment.release_zip
@@ -2039,6 +2105,8 @@ fields:
     show if: financial_affairs.environment.has_release
     required: False
   - State: financial_affairs.environment.release_unit_state
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.environment.has_release
     required: False
   - Zip: financial_affairs.environment.release_unit_zip
@@ -2088,6 +2156,8 @@ fields:
     show if: financial_affairs.environment.has_proceeding
     required: False
   - State: financial_affairs.environment.proceeding_court_state
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.environment.has_proceeding
     required: False
   - Zip: financial_affairs.environment.proceeding_court_zip
@@ -2156,6 +2226,8 @@ fields:
   - Address/PO Box: financial_affairs.businesses[i].street
   - City: financial_affairs.businesses[i].city
   - State: financial_affairs.businesses[i].state
+    input type: dropdown
+    code: get_all_us_states()
   - Zip: financial_affairs.businesses[i].zip
     datatype: text
     minlength: 5
@@ -2194,6 +2266,8 @@ fields:
     show if: financial_affairs.has_statement
     required: False
   - State: financial_affairs.statement_state
+    input type: dropdown
+    code: get_all_us_states()
     show if: financial_affairs.has_statement
     required: False
   - Zip: financial_affairs.statement_zip

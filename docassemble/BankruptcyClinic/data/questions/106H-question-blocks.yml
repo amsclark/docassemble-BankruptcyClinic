@@ -102,6 +102,8 @@ fields:
   - Address/PO Box: debtors.codebtors[i].street
   - City: debtors.codebtors[i].city
   - State: debtors.codebtors[i].state
+    input type: dropdown
+    code: get_all_us_states()
   - Zip: debtors.codebtors[i].zip
     datatype: text
     minlength: 5
@@ -128,6 +130,8 @@ fields:
     datatype: yesnoradio
     show if: debtors.community_property
   - What state or territory did you live in?: debtors.spouse_state
+    input type: dropdown
+    code: get_all_us_states()
     show if: debtors.had_spouse
     required: False
   - note: Fill in the name and current address of that person
