@@ -255,6 +255,14 @@ objects:
       DAList.using(
         object_type=DAObject,
         complete_attribute='complete')
+  # Notice-only parties (creditor matrix entries with no Schedule E/F claim) —
+  # populated exclusively by the creditor-library picker (Roxanne UAT
+  # follow-up, June 2026); never gathered interactively.
+  - prop.notice_only_parties: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete',
+        auto_gather=False)
   - prop.contracts_and_leases: |
       DAList.using(
         object_type=DAObject,
@@ -448,8 +456,11 @@ code: |
   prop.priority_claims.gather()
   # Skip the "do any creditors have nonpriority unsecured claims?" gate and go
   # straight to the list (clinic decision — virtually every filer has at least
-  # one ordinary unsecured debt).
-  prop.nonpriority_claims.there_are_any = True
+  # one ordinary unsecured debt). Conditional so the claim screen's "deleted
+  # every row = I have none" escape (106EF validation code) is not overwritten
+  # on the next mandatory re-pass (Roxanne UAT follow-up, June 2026).
+  if not defined('prop.nonpriority_claims.there_are_any'):
+    prop.nonpriority_claims.there_are_any = True
   prop.nonpriority_claims.gather()
   prop.contracts_and_leases.gather()
   codebtor_auto_populated

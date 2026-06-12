@@ -98,10 +98,17 @@ test.describe('Roxanne UAT June 2026 — static wiring', () => {
     expect(y).toMatch(/priority_unsecured_claim_details[\s\S]{0,400}Schedule E/);
   });
 
-  test('creditor picker: owe-money wording and idempotent injection', async ({ page: _ }) => {
+  test('creditor picker: owe vs notice-only lists, idempotent injection, no forced there_are_any', async ({ page: _ }) => {
     const y = read('creditor-library-picker.yml');
-    expect(y, 'picker explains selections become claims').toContain('Only select a creditor if you actually owe it money.');
+    expect(y, 'owe-money list').toContain('Creditors you OWE money to: library_selected_ids');
+    expect(y, 'notice-only list').toContain('Creditors to NOTIFY only (no debt owed): library_notice_only_ids');
+    expect(y, 'same creditor in both lists rejected').toContain('You selected the same creditor in both lists');
     expect(y, 'injection skips creditors already present').toContain('_already_present');
+    // The delete-all dead end: injection must NOT force there_are_any=True
+    expect(y).not.toContain('prop.priority_claims.there_are_any = True');
+    // Notice-only parties feed the mailing matrix
+    const matrix = read('mailing-matrix.yml');
+    expect(matrix).toContain('prop.notice_only_parties');
   });
 
   test('creditor matrix: conclusion page has a real download link', async ({ page: _ }) => {

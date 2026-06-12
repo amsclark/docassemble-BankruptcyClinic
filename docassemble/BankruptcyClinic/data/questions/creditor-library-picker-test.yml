@@ -1,6 +1,7 @@
 # Minimal standalone interview for testing the creditor library picker.
-# Provides the necessary dependencies (prop.nonpriority_claims) so the
-# picker can be tested without navigating the entire bankruptcy interview.
+# Provides the necessary dependencies (prop.nonpriority_claims,
+# prop.notice_only_parties) so the picker can be tested without navigating
+# the entire bankruptcy interview.
 ---
 modules:
   - .creditor_library
@@ -11,6 +12,12 @@ include:
 objects:
   - prop: DAObject
   - prop.nonpriority_claims: DAList
+  - prop.priority_claims: DAList
+  - prop.notice_only_parties: |
+      DAList.using(
+        object_type=DAObject,
+        complete_attribute='complete',
+        auto_gather=False)
 ---
 # Pre-configure the DAList to avoid triggering gather questions
 mandatory: True
@@ -38,4 +45,12 @@ subquestion: |
   % endfor
   % else:
   No creditors were selected.
+  % endif
+
+  % if defined('prop.notice_only_parties.gathered') and len(prop.notice_only_parties) > 0:
+  Notice-only parties (mailing matrix only):
+
+  % for c in prop.notice_only_parties:
+  - ${ c.name } (${ c.city }, ${ c.state })
+  % endfor
   % endif
