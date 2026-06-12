@@ -1274,14 +1274,23 @@ async function navigateCommunityPropertyMaximalist(page: Page) {
     await spouseGroup.getByRole('radio', { name: 'Yes' }).click();
     await page.waitForTimeout(1000);
 
-    // Fill spouse details using getByLabel (show-if fields may use _field_N IDs)
-    const stateField = page.getByLabel(/community property state.*territory/i).or(page.getByLabel(/state/i).last());
+    // spouse_state is a dropdown since June 2026 (William/ERLS) — select it
+    // first (show-if'd fields can carry _field_N ids, so fall back to the
+    // first visible empty select).
+    await page.evaluate(() => {
+      const sels = Array.from(document.querySelectorAll('select')) as HTMLSelectElement[];
+      const vis = sels.filter((sel) => sel.offsetParent !== null && !sel.value);
+      if (vis.length) {
+        vis[0].value = 'Texas';
+        vis[0].dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
     // Spouse details are behind a second show-if — fill via evaluate to handle any ID format
     await page.evaluate(() => {
       const inputs = Array.from(document.querySelectorAll('input[type="text"]')) as HTMLInputElement[];
       const visible = inputs.filter(i => i.offsetParent !== null && !i.value);
-      // Fill visible empty text fields in order: state, name, street, city, zip
-      const values = ['Texas', 'Former Spouse Testworth', '1000 Community Dr', 'Houston', '77001'];
+      // Fill visible empty text fields in order: name, street, city, zip
+      const values = ['Former Spouse Testworth', '1000 Community Dr', 'Houston', '77001'];
       visible.forEach((el, idx) => {
         if (idx < values.length) {
           el.value = values[idx];
