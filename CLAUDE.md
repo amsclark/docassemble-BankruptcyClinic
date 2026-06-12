@@ -94,13 +94,37 @@ happy-path Playwright runs (which mask these bugs — see `tests/navigation-help
   path that reads it* is the path-sensitive part — that's the BRANCH GAP / CYCLE
   checks in `form_variable_manifest.py`, not the raw graph.
 
+- **`python3 scripts/form_pdf_field_check.py [--findings|--unfilled]`** — the
+  *other* half of the contract: the manifest above checks the interview-variable
+  side; this checks the **builder-key → PDF-template-field** match. docassemble
+  fills PDFs by EXACT field-name match and **silently drops** any builder key
+  absent from the template (`base/pdftk.py`) — the scariest bug class on a legal
+  form (the data just never appears, no error). It maps each attachment's builder
+  dict to the template(s) it fills (unioning multi-template forms, e.g. 107 =
+  main + ext1/2/3), models dynamic-key prefixes, and flags literal keys present in
+  NO template as **WROTE_NONEXISTENT** (with a difflib closest-match suggestion).
+  Found **34** silent-data-loss mismatches in June 2026 — the worst being the
+  106AB jewelry/insurance lines (`hasJewlery`/`jewleryAmt` template misspellings)
+  that shipped blank for *every* filer. `--findings` is the stable, gated mode;
+  `--unfilled` (template fields no builder writes — 646, noisy) is NOT gated.
+
 Both are static and approximate — treat output as high-signal review lists.
 
 These run as **burn-down gates** in `npm run lint` / `pretest`:
 - `npm run lint:flow` (`scripts/lint-flow-gaps.sh`) — fails on any NEW never-defined
   / show-if gap vs `scripts/form-variables-baseline.txt`. After fixing one, tighten
   with `./scripts/lint-flow-gaps.sh --update`.
+- `npm run lint:pdf-fields` (`scripts/lint-pdf-fields.sh`) — fails on any NEW
+  builder-key/template mismatch vs `scripts/pdf-field-baseline.txt` (12 deferred
+  dead keys + the 122A `source1_2`/`source2_2` attorney flag). Tighten with
+  `./scripts/lint-pdf-fields.sh --update`. End-to-end proof that a fix actually
+  populates the PDF lives in `tests/pdf-field-population.spec.ts` (fills a field,
+  downloads the assembled form, asserts the value carries through).
 - `npm run lint:test-complete` (`scripts/lint-test-completeness.sh`) — see Testing.
+
+`scripts/mutation-test-gates.sh` injects a known bug per gate and asserts the
+gate FAILS, then reverts — run it after touching any gate to confirm it still
+has teeth.
 
 ## Production feedback loop
 
