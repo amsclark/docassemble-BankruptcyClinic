@@ -241,14 +241,21 @@ test.describe('YAML-structural proofs', () => {
 
   test('Issue #55: Means Test uses DOJ median tables, not 150% of poverty', async ({ page: _ }) => {
     const { readFileSync } = await import('fs');
+    // The DOJ table moved from 101-question-blocks.yml into objects.py
+    // (get_median_family_income, Roxanne UAT June 2026) so the 122A code and
+    // the poverty_calc note share one source.
+    const objects = readFileSync('docassemble/BankruptcyClinic/objects.py', 'utf8');
     const yml101 = readFileSync('docassemble/BankruptcyClinic/data/questions/101-question-blocks.yml', 'utf8');
     const yml122 = readFileSync('docassemble/BankruptcyClinic/data/questions/122A-question-blocks.yml', 'utf8');
-    // Median-income table is defined
-    expect(yml101).toMatch(/_median_table\s*=\s*\{/);
+    // Median-income table is defined in the shared module
+    expect(objects).toMatch(/DOJ_MEDIAN_INCOME_TABLES\s*=\s*\{/);
     // NE family-of-3 should be > $100k (vs the old buggy $37k)
-    expect(yml101).toMatch(/103358|103,358/);
-    // Means test uses medianFamilyIncome, not 150% poverty math
-    expect(yml122).toContain('medianFamilyIncome');
+    expect(objects).toMatch(/103358|103,358/);
+    // poverty_calc and the 122A median both go through the lookup
+    expect(yml101).toContain('get_median_family_income(');
+    expect(yml122).toContain('get_median_family_income(');
+    // Means test compares against the DOJ median, not 150% poverty math
+    expect(yml122).toContain('monthly_income.median_income');
     expect(yml122).not.toMatch(/\b150\s*%\s*of\s*poverty/i);
   });
 
@@ -412,13 +419,23 @@ test.describe('YAML-structural proofs', () => {
     expect(yvp, 'wired into mandatory flow').toContain('exemption_summary_acknowledged');
   });
 
-  test('Issue #77 deeper: fee-waiver real-estate value pre-fills from Schedule A/B + hard-blocks divergence', async ({ page: _ }) => {
+  test('Issue #77 (superseded by Roxanne UAT June 2026): fee-waiver Part 3 derives from Schedule A/B, never re-asked', async ({ page: _ }) => {
+    // Part 3 used to PRE-FILL its questions from Schedule A/B and hard-block
+    // divergence (#77). It is now DERIVED outright (official form: "If you
+    // have already filled out Schedule A/B ... go to Part 4"), so divergence
+    // is impossible by construction and the questions are gone.
     const { readFileSync } = await import('fs');
     const y103b = readFileSync('docassemble/BankruptcyClinic/data/questions/103B-question-blocks.yml', 'utf8');
-    // Default pulls from prop.interests[0]
-    expect(y103b, 'fee waiver mortgage_current_value defaults from Schedule A/B').toMatch(/prop\.mortgage_current_value[\s\S]{0,200}?default:.*prop\.interests\[0\]\.current_value/);
-    // Hard validation block compares fee waiver value against Schedule A/B
-    expect(y103b, '#77 hard-block validation present').toMatch(/Issue #77[\s\S]+?validation_error/);
+    const yvp = readFileSync('docassemble/BankruptcyClinic/data/questions/voluntary-petition.yml', 'utf8');
+    // Derivation copies the canonical Schedule A/B value verbatim
+    expect(y103b, 'mortgage_current_value derives from Schedule A/B interests').toMatch(/prop\.mortgage_current_value\s*=\s*getattr\(_fw_interests\[0\],\s*'current_value'/);
+    expect(y103b, 'derivation gate variable present').toContain('fee_waiver_part3_derived');
+    // The old Part 3 question screens are gone (no re-asking)
+    expect(y103b, 'cash-on-hand question removed').not.toContain('id: f103b_cash_amount');
+    expect(y103b, 'home-ownership question removed').not.toContain('id: f103b_home_ownership');
+    // Mandatory flow references the derivation, not the old question chain
+    expect(yvp, 'mandatory flow uses derivation gate').toContain('fee_waiver_part3_derived');
+    expect(yvp, 'mandatory flow no longer walks Part 3 questions').not.toMatch(/prop\.has_bank_accounts\s*$/m);
   });
 
   test('Issue #60: non-user-sourced data defaults removed from 2030 + 122A', async ({ page: _ }) => {

@@ -128,8 +128,13 @@ export async function fillVisibleRequiredFields(
       let v = 'N/A';
       // Date checks FIRST: "Payment Date 1" matches the money branch's 'pay'
       // and a numeric value in a date field fails validation (silent block).
-      if (t === 'date') v = '2024-01-01';
-      else if (labelText.includes('date')) v = '01/01/2024';
+      // A RECENT past date: the credit-counseling certificate must be within
+      // 180 days (Roxanne UAT validation), and a recent date stays valid for
+      // every other past-date field (debt incurred, payments, ...).
+      const recentIso = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+      const recentUs = recentIso.slice(5, 7) + '/' + recentIso.slice(8, 10) + '/' + recentIso.slice(0, 4);
+      if (t === 'date') v = recentIso;
+      else if (labelText.includes('date')) v = recentUs;
       else if (isCurrency || t === 'number' || t === 'tel') v = money();
       else if (labelText.includes('zip')) v = '68508';
       // "Schedule A/B line" is number-validated ('N/A' silently blocks)

@@ -188,9 +188,9 @@ question: |
   Your current overall income is estimated to be: ${ currency(overall_means_income) }
   <br><br>
 
-  DOJ median family income for a household of ${ int(monthly_income.median_dependents) } in ${ debtor[0].address.state } is: ${ currency(medianFamilyIncome) }
+  DOJ median family income for a household of ${ int(monthly_income.median_dependents) } in ${ monthly_income.median_state } is: ${ currency(monthly_income.median_income) }
   <br><br>
-  % if overall_means_income < medianFamilyIncome:
+  % if overall_means_income < monthly_income.median_income:
    Your income is below the median. Chapter 7 OK with NO Presumption of Abuse. Means Test Form is Complete. Form 122A-2 is not required.
   % else:
   Your income exceeds the median. Please fill out Form 122A-2 and submit it with your bankruptcy filing.
@@ -244,14 +244,31 @@ code: |
 ---
 question: |
   Calculate the median family income that applies to you.
+subquestion: |
+  Confirm your state and household size below. We will look up the DOJ median
+  family income figure for you on the next screen — you do not need to find it
+  yourself.
 fields:
   - State in which you live: monthly_income.median_state
     default: ${ debtor[0].address.state if defined('debtor[0].address.state') else '' }
   - Number of people in your household: monthly_income.median_dependents
-    datatype: number
+    datatype: integer
     default: ${ len(debtor[0].expenses.dependents) + len(debtor) if defined('debtor[0].expenses.dependents.gathered') else 1 }
-  - Median family income for your state and size of household: monthly_income.median_income
-    datatype: currency
+---
+# Roxanne UAT (June 2026): the screen above used to ALSO ask the debtor to
+# type in the median family income — a number the software already knows and
+# displays (computed in poverty_calc from the DOJ table) on the very next
+# screen. Define it from the lookup instead. This code block is the ONLY
+# generator of monthly_income.median_income (rule 6: the question field was
+# removed above).
+code: |
+  monthly_income.median_state
+  monthly_income.median_dependents
+  # Compute fresh from the confirmed inputs (medianFamilyIncome may have been
+  # computed earlier — e.g. for the fee-waiver eligibility note — with a
+  # default household size of 1 and would be stale here).
+  monthly_income.median_income = get_median_family_income(
+    monthly_income.median_state, monthly_income.median_dependents)
 ---
 id: monthly_income_review
 event: form_122a

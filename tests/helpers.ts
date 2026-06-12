@@ -807,7 +807,7 @@ export async function fillUntilStable(
           labelText.includes('salary')
         )
           v = '0';
-        else if (t === 'date') v = '2024-01-01';
+        else if (t === 'date') v = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
         else if (t === 'email') v = 'test@example.com';
         else if (labelText.includes('year')) v = '2020';
         else if (labelText.includes('mileage') || labelText.includes('milage')) v = '50000';

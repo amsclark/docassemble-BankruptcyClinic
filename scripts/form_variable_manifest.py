@@ -555,6 +555,11 @@ def all_interview_reads(roots):
                 except SyntaxError:
                     continue
                 for v, gsets in col.reads.items():
+                    # The DEFENDED guard sentinel can ride along inside a
+                    # local's resolved set (e.g. `_x = getattr(a, 'b', None)`
+                    # then `c = _x or 0`) — it is not a variable, skip it.
+                    if v == DEFENDED:
+                        continue
                     rec = reads.setdefault(v, {"files": set(), "undefended": False})
                     rec["files"].add(f.name)
                     if any(DEFENDED not in g for g in gsets):

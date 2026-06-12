@@ -38,7 +38,9 @@ NEBRASKA_EXEMPTIONS = {
     'wages': 'Wages (Neb. Rev. Stat. § 25-1558)',
     'public_benefits': 'Public benefits (Neb. Rev. Stat. § 68-148)',
     'earned_income': 'Earned Income Tax Credit (Neb Rev Stat 25-1553)',
-    'life_insurance': 'Life insurance proceeds (Neb. Rev. Stat. § 44-371)',
+    # § 44-371 covers annuity contract benefits as well as life insurance
+    # proceeds, $100,000 limit (Roxanne Alhejaj, Legal Aid of NE, June 2026).
+    'life_insurance': 'Life insurance and annuity contracts (Neb. Rev. Stat. § 44-371)',
     'structured_settlement': 'Structured settlement (Neb. Rev. Stat. § 25-1563.02)',
     'workers_comp': 'Workers compensation (Neb. Rev. Stat. § 48-149)',
     'unemployment': 'Unemployment (Neb. Rev. Stat. § 48-647)',
@@ -78,6 +80,12 @@ CATEGORY_KEYS = {
     'edu_accounts':             ['college_savings', 'wildcard', 'unknown'],
     'tax_refund':               ['earned_income', 'wildcard', 'unknown'],
     'insurance':                ['life_insurance', 'wildcard', 'health_savings', 'unknown'],
+    # Annuities: NE § 44-371 ($100k, shared with life insurance) plus the
+    # retirement exemption for qualified retirement annuities. Previously the
+    # annuity page offered the 'wages' list, which omitted § 44-371 entirely —
+    # the debtor could not claim the annuity exemption at all (Roxanne UAT,
+    # June 2026).
+    'annuity':                  ['life_insurance', 'retirement', 'wildcard', 'unknown'],
     'trust':                    ['structured_settlement', 'wildcard', 'unknown'],
     'third_party':              ['structured_settlement', 'life_insurance', 'wildcard', 'unknown'],
     # Contingent/unliquidated claims can be many things (back pay -> wages,
@@ -234,22 +242,55 @@ def get_exemption_choices_or_combined(state, property_type='all'):
 
 def claiming_less_than_full(amount, value):
     """
-    Derive the Schedule C "claiming less than 100% of fair market value" flag.
+    Derive the Schedule C "specific dollar amount" (vs "100% of fair market
+    value") flag.
 
     The explicit question was removed from the property pages (clinic feedback);
-    instead we infer it: a claimed `amount` strictly less than the item's `value`
-    is a partial (specific-dollar) claim; an amount equal to (or above) the value
-    is a 100%/fair-market claim. Safe by construction — any bad/None input falls
-    back to False (= 100% / fair market, the debtor-favorable default).
+    we infer it from the entered numbers. Originally an amount EQUAL to the
+    item's value was treated as a 100%-of-FMV claim, but Schedule C then showed
+    "100% of FMV" for every debtor who exempted the item's full dollar value —
+    Roxanne (Legal Aid of NE, June 2026): exemptions should be stated as dollar
+    amounts unless the debtor specifically chose 100% of FMV. So now: any
+    entered exemption amount (> 0) is a specific-dollar claim; only a claim with
+    no amount entered falls back to the 100%/fair-market checkbox. `value` is
+    kept in the signature so the 50 existing call sites don't change.
     """
     try:
-        if amount is None or value is None:
+        if amount is None or str(amount).strip() == '':
             return False
         amt = float(str(amount).replace('$', '').replace(',', ''))
-        val = float(str(value).replace('$', '').replace(',', ''))
-        return amt < val
+        return amt > 0
     except (TypeError, ValueError):
         return False
+
+# DOJ Median Family Income thresholds for the Ch. 7 means test.
+# Source: https://www.justice.gov/ust/eo/bapcpa/20250515/bci_data/median_income_table.htm
+# Update when new DOJ tables are published (every ~6 months).
+DOJ_MEDIAN_INCOME_TABLES = {
+    'south dakota': {1: 61022, 2: 92469, 3: 96008, 4: 116374},
+    'nebraska':     {1: 65292, 2: 89130, 3: 103358, 4: 120323},
+}
+DOJ_MEDIAN_ADDITIONAL_PER_PERSON = 11100
+
+
+def get_median_family_income(state, household_size):
+    """DOJ median family income for the state and household size. Households
+    over 4 add $11,100 per additional person (DOJ table note). Bad input falls
+    back to a household of 1; unknown states fall back to Nebraska (the
+    interview only supports NE / SD)."""
+    try:
+        hs = int(float(household_size))
+    except (TypeError, ValueError):
+        hs = 1
+    if hs < 1:
+        hs = 1
+    s = str(state or '').lower()
+    table = (DOJ_MEDIAN_INCOME_TABLES['south dakota']
+             if 'south dakota' in s else DOJ_MEDIAN_INCOME_TABLES['nebraska'])
+    if hs <= 4:
+        return table.get(hs, table[1])
+    return table[4] + (hs - 4) * DOJ_MEDIAN_ADDITIONAL_PER_PERSON
+
 
 def get_exemption_limits(user_state):
     """
@@ -366,57 +407,119 @@ def compute_exemption_totals(prop, debtor_state, num_debtors=1):
         except (ValueError, TypeError):
             return 0.0
 
-    def _add_exemption(item, attr_prefix=''):
-        """Extract exemption claims from a property item."""
-        is_claiming = getattr(item, attr_prefix + 'is_claiming_exemption', False)
-        if not is_claiming:
+    def _add_claim(owner, claim_attr, sub100_attr, value_attr, ex_prefix):
+        """Accumulate one item/category's exemption claims into claimed_by_law.
+
+        `owner` is either a list element or the flat container (prop,
+        prop.financial_assets, ...). Attribute names vary by category — the
+        names here mirror the checkQuestionExemptions() signatures in
+        106AB-question-blocks.yml, which are the authoritative per-screen map.
+        """
+        if not getattr(owner, claim_attr, False):
             return
         # When the debtor claims a FULL (100%) exemption, no explicit
-        # exemption_value is captured (that field only shows when claiming less
-        # than 100%). Fall back to the property's owned value so the claim still
-        # counts in the running totals — otherwise the summary wrongly reported
-        # "No exemptions have been claimed yet" (Roxanne feedback).
-        sub_100 = getattr(item, attr_prefix + 'claiming_sub_100', False)
-        full_value = getattr(item, attr_prefix + 'current_owned_value',
-                             getattr(item, attr_prefix + 'current_value', 0))
-        law1 = getattr(item, attr_prefix + 'exemption_laws', '')
-        val1 = getattr(item, attr_prefix + 'exemption_value', 0)
+        # exemption_value is captured. Fall back to the property's value so the
+        # claim still counts in the running totals — otherwise the summary
+        # wrongly reported "No exemptions have been claimed yet" (Roxanne).
+        sub_100 = getattr(owner, sub100_attr, False)
+        full_value = getattr(owner, value_attr, 0)
+        law1 = getattr(owner, ex_prefix + 'exemption_laws', '')
+        val1 = getattr(owner, ex_prefix + 'exemption_value', 0)
         if law1 and not val1 and not sub_100:
             val1 = full_value
         if law1 and val1:
             claimed_by_law[law1] = claimed_by_law.get(law1, 0) + _safe_float(val1)
 
-        law2 = getattr(item, attr_prefix + 'exemption_laws_2', '')
-        val2 = getattr(item, attr_prefix + 'exemption_value_2', 0)
+        law2 = getattr(owner, ex_prefix + 'exemption_laws_2', '')
+        val2 = getattr(owner, ex_prefix + 'exemption_value_2', 0)
         if law2 and val2:
             claimed_by_law[law2] = claimed_by_law.get(law2, 0) + _safe_float(val2)
 
-    # Real property
-    for interest in getattr(prop, 'interests', []):
-        _add_exemption(interest)
+    def _elements(container, name):
+        """Items of a DAList attribute without triggering a gather-seek.
+        Accepts plain lists too (unit tests use SimpleNamespace fixtures)."""
+        lst = getattr(container, name, None)
+        if lst is None:
+            return []
+        elems = getattr(lst, 'elements', None)
+        if elems is not None:
+            return list(elems)
+        try:
+            return list(lst)
+        except TypeError:
+            return []
 
-    # Vehicles
-    for vehicle in getattr(prop, 'ab_vehicles', []):
-        _add_exemption(vehicle)
-    for vehicle in getattr(prop, 'ab_other_vehicles', []):
-        _add_exemption(vehicle)
+    fa = getattr(prop, 'financial_assets', None)
+    owed = getattr(prop, 'owed_property', None)
+    biz = getattr(prop, 'business_property', None)
+    farm = getattr(prop, 'farming_property', None)
 
-    # Household goods (stored as flat attributes on prop)
-    if getattr(prop, 'household_goods_is_claiming_exemption', False):
-        law1 = getattr(prop, 'household_goods_exemption_laws', '')
-        val1 = getattr(prop, 'household_goods_exemption_value', 0)
-        if law1 and not val1 and not getattr(prop, 'household_goods_claiming_sub_100', False):
-            val1 = getattr(prop, 'household_goods_value', 0)
-        if law1 and val1:
-            claimed_by_law[law1] = claimed_by_law.get(law1, 0) + _safe_float(val1)
+    # ── List-based property (one claim per list item) ──
+    # (container, list_attr, claim_attr, sub100_attr, value_attr)
+    _list_sources = [
+        (prop, 'interests', 'is_claiming_exemption', 'claiming_sub_100', 'current_owned_value'),
+        (prop, 'ab_vehicles', 'is_claiming_exemption', 'claiming_sub_100', 'current_owned_value'),
+        (prop, 'ab_other_vehicles', 'is_claiming_exemption', 'claiming_sub_100', 'current_owned_value'),
+        (fa, 'deposits', 'is_claiming_exemption', 'sub_100', 'amount'),
+        (fa, 'bonds_and_stocks', 'is_claiming_exemption', 'sub_100', 'amount'),
+        (fa, 'non_traded_stock', 'is_claiming_exemption', 'sub_100', 'value'),
+        (fa, 'corporate_bonds', 'is_claiming_exemption', 'sub_100', 'amount'),
+        (fa, 'retirement_accounts', 'has_claim', 'sub_100', 'amount'),
+        (fa, 'prepayments', 'has_claim', 'sub_100', 'amount'),
+        (fa, 'annuities', 'has_claim', 'sub_100', 'amount'),
+        (fa, 'edu_accounts', 'has_claim', 'sub_100', 'amount'),
+    ]
+    for container, list_attr, claim_attr, sub100_attr, value_attr in _list_sources:
+        if container is None:
+            continue
+        for item in _elements(container, list_attr):
+            _add_claim(item, claim_attr, sub100_attr, value_attr, '')
 
-    if getattr(prop, 'secured_household_goods_is_claiming_exemption', False):
-        law1 = getattr(prop, 'secured_household_goods_exemption_laws', '')
-        val1 = getattr(prop, 'secured_household_goods_exemption_value', 0)
-        if law1 and not val1 and not getattr(prop, 'secured_household_goods_claiming_sub_100', False):
-            val1 = getattr(prop, 'secured_household_goods_value', 0)
-        if law1 and val1:
-            claimed_by_law[law1] = claimed_by_law.get(law1, 0) + _safe_float(val1)
+    # ── Flat (single-instance) property categories ──
+    # (container, claim_attr, sub100_attr, value_attr, exemption_attr_prefix)
+    _flat_sources = [
+        (prop, 'household_goods_is_claiming_exemption', 'household_goods_claiming_sub_100', 'household_goods_value', 'household_goods_'),
+        (prop, 'secured_household_goods_is_claiming_exemption', 'secured_household_goods_claiming_sub_100', 'secured_household_goods_value', 'secured_household_goods_'),
+        (prop, 'electronics_is_claiming_exemption', 'electronics_claiming_sub_100', 'electronics_value', 'electronics_'),
+        (prop, 'collectibles_is_claiming_exemption', 'collectibles_claiming_sub_100', 'collectibles_value', 'collectibles_'),
+        (prop, 'hobby_equipment_is_claiming_exemption', 'hobby_equipment_claiming_sub_100', 'hobby_equipment_value', 'hobby_equipment_'),
+        (prop, 'firearms_is_claiming_exemption', 'firearms_claiming_sub_100', 'firearms_value', 'firearms_'),
+        (prop, 'clothes_is_claiming_exemption', 'clothes_claiming_sub_100', 'clothes_value', 'clothes_'),
+        (prop, 'jewelry_is_claiming_exemption', 'jewelry_claiming_sub_100', 'jewelry_value', 'jewelry_'),
+        (prop, 'animal_is_claiming_exemption', 'animal_claiming_sub_100', 'animal_value', 'animal_'),
+        (prop, 'other_household_items_is_claiming_exemption', 'other_household_items_claiming_sub_100', 'other_household_items_value', 'other_household_items_'),
+        (prop, 'other_prop_has_claim', 'other_prop_sub_100', 'other_prop_value', 'other_prop_'),
+        (fa, 'cash_is_claiming_exemption', 'cash_sub_100', 'cash_value', 'cash_'),
+        (fa, 'future_property_interest_has_claim', 'future_property_interest_sub_100', 'future_property_interest_value', 'future_property_interest_'),
+        (fa, 'ip_interest_has_claim', 'ip_interest_sub_100', 'ip_interest_value', 'ip_interest_'),
+        (fa, 'intangible_interest_has_claim', 'intangible_interest_sub_100', 'intangible_interest_value', 'intangible_interest_'),
+        (owed, 'tax_refund_has_claim', 'tax_refund_sub_100', 'tax_refund_federal', 'tax_refund_'),
+        (owed, 'family_support_has_claim', 'family_support_sub_100', 'family_support_alimony', 'family_support_'),
+        (owed, 'other_amounts_has_claim', 'other_amounts_sub_100', 'other_amounts_value', 'other_amounts_'),
+        (owed, 'first_insurance_interest_has_claim', 'first_insurance_interest_sub_100', 'first_insurance_interest_amount', 'first_insurance_interest_'),
+        (owed, 'second_insurance_interest_has_claim', 'second_insurance_interest_sub_100', 'second_insurance_interest_amount', 'second_insurance_interest_'),
+        (owed, 'third_insurance_interest_has_claim', 'third_insurance_interest_sub_100', 'third_insurance_interest_amount', 'third_insurance_interest_'),
+        (owed, 'trust_has_claim', 'trust_sub_100', 'trust_amount', 'trust_'),
+        (owed, 'third_party_has_claim', 'third_party_sub_100', 'third_party_amount', 'third_party_'),
+        (owed, 'contingent_claims_has_claim', 'contingent_claims_sub_100', 'contingent_claims_amount', 'contingent_claims_'),
+        (owed, 'other_assets_has_claim', 'other_assets_sub_100', 'other_assets_amount', 'other_assets_'),
+        (biz, 'ar_has_claim', 'ar_sub_100', 'ar_amount', 'ar_'),
+        (biz, 'equipment_has_claim', 'equipment_sub_100', 'equipment_amount', 'equipment_'),
+        (biz, 'machinery_has_claim', 'machinery_sub_100', 'machinery_amount', 'machinery_'),
+        (biz, 'inventory_has_claim', 'inventory_sub_100', 'inventory_amount', 'inventory_'),
+        (biz, 'partnership_has_claim', 'partnership_sub_100', 'partnershipValue1', 'partnership_'),
+        (biz, 'lists_has_claim', 'lists_sub_100', 'lists_amount', 'lists_'),
+        (biz, 'otherProperty_has_claim', 'otherProperty_sub_100', 'otherPropertyAmount1', 'otherProperty_'),
+        (farm, 'has_animal_claim', 'animal_sub_100', 'animal_amount', 'animal_'),
+        (farm, 'has_crops_claim', 'crops_sub_100', 'crop_amount', 'crops_'),
+        (farm, 'has_equipment_claim', 'equipment_sub_100', 'equipment_amount', 'equipment_'),
+        (farm, 'has_supplies_claim', 'supplies_sub_100', 'supplies_amount', 'supplies_'),
+        (farm, 'has_fishing_claim', 'fishing_sub_100', 'commercial_amount', 'fishing_'),
+    ]
+    for container, claim_attr, sub100_attr, value_attr, ex_prefix in _flat_sources:
+        if container is None:
+            continue
+        _add_claim(container, claim_attr, sub100_attr, value_attr, ex_prefix)
 
     # Build result
     result = {}

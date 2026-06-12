@@ -33,7 +33,14 @@ under: |
 id: priority_unsecured_claim_details
 section: schedule_ef
 question: |
-  Tell the court about an unsecured claim
+  Tell the court about a priority unsecured claim
+subquestion: |
+  This screen is for **PRIORITY unsecured debts** — they appear on
+  **Schedule E** and include **tax debt** (IRS, state revenue departments),
+  **child support**, **alimony / spousal support**, and certain other
+  obligations the law treats as priority. Enter each priority creditor and the
+  amount you owe. You will list ordinary unsecured debts (credit cards, medical
+  bills, personal loans, etc.) on the **next** screen — those go on Schedule F.
 allowed to set:
   - prop.priority_claims[i].complete
 fields:

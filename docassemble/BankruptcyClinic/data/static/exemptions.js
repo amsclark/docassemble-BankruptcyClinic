@@ -11,7 +11,10 @@ const nebraskaExemptions = {
   household_goods: { law: 'Household goods (Neb. Rev. Stat. § 25-1556(1)(c))', limit: 3582, amount: 0 },
   tools: { law: 'Tools of the trade (Neb. Rev. Stat. § 25-1556(1)(d))', limit: 5970, amount: 0 },
   health_savings: { law: 'Health savings (Neb. Rev. Stat. § 8-1,131(2)(b))', limit: 25000, amount: 0 },
-  life_insurance: { law: 'Life insurance proceeds (Neb. Rev. Stat. § 44-371)', limit: 100000, amount: 0 },
+  // § 44-371 covers annuity contract benefits as well as life insurance
+  // proceeds (Roxanne Alhejaj, Legal Aid of NE, June 2026). Law string must
+  // match objects.py NEBRASKA_EXEMPTIONS exactly — the tracker keys on it.
+  life_insurance: { law: 'Life insurance and annuity contracts (Neb. Rev. Stat. § 44-371)', limit: 100000, amount: 0 },
   wildcard: { law: 'Wildcard (Neb. Rev. Stat. § 25-1552)', limit: 5970, amount: 0 },
   clothing: { law: 'Clothing (Neb. Rev. Stat. § 25-1556(1)(b))', limit: 0, amount: 0 },
   personal_possessions: { law: 'Immediate personal possessions (Neb. Rev. Stat. § 25-1556(1)(a))', limit: 0, amount: 0 },
@@ -117,10 +120,23 @@ function getAllExemptionLaws(userState) {
   return allLaws;
 }
 
+// Helper to get exemption law names for annuities — NE § 44-371 (shared
+// life-insurance/annuity cap) plus retirement for qualified retirement
+// annuities. Mirror of CATEGORY_KEYS['annuity'] in objects.py.
+function getAnnuityExemptionLaws(userState) {
+  const exemptions = getCurrentExemptions(userState);
+  const laws = [];
+  if (exemptions.life_insurance) laws.push(exemptions.life_insurance.law);
+  if (exemptions.retirement) laws.push(exemptions.retirement.law);
+  laws.push(exemptions.wildcard.law);
+  laws.push(exemptions.unknown.law);
+  return laws;
+}
+
 // Global function that can be called from Docassemble to populate dropdown choices
 window.getExemptionChoicesForState = function(userState, propertyType) {
   propertyType = propertyType || 'all';
-  
+
   switch(propertyType.toLowerCase()) {
     case 'real_property':
     case 'homestead':
@@ -128,6 +144,8 @@ window.getExemptionChoicesForState = function(userState, propertyType) {
     case 'vehicle':
     case 'motor_vehicle':
       return getVehicleExemptionLaws(userState);
+    case 'annuity':
+      return getAnnuityExemptionLaws(userState);
     case 'all':
     default:
       return getAllExemptionLaws(userState);
@@ -165,6 +183,7 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
       const key = String(exemption_laws || '').toLowerCase();
       if (key.includes('.ab_vehicles')) return 'vehicle';
       if (key.includes('.interests[')) return 'real_property';
+      if (key.includes('.annuities[')) return 'annuity';
       return 'all';
     }
 

@@ -1680,7 +1680,7 @@ fields:
   - Specific laws that allow exemption: prop.financial_assets.annuities[i].exemption_laws
     choices:
       code: |
-        get_exemption_choices_or_combined(exemption_filing_state,'wages')
+        get_exemption_choices_or_combined(exemption_filing_state,'annuity')
     show if: prop.financial_assets.annuities[i].has_claim
     required: False
   - note: Second Exemption
@@ -1692,7 +1692,7 @@ fields:
   - Specific laws that allow exemption: prop.financial_assets.annuities[i].exemption_laws_2
     choices:
       code: |
-        get_exemption_choices_or_combined(exemption_filing_state,'wages')
+        get_exemption_choices_or_combined(exemption_filing_state,'annuity')
     show if: prop.financial_assets.annuities[i].has_claim
     required: False
 list collect: True

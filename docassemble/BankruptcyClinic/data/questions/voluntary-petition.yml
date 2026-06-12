@@ -687,6 +687,9 @@ code: |
   debtor[0].expenses.other_payment2_amount
   debtor[0].expenses.alimony
   debtor[0].expenses.change_in_expense
+  # Disposable-income summary: take-home income, expenses, and what's left
+  # (Roxanne UAT, June 2026 — "no way to see a running total").
+  income_expense_summary_acknowledged
 
   #107
   # Defensive default to prevent circular seeks when other sections reference this
@@ -908,11 +911,11 @@ code: |
     installment_payment_end
   elif case.payment_method == '3':
     waive_fee_intro
-    family.you
-    family.has_spouse
-    family.has_dependents
-    family.dependent_count
-    family.total_number
+    # Part 1 family size derives from the debtor list + Schedule J dependents;
+    # Part 3 (q.10-16) derives from Schedule A/B (official form: "If you have
+    # already filled out Schedule A/B ... attach copies ... and go to Part 4").
+    # Roxanne UAT (June 2026): the fee waiver re-asked all of this.
+    fee_waiver_family_derived
     family.you_income
     family.spouse_income
     family.assistance_income
@@ -924,34 +927,7 @@ code: |
     family.has_other_expense_payers
     family.expense_changes
     family.complete = True
-    prop.cash_on_hand
-    prop.has_bank_accounts
-    if prop.has_bank_accounts == True:
-      prop.accounts.there_are_any = True
-      prop.accounts.gather()
-    prop.has_home
-    if prop.has_home == True:
-      prop.mortgage_street
-      prop.mortgage_city
-      prop.mortgage_state
-      prop.mortgage_zip
-      prop.mortgage_current_value
-      prop.mortgage_amount_owed
-      prop.has_other_real_estate
-      if prop.has_other_real_estate == True:
-        prop.other_mortgage_street
-        prop.other_mortgage_city
-        prop.other_mortgage_state
-        prop.other_mortgage_zip
-        prop.other_mortgage_current_value
-        prop.other_mortgage_amount_owed
-    prop.vehicles.gather()
-    prop.other_asset_description
-    prop.other_asset_value
-    prop.other_asset_owed
-    prop.owers.gather()
-    if len(prop.owers) > 0:
-      prop.will_receive_ower_payment
+    fee_waiver_part3_derived
     prop.complete = True
     additional.paid_for_services
     additional.promised_for_services
@@ -1142,11 +1118,8 @@ code: |
   prop.vehicles[i].amount_owed
   prop.vehicles[i].complete = True
 ---
-code: |
-  prop.owers[i].name
-  prop.owers[i].amount
-  prop.owers[i].complete = True
-
+# (The prop.owers per-item complete block is gone: fee-waiver Part 3 q.16 is
+# no longer collected — the attached Schedule A/B carries that detail.)
 ---
 code: |
   prop.financial_assets.deposits[i].type
