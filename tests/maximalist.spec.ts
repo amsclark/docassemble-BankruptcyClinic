@@ -237,7 +237,9 @@ async function fillRealProperty(page: Page, rp: any, index: number) {
     await stateLoc.fill(rp.stateAbbr);
   }
   await page.locator(`#${b64(`prop.interests[${index}].zip`)}`).fill(rp.zip);
-  await page.locator(`#${b64(`prop.interests[${index}].county`)}`).fill(rp.county);
+  // Real-property county is a NE+SD dropdown now (William/ERLS, June 2026);
+  // the option labels carry a " County" suffix.
+  await page.locator(`#${b64(`prop.interests[${index}].county`)}`).selectOption({ label: rp.county.endsWith(' County') ? rp.county : rp.county + ' County' });
   await page.locator(`label[for="${b64(`prop.interests[${index}].type`)}_${rp.typeIndex}"]`).click();
   // 'who' field
   const propWhoSelect = page.locator(`select#${b64(`prop.interests[${index}].who`)}`);
@@ -267,7 +269,7 @@ async function fillVehicle(page: Page, v: any, index: number) {
     if (await debtorOnlyLabel.count() > 0) await debtorOnlyLabel.click();
   }
   await page.locator(`#${b64(`prop.ab_vehicles[${index}].current_value`)}`).fill(v.value);
-  await page.locator(`#${b64(`prop.ab_vehicles[${index}].state`)}`).fill(v.state);
+  await page.locator(`#${b64(`prop.ab_vehicles[${index}].state`)}`).selectOption({ label: v.state });
 
   if (v.hasLoan) {
     await setCheckbox(page, `prop.ab_vehicles[${index}].has_loan`, true);
@@ -449,7 +451,7 @@ async function fillIncomeForDebtor(page: Page, debtorIdx: number, data: {
         await page.getByLabel('Employer Name').fill(data.employer);
         await page.getByLabel('Address/PO Box').first().fill(data.employer_street);
         await page.getByLabel('City').first().fill(data.employer_city);
-        await page.getByLabel('State').first().fill(data.employer_state);
+        await page.getByLabel('State').first().selectOption({ label: data.employer_state });
         await page.getByLabel('Zip').first().fill(data.employer_zip);
         await page.getByLabel('How long employed there?').fill(data.employment_length);
       }
@@ -1272,14 +1274,23 @@ async function navigateCommunityPropertyMaximalist(page: Page) {
     await spouseGroup.getByRole('radio', { name: 'Yes' }).click();
     await page.waitForTimeout(1000);
 
-    // Fill spouse details using getByLabel (show-if fields may use _field_N IDs)
-    const stateField = page.getByLabel(/community property state.*territory/i).or(page.getByLabel(/state/i).last());
+    // spouse_state is a dropdown since June 2026 (William/ERLS) — select it
+    // first (show-if'd fields can carry _field_N ids, so fall back to the
+    // first visible empty select).
+    await page.evaluate(() => {
+      const sels = Array.from(document.querySelectorAll('select')) as HTMLSelectElement[];
+      const vis = sels.filter((sel) => sel.offsetParent !== null && !sel.value);
+      if (vis.length) {
+        vis[0].value = 'Texas';
+        vis[0].dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
     // Spouse details are behind a second show-if — fill via evaluate to handle any ID format
     await page.evaluate(() => {
       const inputs = Array.from(document.querySelectorAll('input[type="text"]')) as HTMLInputElement[];
       const visible = inputs.filter(i => i.offsetParent !== null && !i.value);
-      // Fill visible empty text fields in order: state, name, street, city, zip
-      const values = ['Texas', 'Former Spouse Testworth', '1000 Community Dr', 'Houston', '77001'];
+      // Fill visible empty text fields in order: name, street, city, zip
+      const values = ['Former Spouse Testworth', '1000 Community Dr', 'Houston', '77001'];
       visible.forEach((el, idx) => {
         if (idx < values.length) {
           el.value = values[idx];

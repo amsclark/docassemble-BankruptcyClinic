@@ -153,12 +153,91 @@ test('delete BOTH injected priority claims, then Continue', async ({ page }) => 
   // must move on to Schedule F (this used to silently re-render the claim
   // screen, demanding amounts for creditors the filer just deleted).
   await clickContinue(page);
-  // Settle: a concurrent ajax racing the submit makes the submit stale and
-  // silently discarded (empirically observed during diagnosis).
-  await page.waitForTimeout(1500);
+  // The submit response is a full ~1.5MB page render that can take several
+  // seconds — wait for the heading to actually change rather than a fixed
+  // settle (a too-early read sees the old page and looks like a failure).
+  await expect(async () => {
+    const h = await getHeading(page);
+    expect(h).not.toMatch(/about a priority unsecured claim/i);
+  }).toPass({ timeout: 30000 });
   await waitForDaPageLoad(page);
   const afterHeading = await getHeading(page);
   console.log(`[probe] after deleting all + Continue: "${afterHeading}"`);
   expect(afterHeading, 'flow continues past Schedule E with zero claims')
     .toMatch(/about a nonpriority unsecured claim/i);
+});
+
+test('"I have no unsecured debts" escape skips Schedule F', async ({ page }) => {
+  await navigateToDebtorPage(page, SIMPLE_SINGLE);
+  await fillDebtorAndAdvance(page, SIMPLE_SINGLE.debtor);
+  await passDebtorFinal(page);
+
+  // Advance to the nonpriority claim screen with NOTHING selected in the
+  // picker (the gate is skipped per the May clinic decision, so a filer with
+  // no unsecured debts lands on a blank required claim form).
+  for (let i = 0; i < 80; i++) {
+    await waitForDaPageLoad(page);
+    const h = await getHeading(page);
+    if (/about a nonpriority unsecured claim/i.test(h)) break;
+    const hasContinue = (await page.locator('#da-continue-button').count()) > 0;
+    if (!hasContinue) {
+      const noBtn = page.locator('button.btn-da:visible').filter({ hasText: /^\s*No\s*$/ }).first();
+      if ((await noBtn.count()) > 0) {
+        await noBtn.click({ timeout: 10000 }).catch(() => {});
+      } else {
+        await page.locator('button.btn-da[value="False"]:visible').first().click({ timeout: 10000 }).catch(() => {});
+      }
+      await page.waitForLoadState('networkidle').catch(() => {});
+      continue;
+    }
+    await page.evaluate(() => {
+      const seen = new Set<string>();
+      document.querySelectorAll('input[type="radio"]').forEach((r) => {
+        const radio = r as HTMLInputElement;
+        if (!radio.name || seen.has(radio.name)) return;
+        seen.add(radio.name);
+        const group = Array.from(document.querySelectorAll(
+          `input[type="radio"][name="${CSS.escape(radio.name)}"]`)) as HTMLInputElement[];
+        if (group.some((g) => g.checked)) return;
+        const visible = group.filter((g) => {
+          const lab = g.id && document.querySelector(`label[for="${CSS.escape(g.id)}"]`) as HTMLElement | null;
+          return !!lab && (lab as HTMLElement).offsetParent !== null;
+        });
+        if (!visible.length) return;
+        const no = visible.find((g) => g.value === 'False') ?? visible[visible.length - 1];
+        const lab = document.querySelector(`label[for="${CSS.escape(no.id)}"]`) as HTMLElement;
+        lab.click();
+      });
+      document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], textarea').forEach((el) => {
+        const input = el as HTMLInputElement;
+        if (input.offsetParent === null || input.value) return;
+        const grp = input.closest('.input-group');
+        const isCurrency = !!(grp && /[$]/.test(grp.textContent || ''));
+        if (input.type === 'date') input.value = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+        else if (isCurrency || input.type === 'number') input.value = '0';
+        else input.value = 'N/A';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      document.querySelectorAll('select').forEach((el) => {
+        const sel = el as HTMLSelectElement;
+        if (sel.offsetParent === null || sel.value) return;
+        for (const o of Array.from(sel.options)) {
+          if (o.value) { sel.value = o.value; break; }
+        }
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    });
+    await page.locator('#da-continue-button').click({ timeout: 10000 }).catch(() => {});
+    await page.waitForLoadState('networkidle').catch(() => {});
+  }
+  const heading = await getHeading(page);
+  expect(heading, 'reached the Schedule F claim screen').toMatch(/about a nonpriority unsecured claim/i);
+
+  // The escape: click "I have no unsecured debts to list" — no fields needed.
+  await page.locator('a, button').filter({ hasText: /I have no unsecured debts to list/i }).first().click();
+  await waitForDaPageLoad(page);
+  const after = await getHeading(page);
+  expect(after, 'Schedule F skipped without inventing a creditor')
+    .toMatch(/executory contracts or unexpired leases/i);
 });

@@ -139,6 +139,10 @@ fields:
     minlength: 5
     maxlength: 5
   - County: prop.interests[i].county
+    input type: dropdown
+    code: |
+      ['N/A'] + county_list('Nebraska') + county_list('South Dakota')
+    datatype: str
   - note: |
       <br><br>
       Tell the court about the value and interest in the property.
@@ -341,6 +345,8 @@ fields:
   - Current property value: prop.ab_vehicles[i].current_value
     datatype: currency
   - State where the vehicle is registered or titled: prop.ab_vehicles[i].state
+    input type: dropdown
+    code: get_all_us_states()
     required: False
   - Do you have a loan or lien on the vehicle?: prop.ab_vehicles[i].has_loan
     datatype: yesno

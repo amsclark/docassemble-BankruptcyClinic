@@ -121,6 +121,8 @@ fields:
       is: True
     required: False
   - State: prop.priority_claims[i].codebtor_state
+    input type: dropdown
+    code: get_all_us_states()
     show if:
       variable: prop.priority_claims[i].has_codebtor
       is: True
@@ -149,6 +151,8 @@ fields:
     show if: prop.priority_claims[i].has_notify
     required: False
   - State: prop.priority_claims[i].other_state
+    input type: dropdown
+    code: get_all_us_states()
     show if: prop.priority_claims[i].has_notify
     required: False
   - Zip: prop.priority_claims[i].other_zip
@@ -170,6 +174,8 @@ fields:
     show if: prop.priority_claims[i].has_notify
     required: False
   - State: prop.priority_claims[i].other_state_2
+    input type: dropdown
+    code: get_all_us_states()
     show if: prop.priority_claims[i].has_notify
     required: False
   - Zip: prop.priority_claims[i].other_zip_2
@@ -191,6 +197,8 @@ fields:
     show if: prop.priority_claims[i].has_notify
     required: False
   - State: prop.priority_claims[i].other_state_3
+    input type: dropdown
+    code: get_all_us_states()
     show if: prop.priority_claims[i].has_notify
     required: False
   - Zip: prop.priority_claims[i].other_zip_3
@@ -212,6 +220,8 @@ fields:
     show if: prop.priority_claims[i].has_notify
     required: False
   - State: prop.priority_claims[i].other_state_4
+    input type: dropdown
+    code: get_all_us_states()
     show if: prop.priority_claims[i].has_notify
     required: False
   - Zip: prop.priority_claims[i].other_zip_4
@@ -233,6 +243,8 @@ fields:
     show if: prop.priority_claims[i].has_notify
     required: False
   - State: prop.priority_claims[i].other_state_5
+    input type: dropdown
+    code: get_all_us_states()
     show if: prop.priority_claims[i].has_notify
     required: False
   - Zip: prop.priority_claims[i].other_zip_5
@@ -254,6 +266,8 @@ fields:
     show if: prop.priority_claims[i].has_notify
     required: False
   - State: prop.priority_claims[i].other_state_6
+    input type: dropdown
+    code: get_all_us_states()
     show if: prop.priority_claims[i].has_notify
     required: False
   - Zip: prop.priority_claims[i].other_zip_6
@@ -331,7 +345,9 @@ subquestion: |
   collateral and aren't priority debts — for example **credit cards, medical
   bills, personal loans, and most court judgments**. Almost every filer has at
   least one. List each creditor you owe below; they appear on **Schedule F**.
-  (If you have none to add, you can continue past this section.)
+
+  If you truly have none:
+  ${ action_button_html(url_action('no_nonpriority_claims'), label='I have no unsecured debts to list', color='secondary') }
 allowed to set:
   - prop.nonpriority_claims[i].complete
 fields:
@@ -410,6 +426,8 @@ fields:
       is: True
     required: False
   - State: prop.nonpriority_claims[i].codebtor_state
+    input type: dropdown
+    code: get_all_us_states()
     show if:
       variable: prop.nonpriority_claims[i].has_codebtor
       is: True
@@ -439,6 +457,8 @@ fields:
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - State: prop.nonpriority_claims[i].other_state
+    input type: dropdown
+    code: get_all_us_states()
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - Zip: prop.nonpriority_claims[i].other_zip
@@ -461,6 +481,8 @@ fields:
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - State: prop.nonpriority_claims[i].other_state_2
+    input type: dropdown
+    code: get_all_us_states()
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - Zip: prop.nonpriority_claims[i].other_zip_2
@@ -483,6 +505,8 @@ fields:
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - State: prop.nonpriority_claims[i].other_state_3
+    input type: dropdown
+    code: get_all_us_states()
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - Zip: prop.nonpriority_claims[i].other_zip_3
@@ -504,6 +528,8 @@ fields:
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - State: prop.nonpriority_claims[i].other_state_4
+    input type: dropdown
+    code: get_all_us_states()
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - Zip: prop.nonpriority_claims[i].other_zip_4
@@ -525,6 +551,8 @@ fields:
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - State: prop.nonpriority_claims[i].other_state_5
+    input type: dropdown
+    code: get_all_us_states()
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - Zip: prop.nonpriority_claims[i].other_zip_5
@@ -546,6 +574,8 @@ fields:
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - State: prop.nonpriority_claims[i].other_state_6
+    input type: dropdown
+    code: get_all_us_states()
     show if: prop.nonpriority_claims[i].has_notify
     required: False
   - Zip: prop.nonpriority_claims[i].other_zip_6
@@ -581,6 +611,15 @@ script: |
     }, 400);
   </script>
 list collect: True
+---
+# "I have no unsecured debts" escape on the Schedule F claim screen
+# (William Franck / ERLS, June 2026: the gate is skipped per the May clinic
+# decision (PR #91), but a filer with NO unsecured debts had no way past the
+# blank required claim — docassemble shows no Delete button on a single row).
+event: no_nonpriority_claims
+code: |
+  prop.nonpriority_claims.clear()
+  mark_list_emptied(prop.nonpriority_claims)
 ---
 id: schedule_ef_review
 event: schedule_ef

@@ -99,7 +99,9 @@ test.describe('PDF Content Verification Suite', () => {
     expect(getField(f, 'prop1City')).toBe('Grand Island');
     expect(getField(f, 'prop1State')).toBe('NE');
     expect(getField(f, 'prop1Zip')).toBe('68801');
-    expect(getField(f, 'prop1County')).toBe('Hall');
+    // County is a NE+SD dropdown since June 2026 (William/ERLS) — the option
+    // values carry the " County" suffix, which is what prints on the PDF.
+    expect(getField(f, 'prop1County')).toBe('Hall County');
     expect(f['prop1SingleFam']).toBe(true);
     expect(f['prop1Debtor1Only']).toBe(true);
     expect(f['hasInterest']).toBe(true);

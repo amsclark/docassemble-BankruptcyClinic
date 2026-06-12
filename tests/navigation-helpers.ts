@@ -177,7 +177,9 @@ async function fillRealProperty(page: Page, rp: RealPropertyData, index: number)
     await stateLoc.fill(rp.stateAbbr);
   }
   await page.locator(`#${b64(`prop.interests[${index}].zip`)}`).fill(rp.zip);
-  await page.locator(`#${b64(`prop.interests[${index}].county`)}`).fill(rp.county);
+  // Real-property county is a NE+SD dropdown now (William/ERLS, June 2026);
+  // the option labels carry a " County" suffix.
+  await page.locator(`#${b64(`prop.interests[${index}].county`)}`).selectOption({ label: rp.county.endsWith(' County') ? rp.county : rp.county + ' County' });
   await page.locator(`label[for="${b64(`prop.interests[${index}].type`)}_${rp.typeIndex}"]`).click();
   // 'who' field — may be a select (dropdown) or radio buttons depending on docassemble rendering
   const propWhoSelect = page.locator(`select#${b64(`prop.interests[${index}].who`)}`);
@@ -232,7 +234,8 @@ async function fillVehicle(page: Page, v: VehicleData, index: number) {
     if (await ownerLabel.count() > 0) await ownerLabel.click();
   }
   await page.locator(`#${b64(`prop.ab_vehicles[${index}].current_value`)}`).fill(v.value);
-  await page.locator(`#${b64(`prop.ab_vehicles[${index}].state`)}`).fill(v.state);
+  // Vehicle registration state is a dropdown now (William/ERLS, June 2026)
+  await page.locator(`#${b64(`prop.ab_vehicles[${index}].state`)}`).selectOption({ label: v.state });
 
   if (v.hasLoan) {
     await setCheckbox(page, `prop.ab_vehicles[${index}].has_loan`, true);
@@ -811,10 +814,9 @@ export async function navigateUnsecuredCreditors(page: Page, scenario: TestScena
     await clickYesNoButton(page, 'prop.priority_claims.there_are_any', false);
   }
 
-  // Nonpriority claims — the "do any creditors have nonpriority unsecured
-  // claims?" gate was removed (clinic decision), so the interview goes straight
-  // to the first claim. Always fill one; use a default for scenarios that don't
-  // specify a nonpriority creditor.
+  // Nonpriority claims — the gate stays skipped (clinic decision, PR #91);
+  // filers with none use the "I have no unsecured debts" escape on the claim
+  // screen (William/ERLS, June 2026). Helpers always enter at least one claim.
   await waitForDaPageLoad(page);
   // Drive EVERY claim in nonpriorityList when the scenario provides one — the
   // PDF content assertions sum the list, and the multi-claim "any more?" loop

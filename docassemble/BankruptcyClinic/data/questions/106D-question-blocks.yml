@@ -133,20 +133,26 @@ check in: unsecured_claim_amount
 allowed to set:
   - prop.creditors[i].complete
 validation code: |
-  # Issue #63: city / ZIP format validation on secured-creditor address
-  city_err = is_valid_city(prop.creditors[i].city)
-  if city_err is not True:
-    validation_error(city_err, field="prop.creditors[i].city")
-  zip_err = is_valid_zip(prop.creditors[i].zip)
-  if zip_err is not True:
-    validation_error(zip_err, field="prop.creditors[i].zip")
-  if getattr(prop.creditors[i], 'has_codebtor', False):
-    co_city_err = is_valid_city(prop.creditors[i].codebtor_city)
-    if co_city_err is not True:
-      validation_error(co_city_err, field="prop.creditors[i].codebtor_city")
-    co_zip_err = is_valid_zip(prop.creditors[i].codebtor_zip)
-    if co_zip_err is not True:
-      validation_error(co_zip_err, field="prop.creditors[i].codebtor_zip")
+  # Deleting EVERY row is an explicit "I have none" — record it and skip the
+  # per-item checks (same escape as the E/F claim screens; William/ERLS +
+  # Roxanne UAT, June 2026).
+  if len(prop.creditors) == 0:
+    mark_list_emptied(prop.creditors)
+  else:
+    # Issue #63: city / ZIP format validation on secured-creditor address
+    city_err = is_valid_city(prop.creditors[i].city)
+    if city_err is not True:
+      validation_error(city_err, field="prop.creditors[i].city")
+    zip_err = is_valid_zip(prop.creditors[i].zip)
+    if zip_err is not True:
+      validation_error(zip_err, field="prop.creditors[i].zip")
+    if getattr(prop.creditors[i], 'has_codebtor', False):
+      co_city_err = is_valid_city(prop.creditors[i].codebtor_city)
+      if co_city_err is not True:
+        validation_error(co_city_err, field="prop.creditors[i].codebtor_city")
+      co_zip_err = is_valid_zip(prop.creditors[i].codebtor_zip)
+      if co_zip_err is not True:
+        validation_error(co_zip_err, field="prop.creditors[i].codebtor_zip")
 fields:
   - Creditor Name: prop.creditors[i].name
   - note: |
@@ -266,6 +272,19 @@ fields:
     show if:
       variable: prop.creditors[i].has_codebtor
       is: True
+script: |
+  <script>
+    // Re-enable Continue when every row is deleted (docassemble disables it,
+    // silently trapping the filer — same fix as the E/F claim screens).
+    if (window.daZeroClaimsTimer) { clearInterval(window.daZeroClaimsTimer); }
+    window.daZeroClaimsTimer = setInterval(function () {
+      var live = $('button.dacollectremove:visible, button.dacollectremoveexisting:visible').length;
+      var removed = $('button.dacollectunremove:visible').length;
+      if (live === 0 && removed > 0) {
+        $('#da-continue-button').prop('disabled', false);
+      }
+    }, 400);
+  </script>
 list collect: True 
 ---
 id: schedule_d_review
