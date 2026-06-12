@@ -268,8 +268,7 @@ fields:
 # explicit "I have none" — record it so the flow moves on.
 validation code: |
   if len(prop.priority_claims) == 0:
-    prop.priority_claims.there_are_any = False
-    prop.priority_claims.gathered = True
+    mark_list_emptied(prop.priority_claims)
 script: |
   <script>
     // docassemble's list collect DISABLES Continue when every row is deleted,
@@ -560,8 +559,7 @@ fields:
 # continuing must actually work.
 validation code: |
   if len(prop.nonpriority_claims) == 0:
-    prop.nonpriority_claims.there_are_any = False
-    prop.nonpriority_claims.gathered = True
+    mark_list_emptied(prop.nonpriority_claims)
 script: |
   <script>
     // docassemble's list collect DISABLES Continue when every row is deleted,

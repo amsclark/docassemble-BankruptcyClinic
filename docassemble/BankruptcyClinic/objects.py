@@ -156,6 +156,18 @@ _STATE_TO_ABBR = {
     'wisconsin': 'WI', 'wyoming': 'WY', 'district of columbia': 'DC',
 }
 
+def mark_list_emptied(the_list):
+    """Record that the filer deleted every row on a list-collect screen — an
+    explicit "I have none" (Roxanne UAT follow-up, June 2026). Done through a
+    function on purpose: assigning `the_list.there_are_any` / `.gathered`
+    directly inside a question's `validation code` registers that list-collect
+    question as a DEFINER of those variables, so an empty-list gather seek
+    asks the collect screen without an index ("list collect question needs
+    iterator i" crash) instead of the yesno gate question."""
+    the_list.there_are_any = False
+    the_list.gathered = True
+
+
 def state_abbr(value):
     """Return the 2-letter abbreviation for a state name; pass through if already
     an abbreviation or unrecognized. Used to keep court-form PDF fields in the
