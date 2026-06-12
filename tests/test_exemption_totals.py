@@ -60,15 +60,20 @@ def test_citation_has_no_bogus_subsection():
 
 
 def test_claiming_less_than_full_derivation():
-    """The '<100% of FMV' flag is derived: amount < value => partial (True),
-    amount == or > value => 100%/fair-market (False); bad input => False."""
-    assert claiming_less_than_full(1500, 4000) is True      # partial
-    assert claiming_less_than_full(4000, 4000) is False     # exactly 100%
-    assert claiming_less_than_full(5000, 4000) is False     # over -> 100%
-    assert claiming_less_than_full(None, 4000) is False     # no amount
-    assert claiming_less_than_full(1500, None) is False     # no value
+    """The 'specific dollar amount' flag is derived: ANY entered amount (> 0)
+    is a specific-dollar claim — including amount == value, which previously
+    flipped to '100% of FMV' on Schedule C (Roxanne, Legal Aid of NE, June
+    2026: exemptions should be dollar amounts unless the debtor specifically
+    chose 100% of FMV). Only a claim with no amount entered is 100%/FMV."""
+    assert claiming_less_than_full(1500, 4000) is True       # partial
+    assert claiming_less_than_full(4000, 4000) is True       # full value entered -> still $ amount
+    assert claiming_less_than_full(5000, 4000) is True       # over -> $ amount as entered
+    assert claiming_less_than_full(None, 4000) is False      # no amount -> 100% FMV
+    assert claiming_less_than_full('', 4000) is False        # blank -> 100% FMV
+    assert claiming_less_than_full(0, 4000) is False         # zero -> 100% FMV
+    assert claiming_less_than_full(1500, None) is True       # value not needed
     assert claiming_less_than_full('$1,500', '$4,000') is True   # currency strings
-    assert claiming_less_than_full('bogus', 4000) is False  # unparseable
+    assert claiming_less_than_full('bogus', 4000) is False   # unparseable
 
 
 def test_2023_cpi_adjusted_amounts():
@@ -312,6 +317,61 @@ def _vprop_interests(*interests):
     return types.SimpleNamespace(interests=list(interests), ab_vehicles=[], ab_other_vehicles=[])
 
 
+def test_financial_assets_and_owed_property_counted():
+    """Annuities, bank deposits, cash and owed-property claims feed the summary.
+    Roxanne UAT (June 2026): the summary showed ONLY car/house/household goods —
+    every other claiming category (financial assets, owed property, business,
+    farm, personal items) was silently dropped from the running totals."""
+    LIFE = NEBRASKA_EXEMPTIONS['life_insurance']
+    EIC = NEBRASKA_EXEMPTIONS['earned_income']
+    fa = types.SimpleNamespace(
+        annuities=[types.SimpleNamespace(
+            has_claim=True, sub_100=True, amount=28000,
+            exemption_value=28000, exemption_laws=LIFE,
+            exemption_value_2=0, exemption_laws_2='')],
+        deposits=[types.SimpleNamespace(
+            is_claiming_exemption=True, sub_100=False, amount=2500,
+            exemption_value=0, exemption_laws=WILD,
+            exemption_value_2=0, exemption_laws_2='')],
+        cash_is_claiming_exemption=True, cash_sub_100=False, cash_value=300,
+        cash_exemption_value=0, cash_exemption_laws=WILD,
+        cash_exemption_value_2=0, cash_exemption_laws_2='')
+    owed = types.SimpleNamespace(
+        tax_refund_has_claim=True, tax_refund_sub_100=True, tax_refund_federal=1200,
+        tax_refund_exemption_value=1200, tax_refund_exemption_laws=EIC,
+        tax_refund_exemption_value_2=0, tax_refund_exemption_laws_2='')
+    prop = types.SimpleNamespace(interests=[], ab_vehicles=[], ab_other_vehicles=[],
+                                 financial_assets=fa, owed_property=owed)
+    res = compute_exemption_totals(prop, 'Nebraska')
+    assert res[LIFE]['claimed'] == 28000.0, res
+    # deposits full claim falls back to the account amount; cash likewise
+    assert res[WILD]['claimed'] == 2800.0, res
+    assert res[EIC]['claimed'] == 1200.0, res
+
+
+def test_flat_personal_property_categories_counted():
+    """Jewelry/electronics-style flat categories count in the totals."""
+    prop = types.SimpleNamespace(
+        interests=[], ab_vehicles=[], ab_other_vehicles=[],
+        jewelry_is_claiming_exemption=True, jewelry_claiming_sub_100=True,
+        jewelry_value=5700, jewelry_exemption_value=5700,
+        jewelry_exemption_laws=WILD, jewelry_exemption_value_2=0,
+        jewelry_exemption_laws_2='')
+    res = compute_exemption_totals(prop, 'Nebraska')
+    assert res[WILD]['claimed'] == 5700.0, res
+
+
+def test_annuity_category_offers_44_371():
+    """The annuity exemption dropdown offers § 44-371 (life insurance/annuity,
+    $100k) and the retirement exemption — previously it showed the 'wages'
+    list, so the annuity exemption could not be claimed (Roxanne UAT)."""
+    from docassemble.BankruptcyClinic.objects import get_exemption_choices
+    choices = get_exemption_choices('Nebraska', 'annuity')
+    assert NEBRASKA_EXEMPTIONS['life_insurance'] in choices, choices
+    assert NEBRASKA_EXEMPTIONS['retirement'] in choices, choices
+    assert NEBRASKA_EXEMPTIONS['wildcard'] in choices, choices
+
+
 if __name__ == '__main__':
     test_full_claim_counts_owned_value()
     test_partial_claim_uses_explicit_value()
@@ -337,4 +397,7 @@ if __name__ == '__main__':
     test_mv_property_invariants()
     test_mv_property_sole_single_car_under_cap_never_blocks()
     test_totals_property_never_negative_and_limit_scales()
+    test_financial_assets_and_owed_property_counted()
+    test_flat_personal_property_categories_counted()
+    test_annuity_category_offers_44_371()
     print('OK: all exemption-totals unit tests passed (incl. property-based)')

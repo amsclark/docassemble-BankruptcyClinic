@@ -27,10 +27,13 @@ question: |
 subquestion: |
   % if len(get_creditor_choices()) > 0:
   Your clinic maintains a list of commonly seen creditors.
-  Select any that apply to your case and their name and address will
-  be pre-filled for you.
+  **Only select a creditor if you actually owe it money.** Each one you select
+  is added to your creditor schedules (Schedule E or F) with its name and
+  address pre-filled, and you will be asked for the amount you owe it.
 
-  You can always add more creditors manually in the next steps.
+  Selecting a creditor here is **not** needed just to send it a notice — leave
+  it unchecked if you don't owe it anything. You can always add more creditors
+  manually in the next steps.
   % else:
   No common creditors have been added to the library yet.
   Click **Continue** to enter your creditors manually.
@@ -54,11 +57,23 @@ code: |
   _all_records = get_all_creditors()
   _injected_count = 0
 
+  # Idempotency guard: if this block is interrupted mid-run by a seek and
+  # re-executed, a creditor already appended must not be appended again
+  # (duplicate IRS/NDR rows the filer then has to delete — Roxanne UAT).
+  _already_present = set()
+  for _lst in (prop.priority_claims, prop.nonpriority_claims):
+    for _c in getattr(_lst, 'elements', []):
+      _nm = str(getattr(_c, 'name', '') or '').strip().upper()
+      if _nm:
+        _already_present.add(_nm)
+
   if defined('library_selected_ids'):
     for _sel_id in library_selected_ids.true_values():
       _rec_id = int(_sel_id)
       if _rec_id in _all_records:
         _data = _all_records[_rec_id]
+        if str(_data.get('name', '') or '').strip().upper() in _already_present:
+          continue
         _ctype = _data.get('type', '')
         if _ctype in PRIORITY_CREDITOR_TYPES:
           # Priority claim (Schedule E) — e.g. tax debt (IRS / NE Dept of

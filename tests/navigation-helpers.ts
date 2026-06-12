@@ -1039,6 +1039,11 @@ export async function navigateExpenses(page: Page, rentAmount: string, dependent
   await waitForDaPageLoad(page);
   await selectYesNoRadio(page, 'debtor[0].expenses.change_in_expense', false);
   await clickContinue(page);
+
+  // Disposable-income summary (Roxanne UAT, June 2026): take-home income,
+  // expenses, and what's left — continue-button gated.
+  await waitForDaPageLoad(page);
+  await clickNthByName(page, b64('income_expense_summary_acknowledged'), 0);
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -1101,10 +1106,10 @@ export async function navigateMeansTest(page: Page, opts: MeansTestOptions = {})
     await clickContinue(page);
   }
 
-  // Median family income screen: state + household size are defaulted,
-  // median_income has NO default and is required.
+  // Median family income screen: state + household size are defaulted; the
+  // median income figure itself is now looked up from the DOJ table by code
+  // (Roxanne UAT, June 2026) — there is no longer a field to type it into.
   await waitForDaPageLoad(page);
-  await fillById(page, b64('monthly_income.median_income'), opts.medianIncome ?? '85000');
   await clickContinue(page);
 
   // review_122 (event + continue button field: monthly_income.reviewed).

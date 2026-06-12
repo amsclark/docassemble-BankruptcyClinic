@@ -277,6 +277,20 @@ validation code: |
       validation_error("ITIN must start with the digit 9.", field="debtor[i].tax_id.tax_id")
     else:
       debtor[i].tax_id.tax_id = _digits[:3] + '-' + _digits[3:5] + '-' + _digits[5:]
+  # Roxanne UAT (June 2026): a joint filing accepted the identical name + SSN
+  # for both debtors. Debtor 2 must be a different person than Debtor 1.
+  if i == 1:
+    _d1_digits = re.sub(r'\D', '', getattr(debtor[0].tax_id, 'tax_id', '') or '')
+    _d2_digits = re.sub(r'\D', '', debtor[i].tax_id.tax_id or '')
+    if _d1_digits and _d2_digits and _d1_digits == _d2_digits:
+      validation_error("This SSN/ITIN is the same as Debtor 1's. Each spouse must enter their own tax ID.", field="debtor[i].tax_id.tax_id")
+    _same_name = (
+      str(debtor[i].name.first or '').strip().lower() == str(debtor[0].name.first or '').strip().lower()
+      and str(debtor[i].name.last or '').strip().lower() == str(debtor[0].name.last or '').strip().lower()
+      and str(getattr(debtor[i].name, 'middle', '') or '').strip().lower() == str(getattr(debtor[0].name, 'middle', '') or '').strip().lower()
+    )
+    if _same_name and not (_d1_digits and _d2_digits):
+      validation_error("Debtor 2 has the same name as Debtor 1. Enter your spouse's own name here — or, if you both truly share the same full name, enter each person's SSN/ITIN so the court can tell you apart.", field="debtor[i].name.first")
 check in: update_counties
 continue button field: debtor_basic_info
 
@@ -470,23 +484,20 @@ code: |
     _deductions = (_gi(debt, 'tax_deduction') + _gi(debt, 'mandatory_contributions') + _gi(debt, 'voluntary_contributions') + _gi(debt, 'fund_loans') + _gi(debt, 'insurance') + _gi(debt, 'domestic_support') + _gi(debt, 'union_dues') + _other_ded)
     _overall += _income_total + _paystub_total - _deductions
   overallIncome = _overall
-  # DOJ Median Family Income thresholds for Ch. 7 means test
-  # Source: https://www.justice.gov/ust/eo/bapcpa/20250515/bci_data/median_income_table.htm
-  # These numbers should be updated when new DOJ tables are published (every ~6 months)
+  # DOJ Median Family Income lookup — table + math live in objects.py
+  # get_median_family_income() (single source, also used to define
+  # monthly_income.median_income for the 122A form).
   _household_size = _num(value('monthly_income.median_dependents')) if defined('monthly_income.median_dependents') else 1
   if _household_size < 1:
     _household_size = 1
-  _state = str(debtor[0].address.state).lower() if defined('debtor[0].address.state') else 'nebraska'
-  if 'south dakota' in _state:
-    _median_table = {1: 61022, 2: 92469, 3: 96008, 4: 116374}
+  # Prefer the state the debtor confirmed on the median-income screen (122A);
+  # fall back to the petition address state (e.g. when this runs for the
+  # fee-waiver eligibility note before the means test).
+  if defined('monthly_income.median_state') and value('monthly_income.median_state'):
+    _state = str(value('monthly_income.median_state')).lower()
   else:
-    _median_table = {1: 65292, 2: 89130, 3: 103358, 4: 120323}
-  _additional_per_person = 11100
-  _hs = int(_household_size)
-  if _hs <= 4:
-    medianFamilyIncome = _median_table.get(_hs, _median_table[1])
-  else:
-    medianFamilyIncome = _median_table[4] + (_hs - 4) * _additional_per_person
+    _state = str(debtor[0].address.state).lower() if defined('debtor[0].address.state') else 'nebraska'
+  medianFamilyIncome = get_median_family_income(_state, _household_size)
 
 ---
 id: previous_bankruptcy
@@ -878,6 +889,15 @@ fields:
    show if:
      variable: debtor[i].counseling.counseling_type
      is: '1'
+validation code: |
+  # Roxanne UAT (June 2026): a certificate dated outside the statutory window
+  # (11 U.S.C. § 109(h): briefing within 180 days before filing) was accepted.
+  if str(debtor[i].counseling.counseling_type) == '1' and defined('debtor[i].counseling.counseling_date') and debtor[i].counseling.counseling_date:
+    _days_ago = date_difference(starting=debtor[i].counseling.counseling_date, ending=today()).days
+    if _days_ago < 0:
+      validation_error("The counseling date cannot be in the future.", field="debtor[i].counseling.counseling_date")
+    elif _days_ago > 180:
+      validation_error("This counseling date is more than 180 days ago. The law requires the credit counseling briefing within the 180 days before you file. If you took the class more than 180 days ago, you will need to complete it again before filing.", field="debtor[i].counseling.counseling_date")
 section: credit_counsel
 ---
 id: counseling_not_required
@@ -1284,7 +1304,10 @@ subquestion: |
   Please review all documents with your attorney before filing.
 
   **Creditor Mailing Matrix (plain text for CM/ECF upload):**
-  ${ mailing_matrix_file }
+
+  [**Download the creditor matrix** (creditor_matrix.txt)](${ mailing_matrix_file.url_for(attachment=True) })
+
+  Open the downloaded file to print it, or upload it directly to CM/ECF.
 allow downloading: True
 attachment code: |
   conclusion_attachments

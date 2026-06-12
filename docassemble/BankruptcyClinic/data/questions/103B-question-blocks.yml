@@ -9,27 +9,20 @@ subquestion: |
 continue button field: waive_fee_intro
 ---
 #Part 1 - Tell the court about your family and your family's income
+# Family-size checkboxes/counts are no longer asked here — they derive from the
+# debtor list and the Schedule J dependents already gathered (Roxanne UAT,
+# June 2026: the fee waiver re-asked information the filer had already given).
+# See the fee_waiver_family_derived code block below.
 id: f103b_q2_family_income
 section: waive_fee
 question: |
-  Tell the court about your family and income
+  Tell the court about your family's income
 subquestion: |
-  Your family includes you, your spouse, and any dependents listed on Schedule J: Your Expenses.
+  Your family includes you${ ', your spouse,' if len(debtor) > 1 else '' } and any dependents listed on Schedule J: Your Expenses — **${ family.total_number } ${ 'people' if family.total_number != 1 else 'person' } total** (${ family.dependent_count } dependent${ 's' if family.dependent_count != 1 else '' }), carried over from your earlier answers.
+
+  We've pre-filled the income fields below from your Schedule I answers; review and adjust if needed.
 fields:
-  - You: family.you
-    datatype: yesno
-  - Your spouse: family.has_spouse
-    datatype: yesno
-  - Your dependents: family.has_dependents
-    datatype: yesno
-  - How many dependents: family.dependent_count
-    datatype: number
-    default: ${ len(debtor[0].expenses.dependents) if defined('debtor[0].expenses.dependents.gathered') else 0 }
-  - Total number of people: family.total_number
-    datatype: number
-    default: ${ len(debtor) + len(debtor[0].expenses.dependents) if defined('debtor[0].expenses.dependents.gathered') else len(debtor) }
   - note: |
-      <br>
       ### Income Information
 
       Make sure to include the value (if known) of any non-cash governmental assistance that you receive, such as food stamps (benefits under the Supplemental Nutrition Assistance Program) or housing subsidies.
@@ -66,6 +59,21 @@ fields:
   - Explain: family.cannot_pay_explain
     input type: area
 ---
+# Form 103B Part 1 family size — derived, not asked (Roxanne UAT, June 2026).
+# The ONLY generator for these variables (rule 6); int() so the PDF shows "3",
+# not "3.0" (Roxanne UAT: household counts rendered with decimal points).
+code: |
+  family.you = True
+  family.has_spouse = len(debtor) > 1
+  if defined('debtor[0].expenses.dependents.gathered'):
+    _fw_dep_count = len(debtor[0].expenses.dependents)
+  else:
+    _fw_dep_count = 0
+  family.has_dependents = _fw_dep_count > 0
+  family.dependent_count = int(_fw_dep_count)
+  family.total_number = int(len(debtor) + _fw_dep_count)
+  fee_waiver_family_derived = True
+---
 #Part 2 - Tell the court about your monthly expenses
 id: f103b_monthly_expenses
 section: waive_fee
@@ -73,9 +81,13 @@ question: |
   Estimate your average monthly expenses.
 subquestion: |
   Include amounts paid by any government assistance that you reported earlier.
+
+  *We've pre-filled this from your Schedule J expense answers (line 22 total);
+  review and adjust if needed.*
 fields:
   - Average Monthly Expense: family.average_monthly_expenses
     datatype: currency
+    default: ${ schedule_j_total_expenses }
   - note: |
       <br><br>
       Do these expenses cover anyone who is not included in your family as reported earlier?
@@ -105,277 +117,72 @@ fields:
     required: False
 ---
 # Part 3 - Tell the court about your property
-table: prop_accounts_table
-rows: prop.accounts
-columns:
-  - Type: row_item.type
-  - Institution: row_item.institution
-  - Amount: row_item.amount
-edit:
-  - type
-  - institution
-  - amount
----
-id: f103b_cash_amount
-section: waive_fee
-question: |
-  How much cash do you have?
-subquestion: |
-  Examples: Money you have in your wallet, in your home, and on hand when you file this application.
-fields:
-  - Cash on Hand: prop.cash_on_hand
-    datatype: currency
----
-id: f103b_bank_accounts_exist
-section: waive_fee
-question: |
-  Do you have bank accounts and other deposits of money?
-subquestion: |
-  Examples: Checking, savings, money market, or other financial accounts; certificates of deposit; shares in banks, credit unions, brokerage houses, and other similar institutions. If you have more than one account with the same institution, list each when asked.
-
-  Do not include 401(k) and IRA accounts.
-yesno: prop.has_bank_accounts
----
-id: f103b_bank_account_details
-section: waive_fee
-question: |
-  Provide details about your account.
-allowed to set:
-  - prop.accounts[i].complete
-fields:
-  - Account Type: prop.accounts[i].type
-    choices:
-      - Checking
-      - Savings
-      - Other
-  - Institution Name: prop.accounts[i].institution
-  - Amount: prop.accounts[i].amount
-    datatype: currency
-under: |
-  ${ prop_accounts_table }
-list collect: True
----
-id: f103b_bank_accounts_add_another
-section: waive_fee
-question: |
-  Do you have any other bank accounts or deposits of money?
-yesno: prop.accounts.there_is_another
-under: |
-  ${ prop_accounts_table }
----
-id: f103b_home_ownership
-section: waive_fee
-question: |
-  Your home?
-subquestion: |
-  Do you own a home outright or are you in the process of purchasing one now?
-
-  % if defined('prop.interests.gathered') and len(prop.interests) > 0:
-  *We've pre-filled the fields below from your Schedule A/B (Real Property) entries. Review and adjust only if the fee-waiver-specific value differs.*
-  % endif
-fields:
-  - Owns home: prop.has_home
-    datatype: yesnoradio
-    default: ${ True if defined('prop.interests.gathered') and len(prop.interests) > 0 else False }
-  - Address/PO Box: prop.mortgage_street
-    show if: prop.has_home
-    required: False
-    default: ${ prop.interests[0].street if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'street') else '' }
-  - City: prop.mortgage_city
-    show if: prop.has_home
-    required: False
-    default: ${ prop.interests[0].city if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'city') else '' }
-  - State: prop.mortgage_state
-    show if: prop.has_home
-    required: False
-    default: ${ prop.interests[0].state if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'state') else '' }
-  - Zip: prop.mortgage_zip
-    datatype: text
-    minlength: 5
-    maxlength: 5
-    show if: prop.has_home
-    required: False
-    default: ${ prop.interests[0].zip if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'zip') else '' }
-  - Current Value: prop.mortgage_current_value
-    datatype: currency
-    show if: prop.has_home
-    required: False
-    default: ${ prop.interests[0].current_value if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'current_value') else 0 }
-  - Amount owed: prop.mortgage_amount_owed
-    datatype: currency
-    show if: prop.has_home
-    required: False
-    default: ${ prop.interests[0].current_owed_amount if defined('prop.interests.gathered') and len(prop.interests) > 0 and hasattr(prop.interests[0], 'current_owed_amount') else 0 }
-validation code: |
-  # Issue #77: hard-block fee-waiver real-estate value if it diverges significantly
-  # from the Schedule A/B canonical value (>10% or >$2,000), with attorney override.
-  if prop.has_home and defined('prop.interests.gathered') and len(prop.interests) > 0:
-    canonical = float(getattr(prop.interests[0], 'current_value', 0) or 0)
-    entered = float(prop.mortgage_current_value or 0)
-    if canonical > 0:
-      tolerance = max(2000.0, canonical * 0.10)
-      if abs(entered - canonical) > tolerance:
-        validation_error("This value ($" + format(entered, ',.0f') + ") differs from your Schedule A/B entry ($" + format(canonical, ',.0f') + ") by more than 10%. Update Schedule A/B first if the canonical value is wrong, or contact your attorney if you need a different value here.", field="prop.mortgage_current_value")
----
-id: f103b_other_real_estate
-section: waive_fee
-question: |
-  Other real estate?
-subquestion: |
-  Do you own any other real estate assets?
-
-  % if defined('prop.interests.gathered') and len(prop.interests) > 1:
-  *Pre-filled from your Schedule A/B second real-property entry.*
-  % endif
-fields:
-  - Has other real estate: prop.has_other_real_estate
-    datatype: yesnoradio
-    default: ${ True if defined('prop.interests.gathered') and len(prop.interests) > 1 else False }
-  - Address/PO Box: prop.other_mortgage_street
-    show if: prop.has_other_real_estate
-    required: False
-    default: ${ prop.interests[1].street if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'street') else '' }
-  - City: prop.other_mortgage_city
-    show if: prop.has_other_real_estate
-    required: False
-    default: ${ prop.interests[1].city if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'city') else '' }
-  - State: prop.other_mortgage_state
-    show if: prop.has_other_real_estate
-    required: False
-    default: ${ prop.interests[1].state if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'state') else '' }
-  - Zip: prop.other_mortgage_zip
-    datatype: text
-    minlength: 5
-    maxlength: 5
-    show if: prop.has_other_real_estate
-    required: False
-    default: ${ prop.interests[1].zip if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'zip') else '' }
-  - Current Value: prop.other_mortgage_current_value
-    datatype: currency
-    show if: prop.has_other_real_estate
-    required: False
-    default: ${ prop.interests[1].current_value if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'current_value') else 0 }
-  - Amount owed: prop.other_mortgage_amount_owed
-    datatype: currency
-    show if: prop.has_other_real_estate
-    required: False
-    default: ${ prop.interests[1].current_owed_amount if defined('prop.interests.gathered') and len(prop.interests) > 1 and hasattr(prop.interests[1], 'current_owed_amount') else 0 }
----
-table: prop_vehicles_table
-rows: prop.vehicles
-columns:
-  - Make: row_item.make
-  - Model: row_item.model
-  - Year: row_item.year
-  - Mileage: row_item.milage
-  - Value: row_item.current_value
-  - Owed: row_item.amount_owed
-edit:
-  - make
-  - model
-  - year
-  - milage
-  - current_value
-  - amount_owed
----
-id: f103b_vehicles_any_exist
-section: waive_fee
-question: |
-  Vehicles?
-subquestion: |
-  Do you own any vehicles? Examples: Cars, vans, trucks, sports utility vehicles, motorcycles, tractors, boats.
-yesno: prop.vehicles.there_are_any
----
-id: f103b_vehicles_add_another
-section: waive_fee
-question: |
-  Do you own any more vehicles?
-yesno: prop.vehicles.there_is_another
-under: |
-  ${ prop_vehicles_table }
----
-section: waive_fee
-question: |
-  Enter vehicle information
-allowed to set:
-  - prop.vehicles[i].complete
-fields:
-  - Make: prop.vehicles[i].make
-  - Model: prop.vehicles[i].model
-  - Year: prop.vehicles[i].year
-  - Mileage: prop.vehicles[i].milage
-    datatype: number
-  - note: |
-      Tell us about the vehicle's value and liens.
-  - Current Value: prop.vehicles[i].current_value
-    datatype: currency
-  - Amount owed: prop.vehicles[i].amount_owed
-    datatype: currency
-list collect: True
----
-id: f103b_other_assets
-section: waive_fee
-question: |
-  Other assets
-subquestion: |
-  What other assets do you own aside from household items and clothing?
-fields:
-  - Describe other assets: prop.other_asset_description
-    input type: area
-  - Current Value: prop.other_asset_value
-    datatype: currency
-  - Amount owed: prop.other_asset_owed
-    datatype: currency
----
-table: prop_owers_table
-rows: prop.owers
-columns:
-  - Name: row_item.name
-  - Amount: row_item.amount
-edit:
-  - name
-  - amount
----
-id: f103b_money_owed_to_you_any_exist
-section: waive_fee
-question: |
-  Money or property due you?
-subquestion: |
-  Examples: Tax refunds, past due or lump sum alimony, spousal support, child support, maintenance, divorce or property settlements, Social Security benefits, workers' compensation, personal injury recovery.
-yesno: prop.owers.there_are_any
----
-id: f103b_money_owed_to_you_add_another
-section: waive_fee
-question: |
-  Do you have any other property due?
-yesno: prop.owers.there_is_another
-under: |
-  ${ prop_owers_table }
----
-id: f103b_money_owed_to_you_details
-section: waive_fee
-question: |
-  Tell us about who owes you money.
-allowed to set:
-  - prop.owers[i].complete
-fields:
-  - Name of person who owes you: prop.owers[i].name
-  - How much?: prop.owers[i].amount
-    datatype: currency
-under: |
-  ${ prop_owers_table }
-list collect: True
----
-id: f103b_likely_payment_received
-section: waive_fee
-question: |
-  Receiving payment?
-fields:
-  - Do you believe you will likely receive payment in the next 180 days?: prop.will_receive_ower_payment
-    datatype: yesnoradio
-  - Explain: prop.ower_payment_explain
-    required: false
-    input type: area
+# Official Form 103B instruction for Part 3: "If you have already filled out
+# Schedule A/B: Property (Official Form 106A/B) attach copies to this
+# application and go to Part 4." This interview ALWAYS assembles Form 106A/B as
+# part of the filing package, so Part 3 is no longer asked (Roxanne UAT, June
+# 2026: the fee waiver made filers re-enter every asset). Cash, bank accounts,
+# real estate and vehicles are factual copies derived from the Schedule A/B
+# answers below (the ONLY generator of these variables — rule 6); "other
+# assets" (q.15) and "money owed to you" (q.16) are intentionally left blank on
+# the PDF — the attached schedules carry that detail.
+code: |
+  _fw_fa = getattr(prop, 'financial_assets', None)
+  # Q10: cash on hand <- Schedule A/B "I have cash"
+  if _fw_fa is not None and getattr(_fw_fa, 'has_cash', False):
+    prop.cash_on_hand = getattr(_fw_fa, 'cash_value', 0) or 0
+  else:
+    prop.cash_on_hand = 0
+  # Q11: bank accounts <- Schedule A/B deposits
+  _fw_deps = list(getattr(getattr(_fw_fa, 'deposits', None), 'elements', [])) if _fw_fa is not None else []
+  prop.has_bank_accounts = len(_fw_deps) > 0
+  prop.accounts.clear()
+  for _fw_k, _fw_dep in enumerate(_fw_deps):
+    prop.accounts.appendObject()
+    # The PDF builder buckets accounts as Checking / Savings / Other — fold the
+    # Schedule A/B deposit types (e.g. "Certificates of deposit") into those.
+    _fw_t = str(getattr(_fw_dep, 'type', '') or '')
+    prop.accounts[_fw_k].type = _fw_t if _fw_t in ('Checking', 'Savings') else 'Other'
+    prop.accounts[_fw_k].institution = str(getattr(_fw_dep, 'institution', ''))
+    prop.accounts[_fw_k].amount = getattr(_fw_dep, 'amount', 0) or 0
+    prop.accounts[_fw_k].complete = True
+  prop.accounts.there_are_any = len(_fw_deps) > 0
+  prop.accounts.gathered = True
+  # Q12/Q13: home + other real estate <- Schedule A/B real-property interests
+  _fw_interests = list(getattr(getattr(prop, 'interests', None), 'elements', []))
+  prop.has_home = len(_fw_interests) > 0
+  if prop.has_home:
+    prop.mortgage_street = str(getattr(_fw_interests[0], 'street', ''))
+    prop.mortgage_city = str(getattr(_fw_interests[0], 'city', ''))
+    prop.mortgage_state = str(getattr(_fw_interests[0], 'state', ''))
+    prop.mortgage_zip = str(getattr(_fw_interests[0], 'zip', ''))
+    prop.mortgage_current_value = getattr(_fw_interests[0], 'current_value', 0) or 0
+    prop.mortgage_amount_owed = getattr(_fw_interests[0], 'current_owed_amount', 0) or 0
+  prop.has_other_real_estate = len(_fw_interests) > 1
+  if prop.has_other_real_estate:
+    prop.other_mortgage_street = str(getattr(_fw_interests[1], 'street', ''))
+    prop.other_mortgage_city = str(getattr(_fw_interests[1], 'city', ''))
+    prop.other_mortgage_state = str(getattr(_fw_interests[1], 'state', ''))
+    prop.other_mortgage_zip = str(getattr(_fw_interests[1], 'zip', ''))
+    prop.other_mortgage_current_value = getattr(_fw_interests[1], 'current_value', 0) or 0
+    prop.other_mortgage_amount_owed = getattr(_fw_interests[1], 'current_owed_amount', 0) or 0
+  # Q14: vehicles <- Schedule A/B vehicles (cars + other vehicles)
+  _fw_cars = list(getattr(getattr(prop, 'ab_vehicles', None), 'elements', [])) + \
+             list(getattr(getattr(prop, 'ab_other_vehicles', None), 'elements', []))
+  prop.vehicles.clear()
+  for _fw_k, _fw_car in enumerate(_fw_cars):
+    prop.vehicles.appendObject()
+    prop.vehicles[_fw_k].make = str(getattr(_fw_car, 'make', ''))
+    prop.vehicles[_fw_k].model = str(getattr(_fw_car, 'model', ''))
+    prop.vehicles[_fw_k].year = getattr(_fw_car, 'year', '')
+    prop.vehicles[_fw_k].milage = getattr(_fw_car, 'milage', '')
+    prop.vehicles[_fw_k].current_value = getattr(_fw_car, 'current_value', 0) or 0
+    # current_owed_amount is show-if gated on has_loan — mirror the gate
+    prop.vehicles[_fw_k].amount_owed = (getattr(_fw_car, 'current_owed_amount', 0) or 0) if getattr(_fw_car, 'has_loan', False) else 0
+    prop.vehicles[_fw_k].complete = True
+  prop.vehicles.there_are_any = len(_fw_cars) > 0
+  prop.vehicles.gathered = True
+  fee_waiver_part3_derived = True
 ---
 #Part 4: Answer these additional questions
 id: f103b_paid_for_services
@@ -522,8 +329,8 @@ code: |
   waive['sizeYou'] = True if family.you == True else False
   waive['sizeSpouse'] = True if family.has_spouse == True else False
   waive['sizeDependents'] = True if family.has_dependents == True else False
-  waive['dependentCount'] = family.dependent_count if family.has_dependents == True else None
-  waive['sizeTotal'] = family.total_number
+  waive['dependentCount'] = int(family.dependent_count) if family.has_dependents == True else None
+  waive['sizeTotal'] = int(family.total_number)
   waive['monthly_income_you'] = currency(family.you_income)
   waive['monthly_income_spouse'] = currency(family.spouse_income)
   waive['monthly_subtotal'] = currency(family.you_income + family.spouse_income)
@@ -588,20 +395,10 @@ code: |
       waive['carOwed'+str(i)] = currency(car.amount_owed)
       i += 1
 
-  waive['otherAssetsDescription'] = prop.other_asset_description
-  waive['otherAssetsValue'] = currency(prop.other_asset_value)
-  waive['otherAssetsOwed'] = currency(prop.other_asset_owed)
-
-  if len(prop.owers) > 0:
-    i = 1
-    for ower in prop.owers:
-      waive['owedName'+str(i)] = ower.name
-      waive['owedValue'+str(i)] = currency(ower.amount)
-      if prop.will_receive_ower_payment == True:
-        waive['owedYesPaymentSoon'] = True
-        waive['owedExplain'] = prop.ower_payment_explain
-      else:
-        waive['owedNoPaymentSoon'] = True
+  # Q15 (other assets) / Q16 (money owed to you) are intentionally left blank
+  # on the PDF — Part 3 derives from the attached Schedule A/B, which carries
+  # that detail (Roxanne UAT, June 2026). Those variables are no longer
+  # collected, so the old owedName/otherAssets field writes are gone.
       i += 1
 
 

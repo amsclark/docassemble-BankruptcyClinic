@@ -479,3 +479,74 @@ code: |
   expenses['deltaExplain'] = getattr(debtor[0].expenses, 'change_explainer', '')
 
 
+---
+# Reusable Schedule I/J totals (Roxanne UAT, June 2026: "no way for me to see a
+# running total of my income and expenses"). Formulas mirror the 106I/106J PDF
+# builders. `reconsider` keeps the figures fresh if the debtor revisits an
+# income or expense screen.
+reconsider: True
+code: |
+  def _ie_num(v):
+    try:
+      return float(v) if v not in (None, '') else 0.0
+    except (TypeError, ValueError):
+      return 0.0
+  _ie_exp = debtor[0].expenses
+  schedule_j_total_expenses = sum(_ie_num(getattr(_ie_exp, _a, 0)) for _a in [
+    'rent_expense', 'real_estate_taxes', 'renters_insurance', 'upkeep_expenses',
+    'owners_dues', 'additional_mortgage_payments', 'util_electric',
+    'util_garbage', 'telephone', 'util_other_amount', 'house_supplies',
+    'childcare', 'clothing', 'personal_care', 'medical', 'transportation',
+    'entertainment', 'charity', 'life_insurance', 'health_insurance',
+    'vehicle_insurance', 'other_insurance_amount', 'other_tax_amount',
+    'vehicle1_payments', 'vehicle2_payments', 'other_payment1_amount',
+    'other_payment2_amount', 'alimony', 'other_support_amount',
+    'overall_other_amount_1', 'overall_other_amount_2',
+    'overall_other_amount_3', 'overall_other_amount_4',
+    'overall_other_amount_5'])
+  schedule_i_take_home_total = sum(
+    (sum(_ie_num(getattr(_ie_d.income, _a, 0)) for _a in [
+        'net_rental_business', 'family_support', 'interest_and_dividends',
+        'unemployment', 'social_security', 'other_govt_assist', 'pension',
+        'other_monthly_amount',
+        'income_amount_1', 'income_amount_2', 'income_amount_3',
+        'income_amount_4', 'income_amount_5', 'income_amount_6',
+        'overtime_pay_1', 'overtime_pay_2', 'overtime_pay_3',
+        'overtime_pay_4', 'overtime_pay_5', 'overtime_pay_6'])
+     - sum(_ie_num(getattr(_ie_d.income, _a, 0)) for _a in [
+        'tax_deduction', 'mandatory_contributions', 'voluntary_contributions',
+        'fund_loans', 'insurance', 'domestic_support', 'union_dues',
+        'other_deduction_amount']))
+    for _ie_d in debtor)
+  schedule_j_net_income = schedule_i_take_home_total - schedule_j_total_expenses
+---
+# Disposable-income summary, shown right after expense entry (Roxanne UAT,
+# June 2026). Gated by a continue button (rule 2).
+id: income_expense_summary
+section: schedule_j
+question: |
+  Your monthly income and expenses
+subquestion: |
+  Here's a summary of what you've entered so far:
+
+  <table class="table">
+    <tbody>
+      <tr><td>Monthly take-home income${ ' (both debtors combined)' if len(debtor) > 1 else '' }</td><td class="text-right">${ currency(schedule_i_take_home_total) }</td></tr>
+      <tr><td>Monthly expenses</td><td class="text-right">&minus; ${ currency(schedule_j_total_expenses) }</td></tr>
+      <tr><td><strong>Monthly disposable income</strong></td><td class="text-right"><strong>${ currency(schedule_j_net_income) }</strong></td></tr>
+    </tbody>
+  </table>
+
+  % if schedule_j_net_income < 0:
+  Your expenses are **${ currency(-schedule_j_net_income) } more than your
+  take-home income each month** (a negative disposable income). That is common
+  for filers and simply reflects what you entered — but if it doesn't look
+  right, use the Back button to review your income and expense answers.
+  % elif schedule_j_net_income == 0:
+  Your expenses exactly match your take-home income, leaving **$0.00** in
+  disposable income each month.
+  % else:
+  This leaves you with **${ currency(schedule_j_net_income) }** in disposable
+  income each month.
+  % endif
+continue button field: income_expense_summary_acknowledged

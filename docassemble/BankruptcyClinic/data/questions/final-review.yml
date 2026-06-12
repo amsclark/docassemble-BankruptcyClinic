@@ -108,6 +108,9 @@ subquestion: |
   % for d in debtor:
   **Debtor ${ loop.index + 1 } employment:** ${ d.income.employment }
   % endfor
+  % if defined('schedule_i_take_home_total'):
+  **Monthly take-home income${ ' (both debtors combined)' if len(debtor) > 1 else '' }:** ${ currency(schedule_i_take_home_total) }
+  % endif
 
   [Revisit income](${ url_action('schedule_i') })
 
@@ -116,6 +119,12 @@ subquestion: |
   ### Expenses (Schedule J)
 
   **Rent/home expenses:** ${ currency(debtor[0].expenses.rent_expense) }
+  % if defined('schedule_j_total_expenses'):
+  **Total monthly expenses:** ${ currency(schedule_j_total_expenses) }
+  % endif
+  % if defined('schedule_j_net_income'):
+  **Monthly disposable income (take-home minus expenses):** ${ currency(schedule_j_net_income) }
+  % endif
 
   [Revisit expenses](${ url_action('schedule_j') })
 
