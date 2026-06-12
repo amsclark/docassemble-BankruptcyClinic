@@ -670,10 +670,13 @@ _RISKY_OPTIONAL_DATATYPES = {"yesnoradio", "noyesradio", "yesnomaybe", "date"}
 def optional_risky_fields(roots):
     """Map of field var -> defining file for fields that are `required: False`
     with a skippable rendering. Such a variable is NOT guaranteed defined even
-    after its question runs. Skippable: unclicked radios, blank dates, AND
-    unselected dropdowns / bare-choices selects (a select left on the
-    "Select..." placeholder submits nothing — the 106D notify other_state
-    class). Comboboxes commit typed text, so they are NOT in this class."""
+    after its question runs. Skippable: unclicked radios and blank dates.
+    Dropdowns / bare-choices selects are NOT in this class: verified
+    empirically (June 2026 lab interview on the current server) that a select
+    left on the "Select..." placeholder posts '' and the variable IS defined —
+    same semantics as a blank text field. (The earlier belief that they
+    submit nothing came from a case that was actually a show-if skip, which
+    the SHOW-IF GAP check covers.) Comboboxes commit typed text — also safe."""
     rootalt = "|".join(sorted(map(re.escape, roots), key=len, reverse=True))
     PATH = rf"(?:{rootalt})(?:\.\w+|\[[^\]]*\])*"
     field_re = re.compile(rf"^(\s*)-\s*(?:[^:#]+:\s*)?({PATH})\s*$")
@@ -694,8 +697,7 @@ def optional_risky_fields(roots):
                 md = re.match(r"\s*datatype:\s*(\S+)", la)
                 if md:
                     dt = md.group(1)
-                if re.match(r"\s*input type:\s*(dropdown|radio)\b", la) \
-                        or re.match(r"\s*choices:\s*$", la):
+                if re.match(r"\s*input type:\s*radio\b", la):
                     dropdownish = True
                 if re.match(r"\s*required:\s*[Ff]alse", la):
                     req_false = True
