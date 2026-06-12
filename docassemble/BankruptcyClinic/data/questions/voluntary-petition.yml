@@ -455,10 +455,11 @@ code: |
   prop.creditors.gather()
   prop.priority_claims.gather()
   # Skip the "do any creditors have nonpriority unsecured claims?" gate and go
-  # straight to the list (clinic decision — virtually every filer has at least
-  # one ordinary unsecured debt). Conditional so the claim screen's "deleted
-  # every row = I have none" escape (106EF validation code) is not overwritten
-  # on the next mandatory re-pass (Roxanne UAT follow-up, June 2026).
+  # straight to the list (clinic decision, May 2026 / PR #91 — virtually every
+  # filer has at least one ordinary unsecured debt). Conditional, NOT a plain
+  # assignment: the claim screen's "I have no unsecured debts" escape (106EF —
+  # William/ERLS, June 2026) sets there_are_any=False, and a plain assignment
+  # would overwrite it on the next mandatory re-pass.
   if not defined('prop.nonpriority_claims.there_are_any'):
     prop.nonpriority_claims.there_are_any = True
   prop.nonpriority_claims.gather()
