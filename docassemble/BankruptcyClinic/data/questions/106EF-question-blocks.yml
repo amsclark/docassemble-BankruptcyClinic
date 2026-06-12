@@ -262,6 +262,34 @@ fields:
     maxlength: 5
     show if: prop.priority_claims[i].has_notify
     required: False
+# Roxanne UAT (June 2026, follow-up): deleting EVERY row on this screen used
+# to silently re-render it demanding a fresh claim (gather() had latched
+# there_are_any=True from the picker-injected rows). An emptied list is an
+# explicit "I have none" — record it so the flow moves on.
+validation code: |
+  if len(prop.priority_claims) == 0:
+    prop.priority_claims.there_are_any = False
+    prop.priority_claims.gathered = True
+script: |
+  <script>
+    // docassemble's list collect DISABLES Continue when every row is deleted,
+    // silently trapping the filer ("Software will NOT let me move on" —
+    // Roxanne UAT, June 2026). Deleting every row is a legitimate "I have
+    // none": re-enable Continue so the form submits; the server-side
+    // validation code records there_are_any=False and the flow moves on.
+    // Poll rather than delegate: the core delete handlers `return false`,
+    // which stops propagation, so a document-delegated click handler never
+    // fires. The poll is a no-op on pages without collect rows, and the
+    // timer is replaced on each screen render.
+    if (window.daZeroClaimsTimer) { clearInterval(window.daZeroClaimsTimer); }
+    window.daZeroClaimsTimer = setInterval(function () {
+      var live = $('button.dacollectremove:visible, button.dacollectremoveexisting:visible').length;
+      var removed = $('button.dacollectunremove:visible').length;
+      if (live === 0 && removed > 0) {
+        $('#da-continue-button').prop('disabled', false);
+      }
+    }, 400);
+  </script>
 list collect: True
 ---
 table: prop_nonpriority_claims_table
@@ -527,6 +555,33 @@ fields:
     maxlength: 5
     show if: prop.nonpriority_claims[i].has_notify
     required: False
+# Same escape hatch as Schedule E: the subquestion promises "If you have none
+# to add, you can continue past this section" — deleting the blank row and
+# continuing must actually work.
+validation code: |
+  if len(prop.nonpriority_claims) == 0:
+    prop.nonpriority_claims.there_are_any = False
+    prop.nonpriority_claims.gathered = True
+script: |
+  <script>
+    // docassemble's list collect DISABLES Continue when every row is deleted,
+    // silently trapping the filer ("Software will NOT let me move on" —
+    // Roxanne UAT, June 2026). Deleting every row is a legitimate "I have
+    // none": re-enable Continue so the form submits; the server-side
+    // validation code records there_are_any=False and the flow moves on.
+    // Poll rather than delegate: the core delete handlers `return false`,
+    // which stops propagation, so a document-delegated click handler never
+    // fires. The poll is a no-op on pages without collect rows, and the
+    // timer is replaced on each screen render.
+    if (window.daZeroClaimsTimer) { clearInterval(window.daZeroClaimsTimer); }
+    window.daZeroClaimsTimer = setInterval(function () {
+      var live = $('button.dacollectremove:visible, button.dacollectremoveexisting:visible').length;
+      var removed = $('button.dacollectunremove:visible').length;
+      if (live === 0 && removed > 0) {
+        $('#da-continue-button').prop('disabled', false);
+      }
+    }, 400);
+  </script>
 list collect: True
 ---
 id: schedule_ef_review

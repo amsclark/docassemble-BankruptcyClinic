@@ -459,6 +459,40 @@ test.describe('Creditor Library – Picker', () => {
 
     await screenshot(page, 'picker-after-selection');
   });
+
+  test('Notice-only selection goes to the matrix list, not the claims', async ({ page }) => {
+    // Roxanne UAT follow-up (June 2026): selecting a creditor in the
+    // "NOTIFY only" list adds it to prop.notice_only_parties (creditor
+    // mailing matrix) without creating a Schedule E/F claim.
+    await gotoAdmin(page);
+    const body0 = await page.locator('body').textContent();
+    if (!body0?.includes(TEST_CREDITOR.name)) {
+      await addCreditorViaAdmin(page, TEST_CREDITOR);
+    }
+
+    await page.goto(PICKER_TEST_URL + '&new_session=1');
+    await waitForDaPageLoad(page);
+
+    // Check the first option of the notice-only group via a real label click
+    // (skipping the auto-added "None of the above").
+    const noticeGroup = `[data-varname="${b64('library_notice_only_ids')}"]`;
+    const label = page.locator(`${noticeGroup} label.danon-nota-checkbox[role="checkbox"]`).first();
+    await expect(label).toBeVisible();
+    await label.click();
+    await page.waitForTimeout(300);
+
+    await clickContinue(page);
+    await waitForDaPageLoad(page);
+
+    const heading = await page.locator('h1, h2, h3').first().textContent();
+    expect(heading?.trim()).toBe('Picker Test Complete');
+    const resultBody = await page.locator('body').textContent();
+    expect(resultBody).toContain('Injected 1 creditor');
+    expect(resultBody).toContain('Notice-only parties (mailing matrix only):');
+    // No claim was created
+    expect(resultBody).toContain('No creditors were selected.');
+    console.log('[PICKER] ✅ Notice-only creditor recorded without a claim');
+  });
 });
 
 

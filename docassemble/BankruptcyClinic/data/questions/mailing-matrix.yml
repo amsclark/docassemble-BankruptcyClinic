@@ -82,6 +82,12 @@ code: |
       _add(_c.name, _c.street, _c.city, _c.state, _c.zip)
       _add_codebtor(_c)
 
+  # Notice-only parties from the creditor-library picker (Roxanne UAT
+  # follow-up): noticed via the matrix, no Schedule E/F claim.
+  if defined('prop.notice_only_parties.gathered') and prop.notice_only_parties.gathered:
+    for _c in prop.notice_only_parties:
+      _add(_c.name, _c.street, _c.city, _c.state, _c.zip)
+
   _matrix_text = '\n\n'.join(_entries)
 
   mailing_matrix_file = DAFile('mailing_matrix_file')

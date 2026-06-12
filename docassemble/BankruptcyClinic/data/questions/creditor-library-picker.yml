@@ -7,9 +7,10 @@
 #  Sets:
 #    - creditor_library_picker_done (True when the picker step is complete)
 #
-#  The picker pre-fills name/address into the relevant DAList so the
-#  user only has to fill the debt-specific details when the gather()
-#  questions appear.
+#  Two kinds of selection (Roxanne UAT follow-up, June 2026):
+#    - "owe money"  -> pre-fills a Schedule E/F claim (amounts asked later)
+#    - "notice only" -> prop.notice_only_parties, included in the creditor
+#       mailing matrix but NOT on the debt schedules
 # ──────────────────────────────────────────────
 ---
 # Seed the clinic's default common creditors (IRS, Nebraska Dept of Revenue)
@@ -26,20 +27,24 @@ question: |
   Common Creditors
 subquestion: |
   % if len(get_creditor_choices()) > 0:
-  Your clinic maintains a list of commonly seen creditors.
-  **Only select a creditor if you actually owe it money.** Each one you select
-  is added to your creditor schedules (Schedule E or F) with its name and
-  address pre-filled, and you will be asked for the amount you owe it.
+  Your clinic maintains a list of commonly seen creditors. There are two ways
+  to use it:
 
-  Selecting a creditor here is **not** needed just to send it a notice — leave
-  it unchecked if you don't owe it anything. You can always add more creditors
-  manually in the next steps.
+  * **Creditors you owe money to** are added to your creditor schedules
+    (Schedule E or F) with the name and address pre-filled — you will be asked
+    for the amount you owe.
+  * **Notice-only creditors** are added to the creditor mailing matrix so they
+    receive notice of your case, **without** creating a debt entry on your
+    schedules. Pick this for agencies you want notified but don't owe.
+
+  Leave a creditor unchecked in both lists if it has nothing to do with your
+  case. You can always add more creditors manually in the next steps.
   % else:
   No common creditors have been added to the library yet.
   Click **Continue** to enter your creditors manually.
   % endif
 fields:
-  - Select creditors to pre-fill: library_selected_ids
+  - Creditors you OWE money to: library_selected_ids
     datatype: checkboxes
     code: |
       [{c['value']: c['label']} for c in get_creditor_choices()]
@@ -47,6 +52,19 @@ fields:
     show if:
       code: |
         len(get_creditor_choices()) > 0
+  - Creditors to NOTIFY only (no debt owed): library_notice_only_ids
+    datatype: checkboxes
+    code: |
+      [{c['value']: c['label']} for c in get_creditor_choices()]
+    required: False
+    show if:
+      code: |
+        len(get_creditor_choices()) > 0
+validation code: |
+  if defined('library_selected_ids') and defined('library_notice_only_ids'):
+    _both = set(library_selected_ids.true_values()) & set(library_notice_only_ids.true_values())
+    if _both:
+      validation_error("You selected the same creditor in both lists. Pick one: either you owe it money (first list) or it should only receive a notice (second list).", field="library_notice_only_ids")
 continue button field: creditor_library_picker_done
 ---
 # Code block that runs after the picker to inject selected creditors
@@ -54,6 +72,13 @@ continue button field: creditor_library_picker_done
 # Secured creditors need too many additional fields to pre-fill usefully,
 # but nonpriority unsecured creditors share the same name/address structure.
 code: |
+  # Instantiate the target lists FIRST: referencing a not-yet-created
+  # objects-block list mid-run seeks its definition, which interrupts and
+  # re-runs this whole block — the idempotency guard then skips the
+  # already-appended creditors and the injected count comes out wrong.
+  prop.nonpriority_claims
+  prop.priority_claims
+  prop.notice_only_parties
   _all_records = get_all_creditors()
   _injected_count = 0
 
@@ -63,7 +88,7 @@ code: |
   # getattr-guarded: the standalone picker-test interview only declares
   # nonpriority_claims, so a raw prop.priority_claims read would seek forever.
   _already_present = set()
-  for _lst_name in ('priority_claims', 'nonpriority_claims'):
+  for _lst_name in ('priority_claims', 'nonpriority_claims', 'notice_only_parties'):
     _lst = getattr(prop, _lst_name, None)
     if _lst is None:
       continue
@@ -88,9 +113,16 @@ code: |
           # priority-type library creditor (IRS / NE DoR) fired the
           # "any PRIORITY unsecured debts?" gate right here, BEFORE secured
           # creditors (Roxanne, June 4), instead of in the 106EF section.
+          #
+          # NOTE: there_are_any is deliberately NOT set here. Forcing it True
+          # meant a filer who deleted every injected row was silently stuck on
+          # the claim screen (it demanded at least one claim with no way to
+          # say "none" — Roxanne UAT June 2026, reproduced empirically). With
+          # it unset, gather() proceeds off the appended elements, and if the
+          # filer deletes them all the Schedule E gate question is asked,
+          # where "No" moves on.
           _claim = prop.priority_claims.appendObject()
           _claim.type = _ctype
-          prop.priority_claims.there_are_any = True
         else:
           # Nonpriority claim (Schedule F)
           _claim = prop.nonpriority_claims.appendObject()  # no len(): see above
@@ -120,5 +152,31 @@ code: |
         _claim.who = 'Debtor 1 only'
         _claim.account_number = _data.get('account_suffix', '')
         _injected_count += 1
+
+  # Notice-only parties: mailing matrix entries with NO Schedule E/F claim
+  # (Roxanne UAT follow-up — she wanted IRS/NDR noticed without being forced
+  # to invent amounts owed). Indexed assignment so the static flow analyzer
+  # sees the definitions. prop.notice_only_parties is referenced directly —
+  # a getattr-with-default guard here returned None for the lazily-created
+  # objects-block list and silently skipped the injection; every interview
+  # that includes this file declares the list.
+  if defined('library_notice_only_ids'):
+    for _sel_id in library_notice_only_ids.true_values():
+      _rec_id = int(_sel_id)
+      if _rec_id in _all_records:
+        _data = _all_records[_rec_id]
+        if str(_data.get('name', '') or '').strip().upper() in _already_present:
+          continue
+        _np_k = len(prop.notice_only_parties.elements)
+        prop.notice_only_parties.appendObject()
+        prop.notice_only_parties[_np_k].name = _data['name']
+        prop.notice_only_parties[_np_k].street = _data.get('street', '')
+        prop.notice_only_parties[_np_k].city = _data.get('city', '')
+        prop.notice_only_parties[_np_k].state = state_name(_data.get('state', ''))
+        prop.notice_only_parties[_np_k].zip = _data.get('zip', '')
+        prop.notice_only_parties[_np_k].complete = True
+        _injected_count += 1
+    prop.notice_only_parties.gathered = True
+    prop.notice_only_parties.auto_gather = False
 
   creditor_library_injected = _injected_count

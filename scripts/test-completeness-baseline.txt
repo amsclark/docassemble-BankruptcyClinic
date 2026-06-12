@@ -1,4 +1,5 @@
 creditor-library.spec.ts
+creditor-picker-delete-all.spec.ts
 cross-validation-demo.spec.ts
 cross-validation.spec.ts
 data-validation.spec.ts
