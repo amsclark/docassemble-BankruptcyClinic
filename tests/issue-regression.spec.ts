@@ -241,14 +241,21 @@ test.describe('YAML-structural proofs', () => {
 
   test('Issue #55: Means Test uses DOJ median tables, not 150% of poverty', async ({ page: _ }) => {
     const { readFileSync } = await import('fs');
+    // The DOJ table moved from 101-question-blocks.yml into objects.py
+    // (get_median_family_income, Roxanne UAT June 2026) so the 122A code and
+    // the poverty_calc note share one source.
+    const objects = readFileSync('docassemble/BankruptcyClinic/objects.py', 'utf8');
     const yml101 = readFileSync('docassemble/BankruptcyClinic/data/questions/101-question-blocks.yml', 'utf8');
     const yml122 = readFileSync('docassemble/BankruptcyClinic/data/questions/122A-question-blocks.yml', 'utf8');
-    // Median-income table is defined
-    expect(yml101).toMatch(/_median_table\s*=\s*\{/);
+    // Median-income table is defined in the shared module
+    expect(objects).toMatch(/DOJ_MEDIAN_INCOME_TABLES\s*=\s*\{/);
     // NE family-of-3 should be > $100k (vs the old buggy $37k)
-    expect(yml101).toMatch(/103358|103,358/);
-    // Means test uses medianFamilyIncome, not 150% poverty math
-    expect(yml122).toContain('medianFamilyIncome');
+    expect(objects).toMatch(/103358|103,358/);
+    // poverty_calc and the 122A median both go through the lookup
+    expect(yml101).toContain('get_median_family_income(');
+    expect(yml122).toContain('get_median_family_income(');
+    // Means test compares against the DOJ median, not 150% poverty math
+    expect(yml122).toContain('monthly_income.median_income');
     expect(yml122).not.toMatch(/\b150\s*%\s*of\s*poverty/i);
   });
 

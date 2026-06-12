@@ -526,7 +526,7 @@ export async function navigateFinancialAffairs(page: Page, scenario: TestScenari
         || labelText.includes('zip');
 
       if (input.type === 'date') {
-        input.value = '2024-01-01';
+        input.value = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
       } else if (isNumeric) {
         input.value = '00000';
       } else {
@@ -1368,7 +1368,7 @@ export async function navigateDynamicPhase(page: Page, scenario: TestScenario) {
           const labelText = (label?.textContent || '').toLowerCase();
           const isNumeric = input.type === 'number' || input.inputMode === 'numeric' || labelText.includes('zip');
           if (input.type === 'date') {
-            input.value = '2024-01-01';
+            input.value = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
           } else if (isNumeric) {
             input.value = '00000';
           } else if (!input.value) {

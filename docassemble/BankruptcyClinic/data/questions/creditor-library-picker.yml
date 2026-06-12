@@ -60,8 +60,13 @@ code: |
   # Idempotency guard: if this block is interrupted mid-run by a seek and
   # re-executed, a creditor already appended must not be appended again
   # (duplicate IRS/NDR rows the filer then has to delete — Roxanne UAT).
+  # getattr-guarded: the standalone picker-test interview only declares
+  # nonpriority_claims, so a raw prop.priority_claims read would seek forever.
   _already_present = set()
-  for _lst in (prop.priority_claims, prop.nonpriority_claims):
+  for _lst_name in ('priority_claims', 'nonpriority_claims'):
+    _lst = getattr(prop, _lst_name, None)
+    if _lst is None:
+      continue
     for _c in getattr(_lst, 'elements', []):
       _nm = str(getattr(_c, 'name', '') or '').strip().upper()
       if _nm:

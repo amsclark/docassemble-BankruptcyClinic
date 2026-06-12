@@ -631,6 +631,11 @@ async function navigateExpensesMaximalist(page: Page) {
   await waitForDaPageLoad(page);
   await selectYesNoRadio(page, 'debtor[0].expenses.change_in_expense', false);
   await clickContinue(page);
+
+  // Disposable-income summary (Roxanne UAT, June 2026) — continue-gated.
+  console.log('  [expenses] Income/expense summary');
+  await waitForDaPageLoad(page);
+  await clickNthByName(page, b64('income_expense_summary_acknowledged'), 0);
 }
 
 // ════════════════════════════════════════════════════════════════════
@@ -696,7 +701,7 @@ async function navigateFinancialAffairsMaximalist(page: Page) {
       const labelText = (label?.textContent || '').toLowerCase();
       const isNumeric = input.type === 'number' || input.inputMode === 'numeric' || labelText.includes('zip');
       if (input.type === 'date') {
-        input.value = '2024-01-01';
+        input.value = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
       } else if (isNumeric) {
         input.value = '00000';
       } else {
