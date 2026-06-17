@@ -47,7 +47,7 @@ const southDakotaExemptions = {
   retirement: { law: 'retirement (SDCL 43-45-26)', limit: 1000000, amount: 0 },
   public_assistance: { law: 'public assistance (SDCL 28-7-16)', limit: 0, amount: 0 },
   wages: { law: 'Wages (SDCL 15-20-12)', limit: 0, amount: 0 },
-  life_insurance: { law: 'Life insurance proceeds (SDCL 58-12-4. 43-45-6)', limit: 10000, amount: 0 },
+  life_insurance: { law: 'Life insurance proceeds (SDCL 58-12-4, 43-45-6)', limit: 20000, amount: 0 }, // SDCL 58-12-4 beneficiary proceeds, $20,000 (William Franck, ERLS, June 2026)
   workers_comp: { law: 'Workers Compensation (SDCL 62-4-42)', limit: 0, amount: 0 },
   unemployment: { law: 'Unemployment (SDCL 61-6-28)', limit: 0, amount: 0 },
   student_loan: { law: 'Student Loan (20 U.S.C. § 1095a(d))', limit: 0, amount: 0 },

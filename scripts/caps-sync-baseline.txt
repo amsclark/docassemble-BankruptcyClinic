@@ -1,2 +1,1 @@
-South Dakota	life_insurance	py=0	js=10000
 South Dakota	retirement	py=0	js=1000000
