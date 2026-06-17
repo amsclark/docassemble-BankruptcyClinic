@@ -142,7 +142,8 @@ Every hit is a real user stuck. A daily 06:00 cron on Alex's machine runs it
 dollar caps in `objects.py get_exemption_limits()` against
 `data/static/exemptions.js` and fails on NEW divergence
 (`scripts/caps-sync-baseline.txt` holds known mismatches awaiting attorney
-verification — currently SD life_insurance and SD retirement).
+verification — currently SD retirement; SD life_insurance resolved to $20,000
+per SDCL 58-12-4, William Franck/ERLS June 2026).
 
 ## Testing
 

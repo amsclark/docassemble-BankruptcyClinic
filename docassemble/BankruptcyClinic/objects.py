@@ -15,7 +15,7 @@ SOUTH_DAKOTA_EXEMPTIONS = {
     'retirement': 'Retirement (SDCL 43-45-26)',
     'public_assistance': 'Public assistance (SDCL 28-7-16)',
     'wages': 'Wages (SDCL 15-20-12)',
-    'life_insurance': 'Life insurance proceeds (SDCL 58-12-4. 43-45-6)',
+    'life_insurance': 'Life insurance proceeds (SDCL 58-12-4, 43-45-6)',
     'workers_comp': 'Workers compensation (SDCL 62-4-42)',
     'unemployment': 'Unemployment (SDCL 61-6-28)',
     'student_loan': 'Student loan (20 U.S.C. § 1095a(d))',
@@ -331,7 +331,10 @@ def get_exemption_limits(user_state):
             'tools': 0,              # Unlimited
             'retirement': 0,          # Unlimited
             'wages': 0,              # Unlimited (follow federal garnishment rules)
-            'life_insurance': 0,      # Unlimited
+            'life_insurance': 20000,  # SDCL 58-12-4: proceeds payable to the
+                                      # beneficiary, $20,000 (William Franck,
+                                      # ERLS, June 2026). 43-45-6 ($10,000) is
+                                      # the narrower estate-distribution case.
             'workers_comp': 0,        # Unlimited
             'unemployment': 0,        # Unlimited
             'social_security': 0,     # Unlimited
