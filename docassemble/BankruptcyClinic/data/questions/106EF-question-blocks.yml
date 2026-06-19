@@ -398,6 +398,14 @@ fields:
     show if:
       variable: prop.nonpriority_claims[i].type
       is: Other
+  - note: |
+      **Student loans are usually _not_ erased by bankruptcy.** A student loan is
+      discharged only if the court finds that repaying it would be an *undue
+      hardship* on you and your dependents (11 U.S.C. § 523(a)(8)). List the loan
+      here, but talk to your attorney before assuming it will be wiped out.
+    show if:
+      variable: prop.nonpriority_claims[i].type
+      is: Student loans
   - note: Claim value
   - Total Claim: prop.nonpriority_claims[i].total_claim
     datatype: currency
