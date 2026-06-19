@@ -102,6 +102,21 @@ fields:
       - State exemptions: You are claiming state and federal nonbankruptcy exemptions.
       - Federal exemptions: You are claiming federal exemptions.
 ---
+id: sd_head_of_family
+section: schedule_c
+question: |
+  Are you the head of a family?
+subquestion: |
+  South Dakota lets you protect property that has no other exemption using a
+  "wildcard" exemption. The amount is **$7,000 if you are the head of a family**
+  and **$5,000 if you are not** (SDCL 43-45-4).
+
+  You are generally the **head of a family** if you are married, or if you
+  support a dependent — for example a child, or another relative who lives with
+  you and relies on you. If you are not sure which applies to you, your attorney
+  can confirm.
+yesno: prop.head_of_family
+---
 id: exempt_property_any_exist
 section: schedule_c
 question: |

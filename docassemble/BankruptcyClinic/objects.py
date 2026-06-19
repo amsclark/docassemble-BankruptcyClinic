@@ -5,7 +5,7 @@ SOUTH_DAKOTA_EXEMPTIONS = {
     'homestead': 'Homestead (SDCL 43-31-1 – 43-31-6)',
     'homestead_proceeds': 'Homestead, proceeds of sale (SDCL 43-31-4)',
     'household_goods': 'Furniture and bedding (SDCL 43-45-5(5))',
-    'wildcard': 'Wildcard (SDCL 43-5-4)',
+    'wildcard': 'Wildcard (SDCL 43-45-4)',
     'personal_property': 'Bible, books, family pictures, burial plots, all wearing apparel, church pew, food & fuel to last one year, and clothing (SDCL 43-45-2)',
     'domestic_support': 'Alimony, maintenance, or support of the debtor (SDCL 43-45-2)',
     'health_aids': 'Health aids (SDCL 43-45-2)',
@@ -304,13 +304,17 @@ def get_median_family_income(state, household_size):
     return table[4] + (hs - 4) * DOJ_MEDIAN_ADDITIONAL_PER_PERSON
 
 
-def get_exemption_limits(user_state):
+def get_exemption_limits(user_state, head_of_family=False):
     """
     Returns a dict of exemption category -> dollar limit for the given state.
     A limit of 0 means unlimited.
 
     Args:
         user_state (str): The user's state (e.g., "Nebraska", "South Dakota")
+        head_of_family (bool): SD wildcard (SDCL 43-45-4) is tiered — $7,000 for
+            a head of a family, $5,000 otherwise (William Franck, ERLS,
+            June 2026). Defaults to the $5,000 single-filer floor so the static
+            caps-sync gate and any context-free caller see the conservative cap.
 
     Returns:
         dict: {category_key: dollar_limit_or_0_for_unlimited}
@@ -325,7 +329,7 @@ def get_exemption_limits(user_state):
             'homestead': 0,          # Unlimited
             'homestead_proceeds': 0,  # Unlimited
             'household_goods': 0,     # Unlimited (SD doesn't specify a dollar limit on furniture/bedding)
-            'wildcard': 6000,
+            'wildcard': 7000 if head_of_family else 5000,  # SDCL 43-45-4 (William Franck, ERLS, June 2026)
             'personal_property': 0,   # Unlimited
             'health_aids': 0,         # Unlimited
             'tools': 0,              # Unlimited
@@ -404,8 +408,11 @@ def compute_exemption_totals(prop, debtor_state, num_debtors=1):
         _n = 1
     if _n < 1:
         _n = 1
+    # SD wildcard is tiered on head-of-family status (SDCL 43-45-4); read it off
+    # the property object (asked of SD filers, defaults False = $5,000 floor).
+    _hof = bool(getattr(prop, 'head_of_family', False))
     limits = {cat: (lim * _n if lim and lim > 0 else 0)
-              for cat, lim in get_exemption_limits(debtor_state).items()}
+              for cat, lim in get_exemption_limits(debtor_state, head_of_family=_hof).items()}
 
     # Map every supported state's law string -> category key. The user can pick
     # any state's law from the unified dropdowns, so the tracker has to recognize
