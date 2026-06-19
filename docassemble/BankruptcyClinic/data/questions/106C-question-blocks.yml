@@ -102,6 +102,31 @@ fields:
       - State exemptions: You are claiming state and federal nonbankruptcy exemptions.
       - Federal exemptions: You are claiming federal exemptions.
 ---
+id: domicile_two_years
+section: schedule_c
+question: |
+  Have you lived in ${ debtor[0].address.state } for at least the last 2 years?
+subquestion: |
+  Bankruptcy law uses the state where you have lived for the **last 2 years
+  (730 days)** to decide which exemptions you can claim
+  (11 U.S.C. § 522(b)(3)(A)). If you moved to ${ debtor[0].address.state } more
+  recently than that, a different state's exemptions may apply to you.
+yesno: prop.domicile_two_years
+---
+id: domicile_warning
+section: schedule_c
+question: |
+  Your exemptions may be governed by another state
+subquestion: |
+  Because you have lived in ${ debtor[0].address.state } for less than 2 years,
+  the exemptions you can claim may be governed by the state where you lived
+  before you moved here (11 U.S.C. § 522(b)(3)(A)). This tool calculates
+  **Nebraska and South Dakota** exemptions only.
+
+  You can keep going, but please confirm with your attorney which state's
+  exemptions apply to you before relying on the amounts shown here.
+continue button field: prop.domicile_warning_acknowledged
+---
 id: sd_head_of_family
 section: schedule_c
 question: |
