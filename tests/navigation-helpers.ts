@@ -438,10 +438,18 @@ export async function navigateExemptionSection(page: Page) {
     await clickContinue(page);
   }
 
+  // SD-only: "Are you the head of a family?" gates the SDCL 43-45-4 wildcard
+  // tier ($7,000 vs $5,000). Only shown for South Dakota filers; answer Yes.
+  await waitForDaPageLoad(page);
+  const hofField = page.locator(`button[name="${b64('prop.head_of_family')}"]`);
+  if (await hofField.count() > 0) {
+    await clickYesNoButton(page, 'prop.head_of_family', true);
+    await waitForDaPageLoad(page);
+  }
+
   // "Do you have any property to claim as exempt?" — this gate is SKIPPED when
   // exemptions were claimed inline (auto-populated into Schedule C). Only answer
   // it if it actually appears.
-  await waitForDaPageLoad(page);
   const exemptGate = page.locator(`[name="${b64('prop.exempt_property.properties.there_are_any')}"]`);
   if (await exemptGate.count() > 0) {
     await clickYesNoButton(page, 'prop.exempt_property.properties.there_are_any', false);

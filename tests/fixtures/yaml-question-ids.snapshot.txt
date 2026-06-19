@@ -110,6 +110,7 @@ docassemble/BankruptcyClinic/data/questions/106C-question-blocks.yml:exempt_prop
 docassemble/BankruptcyClinic/data/questions/106C-question-blocks.yml:exempt_property_details
 docassemble/BankruptcyClinic/data/questions/106C-question-blocks.yml:homestead_exemption
 docassemble/BankruptcyClinic/data/questions/106C-question-blocks.yml:schedule_c_review
+docassemble/BankruptcyClinic/data/questions/106C-question-blocks.yml:sd_head_of_family
 docassemble/BankruptcyClinic/data/questions/106D-question-blocks.yml:schedule_d_review
 docassemble/BankruptcyClinic/data/questions/106D-question-blocks.yml:secured_claim_details
 docassemble/BankruptcyClinic/data/questions/106D-question-blocks.yml:secured_creditors_add_another

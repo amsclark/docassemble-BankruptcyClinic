@@ -435,6 +435,11 @@ code: |
   # confused filers and didn't change behavior — selecting "federal" still
   # showed the state exemptions (Phil/Roxanne feedback). Default it and skip.
   prop.exempt_property.exemption_type = 'You are claiming state and federal nonbankruptcy exemptions.'
+  # SD wildcard (SDCL 43-45-4) is tiered: $7,000 for a head of a family, $5,000
+  # otherwise. NE wildcard is not tiered, so ask only South Dakota filers
+  # (clinic decision, June 2026). compute_exemption_totals reads prop.head_of_family.
+  if 'south dakota' in str(debtor[0].address.state).lower():
+    prop.head_of_family
   prop.exempt_property.properties.gather()
   # Ask the debtor instead of forcing False (Roxanne feedback: the review showed
   # "Claiming Homestead Exemption: No" regardless of input).

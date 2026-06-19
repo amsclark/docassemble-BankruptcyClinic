@@ -38,7 +38,7 @@ const southDakotaExemptions = {
   homestead: { law: 'Homestead (SDCL 43-31-1 – 43-31-6)', limit: 0, amount: 0 }, // Unlimited
   homestead_proceeds: { law: 'Homestead, proceeds of sale (SDCL 43-31-4)', limit: 0, amount: 0 }, // Unlimited
   household_goods: { law: 'Furniture and bedding (SDCL 43-45-5(5))', limit: 0, amount: 0 }, // Unlimited
-  wildcard: { law: 'Wildcard (SDCL 43-5-4)', limit: 6000, amount: 0 },
+  wildcard: { law: 'Wildcard (SDCL 43-45-4)', limit: 5000, amount: 0 }, // SDCL 43-45-4 floor: $5,000 single / $7,000 head of family (the head-of-family bump is applied server-side in objects.py)
   personal_property: { law: 'Bible, books, family pictures, burial plots, all wearing apparel, church pew, food & fuel to last one year, and clothing (SDCL 43-45-2)', limit: 0, amount: 0 },
   domestic_support: { law: 'alimony, maintenance, or support of the debtor (SDCL 43-45-2)', limit: 0, amount: 0 },
   health_aids: { law: 'Health Aids (SDCL 43-45-2)', limit: 0, amount: 0 },
