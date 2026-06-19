@@ -1102,8 +1102,12 @@ export async function navigateMeansTest(page: Page, opts: MeansTestOptions = {})
   await waitForDaPageLoad(page);
   await clickContinue(page);
 
-  // debtor2_current_monthly_income — only for married-filing-jointly.
-  if (filingIdx === 1) {
+  // debtor2_current_monthly_income — shown for married-filing-jointly AND for a
+  // non-filing spouse who is NOT legally separated (their income counts toward
+  // the means test, 11 U.S.C. 101(10A)(B)(i)). Accept the defaults here; tests
+  // that need a specific spouse income drive this screen themselves.
+  const spouseIncomeShown = filingIdx === 1 || (filingIdx === 2 && (opts.separatedStatusIndex ?? 0) === 0);
+  if (spouseIncomeShown) {
     await waitForDaPageLoad(page);
     await clickContinue(page);
   }
