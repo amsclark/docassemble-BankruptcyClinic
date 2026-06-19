@@ -449,14 +449,14 @@ fields:
 under: |
   Note:
 
-  Your current overall income is estimated to be: ${ currency(overallIncome) }
+  Your estimated annual household income is: ${ currency(annualIncome) }
 
-  DOJ median family income for a household of ${ int(monthly_income.median_dependents) } is: ${ currency(medianFamilyIncome) }
+  150% of the federal poverty guideline for a household of ${ int(monthly_income.median_dependents) } is: ${ currency(povertyThreshold150) }
 
-  % if overallIncome < medianFamilyIncome:
-  You may qualify for a fee waiver!
+  % if feeWaiverLikely:
+  Based on income, you may qualify to have the filing fee waived (a judge still must approve it, and only if you also cannot pay in installments).
   % else:
-  Sorry, you do not qualify for the fee waiver.
+  Your income appears to be above 150% of the poverty line, so a fee waiver is unlikely. You may still be able to pay the fee in installments.
   % endif
 
   If you choose to pay the entire fee please check with the clerk's office in your local court for more details about how you may pay.
@@ -503,7 +503,13 @@ code: |
     _state = str(value('monthly_income.median_state')).lower()
   else:
     _state = str(debtor[0].address.state).lower() if defined('debtor[0].address.state') else 'nebraska'
-  medianFamilyIncome = get_median_family_income(_state, _household_size)
+  # Fee waiver (28 U.S.C. 1930(f)): a Chapter 7 fee may be waived only if income
+  # is below 150% of the federal poverty guideline for the household size (NOT
+  # the means-test median family income, which is much higher) — William Franck,
+  # ERLS, June 2026. overallIncome is monthly, so annualize before comparing.
+  annualIncome = overallIncome * 12
+  povertyThreshold150 = get_poverty_guideline(_household_size) * 1.5
+  feeWaiverLikely = annualIncome < povertyThreshold150
 
 ---
 id: previous_bankruptcy
@@ -1361,6 +1367,28 @@ subquestion: |
   [**Download the creditor matrix** (creditor_matrix.txt)](${ mailing_matrix_file.url_for(attachment=True) })
 
   Open the downloaded file to print it, or upload it directly to CM/ECF.
+
+  ---
+
+  #### After you file — don't forget
+
+  **1. Take the second credit-counseling course (debtor education).** After you
+  file, you must complete a *second* course — a "debtor education" or "financial
+  management" course from an approved provider — and file the certificate
+  (Official Form 423). **You will not receive your discharge without it.**
+
+  **2. Bring these documents to your § 341 meeting of creditors.** The trustee
+  will ask for them before the meeting:
+
+  * Photo identification (for example, a driver's license)
+  * Proof of your Social Security number (for example, your Social Security card)
+  * Complete copies of your last two years' tax returns, including W-2s and 1099s
+  * Statements for each of your financial accounts covering the date you filed
+  * Copies of your pay/income statements from shortly before and after you filed
+  * Lien verifications for any secured creditors with an interest in your property
+
+  Your attorney can help you gather these and tell you the date, time, and place
+  of your § 341 meeting.
 allow downloading: True
 attachment code: |
   conclusion_attachments
