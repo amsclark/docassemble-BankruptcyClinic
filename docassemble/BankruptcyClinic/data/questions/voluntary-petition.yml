@@ -435,6 +435,13 @@ code: |
   # confused filers and didn't change behavior — selecting "federal" still
   # showed the state exemptions (Phil/Roxanne feedback). Default it and skip.
   prop.exempt_property.exemption_type = 'You are claiming state and federal nonbankruptcy exemptions.'
+  # 730-day domicile rule (11 U.S.C. 522(b)(3)(A)): the exemptions a debtor may
+  # claim are governed by the state where they were domiciled for the 730 days
+  # before filing. Screen recent movers and warn (non-blocking) — this tool only
+  # computes NE/SD exemptions (William Franck, ERLS, June 2026).
+  prop.domicile_two_years
+  if not prop.domicile_two_years:
+    prop.domicile_warning_acknowledged
   # SD wildcard (SDCL 43-45-4) is tiered: $7,000 for a head of a family, $5,000
   # otherwise. NE wildcard is not tiered, so ask only South Dakota filers
   # (clinic decision, June 2026). compute_exemption_totals reads prop.head_of_family.

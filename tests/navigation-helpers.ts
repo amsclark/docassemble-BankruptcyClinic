@@ -438,9 +438,17 @@ export async function navigateExemptionSection(page: Page) {
     await clickContinue(page);
   }
 
+  // 730-day domicile screen (11 U.S.C. 522(b)(3)(A)) — shown to every filer.
+  // Answer Yes (lived here 2+ years) so the recent-mover warning is skipped.
+  await waitForDaPageLoad(page);
+  const domicileField = page.locator(`button[name="${b64('prop.domicile_two_years')}"]`);
+  if (await domicileField.count() > 0) {
+    await clickYesNoButton(page, 'prop.domicile_two_years', true);
+    await waitForDaPageLoad(page);
+  }
+
   // SD-only: "Are you the head of a family?" gates the SDCL 43-45-4 wildcard
   // tier ($7,000 vs $5,000). Only shown for South Dakota filers; answer Yes.
-  await waitForDaPageLoad(page);
   const hofField = page.locator(`button[name="${b64('prop.head_of_family')}"]`);
   if (await hofField.count() > 0) {
     await clickYesNoButton(page, 'prop.head_of_family', true);

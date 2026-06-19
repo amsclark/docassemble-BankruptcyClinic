@@ -103,6 +103,8 @@ docassemble/BankruptcyClinic/data/questions/106AB-question-blocks.yml:trusts_fut
 docassemble/BankruptcyClinic/data/questions/106AB-question-blocks.yml:vehicle_details
 docassemble/BankruptcyClinic/data/questions/106AB-question-blocks.yml:vehicles_add_another
 docassemble/BankruptcyClinic/data/questions/106AB-question-blocks.yml:vehicles_any_exist
+docassemble/BankruptcyClinic/data/questions/106C-question-blocks.yml:domicile_two_years
+docassemble/BankruptcyClinic/data/questions/106C-question-blocks.yml:domicile_warning
 docassemble/BankruptcyClinic/data/questions/106C-question-blocks.yml:exemption_summary_overview
 docassemble/BankruptcyClinic/data/questions/106C-question-blocks.yml:exemption_type_selection
 docassemble/BankruptcyClinic/data/questions/106C-question-blocks.yml:exempt_property_add_another
