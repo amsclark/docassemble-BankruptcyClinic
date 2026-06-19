@@ -304,6 +304,37 @@ def get_median_family_income(state, household_size):
     return table[4] + (hs - 4) * DOJ_MEDIAN_ADDITIONAL_PER_PERSON
 
 
+# HHS Federal Poverty Guidelines (48 contiguous states + DC) for the bankruptcy
+# fee-waiver test: a Chapter 7 fee may be waived only if income is below 150% of
+# the poverty line for the household size and the filer cannot pay in
+# installments (28 U.S.C. 1930(f); William Franck, ERLS, June 2026 — the median
+# family income previously used here was the wrong, much higher threshold).
+# 2026 figures, published in the Federal Register Jan 15, 2026.
+# Source: https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines
+# NEXT REVIEW: 2027 guidelines (published ~Jan 2027).
+HHS_POVERTY_GUIDELINES_2026 = {
+    1: 15960, 2: 21640, 3: 27320, 4: 33000,
+    5: 38680, 6: 44360, 7: 50040, 8: 55720,
+}
+HHS_POVERTY_ADDITIONAL_PER_PERSON = 5680
+
+
+def get_poverty_guideline(household_size):
+    """Annual 100% HHS poverty guideline (2026, 48 contiguous states + DC) for
+    the household size. Households over 8 add $5,680 per additional person. Bad
+    input falls back to a household of 1. NE and SD are both contiguous, so the
+    single contiguous table applies to every filer this interview supports."""
+    try:
+        hs = int(float(household_size))
+    except (TypeError, ValueError):
+        hs = 1
+    if hs < 1:
+        hs = 1
+    if hs <= 8:
+        return HHS_POVERTY_GUIDELINES_2026[hs]
+    return HHS_POVERTY_GUIDELINES_2026[8] + (hs - 8) * HHS_POVERTY_ADDITIONAL_PER_PERSON
+
+
 def get_exemption_limits(user_state, head_of_family=False):
     """
     Returns a dict of exemption category -> dollar limit for the given state.
