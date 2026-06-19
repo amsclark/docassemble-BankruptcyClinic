@@ -206,6 +206,10 @@ code: |
       return float(v) if v not in (None, '') else 0.0
     except (TypeError, ValueError):
       return 0.0
+  # Social Security Act benefits are EXCLUDED from current monthly income for
+  # the means test (11 U.S.C. 101(10A)(B)(ii)(I); confirmed William Franck,
+  # ERLS, June 2026). 'social1'/'social2' are still collected and shown on the
+  # form's line-9 SSA box, but are not summed into the median comparison.
   debtor_1_income = (_n(monthly_income, 'gross_wages1') +
                           _n(monthly_income, 'alimony1') +
                           _n(monthly_income, 'other_income1') +
@@ -213,7 +217,6 @@ code: |
                           _n(monthly_income, 'rental_gross_receipts1') +
                           _n(monthly_income, 'interest1') +
                           _n(monthly_income, 'unemployment1') +
-                          _n(monthly_income, 'social1') +
                           _n(monthly_income, 'pension1') +
                           _n(monthly_income, 'source1_amount_1') +
                           _n(monthly_income, 'source2_amount_1')
@@ -230,7 +233,6 @@ code: |
                             _n(monthly_income, 'rental_gross_receipts2') +
                             _n(monthly_income, 'interest2') +
                             _n(monthly_income, 'unemployment2') +
-                            _n(monthly_income, 'social2') +
                             _n(monthly_income, 'pension2') +
                             _n(monthly_income, 'source1_amount_2') +
                             _n(monthly_income, 'source2_amount_2')
@@ -369,6 +371,9 @@ code: |
     income['netIncomeRent1-1'] = currency(monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1)
     income['interest1'] = currency(monthly_income.interest1)
     income['unemployment1'] = currency(monthly_income.unemployment1)
+    # Social Security Act benefits appear here (form line-9 SSA box) but are
+    # excluded from current monthly income for the means test
+    # (11 U.S.C. 101(10A)(B)(ii)(I)).
     income['unemploymentForYou'] = currency(monthly_income.social1)
     income['pension1'] = currency(monthly_income.pension1)
     income['source1'] = monthly_income.source1_1
@@ -376,7 +381,12 @@ code: |
     income['source2'] = monthly_income.source2_1
     income['other2Amt1'] = currency(monthly_income.source2_amount_1)
     income['total1'] = currency(monthly_income.source1_amount_1 + monthly_income.source2_amount_1)
-    income['totalMonthly1'] = currency(monthly_income.gross_wages1 + monthly_income.alimony1 + monthly_income.other_income1 + (monthly_income.business_gross_receipts1 - monthly_income.business_operating_expenses1) + (monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1) + monthly_income.interest1 + monthly_income.unemployment1 + monthly_income.social1 + monthly_income.pension1 + monthly_income.source1_amount_1 + monthly_income.source2_amount_1)
+    # _cmi1 / _cmi2 = each debtor's current monthly income EXCLUDING Social
+    # Security Act benefits (excluded from the means test per
+    # 11 U.S.C. 101(10A)(B)(ii)(I)). Reused for the column totals and the
+    # median comparison so the form total and the presumption checkbox agree.
+    _cmi1 = (monthly_income.gross_wages1 + monthly_income.alimony1 + monthly_income.other_income1 + (monthly_income.business_gross_receipts1 - monthly_income.business_operating_expenses1) + (monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1) + monthly_income.interest1 + monthly_income.unemployment1 + monthly_income.pension1 + monthly_income.source1_amount_1 + monthly_income.source2_amount_1)
+    income['totalMonthly1'] = currency(_cmi1)
 
     income['wages2'] = currency(monthly_income.gross_wages2)
     income['alimony2'] = currency(monthly_income.alimony2)
@@ -398,14 +408,15 @@ code: |
     income['source2_2'] = monthly_income.source2_2
     income['other2Amt2'] = currency(monthly_income.source2_amount_2)
     income['total2'] = currency(monthly_income.source1_amount_2 + monthly_income.source2_amount_2)
-    income['totalMonthly2'] = currency(monthly_income.gross_wages2 + monthly_income.alimony2 + monthly_income.other_income2 + (monthly_income.business_gross_receipts2 - monthly_income.business_operating_expenses2) + (monthly_income.rental_gross_receipts2 - monthly_income.rental_operating_expenses2) + monthly_income.interest2 + monthly_income.unemployment2 + monthly_income.spouse_social2 + monthly_income.pension2 + monthly_income.source1_amount_2 + monthly_income.source2_amount_2)
+    _cmi2 = (monthly_income.gross_wages2 + monthly_income.alimony2 + monthly_income.other_income2 + (monthly_income.business_gross_receipts2 - monthly_income.business_operating_expenses2) + (monthly_income.rental_gross_receipts2 - monthly_income.rental_operating_expenses2) + monthly_income.interest2 + monthly_income.unemployment2 + monthly_income.pension2 + monthly_income.source1_amount_2 + monthly_income.source2_amount_2)
+    income['totalMonthly2'] = currency(_cmi2)
 
-    income['overallTotalMonthly'] = currency((monthly_income.gross_wages1 + monthly_income.alimony1 + monthly_income.other_income1 + (monthly_income.business_gross_receipts1 - monthly_income.business_operating_expenses1) + (monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1) + monthly_income.interest1 + monthly_income.unemployment1 + monthly_income.social1 + monthly_income.pension1 + monthly_income.source1_amount_1 + monthly_income.source2_amount_1) + (monthly_income.gross_wages2 + monthly_income.alimony2 + monthly_income.other_income2 + (monthly_income.business_gross_receipts2 - monthly_income.business_operating_expenses2) + (monthly_income.rental_gross_receipts2 - monthly_income.rental_operating_expenses2) + monthly_income.interest2 + monthly_income.unemployment2 + monthly_income.spouse_social2 + monthly_income.pension2 + monthly_income.source1_amount_2 + monthly_income.source2_amount_2))
-    income['overallTotalMonthly-1'] = currency((monthly_income.gross_wages1 + monthly_income.alimony1 + monthly_income.other_income1 + (monthly_income.business_gross_receipts1 - monthly_income.business_operating_expenses1) + (monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1) + monthly_income.interest1 + monthly_income.unemployment1 + monthly_income.social1 + monthly_income.pension1 + monthly_income.source1_amount_1 + monthly_income.source2_amount_1) + (monthly_income.gross_wages2 + monthly_income.alimony2 + monthly_income.other_income2 + (monthly_income.business_gross_receipts2 - monthly_income.business_operating_expenses2) + (monthly_income.rental_gross_receipts2 - monthly_income.rental_operating_expenses2) + monthly_income.interest2 + monthly_income.unemployment2 + monthly_income.spouse_social2 + monthly_income.pension2 + monthly_income.source1_amount_2 + monthly_income.source2_amount_2))
-    income['overallTotalYear'] = currency(((monthly_income.gross_wages1 + monthly_income.alimony1 + monthly_income.other_income1 + (monthly_income.business_gross_receipts1 - monthly_income.business_operating_expenses1) + (monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1) + monthly_income.interest1 + monthly_income.unemployment1 + monthly_income.social1 + monthly_income.pension1 + monthly_income.source1_amount_1 + monthly_income.source2_amount_1) + (monthly_income.gross_wages2 + monthly_income.alimony2 + monthly_income.other_income2 + (monthly_income.business_gross_receipts2 - monthly_income.business_operating_expenses2) + (monthly_income.rental_gross_receipts2 - monthly_income.rental_operating_expenses2) + monthly_income.interest2 + monthly_income.unemployment2 + monthly_income.spouse_social2 + monthly_income.pension2 + monthly_income.source1_amount_2 + monthly_income.source2_amount_2)) * 12)
+    income['overallTotalMonthly'] = currency(_cmi1 + _cmi2)
+    income['overallTotalMonthly-1'] = currency(_cmi1 + _cmi2)
+    income['overallTotalYear'] = currency((_cmi1 + _cmi2) * 12)
     income['state'] = monthly_income.median_state
     income['dependents'] = monthly_income.median_dependents
     income['medianIncome'] = monthly_income.median_income
-    income['lessThan'] = True if ((monthly_income.gross_wages1 + monthly_income.alimony1 + monthly_income.other_income1 + (monthly_income.business_gross_receipts1 - monthly_income.business_operating_expenses1) + (monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1) + monthly_income.interest1 + monthly_income.unemployment1 + monthly_income.social1 + monthly_income.pension1 + monthly_income.source1_amount_1 + monthly_income.source2_amount_1) + (monthly_income.gross_wages2 + monthly_income.alimony2 + monthly_income.other_income2 + (monthly_income.business_gross_receipts2 - monthly_income.business_operating_expenses2) + (monthly_income.rental_gross_receipts2 - monthly_income.rental_operating_expenses2) + monthly_income.interest2 + monthly_income.unemployment2 + monthly_income.spouse_social2 + monthly_income.pension2 + monthly_income.source1_amount_2 + monthly_income.source2_amount_2) < monthly_income.median_income) else False
-    income['moreThan'] = True if ((monthly_income.gross_wages1 + monthly_income.alimony1 + monthly_income.other_income1 + (monthly_income.business_gross_receipts1 - monthly_income.business_operating_expenses1) + (monthly_income.rental_gross_receipts1 - monthly_income.rental_operating_expenses1) + monthly_income.interest1 + monthly_income.unemployment1 + monthly_income.social1 + monthly_income.pension1 + monthly_income.source1_amount_1 + monthly_income.source2_amount_1) + (monthly_income.gross_wages2 + monthly_income.alimony2 + monthly_income.other_income2 + (monthly_income.business_gross_receipts2 - monthly_income.business_operating_expenses2) + (monthly_income.rental_gross_receipts2 - monthly_income.rental_operating_expenses2) + monthly_income.interest2 + monthly_income.unemployment2 + monthly_income.spouse_social2 + monthly_income.pension2 + monthly_income.source1_amount_2 + monthly_income.source2_amount_2) > monthly_income.median_income) else False
+    income['lessThan'] = True if (_cmi1 + _cmi2) < monthly_income.median_income else False
+    income['moreThan'] = True if (_cmi1 + _cmi2) > monthly_income.median_income else False
 
