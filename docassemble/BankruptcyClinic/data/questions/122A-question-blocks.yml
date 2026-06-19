@@ -119,11 +119,24 @@ fields:
 id: debtor2_current_monthly_income
 section: form_122a
 question: |
+  % if len(debtor) > 1:
   Calculate Debtor 2 current monthly income
+  % else:
+  Calculate your spouse's current monthly income
+  % endif
 subquestion: |
+  % if len(debtor) > 1:
   Be as complete and accurate as possible. If two married people are filing together, both are equally responsible for being accurate.
+  % else:
+  Your spouse is not filing with you, but because you live in the same household their income still counts toward the means test. Enter your spouse's income below.
+  % endif
 fields:
-  - note: Income calculation Debtor 2
+  - note: |
+      % if len(debtor) > 1:
+      Income calculation Debtor 2
+      % else:
+      Income calculation — your spouse
+      % endif
   - Your gross wages, salary, tips, bonuses, overtime, and commissions: monthly_income.gross_wages2
     datatype: currency
     default: ${ (getattr(debtor[1].income, 'income_amount_1', 0) + getattr(debtor[1].income, 'overtime_pay_1', 0)) if len(debtor) > 1 else 0 }
@@ -225,7 +238,14 @@ code: |
                            _n(monthly_income, 'rental_operating_expenses1')
                           )
   debtor_2_income = 0
-  if len(debtor) > 1:
+  # Column-B income belongs in CMI for a filing spouse (len(debtor) > 1) AND for
+  # a non-filing spouse who is not legally separated / living apart
+  # (11 U.S.C. 101(10A)(B)(i); William Franck, ERLS, June 2026). In both cases
+  # the spouse income lives in the 'gross_wages2'... fields.
+  _include_spouse = len(debtor) > 1 or (
+      monthly_income.filing_status == "Married and your spouse is NOT filing with you."
+      and getattr(monthly_income, 'separated_status', '') != 'Living separately or are legally separated')
+  if _include_spouse:
     debtor_2_income = (_n(monthly_income, 'gross_wages2') +
                             _n(monthly_income, 'alimony2') +
                             _n(monthly_income, 'other_income2') +

@@ -844,13 +844,18 @@ code: |
   if monthly_income.non_consumer_debts == False and monthly_income.disabled_veteran == False and monthly_income.reservists == False:
     monthly_income.filing_status
     monthly_income.gross_wages1
-    if monthly_income.filing_status == "Married and your spouse is filing with you.":
+    # A non-filing spouse's income is part of current monthly income for the
+    # median test UNLESS the spouses are legally separated / living apart
+    # (11 U.S.C. 101(10A)(B)(i); confirmed William Franck, ERLS, June 2026). So
+    # collect the Column-B / spouse income screen for BOTH a filing spouse and a
+    # non-filing-but-not-separated spouse.
+    if monthly_income.filing_status == "Married and your spouse is filing with you." or (monthly_income.filing_status == "Married and your spouse is NOT filing with you." and getattr(monthly_income, 'separated_status', '') != 'Living separately or are legally separated'):
       monthly_income.gross_wages2
     else:
-      # Single / spouse-not-filing: the debtor-2 income screen is never shown, so
-      # the 122A PDF would read undefined debtor-2 fields and crash for ANY
-      # non-married-filing consumer-debt filer. Default every debtor-2 field the
-      # form reads (currency -> 0, source labels -> '').
+      # Single / legally-separated spouse: the debtor-2 income screen is never
+      # shown, so the 122A PDF would read undefined debtor-2 fields and crash for
+      # ANY such consumer-debt filer. Default every debtor-2 field the form reads
+      # (currency -> 0, source labels -> '').
       for _f2 in ['gross_wages2', 'alimony2', 'other_income2', 'business_gross_receipts2',
                   'business_operating_expenses2', 'rental_gross_receipts2',
                   'rental_operating_expenses2', 'interest2', 'unemployment2',
