@@ -12,7 +12,7 @@ SOUTH_DAKOTA_EXEMPTIONS = {
     'tools': 'Tools of the trade (SDCL 43-45-5(6))',
     'city_employee_pensions': 'City employee pensions (SDCL 9-16-47)',
     'public_employee_pensions': 'Public employee pensions (SDCL 3-12-115)',
-    'retirement': 'Retirement (SDCL 43-45-26)',
+    'retirement': 'Retirement (SDCL 43-45-16)',
     'public_assistance': 'Public assistance (SDCL 28-7-16)',
     'wages': 'Wages (SDCL 15-20-12)',
     'life_insurance': 'Life insurance proceeds (SDCL 58-12-4, 43-45-6)',
@@ -329,7 +329,10 @@ def get_exemption_limits(user_state):
             'personal_property': 0,   # Unlimited
             'health_aids': 0,         # Unlimited
             'tools': 0,              # Unlimited
-            'retirement': 0,          # Unlimited
+            'retirement': 1000000,    # SDCL 43-45-16: $1,000,000 cap on
+                                      # employee benefit plans (William Franck,
+                                      # ERLS, June 2026). Prior cite 43-45-26
+                                      # does not exist.
             'wages': 0,              # Unlimited (follow federal garnishment rules)
             'life_insurance': 20000,  # SDCL 58-12-4: proceeds payable to the
                                       # beneficiary, $20,000 (William Franck,

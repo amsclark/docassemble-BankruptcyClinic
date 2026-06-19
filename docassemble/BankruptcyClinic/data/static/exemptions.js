@@ -44,7 +44,7 @@ const southDakotaExemptions = {
   health_aids: { law: 'Health Aids (SDCL 43-45-2)', limit: 0, amount: 0 },
   city_employee_pensions: { law: 'city employee pensions (SDCL 9-16-47)', limit: 0, amount: 0 },
   public_employee_pensions: { law: 'public employee pensions (SDCL 3-12-115)', limit: 0, amount: 0 },
-  retirement: { law: 'retirement (SDCL 43-45-26)', limit: 1000000, amount: 0 },
+  retirement: { law: 'retirement (SDCL 43-45-16)', limit: 1000000, amount: 0 }, // $1M cap on employee benefit plans (William Franck, ERLS, June 2026)
   public_assistance: { law: 'public assistance (SDCL 28-7-16)', limit: 0, amount: 0 },
   wages: { law: 'Wages (SDCL 15-20-12)', limit: 0, amount: 0 },
   life_insurance: { law: 'Life insurance proceeds (SDCL 58-12-4, 43-45-6)', limit: 20000, amount: 0 }, // SDCL 58-12-4 beneficiary proceeds, $20,000 (William Franck, ERLS, June 2026)
