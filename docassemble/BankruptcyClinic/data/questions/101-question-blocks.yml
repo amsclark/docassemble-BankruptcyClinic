@@ -520,8 +520,16 @@ allowed to set:
 fields:
   - District: case.previous_bankruptcy[i].district
     code: courts_list
-  - When: case.previous_bankruptcy[i].when
+  - Chapter: case.previous_bankruptcy[i].chapter
+    choices:
+      - "7"
+      - "11"
+      - "12"
+      - "13"
+  - When was this case filed?: case.previous_bankruptcy[i].when
     datatype: date
+  - Was a discharge granted in this case?: case.previous_bankruptcy[i].discharge_granted
+    datatype: yesnoradio
   - Case Number: case.previous_bankruptcy[i].case_number
 section: case_det
 list collect: True
@@ -533,6 +541,45 @@ under: |
   ${ previous_bankruptcy_table }
 yesno: case.previous_bankruptcy.there_is_another
 section: case_det
+---
+# Discharge-eligibility check (11 U.S.C. 727(a)(8)/(9)). The bar runs from the
+# prior case's FILING date, not the discharge date (William Franck, ERLS,
+# June 2026): a prior Chapter 7 discharge in a case filed within 8 years, or a
+# prior Chapter 12/13 discharge in a case filed within 6 years, before this
+# petition bars a discharge here. Only a GRANTED discharge triggers the bar.
+code: |
+  _risk = False
+  if getattr(case.previous_bankruptcy, 'gathered', False):
+    for _pb in case.previous_bankruptcy:
+      if not getattr(_pb, 'discharge_granted', False):
+        continue
+      _filed = getattr(_pb, 'when', None)
+      if not _filed:
+        continue
+      _yrs = date_difference(starting=_filed, ending=today()).years
+      _ch = str(getattr(_pb, 'chapter', ''))
+      if (_ch == '7' and _yrs < 8) or (_ch in ('12', '13') and _yrs < 6):
+        _risk = True
+        break
+  case.discharge_bar_risk = _risk
+---
+id: discharge_bar_warning
+section: case_det
+question: |
+  Possible discharge-eligibility issue
+subquestion: |
+  Based on the prior bankruptcy you listed, you may **not** be eligible to
+  receive a discharge in this case.
+
+  Under 11 U.S.C. § 727(a)(8)–(9), the court will not grant a Chapter 7
+  discharge if you were granted a discharge in a prior **Chapter 7** case filed
+  within **8 years**, or a prior **Chapter 12 or 13** case filed within
+  **6 years**, before the date you file this case. This period runs from the
+  **filing date** of the prior case, not the date the discharge was entered.
+
+  You can still file your petition, but please confirm your discharge
+  eligibility with your attorney before proceeding.
+continue button field: case.discharge_bar_acknowledged
 ---
 id: pending_bankruptcy
 question: |
