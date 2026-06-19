@@ -905,6 +905,10 @@ code: |
   if case.has_previous_bankruptcy:
     case.previous_bankruptcy.there_are_any = True
     case.previous_bankruptcy.gather()
+    # Non-blocking discharge-eligibility warning (727(a)(8)/(9)); only shown
+    # when a prior granted discharge falls inside the 8/6-year window.
+    if case.discharge_bar_risk:
+      case.discharge_bar_acknowledged
   case.has_pending_bankruptcy
   if case.has_pending_bankruptcy:
     case.pending_bankruptcy.there_are_any = True
@@ -1069,7 +1073,9 @@ code: |
 ---
 code: |
   case.previous_bankruptcy[i].district
+  case.previous_bankruptcy[i].chapter
   case.previous_bankruptcy[i].when
+  case.previous_bankruptcy[i].discharge_granted
   case.previous_bankruptcy[i].case_number
   case.previous_bankruptcy[i].complete = True
 ---

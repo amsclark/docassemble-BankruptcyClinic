@@ -16,6 +16,7 @@ docassemble/BankruptcyClinic/data/questions/101-question-blocks.yml:debtor_alias
 docassemble/BankruptcyClinic/data/questions/101-question-blocks.yml:debtor_another
 docassemble/BankruptcyClinic/data/questions/101-question-blocks.yml:debtor_basic_info
 docassemble/BankruptcyClinic/data/questions/101-question-blocks.yml:debtor_final
+docassemble/BankruptcyClinic/data/questions/101-question-blocks.yml:discharge_bar_warning
 docassemble/BankruptcyClinic/data/questions/101-question-blocks.yml:district_amended
 docassemble/BankruptcyClinic/data/questions/101-question-blocks.yml:district_case_number
 docassemble/BankruptcyClinic/data/questions/101-question-blocks.yml:district_final
