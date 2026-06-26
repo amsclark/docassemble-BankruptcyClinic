@@ -32,7 +32,7 @@
     "pretest": "npm run lint:selectors && npm run lint:yaml-ids && npm run lint:flow && npm run lint:test-complete && npm run lint:caps-sync && npm run lint:pdf-fields"
   },
   "devDependencies": {
-    "@playwright/test": "^1.60.0",
+    "@playwright/test": "^1.61.1",
     "@types/node": "^26.0.0",
     "pdf-lib": "^1.17.1",
     "playwright": "^1.61.1",
