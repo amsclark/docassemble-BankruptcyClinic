@@ -23,7 +23,7 @@
  * by the YAML, flow, and pdf-field gates; they carry no flow-logic risk.)
  */
 import { test, expect, Page } from '@playwright/test';
-import { SIMPLE_SINGLE } from './fixtures';
+import { SIMPLE_SINGLE, JOINT_COUPLE } from './fixtures';
 import { runFullInterview } from './navigation-helpers';
 import { b64, waitForDaPageLoad, clickContinue, fillById } from './helpers';
 import { finishAndAssertAllPdfs } from './assert-helpers';
@@ -78,6 +78,39 @@ test.describe('McKenna feedback #3 — income is editable from the review screen
 
     // 5) Change the value and continue — the edit must submit without error.
     await fillById(page, b64('debtor[0].income.income_amount_1'), '4321');
+    await clickContinue(page);
+    await waitForDaPageLoad(page);
+    await assertNoErrorPage(page);
+  });
+
+  test('joint case: BOTH debtors get Revisit buttons and Debtor 2 income is editable', async ({ page }) => {
+    // Joint filers exercise the debtor[1] Revisit buttons (show if: debtor[1]).
+    await runFullInterview(page, JOINT_COUPLE);
+    await finishAndAssertAllPdfs(page);
+
+    const yourIncome = page.getByRole('link', { name: /^your income$/i });
+    await expect(yourIncome).toBeVisible();
+    await yourIncome.click();
+    await waitForDaPageLoad(page);
+    await assertNoErrorPage(page);
+    expect((await heading(page)).toLowerCase()).toContain('review employment');
+
+    // 5 buttons per debtor → 10 for a joint case. Order: debtor[0] employment(0),
+    // monthly income(1), payroll(2), other deductions(3), other income(4);
+    // debtor[1] employment(5), monthly income(6), …
+    const revisitButtons = page.getByRole('button', { name: /^revisit$/i });
+    await expect(revisitButtons).toHaveCount(10);  // 5 per debtor (incl. Debtor 2)
+
+    // Click Debtor 2's *employment* Revisit (always asked, unlike the income
+    // amount screens which are skipped for a not-employed spouse) and confirm it
+    // opens Debtor 2's editable employment screen. Order: debtor[0] = 0-4,
+    // debtor[1] employment = 5.
+    await revisitButtons.nth(5).click();
+    await waitForDaPageLoad(page);
+    await assertNoErrorPage(page);
+    expect((await heading(page)).toLowerCase()).toContain('employment information for the other debtor');
+
+    // The screen is editable and submits without error.
     await clickContinue(page);
     await waitForDaPageLoad(page);
     await assertNoErrorPage(page);
