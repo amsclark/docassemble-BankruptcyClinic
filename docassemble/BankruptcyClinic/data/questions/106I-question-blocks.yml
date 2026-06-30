@@ -631,6 +631,23 @@ review:
         Has other monthly income: No
       % endif
   - note: |
+      **Need to change something above? Use these buttons to go back and edit.**
+  - Revisit: debtor[0].income.employment
+    button: |
+      Employment information
+  - Revisit: debtor[0].income.income_amount_1
+    button: |
+      Monthly income (wages &amp; overtime)
+  - Revisit: debtor[0].income.tax_deduction
+    button: |
+      Payroll deductions
+  - Revisit: debtor[0].income.other_deduction
+    button: |
+      Other deductions
+  - Revisit: debtor[0].income.net_rental_business
+    button: |
+      Other income sources
+  - note: |
       <br>
       ### Other Debtor
       Employment Status: ${ debtor[1].income.employment }
@@ -685,6 +702,29 @@ review:
         Has other monthly income: No
       % endif
 
+    show if: debtor[1]
+  - note: |
+      **Need to change something above? Use these buttons to go back and edit.**
+    show if: debtor[1]
+  - Revisit: debtor[1].income.employment
+    button: |
+      The other debtor's employment information
+    show if: debtor[1]
+  - Revisit: debtor[1].income.income_amount_1
+    button: |
+      The other debtor's monthly income (wages &amp; overtime)
+    show if: debtor[1]
+  - Revisit: debtor[1].income.tax_deduction
+    button: |
+      The other debtor's payroll deductions
+    show if: debtor[1]
+  - Revisit: debtor[1].income.other_deduction
+    button: |
+      The other debtor's other deductions
+    show if: debtor[1]
+  - Revisit: debtor[1].income.net_rental_business
+    button: |
+      The other debtor's other income sources
     show if: debtor[1]
 ---
 attachment:

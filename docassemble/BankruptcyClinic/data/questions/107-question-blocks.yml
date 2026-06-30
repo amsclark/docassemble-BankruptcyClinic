@@ -4,6 +4,13 @@ question: |
   Give details about your marital status and where you lived before
 subquestion: |
   Be as complete and accurate as possible. If two married people are filing together, both are equally responsible for supplying correct information.
+
+  % if defined('financial_affairs.debtor_count') and financial_affairs.debtor_count > 1:
+  Because you are filing jointly, for **each** place you lived in the last 3 years
+  the form also asks where Debtor 2 lived during that same period. If Debtor 2
+  lived with you, just choose **"Same address as you?" &rarr; Yes** and you will
+  not have to re-type the address.
+  % endif
 validation code: |
   if financial_affairs.lived_elsewhere:
     # The address fields are required:False so that answering "No" never blocks
@@ -847,6 +854,10 @@ fields:
 section: form_107
 question: |
   Explain the sources of debtor 2's income
+subquestion: |
+  This is a separate question for the co-debtor (Debtor 2). The court needs each
+  filer's income history, so you are answering for Debtor 2 here even though you
+  already gave your own income on the previous screen.
 fields:
   - note: |
       Did debtor 2 have any income from employment or from operating a business during this year or the two previous calendar years?

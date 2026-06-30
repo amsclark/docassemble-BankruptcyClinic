@@ -462,6 +462,7 @@ fields:
   - Year: prop.ab_other_vehicles[i].year
     datatype: number
   - Other info: prop.ab_other_vehicles[i].other_info
+    required: false
     input type: area
   - Who has an interest in the property?: prop.ab_other_vehicles[i].who
     input type: radio
@@ -2244,19 +2245,29 @@ fields:
       <br><br>
       Interest in insurance policies
 
-      Examples: Health, disability, or life insurance; health savings account (HSA); credit, homeowner's, or renter's insurance
+      Examples: Health, disability, or life insurance; health savings account (HSA); credit, homeowner's, or renter's insurance.
+
+      For each policy, enter the insurance company's name &mdash; you can include the
+      **type of policy** there too (for example, "MetLife &ndash; life" or "State Farm &ndash; auto").
+      The **value** is the policy's current cash or surrender value: what you would
+      receive if you cashed it in today. **It is not your monthly or yearly premium.**
+      Many term life, auto, and health policies have no cash value &mdash; enter $0 if that is the case.
   - Has insurance policies: prop.owed_property.has_insurance_interest
     datatype: yesnoradio
   - note: Institution 1
     show if: prop.owed_property.has_insurance_interest
-  - Institution name: prop.owed_property.first_insurance_interest_name
+  - Insurance company name: prop.owed_property.first_insurance_interest_name
     required: False
     show if: prop.owed_property.has_insurance_interest
   - Beneficiary: prop.owed_property.first_insurance_beneficiary
     required: False
     show if: prop.owed_property.has_insurance_interest
-  - Amount: prop.owed_property.first_insurance_interest_amount
+  - Current cash/surrender value of the policy: prop.owed_property.first_insurance_interest_amount
     datatype: currency
+    help: |
+      The cash or surrender value &mdash; what you would receive if you cashed in the
+      policy today. This is NOT your monthly or yearly premium. Enter $0 if the
+      policy has no cash value (most term life, auto, and health policies).
     required: False
     show if: prop.owed_property.has_insurance_interest
   - Claiming Exemption?: prop.owed_property.first_insurance_interest_has_claim
@@ -2292,14 +2303,18 @@ fields:
     datatype: yesnoradio
     show if: prop.owed_property.has_insurance_interest
     required: False
-  - Institution name: prop.owed_property.second_insurance_interest_name
+  - Insurance company name: prop.owed_property.second_insurance_interest_name
     required: False
     show if: prop.owed_property.has_second_insurance_interest
   - Beneficiary: prop.owed_property.second_insurance_beneficiary
     required: False
     show if: prop.owed_property.has_second_insurance_interest
-  - Amount: prop.owed_property.second_insurance_interest_amount
+  - Current cash/surrender value of the policy: prop.owed_property.second_insurance_interest_amount
     datatype: currency
+    help: |
+      The cash or surrender value &mdash; what you would receive if you cashed in the
+      policy today. This is NOT your monthly or yearly premium. Enter $0 if the
+      policy has no cash value (most term life, auto, and health policies).
     required: False
     show if: prop.owed_property.has_second_insurance_interest
   - Claiming Exemption?: prop.owed_property.second_insurance_interest_has_claim
@@ -2336,14 +2351,18 @@ fields:
     datatype: yesnoradio
     show if: prop.owed_property.has_insurance_interest
     required: False
-  - Institution name: prop.owed_property.third_insurance_interest_name
+  - Insurance company name: prop.owed_property.third_insurance_interest_name
     required: False
     show if: prop.owed_property.has_third_insurance_interest
   - Beneficiary: prop.owed_property.third_insurance_beneficiary
     required: False
     show if: prop.owed_property.has_third_insurance_interest
-  - Amount: prop.owed_property.third_insurance_interest_amount
+  - Current cash/surrender value of the policy: prop.owed_property.third_insurance_interest_amount
     datatype: currency
+    help: |
+      The cash or surrender value &mdash; what you would receive if you cashed in the
+      policy today. This is NOT your monthly or yearly premium. Enter $0 if the
+      policy has no cash value (most term life, auto, and health policies).
     required: False
     show if: prop.owed_property.has_third_insurance_interest
   - Claiming Exemption?: prop.owed_property.third_insurance_interest_has_claim
