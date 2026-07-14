@@ -57,6 +57,15 @@ id: secured_creditors_any_exist
 section: schedule_d
 question: |
   Do any creditors have claims secured by your property?
+subquestion: |
+  A **secured** creditor is one that can take specific property if you don't
+  pay — for example, a **home mortgage lender**, a **car loan lender**, or any
+  creditor with a lien on your property.
+
+  **Include your home mortgage and vehicle loan lenders here.** Earlier
+  questions about your home and vehicles only asked *how much* you owe — the
+  lenders themselves have not been listed yet. Each secured creditor must be
+  listed on this schedule (Schedule D) for your bankruptcy to cover that debt.
 yesno: prop.creditors.there_are_any
 ---
 id: secured_creditors_add_another
@@ -128,7 +137,9 @@ section: schedule_d
 question: |
   Tell the court about your secured claim.
 subquestion: |
-  If a creditor has more than one secured claim, list the creditor separately for each claim.
+  Include your home mortgage lender, vehicle loan lender, and any other
+  creditor whose debt is backed by your property. If a creditor has more than
+  one secured claim, list the creditor separately for each claim.
 check in: unsecured_claim_amount
 allowed to set:
   - prop.creditors[i].complete

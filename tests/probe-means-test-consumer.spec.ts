@@ -25,6 +25,11 @@ async function getHeading(p: import('@playwright/test').Page) {
   return ((await p.locator('h1').first().textContent({ timeout: 5000 }).catch(() => '')) || '').trim();
 }
 
+// consumerDebts:true makes navigateFinancialAffairs pick "Primarily consumer
+// debts" on the single Form 101 debt-classification radio, which is what now
+// derives non_consumer_debts=False (the consumer path this probe exercises).
+const SCN = { ...SIMPLE_SINGLE, meansTest: { consumerDebts: true } };
+
 async function reachMeansTestExemptions(page: import('@playwright/test').Page) {
   await navigateToDebtorPage(page, SIMPLE_SINGLE);
   await fillDebtorAndAdvance(page, SIMPLE_SINGLE.debtor);
@@ -38,7 +43,7 @@ async function reachMeansTestExemptions(page: import('@playwright/test').Page) {
   await navigateCommunityProperty(page);
   await navigateIncome(page, SIMPLE_SINGLE);
   await navigateExpenses(page, SIMPLE_SINGLE.rentExpense, 0);
-  await navigateFinancialAffairs(page, SIMPLE_SINGLE);
+  await navigateFinancialAffairs(page, SCN);
   await navigateReporting(page);
   await navigatePersonalLeases(page);
 
@@ -59,9 +64,9 @@ test('means_test_exemptions advances under masked Continue with all-No (consumer
   const heading = await getHeading(page);
   expect(heading.toLowerCase()).toContain('identify any exemptions from presumption of abuse');
 
-  // Click No on each of the 3 yesnoradios via label
+  // Click No on each of the yesnoradios (veteran, reservist) via label
   await page.evaluate(() => {
-    const names = ['monthly_income.non_consumer_debts', 'monthly_income.disabled_veteran', 'monthly_income.reservists'];
+    const names = ['monthly_income.disabled_veteran', 'monthly_income.reservists'];
     names.forEach((name) => {
       // docassemble b64: standard base64, no padding
       const b64 = btoa(name).replace(/=+$/, '');
@@ -88,7 +93,7 @@ test('means_test_exemptions advances under STRICT Continue with all-No (consumer
   expect(heading.toLowerCase()).toContain('identify any exemptions from presumption of abuse');
 
   await page.evaluate(() => {
-    const names = ['monthly_income.non_consumer_debts', 'monthly_income.disabled_veteran', 'monthly_income.reservists'];
+    const names = ['monthly_income.disabled_veteran', 'monthly_income.reservists'];
     names.forEach((name) => {
       // docassemble b64: standard base64, no padding
       const b64 = btoa(name).replace(/=+$/, '');

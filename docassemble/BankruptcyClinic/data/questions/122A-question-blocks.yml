@@ -15,9 +15,11 @@ id: means_test_exemptions
 section: form_122a
 question: |
   Identify any exemptions from Presumption of Abuse.
+subquestion: |
+  You already told us your debts are primarily
+  ${ 'consumer' if reporting.reporting_type == '1' else 'non-consumer' } debts,
+  so we won't ask that again.
 fields:
-  - Are your debts primarily non-consumer?: monthly_income.non_consumer_debts
-    datatype: yesnoradio
   - Are you a disabled veteran?: monthly_income.disabled_veteran
     datatype: yesnoradio
   - Are you in the Reservists or National Guard?: monthly_income.reservists

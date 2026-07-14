@@ -48,11 +48,10 @@ test('Social Security is excluded from the means-test median comparison', async 
   await selectByName(page, b64('monthly_income.means_type'), 'There is no presumption of abuse.');
   await clickContinue(page);
 
-  // means_test_exemptions — consumer debts (non_consumer_debts = false) drives
-  // the full 122A median comparison.
+  // means_test_exemptions — consumer debts (picked on the SOFA-point Form 101
+  // radio via meansTest.consumerDebts) drives the full 122A median comparison;
+  // non_consumer_debts is derived, not a field here.
   await waitForDaPageLoad(page);
-  await selectYesNoRadio(page, 'monthly_income.non_consumer_debts', false);
-  await page.waitForTimeout(300);
   await selectYesNoRadio(page, 'monthly_income.disabled_veteran', false);
   await page.waitForTimeout(300);
   await selectYesNoRadio(page, 'monthly_income.reservists', false);

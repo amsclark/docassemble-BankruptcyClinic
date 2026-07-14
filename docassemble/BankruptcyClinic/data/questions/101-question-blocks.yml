@@ -989,9 +989,20 @@ review:
       ${ counseling_table }
 ---
 #Part 6: Answer These Questions for Reporting Purposes
+# Single source of truth for the debt classification: Form 107 question 6 and
+# the 122A means-test exemption both DERIVE from this answer (see the mandatory
+# block in voluntary-petition.yml) so the interview asks only once — Roxanne
+# feedback, July 2026 ("the software asks again what kinds of debts").
 id: reporting_type
 question: |
   What kind of debts do you have?
+subquestion: |
+  For most people the answer is **Primarily consumer debts** — debts incurred
+  for personal, family, or household purposes, such as credit cards, medical
+  bills, a home mortgage, or a car loan (11 U.S.C. § 101(8)).
+
+  Choose **Primarily business debts** only if most of what you owe comes from
+  running a business.
 fields:
   - no label: reporting.reporting_type
     input type: radio

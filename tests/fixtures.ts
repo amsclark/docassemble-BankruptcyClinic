@@ -154,7 +154,9 @@ export interface ExpenseData {
 /** Drives the 122A means-test branch. Omit (or consumerDebts: false) for the
  *  non-consumer short-circuit the happy-path helpers always took. */
 export interface MeansTestOptions {
-  /** Answer "are your debts primarily NON-consumer?" with No → full means test. */
+  /** Pick "Primarily consumer debts" on the single Form 101 debt-classification
+   *  radio (asked at the SOFA point) → full means test. Omit/false picks
+   *  "Primarily business debts" → means test short-circuits. */
   consumerDebts?: boolean;
   /** Index into the filing_status choices:
    *  0 = Not married, 1 = Married filing jointly, 2 = Married NOT filing. */

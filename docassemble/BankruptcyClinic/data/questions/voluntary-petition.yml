@@ -750,7 +750,12 @@ code: |
   financial_affairs.had_other_income
   if len(debtor) > 1:
     financial_affairs.debtor2_had_other_income
-  financial_affairs.primarily_consumer_debts
+  # Debt classification is asked ONCE — Form 101 Part 6 ("What kind of debts
+  # do you have?") — and 107 q6 + 122A derive from it (Roxanne feedback, July
+  # 2026: the interview asked the same thing three times). reporting_type:
+  # '1' = primarily consumer, '2' = primarily business, '3' = other.
+  reporting.reporting_type
+  financial_affairs.primarily_consumer_debts = (reporting.reporting_type == '1')
 
   financial_affairs.consumer_debt_payments.gather()
 
@@ -806,8 +811,9 @@ code: |
       add_creditor(_cred.name, _cred.street, _cred.city, _cred.state, _cred.zip, getattr(_cred, 'type', 'Nonpriority'))
       _cred.save_to_library = False
 
-  # Reporting — moved here so estimates auto-populate from entered data
-  reporting.reporting_type
+  # Reporting — moved here so estimates auto-populate from entered data.
+  # (reporting.reporting_type is already asked earlier, at the SOFA debt-
+  # classification point.)
   reporting.funds_for_creditors
   # Auto-calculate estimates from already-entered data
   reporting.creditor_estimate = len(prop.creditors) + len(prop.priority_claims) + len(prop.nonpriority_claims)
@@ -852,7 +858,12 @@ code: |
 
   #122a - Income and means test
   monthly_income.means_type
-  monthly_income.non_consumer_debts
+  # Derived from the single Form 101 Part 6 debt-classification answer — no
+  # longer asked on the means-test exemptions screen (Roxanne feedback, July
+  # 2026). The veteran/reservist questions are still asked (screen below).
+  monthly_income.non_consumer_debts = (reporting.reporting_type != '1')
+  monthly_income.disabled_veteran
+  monthly_income.reservists
   if monthly_income.non_consumer_debts == False and monthly_income.disabled_veteran == False and monthly_income.reservists == False:
     monthly_income.filing_status
     monthly_income.gross_wages1
