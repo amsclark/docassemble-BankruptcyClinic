@@ -586,11 +586,13 @@ export async function navigateFinancialAffairs(page: Page, scenario: TestScenari
   // (Form 101 Part 6; 107 q6 + 122A non_consumer_debts derive from it). Pick
   // consumer when the scenario drives the full means test, business otherwise
   // so the means test keeps short-circuiting like the old non_consumer=Yes
-  // default did.
+  // default did. meansTest.debtKind overrides for the 'other' branch.
+  const DEBT_KIND_INDEX = { consumer: 0, business: 1, other: 2 } as const;
+  const debtKind =
+    scenario.meansTest?.debtKind ??
+    (scenario.meansTest?.consumerDebts ? 'consumer' : 'business');
   await waitForDaPageLoad(page);
-  await page.locator('label').filter({
-    hasText: scenario.meansTest?.consumerDebts ? 'Primarily consumer debts' : 'Primarily business debts',
-  }).click();
+  await selectChoiceRadio(page, 'reporting.reporting_type', DEBT_KIND_INDEX[debtKind]);
   await clickContinue(page);
   await waitForDaPageLoad(page);
 

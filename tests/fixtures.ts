@@ -158,6 +158,9 @@ export interface MeansTestOptions {
    *  radio (asked at the SOFA point) → full means test. Omit/false picks
    *  "Primarily business debts" → means test short-circuits. */
   consumerDebts?: boolean;
+  /** Explicit debt-kind radio choice; overrides consumerDebts when set.
+   *  'other' short-circuits the means test like 'business' does. */
+  debtKind?: 'consumer' | 'business' | 'other';
   /** Index into the filing_status choices:
    *  0 = Not married, 1 = Married filing jointly, 2 = Married NOT filing. */
   filingStatusIndex?: 0 | 1 | 2;
