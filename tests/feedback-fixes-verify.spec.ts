@@ -80,9 +80,8 @@ async function consumerDebtMeansTest(page: Page, joint: boolean) {
     if (h.includes('presumption of abuse') && body.includes('select the option')) {
       await selectByName(page, b64('monthly_income.means_type'), 'There is no presumption of abuse.');
     } else if (h.includes('identify any exemptions')) {
-      // The KEY: consumer debts (NO) → drops into review_122 + poverty_calc.
-      await fillYesNoRadio(page, 'monthly_income.non_consumer_debts', false);
-      await page.waitForTimeout(150);
+      // non_consumer_debts derives from the Form 101 radio (answered consumer
+      // back at the SOFA point) → drops into review_122 + poverty_calc.
       await fillYesNoRadio(page, 'monthly_income.disabled_veteran', false);
       await page.waitForTimeout(150);
       await fillYesNoRadio(page, 'monthly_income.reservists', false);
@@ -101,7 +100,10 @@ test.describe('June 2026 feedback fixes — Schedule G lease + consumer-debt mea
   test.setTimeout(300_000);
 
   test('joint interview with an added lease and zero-income consumer means test reaches conclusion', async ({ page }) => {
-    const scenario = JOINT_COUPLE;
+    // consumerDebts:true → navigateFinancialAffairs picks "Primarily consumer
+    // debts" on the Form 101 radio, which derives non_consumer_debts=False
+    // (the consumer means-test path this spec exercises).
+    const scenario = { ...JOINT_COUPLE, meansTest: { consumerDebts: true } };
     await navigateToDebtorPage(page, scenario);
     await fillDebtorAndAdvance(page, scenario.debtor);
     if (scenario.jointFiling && scenario.spouse) {

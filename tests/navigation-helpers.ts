@@ -582,9 +582,19 @@ export async function navigateFinancialAffairs(page: Page, scenario: TestScenari
     await clickContinue(page);
   }
 
-  // Consumer debts → Yes
+  // Debt classification — the single "What kind of debts do you have?" radio
+  // (Form 101 Part 6; 107 q6 + 122A non_consumer_debts derive from it). Pick
+  // consumer when the scenario drives the full means test, business otherwise
+  // so the means test keeps short-circuiting like the old non_consumer=Yes
+  // default did. meansTest.debtKind overrides for the 'other' branch.
+  const DEBT_KIND_INDEX = { consumer: 0, business: 1, other: 2 } as const;
+  const debtKind =
+    scenario.meansTest?.debtKind ??
+    (scenario.meansTest?.consumerDebts ? 'consumer' : 'business');
   await waitForDaPageLoad(page);
-  await clickYesNoButton(page, 'financial_affairs.primarily_consumer_debts', true);
+  await selectChoiceRadio(page, 'reporting.reporting_type', DEBT_KIND_INDEX[debtKind]);
+  await clickContinue(page);
+  await waitForDaPageLoad(page);
 
   // All list-gathers → No
   for (const varName of [
@@ -1074,10 +1084,9 @@ export async function navigateMeansTest(page: Page, opts: MeansTestOptions = {})
   await clickContinue(page);
 
   await waitForDaPageLoad(page);
-  // non_consumer_debts=true short-circuits the means test (the happy path the
-  // helpers always took — which is why the consumer-branch crashes hid there).
-  await selectYesNoRadio(page, 'monthly_income.non_consumer_debts', !opts.consumerDebts);
-  await page.waitForTimeout(300);
+  // non_consumer_debts is no longer a field here — it derives from the Form
+  // 101 "what kind of debts" radio answered back in navigateFinancialAffairs
+  // (scenario.meansTest.consumerDebts picks consumer vs business there).
   await selectYesNoRadio(page, 'monthly_income.disabled_veteran', false);
   await page.waitForTimeout(300);
   await selectYesNoRadio(page, 'monthly_income.reservists', false);
@@ -1241,10 +1250,9 @@ export async function navigateCreditCounseling(page: Page, scenario: TestScenari
 // ════════════════════════════════════════════════════════════════════
 
 export async function navigateReporting(page: Page) {
-  await waitForDaPageLoad(page);
-  await page.locator('label').filter({ hasText: 'Primarily consumer debts' }).click();
-  await clickContinue(page);
-
+  // reporting.reporting_type ("what kind of debts") is now answered earlier,
+  // at the SOFA debt-classification point (navigateFinancialAffairs) — the
+  // reporting section starts directly at funds_for_creditors.
   await waitForDaPageLoad(page);
   await clickYesNoButton(page, 'reporting.funds_for_creditors', false);
 }

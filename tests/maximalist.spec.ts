@@ -817,10 +817,13 @@ async function navigateFinancialAffairsMaximalist(page: Page) {
   await fillYesNoRadio(page, 'financial_affairs.debtor2_had_other_income', false);
   await clickContinue(page);
 
-  // Consumer debts -> Yes
-  console.log('  [financialAffairs] Consumer debts -> Yes');
+  // Debt classification — single Form 101 "what kind of debts" radio (107 q6
+  // and 122A non_consumer_debts derive from it). Consumer -> full means test.
+  console.log('  [financialAffairs] Kind of debts -> Primarily consumer');
   await waitForDaPageLoad(page);
-  await clickYesNoButton(page, 'financial_affairs.primarily_consumer_debts', true);
+  await page.locator('label').filter({ hasText: 'Primarily consumer debts' }).click();
+  await clickContinue(page);
+  await waitForDaPageLoad(page);
 
   // All list-gathers -> No
   for (const varName of [
@@ -1315,10 +1318,8 @@ async function navigateMeansTestMaximalist(page: Page) {
   await selectByName(page, b64('monthly_income.means_type'), 'There is no presumption of abuse.');
   await clickContinue(page);
 
-  console.log('  [meansTest] Exemptions (non_consumer_debts=False)');
+  console.log('  [meansTest] Exemptions (non_consumer_debts derived from Form 101 radio)');
   await waitForDaPageLoad(page);
-  await selectYesNoRadio(page, 'monthly_income.non_consumer_debts', false);
-  await page.waitForTimeout(300);
   await selectYesNoRadio(page, 'monthly_income.disabled_veteran', false);
   await page.waitForTimeout(300);
   await selectYesNoRadio(page, 'monthly_income.reservists', false);

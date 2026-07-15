@@ -1081,14 +1081,11 @@ edit:
   - amount_owed
   - payment_for
 ---
-id: consumer_debts_classification
-question: |
-  % if len(debtor) > 1:
-  Are either Debtor 1's or Debtor 2's debts primarily consumer debts?
-  % else:
-  Are your debts primarily consumer debts?
-  % endif
-yesno: financial_affairs.primarily_consumer_debts
+# financial_affairs.primarily_consumer_debts is no longer asked here — it is
+# DERIVED from the Form 101 Part 6 answer (reporting.reporting_type) in the
+# mandatory block of voluntary-petition.yml, so the interview asks about the
+# kind of debts only once (Roxanne feedback, July 2026). Keeping a question
+# block here too would violate the one-generator-per-variable rule (loop risk).
 ---
 id: consumer_creditor_payments
 question: |

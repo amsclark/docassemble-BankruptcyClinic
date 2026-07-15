@@ -163,7 +163,6 @@ docassemble/BankruptcyClinic/data/questions/107-question-blocks.yml:charitable_c
 docassemble/BankruptcyClinic/data/questions/107-question-blocks.yml:consumer_creditor_payments
 docassemble/BankruptcyClinic/data/questions/107-question-blocks.yml:consumer_debt_additional_creditors
 docassemble/BankruptcyClinic/data/questions/107-question-blocks.yml:consumer_debt_payment_details
-docassemble/BankruptcyClinic/data/questions/107-question-blocks.yml:consumer_debts_classification
 docassemble/BankruptcyClinic/data/questions/107-question-blocks.yml:environmental_hazardous_gateway
 docassemble/BankruptcyClinic/data/questions/107-question-blocks.yml:environmental_judicial_proceeding
 docassemble/BankruptcyClinic/data/questions/107-question-blocks.yml:environmental_law_liability
