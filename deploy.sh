@@ -7,7 +7,6 @@
 
 set -e
 
-API_KEY="${DA_API_KEY:-M1L356QF6eplHGeaNNkF8QxDic126Wtv}"
 API_URL="${DA_API_URL:-http://localhost:8080}"
 PACKAGE_DIR="$(cd "$(dirname "$0")" && pwd)"
 DOCKER_CONTAINER="${DA_CONTAINER:-docassemble}"

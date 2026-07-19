@@ -99,3 +99,6 @@ build/
 
 # Playwright
 /blob-report/
+
+# Claude Code local settings — contains machine-local permission rules; may hold secrets
+.claude/settings.local.json
