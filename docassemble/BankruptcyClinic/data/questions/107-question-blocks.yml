@@ -2918,20 +2918,25 @@ review:
       Currently married: ${ "Yes" if financial_affairs.marital_status else "No" }
 
       Lived elsewhere in last 3 years: ${ "Yes" if financial_affairs.lived_elsewhere else "No" }
-  - Revisit: financial_affairs.income_amount
+  - Revisit: financial_affairs.employed
     button: |
       **Income**
 
-      Employment income (this year): $${ financial_affairs.income_amount }
+      Had employment income: ${ "Yes" if financial_affairs.employed else "No" }
+      % if financial_affairs.employed:
 
-      Employment income (last year): $${ financial_affairs.income_amount_2 }
-  - Revisit: financial_affairs.has_garnishment
+      Gross income (this year, to filing): $${ getattr(financial_affairs, 'current_gross_income', 0) }
+
+      Gross income (last calendar year): $${ getattr(financial_affairs, 'last_gross_income', 0) }
+      % endif
+  - Revisit: financial_affairs.lawsuits.there_are_any
     button: |
-      **Garnishments and legal actions**
+      **Lawsuits and legal actions**
 
-      Had garnishments: ${ "Yes" if financial_affairs.has_garnishment else "No" }
+      Party to any lawsuit, court action, or administrative proceeding: ${ "Yes" if financial_affairs.lawsuits.there_are_any else "No" }
+  - Revisit: financial_affairs.levies.there_are_any
+    button: |
+      **Repossessions and garnishments**
 
-      Had lawsuits: ${ "Yes" if financial_affairs.has_lawsuit else "No" }
-
-      Had repossessions: ${ "Yes" if financial_affairs.has_repossession else "No" }
+      Property repossessed, foreclosed, garnished, attached, seized, or levied: ${ "Yes" if financial_affairs.levies.there_are_any else "No" }
 

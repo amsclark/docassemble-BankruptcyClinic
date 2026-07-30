@@ -664,8 +664,8 @@ review:
       % endif
 
       ### Income
-      Monthly gross wages: ${ debtor[1].income.income_amount }
-      Overtime pay: ${ debtor[1].income.overtime_pay }
+      Monthly gross wages: ${ debtor[1].income.income_amount_1 + debtor[1].income.income_amount_2 + debtor[1].income.income_amount_3 + debtor[1].income.income_amount_4 + debtor[1].income.income_amount_5 + debtor[1].income.income_amount_6 }
+      Overtime pay: ${ debtor[1].income.overtime_pay_1 + debtor[1].income.overtime_pay_2 + debtor[1].income.overtime_pay_3 + debtor[1].income.overtime_pay_4 + debtor[1].income.overtime_pay_5 + debtor[1].income.overtime_pay_6 }
       Tax Deduction: ${ debtor[1].income.tax_deduction }
       Mandatory Contributions: ${ debtor[1].income.mandatory_contributions }
       Voluntary Contributions: ${ debtor[1].income.voluntary_contributions }

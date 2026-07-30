@@ -95,10 +95,10 @@ happy-path Playwright runs (which mask these bugs — see `tests/navigation-help
   skip-if-undefined semantic also powers **REVIEW_OMITTED** (config-independent):
   a review item reading a never-defined name is silently omitted for EVERY user
   (no crash — the Revisit entry just never displays; the McKenna "SOFA Debtor 2"
-  class). Gated as **`npm run lint:seek-sim`** (`scripts/lint-seek-sim.sh`)
-  against `scripts/seek-sim-baseline.txt` — crash/loop findings are ZERO (the
-  interview simulates clean end-to-end; a new one is a new crash path); the
-  baseline holds 13 REVIEW_OMITTED typos awaiting burn-down.
+  class; the check's first run found 13 real ones, all fixed). Gated as
+  **`npm run lint:seek-sim`** (`scripts/lint-seek-sim.sh`) against
+  `scripts/seek-sim-baseline.txt`, which is EMPTY — the interview simulates
+  clean end-to-end and every review item resolves; keep it at zero.
 
 - **`python3 scripts/interview_dependency_check.py`** — "internal soundness":
   top-level scalars defined by **both a question and code** (the rule-6 loop

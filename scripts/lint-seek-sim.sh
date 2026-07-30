@@ -16,8 +16,8 @@
 # Burn-down gate, same contract as lint-flow-gaps.sh:
 #   - NEW findings (not in the baseline) FAIL the build.
 #   - FIXED findings prompt you to tighten with --update.
-# Crash/loop findings are ZERO — the interview simulates clean; keep it that
-# way. The baseline holds 13 REVIEW_OMITTED typos awaiting burn-down.
+# Baseline is currently EMPTY — the interview simulates clean and every
+# review item's variables resolve; keep it that way.
 #
 # Usage:
 #   ./scripts/lint-seek-sim.sh           # check
