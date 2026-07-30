@@ -62,6 +62,13 @@ f="$Q/106H-question-blocks.yml"
 sed -i "0,/^id: codebtors_any_exist/s//id: codebtors_any_exist_MUTATED/" "$f"
 check "lint:yaml-ids (id snapshot)" "$f" ./scripts/yaml-question-ids-snapshot.sh
 
+# 6) Namespace clobber: make a code-block loop target shadow a global object
+#    (the prod DAErrorMissingVariable of 2026-07-30 — `for payment in ...`
+#    overwrote the Form 103A `payment` object).
+f="$Q/107-question-blocks.yml"
+sed -i "0,/for pmt in financial_affairs.consumer_debt_payments:/s//for payment in financial_affairs.consumer_debt_payments:/" "$f"
+check "lint:namespace-clobber" "$f" python3 scripts/lint_namespace_clobber.py
+
 echo ""
 if [ "$FAILS" -eq 0 ]; then
   echo "✅ all gates have teeth — every injected bug was caught"

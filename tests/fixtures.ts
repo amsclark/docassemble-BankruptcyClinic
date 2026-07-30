@@ -171,6 +171,35 @@ export interface MeansTestOptions {
   medianIncome?: string;
 }
 
+export interface ConsumerDebtPaymentData {
+  name: string;
+  street: string;
+  city: string;
+  /** Full state name, as shown in the dropdown (e.g. 'Nebraska'). */
+  state: string;
+  zip: string;
+  paymentDates: string;
+  totalAmount: string;
+  amountOwed: string;
+  /** One of: Mortgage, Car, Credit Card, Loan repayment, Suppliers or vendors, Other. */
+  paymentFor: string;
+}
+
+export interface CaseDetailsOptions {
+  /**
+   * Which Form 101 fee-payment option to choose. 'full' (default) is the happy
+   * path; 'installments' drives the Form 103A application, which is the branch
+   * that defines the global `payment` object.
+   */
+  feePayment?: 'full' | 'installments';
+  /** Installments only: make a first payment when filing (Form 103A line 1a). */
+  paymentOnPetition?: boolean;
+  /** Installments only: amount paid when filing, when paymentOnPetition. */
+  initialPaymentAmount?: string;
+  /** Installments only: the proposed installment schedule (≥1 required). */
+  installments?: Array<{ amount: string; date: string }>;
+}
+
 export interface TestScenario {
   name: string;
   district: string;
@@ -187,6 +216,13 @@ export interface TestScenario {
   expenses?: ExpenseData;
   hasCodebtor?: boolean;
   hasContracts?: boolean;
+  /**
+   * SOFA q6 consumer-creditor payments (last 90 days). Omit/empty for the happy
+   * path "No"; supply entries to drive the 107 builder's payment loops.
+   */
+  consumerDebtPayments?: ConsumerDebtPaymentData[];
+  /** Form 101 fee-payment branch + Form 103A installment details. */
+  caseDetails?: CaseDetailsOptions;
   dependents?: number;
   meansTest?: MeansTestOptions;
 }

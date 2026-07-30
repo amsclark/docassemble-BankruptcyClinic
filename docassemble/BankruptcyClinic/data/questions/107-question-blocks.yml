@@ -2542,60 +2542,60 @@ code: |
 
 
   x=1
-  for payment in financial_affairs.consumer_debt_payments:
-    fin['creditor'+str(x)] = payment.creditor_name
-    fin['creditor_totalPaid'+str(x)] = currency(payment.total_amount)
-    fin['creditor_amountOwed'+str(x)] = currency(payment.amount_owed)
-    fin['creditor_isMortgage'+str(x)] = True if payment.payment_for == 'Mortgage' else False
-    fin['creditor_address'+str(x)] = payment.creditor_street
-    fin['creditor_paymentDates'+str(x)] = payment.paymentDates
-    fin['creditor_isCar'+str(x)] = True if payment.payment_for == 'Car' else False
-    fin['creditor_isCC'+str(x)] = True if payment.payment_for == 'Credit Card' else False
-    fin['creditor_isLoan'+str(x)] = True if payment.payment_for == 'Loan repayment' else False
-    fin['creditor_isVendor'+str(x)] = True if payment.payment_for == 'Suppliers or vendors' else False
-    fin['creditor_city'+str(x)] = payment.creditor_city
-    fin['creditor_state'+str(x)] = payment.creditor_state
-    fin['creditor_zip'+str(x)] = payment.creditor_zip
-    fin['creditor_isOther'+str(x)] = True if payment.payment_for == 'Other' else False
-    fin['creditor_other'+str(x)] = payment.payment_for
+  for pmt in financial_affairs.consumer_debt_payments:
+    fin['creditor'+str(x)] = pmt.creditor_name
+    fin['creditor_totalPaid'+str(x)] = currency(pmt.total_amount)
+    fin['creditor_amountOwed'+str(x)] = currency(pmt.amount_owed)
+    fin['creditor_isMortgage'+str(x)] = True if pmt.payment_for == 'Mortgage' else False
+    fin['creditor_address'+str(x)] = pmt.creditor_street
+    fin['creditor_paymentDates'+str(x)] = pmt.paymentDates
+    fin['creditor_isCar'+str(x)] = True if pmt.payment_for == 'Car' else False
+    fin['creditor_isCC'+str(x)] = True if pmt.payment_for == 'Credit Card' else False
+    fin['creditor_isLoan'+str(x)] = True if pmt.payment_for == 'Loan repayment' else False
+    fin['creditor_isVendor'+str(x)] = True if pmt.payment_for == 'Suppliers or vendors' else False
+    fin['creditor_city'+str(x)] = pmt.creditor_city
+    fin['creditor_state'+str(x)] = pmt.creditor_state
+    fin['creditor_zip'+str(x)] = pmt.creditor_zip
+    fin['creditor_isOther'+str(x)] = True if pmt.payment_for == 'Other' else False
+    fin['creditor_other'+str(x)] = pmt.payment_for
 
     x += 1
 
   fin['noInsiderPayments'] = True if financial_affairs.insider_payments.there_are_any == False else False
   fin['yesInsiderPayments'] = True if financial_affairs.insider_payments.there_are_any == True else False
   x = 1
-  for payment in financial_affairs.insider_payments:
-    fin['insider'+str(x)] = payment.insider_name
-    fin['insider_address'+str(x)] = payment.street
-    fin['insider_city'+str(x)] = payment.city
-    fin['insider_state'+str(x)] = payment.state
-    fin['insider_zip'+str(x)] = payment.zip
-    fin['insider_paymentDates'+str(x)] = payment.paymentDates
-    fin['insider_totalPaid'+str(x)] = currency(payment.total_amount)
-    fin['insider_amountOwed'+str(x)] = currency(payment.amount_owed)
-    fin['insider_reason'+str(x)] = payment.reason
+  for pmt in financial_affairs.insider_payments:
+    fin['insider'+str(x)] = pmt.insider_name
+    fin['insider_address'+str(x)] = pmt.street
+    fin['insider_city'+str(x)] = pmt.city
+    fin['insider_state'+str(x)] = pmt.state
+    fin['insider_zip'+str(x)] = pmt.zip
+    fin['insider_paymentDates'+str(x)] = pmt.paymentDates
+    fin['insider_totalPaid'+str(x)] = currency(pmt.total_amount)
+    fin['insider_amountOwed'+str(x)] = currency(pmt.amount_owed)
+    fin['insider_reason'+str(x)] = pmt.reason
 
     x += 1
 
   fin['noBenefitPayments'] = True if financial_affairs.insider_benefits.there_are_any == False else False
   fin['yesBenefitPayments'] = True if financial_affairs.insider_benefits.there_are_any == True else False
   x = 1
-  for payment in financial_affairs.insider_benefits:
-    fin['benefit'+str(x)] = payment.insider_name
-    fin['benefit_address'+str(x)] = payment.street
-    fin['benefit_city'+str(x)] = payment.city
-    fin['benefit_state'+str(x)] = payment.state
-    fin['benefit_zip'+str(x)] = payment.zip
-    fin['benefit_payment1_'+str(x)] = format_date(payment.payment_date_1, format='MM/dd/yyyy')
-    fin['benefit_payment2_'+str(x)] = format_date(payment.payment_date_2, format='MM/dd/yyyy') if getattr(payment, 'payment_date_2', None) else None
-    fin['benefit_payment3_'+str(x)] = format_date(payment.payment_date_3, format='MM/dd/yyyy') if getattr(payment, 'payment_date_3', None) else None
+  for pmt in financial_affairs.insider_benefits:
+    fin['benefit'+str(x)] = pmt.insider_name
+    fin['benefit_address'+str(x)] = pmt.street
+    fin['benefit_city'+str(x)] = pmt.city
+    fin['benefit_state'+str(x)] = pmt.state
+    fin['benefit_zip'+str(x)] = pmt.zip
+    fin['benefit_payment1_'+str(x)] = format_date(pmt.payment_date_1, format='MM/dd/yyyy')
+    fin['benefit_payment2_'+str(x)] = format_date(pmt.payment_date_2, format='MM/dd/yyyy') if getattr(pmt, 'payment_date_2', None) else None
+    fin['benefit_payment3_'+str(x)] = format_date(pmt.payment_date_3, format='MM/dd/yyyy') if getattr(pmt, 'payment_date_3', None) else None
     for _dn in [4, 5, 6]:
-      _pd = getattr(payment, 'payment_date_' + str(_dn), None)
+      _pd = getattr(pmt, 'payment_date_' + str(_dn), None)
       if _pd:
         fin['benefit_payment'+str(_dn)+'_'+str(x)] = format_date(_pd, format='MM/dd/yyyy')
-    fin['benefit_totalPaid'+str(x)] = currency(payment.total_amount)
-    fin['benefit_amountOwed'+str(x)] = currency(payment.amount_owed)
-    fin['benefit_reason'+str(x)] = payment.reason
+    fin['benefit_totalPaid'+str(x)] = currency(pmt.total_amount)
+    fin['benefit_amountOwed'+str(x)] = currency(pmt.amount_owed)
+    fin['benefit_reason'+str(x)] = pmt.reason
 
     x += 1
 
@@ -2695,20 +2695,20 @@ code: |
   fin['noConsulting'] = True if financial_affairs.bankruptcy_payments.there_are_any == False else False
   fin['yesConsulting'] = True if financial_affairs.bankruptcy_payments.there_are_any == True else False
   x = 1
-  for payment in financial_affairs.bankruptcy_payments:
-    fin['consult_name'+str(x)] = payment.name
-    fin['consult_address'+str(x)] = payment.street
-    fin['consult_city'+str(x)] = payment.city
-    fin['consult_state'+str(x)] = payment.state
-    fin['consult_zip'+str(x)] = payment.zip
-    fin['consult_email'+str(x)] = payment.email_or_website
-    fin['consult_date1-'+str(x)] = format_date(payment.date_1, format='MM/dd/yyyy')
-    fin['consult_amt1-'+str(x)] = currency(payment.value_1)
-    if payment.value_2 > 0:
-      fin['consult_date2-'+str(x)] = format_date(payment.date_2, format='MM/dd/yyyy') if getattr(payment, 'date_2', None) else None
-      fin['consult_amt2-'+str(x)] = currency(payment.value_2)
-    fin['consult_who'+str(x)] = payment.payment_person
-    fin['consult_describe'+str(x)] = payment.property_description
+  for pmt in financial_affairs.bankruptcy_payments:
+    fin['consult_name'+str(x)] = pmt.name
+    fin['consult_address'+str(x)] = pmt.street
+    fin['consult_city'+str(x)] = pmt.city
+    fin['consult_state'+str(x)] = pmt.state
+    fin['consult_zip'+str(x)] = pmt.zip
+    fin['consult_email'+str(x)] = pmt.email_or_website
+    fin['consult_date1-'+str(x)] = format_date(pmt.date_1, format='MM/dd/yyyy')
+    fin['consult_amt1-'+str(x)] = currency(pmt.value_1)
+    if pmt.value_2 > 0:
+      fin['consult_date2-'+str(x)] = format_date(pmt.date_2, format='MM/dd/yyyy') if getattr(pmt, 'date_2', None) else None
+      fin['consult_amt2-'+str(x)] = currency(pmt.value_2)
+    fin['consult_who'+str(x)] = pmt.payment_person
+    fin['consult_describe'+str(x)] = pmt.property_description
 
     x += 1
 

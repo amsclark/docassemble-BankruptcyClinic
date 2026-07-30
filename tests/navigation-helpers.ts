@@ -27,7 +27,7 @@ import {
   setCheckbox,
   handleAnotherPage,
 } from './helpers';
-import { TestScenario, MeansTestOptions, DebtorProfile, RealPropertyData, VehicleData, DepositData } from './fixtures';
+import { TestScenario, MeansTestOptions, CaseDetailsOptions, DebtorProfile, RealPropertyData, VehicleData, DepositData } from './fixtures';
 
 // ════════════════════════════════════════════════════════════════════
 //  INTRO → DEBTOR PAGE
@@ -596,9 +596,44 @@ export async function navigateFinancialAffairs(page: Page, scenario: TestScenari
   await clickContinue(page);
   await waitForDaPageLoad(page);
 
-  // All list-gathers → No
+  // SOFA q6 — consumer-creditor payments in the last 90 days. Default No (the
+  // happy path), but a scenario can add real entries: the 107 builder loops
+  // over this list, and a non-empty list is what exposed the loop-variable
+  // clobber of the global `payment` object (prod DAErrorMissingVariable,
+  // 2026-07-30). Regression coverage needs at least one entry.
+  await waitForDaPageLoad(page);
+  const consumerPayments = scenario.consumerDebtPayments ?? [];
+  if (consumerPayments.length > 0) {
+    await clickYesNoButton(page, 'financial_affairs.consumer_debt_payments.there_are_any', true);
+    for (let i = 0; i < consumerPayments.length; i++) {
+      const p = consumerPayments[i];
+      // The per-item question renders its field names with a LITERAL `[i]`
+      // (the iterator is carried server-side), so don't substitute the index.
+      const v = (attr: string) => b64(`financial_affairs.consumer_debt_payments[i].${attr}`);
+      await waitForDaPageLoad(page);
+      await page.locator(`#${v('creditor_name')}`).fill(p.name);
+      await page.locator(`#${v('creditor_street')}`).fill(p.street);
+      await page.locator(`#${v('creditor_city')}`).fill(p.city);
+      await page.locator(`select#${v('creditor_state')}`).selectOption(p.state);
+      await page.locator(`#${v('creditor_zip')}`).fill(p.zip);
+      await page.locator(`#${v('paymentDates')}`).fill(p.paymentDates);
+      await page.locator(`#${v('total_amount')}`).fill(p.totalAmount);
+      await page.locator(`#${v('amount_owed')}`).fill(p.amountOwed);
+      await page.locator(`select#${v('payment_for')}`).selectOption(p.paymentFor);
+      await clickContinue(page);
+      await waitForDaPageLoad(page);
+      await clickYesNoButton(
+        page,
+        'financial_affairs.consumer_debt_payments.there_is_another',
+        i < consumerPayments.length - 1,
+      );
+    }
+  } else {
+    await clickYesNoButton(page, 'financial_affairs.consumer_debt_payments.there_are_any', false);
+  }
+
+  // Remaining list-gathers → No
   for (const varName of [
-    'financial_affairs.consumer_debt_payments.there_are_any',
     'financial_affairs.insider_payments.there_are_any',
     'financial_affairs.insider_benefits.there_are_any',
     'financial_affairs.lawsuits.there_are_any',
@@ -1153,7 +1188,7 @@ export async function navigateMeansTest(page: Page, opts: MeansTestOptions = {})
 //  CASE DETAILS
 // ════════════════════════════════════════════════════════════════════
 
-export async function navigateCaseDetails(page: Page) {
+export async function navigateCaseDetails(page: Page, opts: CaseDetailsOptions = {}) {
   await waitForDaPageLoad(page);
 
   // Handle unexpected debtor[1] income page that sometimes appears here
@@ -1187,7 +1222,11 @@ export async function navigateCaseDetails(page: Page) {
     console.log(`  [navigateCaseDetails] Next heading: "${caseH}"`);
   }
 
-  const payLabel = page.locator('label').filter({ hasText: 'I will pay the entire fee when I file my petition' });
+  const wantsInstallments = opts.feePayment === 'installments';
+  const payLabelText = wantsInstallments
+    ? 'I need to pay the fee in installments'
+    : 'I will pay the entire fee when I file my petition';
+  const payLabel = page.locator('label').filter({ hasText: payLabelText });
   await payLabel.click();
   await clickContinue(page);
 
@@ -1199,6 +1238,45 @@ export async function navigateCaseDetails(page: Page) {
 
   await waitForDaPageLoad(page);
   await clickYesNoButton(page, 'case.rents_residence', false);
+
+  // Form 103A — only when paying in installments. This is the branch that
+  // defines the global `payment` object read by the 103A builder.
+  if (wantsInstallments) {
+    const paymentOnPetition = opts.paymentOnPetition ?? true;
+    const installments = opts.installments ?? [{ amount: '100', date: '2026-09-15' }];
+
+    // installment_payment_intro (continue button field)
+    await waitForDaPageLoad(page);
+    await clickNthByName(page, b64('installment_payment_intro'), 0);
+
+    // payment_method_details — payment_on_petition + (show-if) initial amount
+    await waitForDaPageLoad(page);
+    await selectYesNoRadio(page, 'payment.payment_on_petition', paymentOnPetition);
+    if (paymentOnPetition) {
+      // show-if'd fields render with a `_field_N` name, not the b64 variable
+      // name — target by label instead.
+      await page.getByLabel('Filing payment amount').fill(opts.initialPaymentAmount ?? '78');
+    }
+    await clickContinue(page);
+
+    // payment.payments — `list collect: True`, so every installment is filled
+    // on ONE page; item 0 is pre-rendered (minimum_number: 1) and further items
+    // are added with the collect page's "Add another" control.
+    await waitForDaPageLoad(page);
+    for (let i = 0; i < installments.length; i++) {
+      if (i > 0) {
+        await page.locator('a.dacollectadd:visible, button.dacollectadd:visible').first().click();
+        await page.locator(`#${b64(`payment.payments[${i}].amount`)}`).waitFor({ state: 'visible', timeout: 15000 });
+      }
+      await page.locator(`#${b64(`payment.payments[${i}].amount`)}`).fill(installments[i].amount);
+      await page.locator(`#${b64(`payment.payments[${i}].proposed_date`)}`).fill(installments[i].date);
+    }
+    await clickContinue(page);
+
+    // installment_payment_end (continue button field)
+    await waitForDaPageLoad(page);
+    await clickNthByName(page, b64('installment_payment_end'), 0);
+  }
 
   await waitForDaPageLoad(page);
   await clickNthByName(page, b64('case_final'), 0);
@@ -1694,7 +1772,7 @@ export async function runFullInterview(page: Page, scenario: TestScenario) {
   // Personal-property leases (form 108) now gather in their own step, after SOFA.
   log('personalLeases'); await navigatePersonalLeases(page);
   log('meansTest'); await navigateMeansTest(page, scenario.meansTest ?? {});
-  log('caseDetails'); await navigateCaseDetails(page);
+  log('caseDetails'); await navigateCaseDetails(page, scenario.caseDetails ?? {});
   log('business'); await navigateBusiness(page);
   log('hazardousProperty'); await navigateHazardousProperty(page);
   log('creditCounseling'); await navigateCreditCounseling(page, scenario);
