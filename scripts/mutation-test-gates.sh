@@ -69,6 +69,22 @@ f="$Q/107-question-blocks.yml"
 sed -i "0,/for pmt in financial_affairs.consumer_debt_payments:/s//for payment in financial_affairs.consumer_debt_payments:/" "$f"
 check "lint:namespace-clobber" "$f" python3 scripts/lint_namespace_clobber.py
 
+# 7) Seek simulation: un-mirror a show-if guard in a form builder (the 122A
+#    gross_wages2 class — builder reads a show-if'd field on a path where the
+#    field may be hidden -> re-present/loop at assembly).
+f="$Q/103A-question-blocks.yml"
+python3 - "$f" <<'PY'
+import sys
+p=sys.argv[1]; t=open(p).read()
+old="""  if payment.payment_on_petition == True:
+    pymts['amt1'] = currency(payment.initial_payment_amount)"""
+assert old in t, "mutation anchor moved — update mutation 7"
+t=t.replace(old,"""  pymts['amt1'] = currency(payment.initial_payment_amount)
+  if payment.payment_on_petition == True:""",1)
+open(p,'w').write(t)
+PY
+check "lint:seek-sim (SHOWIF_RESHOW)" "$f" ./scripts/lint-seek-sim.sh
+
 echo ""
 if [ "$FAILS" -eq 0 ]; then
   echo "✅ all gates have teeth — every injected bug was caught"
