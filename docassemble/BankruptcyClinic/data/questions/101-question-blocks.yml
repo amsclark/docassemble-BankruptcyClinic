@@ -937,6 +937,9 @@ subquestion: |
 fields:
 
  - Credit counseling status: debtor[i].counseling.counseling_type
+   # Radio, not dropdown: these long labels cannot wrap inside a <select>, so
+   # the menu ran off the screen (Roxanne UAT 2026-07-29).
+   input type: radio
    choices:
      - I received a briefing from an approved credit counseling agency within the 180 days before I filed this bankruptcy petition, and I received a certificate of completion.: 1
      - I received a briefing from an approved credit counseling agency within the 180 days before I filed this bankruptcy petition, but I do not have a certificate of completion.: 2

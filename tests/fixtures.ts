@@ -198,6 +198,13 @@ export interface CaseDetailsOptions {
   initialPaymentAmount?: string;
   /** Installments only: the proposed installment schedule (≥1 required). */
   installments?: Array<{ amount: string; date: string }>;
+  /**
+   * Installments only: an ISO date to try FIRST for installment 0. The helper
+   * expects the client-side 90-day cap (HTML5 max + jQuery validator) to
+   * reject it, then corrects it to `installments[0].date` and continues.
+   * Drives the failing branch of the Roxanne 2026-07 90-day cap.
+   */
+  invalidInstallmentDate?: string;
 }
 
 export interface TestScenario {

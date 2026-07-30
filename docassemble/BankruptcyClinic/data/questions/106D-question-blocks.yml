@@ -2,7 +2,10 @@ code: |
   prop_options = []
   if len(prop.interests) > 0:
     for interest in prop.interests:
-      prop_options.append(f'{interest.type} - {interest.street} {interest.city}, {interest.state}')
+      # `interest.type` is a checkboxes DADict — stringifying it front-loads a
+      # long type list and pushes the address out of the visible dropdown.
+      # Lead with "Real estate - <address>" instead (Roxanne UAT 2026-07-29).
+      prop_options.append(f'Real estate - {interest.street} {interest.city}, {interest.state}')
   if len(prop.ab_vehicles) > 0:
     for vehicle in prop.ab_vehicles:
       prop_options.append(f'Vehicle - {vehicle.make} {vehicle.model} {vehicle.year}')

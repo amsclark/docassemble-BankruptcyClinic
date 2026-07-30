@@ -385,10 +385,15 @@ async function navigatePropertySectionMulti(page: Page) {
     // Hand off at the exemption boundary: the caller runs navigateExemptionSection
     // next, so just BREAK when we reach it — don't touch the gate. NE/SD skip the
     // exemption_type select, so detect the "Do you have any property to claim as
-    // exempt?" gate (a yesno-button screen) directly.
+    // exempt?" gate (a yesno-button screen) directly. The 730-day domicile
+    // screen (PR #132) now opens the exemption flow — it is a yesno-BUTTON page
+    // with no Continue button, so it must also break this Continue-clicking
+    // loop (navigateExemptionSection answers it).
     const exemptionSelect = page.locator(`select[name="${b64('prop.exempt_property.exemption_type')}"]`);
     const exemptGate = page.locator(`[name="${b64('prop.exempt_property.properties.there_are_any')}"]`);
-    if ((await exemptionSelect.count()) > 0 || (await exemptGate.count()) > 0 || /claim as exempt/i.test(heading || '')) {
+    const domicileBtn = page.locator(`button[name="${b64('prop.domicile_two_years')}"]`);
+    if ((await exemptionSelect.count()) > 0 || (await exemptGate.count()) > 0
+        || (await domicileBtn.count()) > 0 || /claim as exempt/i.test(heading || '')) {
       console.log('  [property] Reached exemption boundary, handing off to navigateExemptionSection');
       break;
     }
@@ -1448,10 +1453,23 @@ async function navigateCaseDetailsMaximalist(page: Page) {
     await districtSelect.selectOption('District of Nebraska');
   }
 
+  // Chapter select + discharge radio were added by PR #128 (727(a)(8)/(9)
+  // discharge-bar warning) — both required, so Continue silently refuses to
+  // advance if they're left blank. Answer discharge=No so the non-blocking
+  // warning screen (granted discharge inside the 8/6-year window) is skipped.
+  const chapterSelect = page.locator(`select[name="${b64('case.previous_bankruptcy[0].chapter')}"]`);
+  if (await chapterSelect.count() > 0) {
+    await chapterSelect.selectOption({ label: '7' });
+  }
+
   const whenField = page.locator(`#${b64('case.previous_bankruptcy[0].when')}`);
   if (await whenField.count() > 0) {
     await whenField.fill('2018-11-03');
+    await whenField.blur();
   }
+
+  await selectYesNoRadio(page, 'case.previous_bankruptcy[0].discharge_granted', false);
+  await page.waitForTimeout(300);
 
   const caseNumField = page.locator(`#${b64('case.previous_bankruptcy[0].case_number')}`);
   if (await caseNumField.count() > 0) {

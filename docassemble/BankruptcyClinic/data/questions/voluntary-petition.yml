@@ -908,22 +908,25 @@ code: |
 
 
   case.payment_method
-  if case.payment_method == '2':
+  if case.payment_method in ('2', '3'):
+    # Add the fee subsection under the *Case Details* nav entry. This used to
+    # assign to the_sections[3], but index 3 is "Property" (schedule_ab) —
+    # every installment/fee-waiver filer lost the Property link from the left
+    # menu (Roxanne UAT 2026-07-29: "the property summary ... just lists
+    # personal property"). Locate case_det by key instead of by position.
     new_sub_section = {}
-    new_sub_section["payment_installments"] = "Pay in Installments"
+    if case.payment_method == '2':
+      new_sub_section["payment_installments"] = "Pay in Installments"
+    else:
+      new_sub_section["waive_fee"] = "Waive Fees"
     new_main_section = {}
-    new_main_section["case_det"] = "Case Detail"
+    new_main_section["case_det"] = "Case Details"
     new_main_section["subsections"] = [new_sub_section]
     the_sections = nav.get_sections()
-    the_sections[3] = new_main_section
-  elif case.payment_method == '3':
-    new_sub_section = {}
-    new_sub_section["waive_fee"] = "Waive Fees"
-    new_main_section = {}
-    new_main_section["case_det"] = "Case Detail"
-    new_main_section["subsections"] = [new_sub_section]
-    the_sections = nav.get_sections()
-    the_sections[3] = new_main_section
+    for _nav_i, _nav_entry in enumerate(the_sections):
+      if isinstance(_nav_entry, dict) and "case_det" in _nav_entry:
+        the_sections[_nav_i] = new_main_section
+        break
   case.has_previous_bankruptcy
   if case.has_previous_bankruptcy:
     case.previous_bankruptcy.there_are_any = True
@@ -1476,12 +1479,12 @@ review:
 #Property
   - note: |
       <br>
-      ### Property Interests
+      ### Real Estate
       % if len(prop.interests) > 0:
         ${ prop_interests_table }
         ${ prop.interests.add_action() }
       % else:
-        No property interests currently listed.
+        No real estate currently listed.
         ${ prop.interests.add_action() }
       % endif
   - note: |

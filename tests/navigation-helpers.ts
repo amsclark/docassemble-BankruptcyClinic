@@ -1243,7 +1243,13 @@ export async function navigateCaseDetails(page: Page, opts: CaseDetailsOptions =
   // defines the global `payment` object read by the 103A builder.
   if (wantsInstallments) {
     const paymentOnPetition = opts.paymentOnPetition ?? true;
-    const installments = opts.installments ?? [{ amount: '100', date: '2026-09-15' }];
+    // Default date computed from today: the 103A page rejects dates more than
+    // 90 days out (Roxanne UAT 2026-07), so a hardcoded date would go stale.
+    const defaultDate = new Date();
+    defaultDate.setDate(defaultDate.getDate() + 45);
+    const installments = opts.installments ?? [
+      { amount: '100', date: defaultDate.toISOString().slice(0, 10) },
+    ];
 
     // installment_payment_intro (continue button field)
     await waitForDaPageLoad(page);
@@ -1263,6 +1269,41 @@ export async function navigateCaseDetails(page: Page, opts: CaseDetailsOptions =
     // on ONE page; item 0 is pre-rendered (minimum_number: 1) and further items
     // are added with the collect page's "Add another" control.
     await waitForDaPageLoad(page);
+
+    // Optionally drive the FAILING branch of the 90-day installment cap: try
+    // an over-limit date first and require the rejection message. The cap is
+    // the HTML5 `max` on the date field enforced by the client validator —
+    // server-side validation (question-level OR per-field) on this
+    // `list collect` page infinite-loops docassemble's re-render into an
+    // HTTP 501, so the max attribute is the only workable enforcement.
+    // clickContinue only sets `ignore: ':hidden'`, so visible-field rules
+    // like this one still run — the submit is genuinely blocked.
+    if (opts.invalidInstallmentDate) {
+      const amountField = page.locator(`#${b64('payment.payments[0].amount')}`);
+      const dateField = page.locator(`#${b64('payment.payments[0].proposed_date')}`);
+      await amountField.fill(installments[0].amount);
+      await dateField.fill(opts.invalidInstallmentDate);
+      // Blur commits the value so the client validator evaluates the cap now.
+      await dateField.blur();
+      await expect(
+        page.getByText(/within 90 days of the initial payment/).first(),
+        `installment date ${opts.invalidInstallmentDate} should be rejected by the 90-day cap`,
+      ).toBeVisible({ timeout: 15000 });
+      // Navigation must actually be blocked, not just flagged.
+      await clickContinue(page);
+      await expect(
+        dateField,
+        'over-limit installment date should keep the filer on the payment screen',
+      ).toBeVisible();
+      // Correct the date and wait for the error to clear BEFORE the real
+      // Continue click below: removing the error label reflows the page, and a
+      // click that lands mid-reflow misses the moving button (both for
+      // Playwright and for a real user's first click).
+      await dateField.fill(installments[0].date);
+      await dateField.blur();
+      await expect(page.getByText(/within 90 days of the initial payment/).first()).toBeHidden();
+    }
+
     for (let i = 0; i < installments.length; i++) {
       if (i > 0) {
         await page.locator('a.dacollectadd:visible, button.dacollectadd:visible').first().click();
@@ -1315,7 +1356,9 @@ export async function navigateCreditCounseling(page: Page, scenario: TestScenari
   const debtorCount = scenario.jointFiling ? 2 : 1;
   for (let d = 0; d < debtorCount; d++) {
     await waitForDaPageLoad(page);
-    await selectByName(page, b64('debtor[i].counseling.counseling_type'), '1');
+    // Radio field (was a dropdown that ran off screen — Roxanne UAT 2026-07);
+    // index 0 = "received a briefing ... and I received a certificate" ('1').
+    await selectChoiceRadio(page, 'debtor[i].counseling.counseling_type', 0);
     await clickContinue(page);
   }
 
