@@ -46,6 +46,10 @@ Finding kinds
   SHOWIF_RESHOW   seek of X whose only definers are screens ALREADY shown
                   (the show-if gap, path-sensitively confirmed: the engine
                   re-presents an answered screen, or loops)
+  REVIEW_OMITTED  a `review:` item reads a name defined NOWHERE (typo /
+                  stale rename). Never crashes — docassemble just omits the
+                  item — so the review entry silently never displays for
+                  ANY user (config-independent check)
 
 Modeled engine semantics worth knowing
 --------------------------------------
@@ -178,6 +182,9 @@ class Index:
         self.domains = {}            # normed path -> list of choice values
         self.roots = M.interview_roots()
         self.qfields_by_block = {}
+        self.tables = set()          # names defined by `table:` blocks
+        self.review_reads = []       # [(file, line, label, read, is_path)]
+        self.mandatory_assigns = set()  # paths the mandatory blocks assign
 
     def add_definer(self, path, block):
         self.definers.setdefault(path, []).append(block)
@@ -287,6 +294,9 @@ def build_index():
         for start, doc in split_blocks_lined(f):
             if not doc.strip():
                 continue
+            tm = re.search(r"^table:[ \t]*([A-Za-z_][\w.\[\]]*)", doc, re.M)
+            if tm:
+                idx.tables.add(tm.group(1))
             code = M.get_code(doc)
             is_mand = re.search(r"^mandatory:\s*(True|true)\b", doc, re.M)
             is_attach = re.search(r"^attachment:", doc, re.M)
@@ -309,6 +319,9 @@ def build_index():
                     continue
                 if is_mand:
                     idx.mandatory.append((f.name, start, tree))
+                    idx.mandatory_assigns |= \
+                        code_assign_targets(tree, idx.roots) | \
+                        M._dynamic_code_defs(code, idx.roots)
                     continue
                 assigns = code_assign_targets(tree, idx.roots)
                 assigns |= M._dynamic_code_defs(code, idx.roots)
@@ -378,7 +391,32 @@ def build_index():
                 # template reads — minus `review:` items: docassemble shows a
                 # review item only when its variable is already defined
                 # (undefined items are OMITTED, not sought), so reads inside
-                # them can never trigger a seek
+                # them can never trigger a seek. The flip side: a review item
+                # reading a NEVER-defined name (typo) is silently omitted for
+                # every user — collect review reads for that separate check.
+                rm = re.search(r"^review:[ \t]*\n((?:(?:[ \t]+[^\n]*)?\n)*)",
+                               doc, re.M)
+                if rm:
+                    rtext = rm.group(1)
+                    rcol = M.Collector(idx.roots, "\x00")
+                    try:
+                        rcol.visit(ast.parse(M.mako_to_py(rtext)))
+                    except SyntaxError:
+                        pass
+                    for rp, gsets in rcol.reads.items():
+                        if all(M.DEFENDED in g for g in gsets):
+                            continue
+                        idx.review_reads.append(
+                            (f.name, start, label, M.norm(rp), True))
+                    for mb in re.finditer(r"\$\{\s*([A-Za-z_]\w*)\s*([(.]?)",
+                                          rtext):
+                        name, nxt = mb.group(1), mb.group(2)
+                        if nxt == "(" or name in idx.roots:
+                            continue    # function call / path (handled above)
+                        if nxt == "." :
+                            continue    # non-root path base — out of scope
+                        idx.review_reads.append(
+                            (f.name, start, label, name, False))
                 tdoc = re.sub(r"^review:[ \t]*\n(?:(?:[ \t]+[^\n]*)?\n)*",
                               "", doc, flags=re.M)
                 col = M.Collector(idx.roots | {"wish_to_stay", "landlord_name"}, "\x00")
@@ -468,7 +506,8 @@ class Finding:
 
     def line(self):
         ch = " -> ".join(self.chain[-6:])
-        return f"{self.where}\t{self.kind}\t{self.var}\t[{config_label(self.cfg)}] {ch}" + \
+        lbl = config_label(self.cfg) if self.cfg else "any config"
+        return f"{self.where}\t{self.kind}\t{self.var}\t[{lbl}] {ch}" + \
                (f"  ({self.note})" if self.note else "")
 
 
@@ -1288,8 +1327,39 @@ class Sim:
 
 # ---------------------------------------------------------------- reporting
 
+def review_omitted(index):
+    """Config-independent check: a review item whose template reads a name
+    defined NOWHERE is silently omitted by docassemble for every user — the
+    typo never crashes, the item (and its Revisit button) just never shows."""
+    out, seen = [], set()
+    defined_names = set(index.definers) | index.tables | index.objects \
+        | index.mandatory_assigns
+    for fname, line, label, read, is_path in index.review_reads:
+        n = cnorm(read)
+        if n in defined_names or read in defined_names:
+            continue
+        if is_path:
+            tail = n.rsplit(".", 1)[-1].replace("[i]", "").replace("[*]", "")
+            if tail in M.DAOBJECT_ATTRS:
+                continue
+            # a list/object is materialized by its item questions / gather
+            # attrs / objects declarations even without an exact-name definer
+            if any(k.startswith(n + ".") or k.startswith(n + "[")
+                   for k in defined_names):
+                continue
+        fd = Finding("REVIEW_OMITTED", n, f"{fname}:{line}",
+                     [f"review '{label}'"], None,
+                     "review item reads a never-defined name -> item is "
+                     "silently omitted for every user")
+        if fd.key() not in seen:
+            seen.add(fd.key()); out.append(fd)
+    return out
+
+
 def run_all(index, cfgs):
     dedup = {}
+    for fd in review_omitted(index):
+        dedup.setdefault(fd.key(), fd)
     screens_by_cfg = []
     for cfg in cfgs:
         sim = Sim(index, cfg)
