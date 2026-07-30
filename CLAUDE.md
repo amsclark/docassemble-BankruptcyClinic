@@ -76,6 +76,30 @@ happy-path Playwright runs (which mask these bugs — see `tests/navigation-help
   Also caught `122A separated_status` and the `106AB` grand-total bug (totals sum
   ~50 show-if'd category `*_value`/`*_amount` fields unconditionally).
 
+- **`python3 scripts/seek_simulator.py`** — the path-SENSITIVE check: symbolically
+  executes the mandatory flow the way docassemble's seek resolver does, across
+  72 long-range answer configurations (filing status × payment method × debt
+  classification × means-test shape × NE/SD), simulating a SEEK for every read.
+  Unknown branches fork-join (must=∩, may=∪) with **guard correlation**: show-if
+  fields and if-body-only code definitions are recorded with their governing
+  condition, and branch assumptions (`if x.type['Other']:`, else of `X == False`,
+  `defined('p')`, 2-value radio negation) prove them safe — so a builder that
+  mirrors a show-if is clean and one that doesn't is flagged. Finds
+  **DEAD_END** (no definer fires on the path), **SEEK_CYCLE** (Infinite loop),
+  **OUT_OF_ORDER** (template pulls a question out of order), **SHOWIF_RESHOW**
+  (read of a possibly-hidden field → engine re-presents an answered screen or
+  loops); every finding carries the config answer-sheet + seek chain as a
+  reproduction recipe. Models review-item skip-if-undefined, gather-screen
+  rendering, `validation code:` fields, and last-parsed-wins candidate order —
+  see the module docstring for the full semantics/approximation list. The
+  skip-if-undefined semantic also powers **REVIEW_OMITTED** (config-independent):
+  a review item reading a never-defined name is silently omitted for EVERY user
+  (no crash — the Revisit entry just never displays; the McKenna "SOFA Debtor 2"
+  class; the check's first run found 13 real ones, all fixed). Gated as
+  **`npm run lint:seek-sim`** (`scripts/lint-seek-sim.sh`) against
+  `scripts/seek-sim-baseline.txt`, which is EMPTY — the interview simulates
+  clean end-to-end and every review item resolves; keep it at zero.
+
 - **`python3 scripts/interview_dependency_check.py`** — "internal soundness":
   top-level scalars defined by **both a question and code** (the rule-6 loop
   risk). Each hit is a "confirm the definers are mutually exclusive and ordered."

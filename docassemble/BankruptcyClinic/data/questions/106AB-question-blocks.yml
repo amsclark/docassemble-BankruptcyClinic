@@ -5208,7 +5208,7 @@ review:
     show if: prop.has_electronics
   - Revisit: prop.has_collectibles
     button: |
-      % if prop.has_collectables:
+      % if prop.has_collectibles:
         Owns collectables: Yes
       % else:
         Owns collectables: No
@@ -5304,17 +5304,17 @@ review:
 
       Total Value: ${ prop.other_household_items_value }
     show if: prop.has_other_household_items
-  - Revisit: prop.has_cash
+  - Revisit: prop.financial_assets.has_cash
     button: |
-      % if prop.has_cash:
+      % if prop.financial_assets.has_cash:
         Has cash on hand: Yes
       % else:
         Has cash on hand: No
       % endif
-  - Revisit: prop.cash_value
+  - Revisit: prop.financial_assets.cash_value
     button: |
-      Cash Value: ${ prop.cash_value }
-    show if: prop.has_cash
+      Cash Value: ${ prop.financial_assets.cash_value }
+    show if: prop.financial_assets.has_cash
   - note: |
       <br>
       ### Financial Assets
@@ -5384,11 +5384,11 @@ review:
 
       Education Accounts
       % if len(prop.financial_assets.edu_accounts) > 0:
-        ${ financial_edu_account_table }
-        ${ prop.financial_assets.edu_account.add_action() }
+        ${ financial_edu_accounts_table }
+        ${ prop.financial_assets.edu_accounts.add_action() }
       % else:
         No Education Accounts
-        ${ prop.financial_assets.edu_account.add_action() }
+        ${ prop.financial_assets.edu_accounts.add_action() }
       % endif
   - Revisit: prop.financial_assets.has_future_property_interest
     button: |
@@ -5466,7 +5466,7 @@ review:
       Maintenance Amount: ${ prop.owed_property.family_support_maintenance }
       Support Amount: ${ prop.owed_property.family_support_support }
       Divorce Settlement Amount: ${ prop.owed_property.family_support_divorce }
-      Property Settlement Amount: ${ prop.owed_property.family_support_settlment }
+      Property Settlement Amount: ${ prop.owed_property.family_support_settlement }
     show if: prop.owed_property.has_family_support
   - Revisit: prop.owed_property.has_other_amounts
     button: |
