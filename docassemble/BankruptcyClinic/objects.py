@@ -276,11 +276,13 @@ def claiming_less_than_full(amount, value):
         return False
 
 # DOJ Median Family Income thresholds for the Ch. 7 means test.
-# Source: https://www.justice.gov/ust/eo/bapcpa/20250515/bci_data/median_income_table.htm
-# Update when new DOJ tables are published (every ~6 months).
+# Source: https://www.justice.gov/ust/eo/bapcpa/20260715/bci_data/median_income_table.htm
+# (cases filed on or after July 15, 2026; pulled from the live DOJ table
+# 2026-07-29). Update when new DOJ tables are published (every ~6 months) —
+# these do NOT auto-update.
 DOJ_MEDIAN_INCOME_TABLES = {
-    'south dakota': {1: 61022, 2: 92469, 3: 96008, 4: 116374},
-    'nebraska':     {1: 65292, 2: 89130, 3: 103358, 4: 120323},
+    'south dakota': {1: 69190, 2: 89809, 3: 100883, 4: 130738},
+    'nebraska':     {1: 66922, 2: 90728, 3: 103405, 4: 125074},
 }
 DOJ_MEDIAN_ADDITIONAL_PER_PERSON = 11100
 

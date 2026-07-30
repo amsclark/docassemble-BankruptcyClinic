@@ -47,10 +47,20 @@ const SCN: TestScenario = {
     feePayment: 'installments',
     paymentOnPetition: true,
     initialPaymentAmount: '78',
-    // ISO format — the collect page renders <input type="date">.
-    installments: [{ amount: '260', date: '2026-09-15' }],
+    // ISO format — the collect page renders <input type="date">. Computed
+    // relative to today so the 90-day cap assertions never go stale.
+    installments: [{ amount: '260', date: isoDaysFromNow(30) }],
+    // Tried first; the server-side 90-day cap (Roxanne UAT 2026-07-29) must
+    // reject it before the valid date above is accepted.
+    invalidInstallmentDate: isoDaysFromNow(120),
   },
 };
+
+function isoDaysFromNow(days: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
 
 test.setTimeout(600_000);
 
@@ -58,6 +68,14 @@ test('installments + SOFA consumer-debt payments assembles (global `payment` not
   page,
 }) => {
   await runFullInterview(page, SCN);
+
+  // Nav regression (Roxanne 2026-07-29): choosing installments used to
+  // overwrite nav section index 3 — the "Property" entry — with a duplicate
+  // "Case Detail". Property must still be in the left-hand menu.
+  await expect(
+    page.locator('.danavdiv, #daTOC, nav').first(),
+    'left-hand menu lost its "Property" section (nav index clobber)',
+  ).toContainText('Property');
 
   // The crash surfaced as an error page while assembling 103A. Assert the
   // interview reached assembly and produced the forms, including 103A.

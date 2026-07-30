@@ -15,7 +15,7 @@ question: |
 subquestion: |
   You may apply to pay the filing fee in up to four installments. Fill in the amounts you propose to pay and the dates you plan to pay them. Be sure all dates are business days. Then add the payments you propose to pay.
   
-  You must propose to pay the entire fee no later than 120 days after you file this bankruptcy case. If the court approves your application, the court will set your final payment timetable.
+  You must propose to pay the entire fee within 90 days of the initial payment you make when you file this bankruptcy case. If the court approves your application, the court will set your final payment timetable.
 continue button field: installment_payment_intro
 ---
 id: installment_payment_summary_end
@@ -87,7 +87,7 @@ fields:
 id: payment_dates_add_another
 section: payment_installments
 question: |
-  Are there any more payment dates you'd like to add in the next 120 days?
+  Are there any more payment dates you'd like to add in the next 90 days?
 under: |
   % if payment.payment_on_petition:
     Payment on filing: ${payment.initial_payment_amount}
@@ -99,7 +99,7 @@ yesno: payment.payments.there_is_another
 id: payment_dates_any_exist
 section: payment_installments
 question: |
-  Do you have any payment dates you'd like to add in the next 120 days?
+  Do you have any payment dates you'd like to add in the next 90 days?
 yesno: payment.payments.there_are_any
 ---
 id: payment_details_individual
@@ -107,7 +107,10 @@ section: payment_installments
 question: |
   Fill in payment details.
 subquestion: |
-  You may apply to pay the filing fee in up to four installments. You must propose to pay the entire fee no later than 120 days after you file this bankruptcy case. If the court approves your application, the court will set your final payment timetable.
+  You may apply to pay the filing fee in up to four installments. Each proposed
+  payment date must be within 90 days of the day you file your case (the day
+  you pay the initial amount). If the court approves your application, the
+  court will set your final payment timetable.
 allowed to set:
   - payment.payments[i].complete
 fields:
@@ -115,6 +118,18 @@ fields:
     datatype: currency
   - On or before: payment.payments[i].proposed_date
     datatype: date
+    # Roxanne (Legal Aid NE) 2026-07-29: no installment may be proposed more
+    # than 90 days after the initial payment, which is made at filing; "today"
+    # stands in for the filing date since the application is prepared at
+    # filing time. Enforced with the HTML5 max attribute + client validator,
+    # NOT server-side validation: on a `list collect` page BOTH question-level
+    # `validation code` and per-field `validate` failures make the post-
+    # validation re-render infinite-loop on x.amount/x.complete → HTTP 501
+    # error page (verified empirically 2026-07-29/30).
+    max: ${ today().plus(days=90) }
+    validation messages:
+      date max: |
+        Each installment must be paid within 90 days of the initial payment you make when you file.
 under: |
   % if payment.payment_on_petition:
     Payment on filing: ${payment.initial_payment_amount}

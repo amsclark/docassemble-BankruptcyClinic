@@ -5147,12 +5147,12 @@ question: |
 review:
   - note: |
       <br>
-      ### Property Interests
+      ### Real Estate
       % if len(prop.interests) > 0:
         ${ prop_interests_table }
         ${ prop.interests.add_action() }
       % else:
-        No property interests currently listed.
+        No real estate currently listed.
         ${ prop.interests.add_action() }
       % endif
   - note: |
