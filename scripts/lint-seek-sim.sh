@@ -9,11 +9,15 @@
 #   OUT_OF_ORDER   - a screen template pulls another question out of order
 #   SHOWIF_RESHOW  - a show-if'd field is read on a path where it may be
 #                    hidden -> the engine re-presents an answered screen/loops
+#   REVIEW_OMITTED - a review item reads a never-defined name -> docassemble
+#                    silently omits the item for EVERY user (no crash; the
+#                    Revisit entry just never displays)
 #
 # Burn-down gate, same contract as lint-flow-gaps.sh:
 #   - NEW findings (not in the baseline) FAIL the build.
 #   - FIXED findings prompt you to tighten with --update.
-# Baseline is currently EMPTY — the interview simulates clean; keep it that way.
+# Crash/loop findings are ZERO — the interview simulates clean; keep it that
+# way. The baseline holds 13 REVIEW_OMITTED typos awaiting burn-down.
 #
 # Usage:
 #   ./scripts/lint-seek-sim.sh           # check
