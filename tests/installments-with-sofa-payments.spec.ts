@@ -81,6 +81,14 @@ test('installments + SOFA consumer-debt payments assembles (global `payment` not
   // interview reached assembly and produced the forms, including 103A.
   const pdfs = await finishAndAssertAllPdfs(page, { mustInclude: ['101', '103', '106', '107', '122'] });
 
+  // Shirley 2026-07-31: she left the conclusion screen without downloading,
+  // expecting the email copy — which never arrived. The screen must tell
+  // users to download before leaving.
+  await expect(
+    page.locator('body'),
+    'conclusion screen is missing the download-before-leaving guidance',
+  ).toContainText('Download your documents now, before leaving this page');
+
   const names = pdfs.map((p) => p.name.toLowerCase()).join(' | ');
   expect(names, 'Form 103A (installment application) did not assemble').toContain('103');
 });

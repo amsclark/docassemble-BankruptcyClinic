@@ -1376,6 +1376,12 @@ subquestion: |
   Your Chapter 7 bankruptcy petition documents are ready for download.
   Please review all documents with your attorney before filing.
 
+  **Download your documents now, before leaving this page.** If you use the
+  option to email the documents to yourself, still download them here first:
+  email can be delayed or blocked by spam filters, and this page is the only
+  reliable way to get your completed forms. If you do request an email and it
+  does not arrive, check your spam or junk folder.
+
   **Creditor Mailing Matrix (plain text for CM/ECF upload):**
 
   [**Download the creditor matrix** (creditor_matrix.txt)](${ mailing_matrix_file.url_for(attachment=True) })
