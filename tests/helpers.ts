@@ -16,8 +16,20 @@ const BASE_URL = _POOL.length > 0
   ? _POOL[_WORKER % _POOL.length]
   : (process.env.BASE_URL || 'http://localhost:8080');
 const INTERVIEW_PACKAGE = process.env.INTERVIEW_PACKAGE || 'docassemble.BankruptcyClinic:data/questions/voluntary-petition.yml';
-export const INTERVIEW_URL =
+
+/** What a real user gets: assembled PDFs are FLATTENED, so the official B-form
+ *  "Reset" pushbutton and embedded JavaScript cannot survive into the filer's
+ *  copy (a tester pressed Reset on an emailed PDF and it wiped the form).
+ *  `pdf-flattening.spec.ts` drives this URL and asserts the buttons are gone. */
+export const PRODUCTION_INTERVIEW_URL =
   `${BASE_URL}/interview?i=${INTERVIEW_PACKAGE}#page1`;
+
+/** Default test URL. `pdf_editable=1` opts back into fillable AcroForm output so
+ *  the ~9 specs that read field VALUES out of the assembled PDFs still can.
+ *  The query arg must sit before the `#` fragment to reach docassemble's
+ *  `url_args`. */
+export const INTERVIEW_URL =
+  `${BASE_URL}/interview?i=${INTERVIEW_PACKAGE}&pdf_editable=1#page1`;
 
 /** Base64-url-encode a docassemble field name (strips trailing '=' padding). */
 export const b64 = (str: string): string =>

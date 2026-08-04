@@ -35,10 +35,11 @@ code: |
       # Issue #76: Income validation
       if (defined('family.you_income') and defined('debtor[0].income')):
         d0_income = debtor[0].income
-        income_section_total = 0
+        # All six job slots, matching Schedule I and the fee-waiver default.
+        income_section_total = gross_monthly_wages(d0_income)
 
-        # Sum income fields that exist
-        income_fields = ['income_amount_1', 'overtime_pay_1', 'net_rental_business', 'social_security', 'pension', 'unemployment', 'family_support', 'interest_and_dividends', 'other_govt_assist']
+        # Sum the remaining (non-wage) income fields that exist
+        income_fields = ['net_rental_business', 'social_security', 'pension', 'unemployment', 'family_support', 'interest_and_dividends', 'other_govt_assist']
         for field in income_fields:
           if hasattr(d0_income, field):
             val = getattr(d0_income, field)

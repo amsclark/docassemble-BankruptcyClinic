@@ -2295,6 +2295,7 @@ attachment:
   - name: Form 107Ext1
     filename: form_b107ext1.pdf
     pdf template file: form_b_107_ext1.pdf
+    editable: pdf_editable
     variable name: form_107_ext1
     code: fin
 ---
@@ -2302,6 +2303,7 @@ attachment:
   - name: Form 107Ext2
     filename: form_b107ext2.pdf
     pdf template file: form_b_107_ext2.pdf
+    editable: pdf_editable
     variable name: form_107_ext2
     code: fin
 ---
@@ -2309,6 +2311,7 @@ attachment:
   - name: Form 107
     filename: form_b107_v2.pdf
     pdf template file: form_b_107_v2.pdf
+    editable: pdf_editable
     variable name: form_107_temp
     code: fin
 ---
@@ -2316,6 +2319,7 @@ attachment:
   - name: Form 107Ext3
     filename: form_b107ext3.pdf
     pdf template file: form_b_107_ext3.pdf
+    editable: pdf_editable
     variable name: form_107_ext3
     code: fin
 ---

@@ -63,7 +63,7 @@ fields:
       % endif
   - Your gross wages, salary, tips, bonuses, overtime, and commissions: monthly_income.gross_wages1
     datatype: currency
-    default: ${ getattr(debtor[0].income, 'income_amount_1', 0) + getattr(debtor[0].income, 'overtime_pay_1', 0) }
+    default: ${ gross_monthly_wages(debtor[0].income) }
   - Alimony and maintenance payments: monthly_income.alimony1
     datatype: currency
     default: ${ debtor[0].income.family_support }
@@ -141,7 +141,7 @@ fields:
       % endif
   - Your gross wages, salary, tips, bonuses, overtime, and commissions: monthly_income.gross_wages2
     datatype: currency
-    default: ${ (getattr(debtor[1].income, 'income_amount_1', 0) + getattr(debtor[1].income, 'overtime_pay_1', 0)) if len(debtor) > 1 else 0 }
+    default: ${ gross_monthly_wages(debtor[1].income) if len(debtor) > 1 else 0 }
   - Alimony and maintenance payments: monthly_income.alimony2
     datatype: currency
     default: ${ debtor[1].income.family_support if len(debtor) > 1 else 0 }
@@ -350,6 +350,7 @@ attachment:
   - name: Form 122a
     filename: form_b22a-1.pdf
     pdf template file: b_122a-1.pdf
+    editable: pdf_editable
     variable name: attach_122a
     code: income
 ---

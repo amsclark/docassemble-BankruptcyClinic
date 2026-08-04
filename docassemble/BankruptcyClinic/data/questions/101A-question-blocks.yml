@@ -36,12 +36,14 @@ fields:
 attachment:
   filename: form_b101b.pdf
   pdf template file: form_b101b.pdf
+  editable: pdf_editable
   code: evict2
   variable name: attach_101b
 ---
 attachment:
   filename: form_b101a.pdf
   pdf template file: form_b101a.pdf
+  editable: pdf_editable
   code: evict
   variable name: attach_101a
 ---

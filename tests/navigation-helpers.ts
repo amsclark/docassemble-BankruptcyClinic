@@ -33,8 +33,10 @@ import { TestScenario, MeansTestOptions, CaseDetailsOptions, DebtorProfile, Real
 //  INTRO → DEBTOR PAGE
 // ════════════════════════════════════════════════════════════════════
 
-export async function navigateToDebtorPage(page: Page, scenario: TestScenario) {
-  await page.goto(INTERVIEW_URL + '&new_session=1');
+/** `startUrl` overrides the interview URL — pass `PRODUCTION_INTERVIEW_URL` to
+ *  exercise the flattened (non-fillable) PDF output real users receive. */
+export async function navigateToDebtorPage(page: Page, scenario: TestScenario, startUrl?: string) {
+  await page.goto((startUrl ?? INTERVIEW_URL) + '&new_session=1');
   await waitForDaPageLoad(page);
 
   // Intro
@@ -1777,7 +1779,7 @@ export async function navigateDynamicPhase(page: Page, scenario: TestScenario) {
 //  FULL INTERVIEW RUNNER
 // ════════════════════════════════════════════════════════════════════
 
-export async function runFullInterview(page: Page, scenario: TestScenario) {
+export async function runFullInterview(page: Page, scenario: TestScenario, startUrl?: string) {
   console.log(`\n${'═'.repeat(60)}`);
   console.log(`  TEST: ${scenario.name}`);
   console.log(`  District: ${scenario.district}`);
@@ -1789,7 +1791,7 @@ export async function runFullInterview(page: Page, scenario: TestScenario) {
 
   const log = (step: string) => console.log(`  [${step}] starting...`);
 
-  log('debtorPage'); await navigateToDebtorPage(page, scenario);
+  log('debtorPage'); await navigateToDebtorPage(page, scenario, startUrl);
   log('fillDebtor1'); await fillDebtorAndAdvance(page, scenario.debtor);
 
   if (scenario.jointFiling && scenario.spouse) {
