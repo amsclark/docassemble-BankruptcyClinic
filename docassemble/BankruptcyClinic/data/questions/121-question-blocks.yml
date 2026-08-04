@@ -59,6 +59,7 @@ attachment:
   - name: Form 121
     filename: form_b121.pdf
     pdf template file: form_b121.pdf
+    editable: pdf_editable
     variable name: attach_121
     code: ssn
 ---

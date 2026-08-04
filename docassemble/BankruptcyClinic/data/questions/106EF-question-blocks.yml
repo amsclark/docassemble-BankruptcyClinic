@@ -659,6 +659,7 @@ attachment:
   - name: Form 106EF
     filename: form_b106ef.pdf
     pdf template file: form_b106ef.pdf
+    editable: pdf_editable
     variable name: ef_attach
     code: unsecured_claims
 ---

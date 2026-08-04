@@ -219,6 +219,7 @@ attachment:
   - name: Form B2030 Disclosure of Compensation
     filename: form_b2030
     pdf template file: form_b2030.pdf
+    editable: pdf_editable
     variable name: attach_2030
     code: b2030_fields
 ---

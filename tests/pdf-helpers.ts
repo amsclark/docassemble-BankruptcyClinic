@@ -57,18 +57,25 @@ export async function assertPdfContains(
 
 /** Download all PDFs from the conclusion page. Returns array of PdfInfo. */
 export async function downloadAllPdfs(page: Page): Promise<PdfInfo[]> {
+  // Pair each download link with the heading of the attachment block it sits
+  // in, by walking the document in order and remembering the last heading seen.
+  // (Pairing headings to links by index breaks as soon as one attachment's
+  // heading does not start with "Form" — e.g. the combined petition packet.)
   const downloadLinks = await page.evaluate(() => {
-    const links = document.querySelectorAll('a[href*="/uploadedfile/"]');
-    return Array.from(links).map(a => ({
-      name: a.textContent?.trim() || '',
-      href: (a as HTMLAnchorElement).href,
-    }));
-  });
-
-  const formHeadings = await page.evaluate(() => {
-    return Array.from(document.querySelectorAll('h3'))
-      .map(h => h.textContent?.trim() || '')
-      .filter(t => t.toLowerCase().startsWith('form'));
+    const nodes = document.querySelectorAll('h1, h2, h3, h4, a[href*="/uploadedfile/"]');
+    let heading = '';
+    const out: { name: string; href: string }[] = [];
+    for (const el of Array.from(nodes)) {
+      if (el.tagName === 'A') {
+        out.push({
+          name: heading || (el.textContent?.trim() ?? ''),
+          href: (el as HTMLAnchorElement).href,
+        });
+      } else {
+        heading = el.textContent?.trim() || '';
+      }
+    }
+    return out;
   });
 
   const pdfInfos: PdfInfo[] = [];
@@ -79,7 +86,7 @@ export async function downloadAllPdfs(page: Page): Promise<PdfInfo[]> {
     const pdfDoc = await PDFDocument.load(buffer, { ignoreEncryption: true });
     const fields = await getPdfFieldValues(buffer);
     pdfInfos.push({
-      name: formHeadings[i] || downloadLinks[i].name,
+      name: downloadLinks[i].name,
       href: downloadLinks[i].href,
       buffer,
       pages: pdfDoc.getPageCount(),

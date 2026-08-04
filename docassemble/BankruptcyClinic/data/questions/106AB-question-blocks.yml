@@ -5137,6 +5137,7 @@ attachment:
   - name: Form 106AB
     filename: form_b106ab.pdf
     pdf template file: form_b106ab.pdf
+    editable: pdf_editable
     code: ab
     variable name: ab_attach
 ---

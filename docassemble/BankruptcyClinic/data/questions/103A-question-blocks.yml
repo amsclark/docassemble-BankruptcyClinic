@@ -142,6 +142,7 @@ attachment:
   name: Form 103a
   filename: form_b103a.pdf
   pdf template file: form_b103a.pdf
+  editable: pdf_editable
   code: pymts
   variable name: attach_103a
 ---

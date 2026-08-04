@@ -168,6 +168,25 @@ def mark_list_emptied(the_list):
     the_list.gathered = True
 
 
+def gross_monthly_wages(income, include_overtime=True):
+    """Total monthly gross wages across all six job slots on the Schedule I
+    pay screen (`income_amount_1..6`, plus `overtime_pay_1..6`).
+
+    The screen offers six rows because a filer (or a non-filing spouse) can
+    hold several jobs; Schedule I, Schedule J and Form 101 all sum every row.
+    Form 122A (means test) and Form 103B (fee waiver) used to pre-fill from
+    slot 1 only, so a filer with two jobs saw a means-test figure that silently
+    disagreed with their own Schedule I. Everything goes through this function
+    now so there is one definition of "gross monthly wages" (Phil Martin, UAT
+    August 2026)."""
+    total = 0
+    for slot in range(1, 7):
+        total += getattr(income, 'income_amount_' + str(slot), 0) or 0
+        if include_overtime:
+            total += getattr(income, 'overtime_pay_' + str(slot), 0) or 0
+    return total
+
+
 def state_abbr(value):
     """Return the 2-letter abbreviation for a state name; pass through if already
     an abbreviation or unrecognized. Used to keep court-form PDF fields in the

@@ -339,6 +339,7 @@ attachment:
   - name: Form 106J
     filename: form_b106j.pdf
     pdf template file: form_b106j.pdf
+    editable: pdf_editable
     variable name: j_attach
     code: expenses
 ---

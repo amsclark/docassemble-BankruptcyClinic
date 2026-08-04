@@ -60,48 +60,66 @@ question: Give details about monthly income
 subquestion: |
     Estimate your **expected** monthly income at the time of filing, not necessarily what you earned last month. The purpose of Schedule I is to show the court your budget during the bankruptcy. If last month was unusual (e.g., due to job change, seasonal work, or one-time payments), adjust your figures to reflect your typical ongoing income.
 
-    If you have nothing to report for any line, write 0. Include your non-filing spouse unless you are separated. If you or your non-filing spouse have more than one employer, combine the information for all employers for that person on the lines below.
+    **Enter a MONTHLY amount, not the amount on one pay stub.** There is one row
+    below for each job you hold. Most people fill in **Job 1 only**. The extra
+    rows are for a *second or third employer*, not for a second or third
+    paycheck from the same employer — do not list six pay stubs here, or your
+    monthly income will come out several times too high.
 
-    Please enter your pay stub information for a typical recent month.
+    To turn your pay stub into a monthly amount:
+
+    * Paid **weekly**: gross pay on one stub &times; 52 &divide; 12 (about &times; 4.33)
+    * Paid **every two weeks**: gross pay on one stub &times; 26 &divide; 12 (about &times; 2.17)
+    * Paid **twice a month**: gross pay on one stub &times; 2
+    * Paid **monthly**: the amount on the stub
+
+    If you have nothing to report for a line, write 0. Include your non-filing
+    spouse's job(s) on the rows below unless you are separated.
 fields:
-  - note: Check 1
-  - Gross wages, salary, and commissions: debtor[0].income.income_amount_1
+  - note: |
+      **Job 1** &mdash; monthly gross pay from your main employer
+  - Gross wages, salary, and commissions (per month): debtor[0].income.income_amount_1
     datatype: currency
   - Estimate and list monthly overtime pay: debtor[0].income.overtime_pay_1
     datatype: currency
 
-  - note: Check 2
-  - Gross wages, salary, and commissions: debtor[0].income.income_amount_2
+  - note: |
+      **Job 2** &mdash; only if you (or a non-filing spouse) have a second employer. Leave blank otherwise.
+  - Gross wages, salary, and commissions (per month): debtor[0].income.income_amount_2
     datatype: currency
     required: False
   - Estimate and list monthly overtime pay: debtor[0].income.overtime_pay_2
     datatype: currency
     required: False
 
-  - note: Check 3
-  - Gross wages, salary, and commissions: debtor[0].income.income_amount_3
+  - note: |
+      **Job 3** &mdash; only if there is a third employer.
+  - Gross wages, salary, and commissions (per month): debtor[0].income.income_amount_3
     datatype: currency
     required: False
   - Estimate and list monthly overtime pay: debtor[0].income.overtime_pay_3
     datatype: currency
     required: False
 
-  - note: Check 4
-  - Gross wages, salary, and commissions: debtor[0].income.income_amount_4
+  - note: |
+      **Job 4** &mdash; only if there is a fourth employer.
+  - Gross wages, salary, and commissions (per month): debtor[0].income.income_amount_4
     datatype: currency
     required: False
   - Estimate and list monthly overtime pay: debtor[0].income.overtime_pay_4
     datatype: currency
     required: False
-  - note: Check 5
-  - Gross wages, salary, and commissions: debtor[0].income.income_amount_5
+  - note: |
+      **Job 5** &mdash; only if there is a fifth employer.
+  - Gross wages, salary, and commissions (per month): debtor[0].income.income_amount_5
     datatype: currency
     required: False
   - Estimate and list monthly overtime pay: debtor[0].income.overtime_pay_5
     datatype: currency
     required: False
-  - note: Check 6
-  - Gross wages, salary, and commissions: debtor[0].income.income_amount_6
+  - note: |
+      **Job 6** &mdash; only if there is a sixth employer.
+  - Gross wages, salary, and commissions (per month): debtor[0].income.income_amount_6
     datatype: currency
     required: False
   - Estimate and list monthly overtime pay: debtor[0].income.overtime_pay_6
@@ -342,48 +360,65 @@ question: Give details about Debtor 2 monthly income
 subquestion: |
     Estimate Debtor 2's **expected** monthly income at the time of filing, not necessarily what was earned last month. The purpose of Schedule I is to show the court your budget during the bankruptcy.
 
-    If you have nothing to report for any line, write 0. If you or your non-filing spouse have more than one employer, combine the information for all employers for that person on the lines below.
+    **Enter a MONTHLY amount, not the amount on one pay stub.** There is one row
+    below for each job Debtor 2 holds. Most people fill in **Job 1 only**. The
+    extra rows are for a *second or third employer*, not for a second or third
+    paycheck from the same employer — do not list six pay stubs here, or the
+    monthly income will come out several times too high.
 
-    Please enter pay stub information for a typical recent month.
+    To turn a pay stub into a monthly amount:
+
+    * Paid **weekly**: gross pay on one stub &times; 52 &divide; 12 (about &times; 4.33)
+    * Paid **every two weeks**: gross pay on one stub &times; 26 &divide; 12 (about &times; 2.17)
+    * Paid **twice a month**: gross pay on one stub &times; 2
+    * Paid **monthly**: the amount on the stub
+
+    If you have nothing to report for a line, write 0.
 fields:
-  - note: Check 1
-  - Gross wages, salary, and commissions: debtor[1].income.income_amount_1
+  - note: |
+      **Job 1** &mdash; monthly gross pay from Debtor 2's main employer
+  - Gross wages, salary, and commissions (per month): debtor[1].income.income_amount_1
     datatype: currency
   - Estimate and list monthly overtime pay: debtor[1].income.overtime_pay_1
     datatype: currency
 
-  - note: Check 2
-  - Gross wages, salary, and commissions: debtor[1].income.income_amount_2
+  - note: |
+      **Job 2** &mdash; only if Debtor 2 has a second employer. Leave blank otherwise.
+  - Gross wages, salary, and commissions (per month): debtor[1].income.income_amount_2
     datatype: currency
     required: False
   - Estimate and list monthly overtime pay: debtor[1].income.overtime_pay_2
     datatype: currency
     required: False
 
-  - note: Check 3
-  - Gross wages, salary, and commissions: debtor[1].income.income_amount_3
+  - note: |
+      **Job 3** &mdash; only if there is a third employer.
+  - Gross wages, salary, and commissions (per month): debtor[1].income.income_amount_3
     datatype: currency
     required: False
   - Estimate and list monthly overtime pay: debtor[1].income.overtime_pay_3
     datatype: currency
     required: False
 
-  - note: Check 4
-  - Gross wages, salary, and commissions: debtor[1].income.income_amount_4
+  - note: |
+      **Job 4** &mdash; only if there is a fourth employer.
+  - Gross wages, salary, and commissions (per month): debtor[1].income.income_amount_4
     datatype: currency
     required: False
   - Estimate and list monthly overtime pay: debtor[1].income.overtime_pay_4
     datatype: currency
     required: False
-  - note: Check 5
-  - Gross wages, salary, and commissions: debtor[1].income.income_amount_5
+  - note: |
+      **Job 5** &mdash; only if there is a fifth employer.
+  - Gross wages, salary, and commissions (per month): debtor[1].income.income_amount_5
     datatype: currency
     required: False
   - Estimate and list monthly overtime pay: debtor[1].income.overtime_pay_5
     datatype: currency
     required: False
-  - note: Check 6
-  - Gross wages, salary, and commissions: debtor[1].income.income_amount_6
+  - note: |
+      **Job 6** &mdash; only if there is a sixth employer.
+  - Gross wages, salary, and commissions (per month): debtor[1].income.income_amount_6
     datatype: currency
     required: False
   - Estimate and list monthly overtime pay: debtor[1].income.overtime_pay_6
@@ -731,6 +766,7 @@ attachment:
   - name: Form 106I
     filename: form_b106i.pdf
     pdf template file: form_b106i.pdf
+    editable: pdf_editable
     variable name: i_attach
     code: income1
 ---

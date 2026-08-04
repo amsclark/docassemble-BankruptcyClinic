@@ -82,6 +82,7 @@ attachment:
   - name: Form 108
     filename: form_b108.pdf
     pdf template file: form_b108.pdf
+    editable: pdf_editable
     variable name: attach_108
     code: leases
 ---

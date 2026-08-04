@@ -193,6 +193,7 @@ attachment:
   - name: Form 106H
     filename: form_b106h.pdf
     pdf template file: form_b106h.pdf
+    editable: pdf_editable
     variable name: h_attach
     code: codebtors
 ---

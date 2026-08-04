@@ -108,6 +108,7 @@ attachment:
   - name: Form 106G
     filename: form_b106g.pdf
     pdf template file: form_b106g.pdf
+    editable: pdf_editable
     variable name: g_attach
     code: contracts
 ---

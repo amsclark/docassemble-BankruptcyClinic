@@ -322,6 +322,7 @@ attachment:
   - name: Form 106D
     filename: form_b106d.pdf
     pdf template file: form_b106d.pdf
+    editable: pdf_editable
     code: claims
     variable name: d_attach
 ---

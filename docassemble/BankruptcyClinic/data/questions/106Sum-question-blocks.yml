@@ -8,6 +8,7 @@ attachment:
   - name: Form 106 Summary
     filename: form_b106sum.pdf
     pdf template file: form_b106sum.pdf
+    editable: pdf_editable
     variable name: summary_attach
     code: summary_fields
 ---
