@@ -7,7 +7,7 @@
  *
  *   1. "on the pdf that was emailed to me has a 'Reset' button at the bottom.
  *      I pushed it just to see if it would work. It does. It deleted
- *      everything."  21 of the 27 official USCourts B-form templates ship a
+ *      everything."  20 of the 27 official USCourts B-form templates ship a
  *      /ResetForm pushbutton plus embedded form JavaScript, and nothing set
  *      `editable:` on the attachments, so every assembled form went out as a
  *      live fillable form with a working wipe-everything button.
