@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 
 /** Base URL for the docassemble interview.
  *
@@ -413,6 +413,34 @@ export async function clickNthByName(page: Page, name: string, index = 0) {
   // index 0 = "Yes", index 1 = "No"
   const buttonText = index === 0 ? 'Yes' : 'No';
 
+  // docassemble DISABLES the Continue button on an attachment screen while the
+  // document is still assembling, then enables it. Clicking straight away races
+  // that: Playwright sits on a disabled button until the page navigates out from
+  // under it ("element was detached from the DOM"). Waiting for enabled makes
+  // the click deterministic and reports assembly time, which is the number that
+  // actually matters to a filer staring at a spinner.
+  // Returns false when the element is gone, meaning the page already advanced
+  // (the caller polled count() on a DOM that has since navigated) — clicking a
+  // ghost just burns the action timeout, so the caller should skip it.
+  async function waitUntilEnabled(locator: Locator, label: string): Promise<boolean> {
+    const started = Date.now();
+    try {
+      await locator.waitFor({ state: 'attached', timeout: 5000 });
+      while (await locator.isDisabled()) {
+        if (Date.now() - started > 600_000) break;
+        await page.waitForTimeout(500);
+      }
+    } catch {
+      console.log(`  [skip] "${label}" vanished before click; page already advanced`);
+      return false;
+    }
+    const waited = Date.now() - started;
+    if (waited > 2000) {
+      console.log(`  [assembly] waited ${(waited / 1000).toFixed(1)}s for "${label}" to enable`);
+    }
+    return true;
+  }
+
   // Try multiple approaches to find the right button
   let buttonLocator = page.locator(`button[name="${name}"]`).filter({ hasText: buttonText });
   let buttonCount = await buttonLocator.count();
@@ -428,6 +456,7 @@ export async function clickNthByName(page: Page, name: string, index = 0) {
     const allButtons = page.locator(`button[name="${name}"]`);
     const allCount = await allButtons.count();
     if (allCount > index) {
+      if (!(await waitUntilEnabled(allButtons.nth(index), name))) return;
       await allButtons.nth(index).click();
       await page.waitForLoadState('networkidle');
       return;
@@ -440,6 +469,7 @@ export async function clickNthByName(page: Page, name: string, index = 0) {
   } else {
     // Fallback to original approach for other field types
     const exactMatch = page.locator(`[name="${name}"]`);
+    if (!(await waitUntilEnabled(exactMatch.nth(index), name))) return;
     await exactMatch.nth(index).click();
   }
 

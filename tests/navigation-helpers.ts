@@ -992,6 +992,15 @@ export async function navigateIncome(page: Page, scenario: TestScenario) {
     await waitForDaPageLoad(page);
     await fillById(page, b64('debtor[0].income.income_amount_1'), inc?.grossWages ?? '0');
     await fillById(page, b64('debtor[0].income.overtime_pay_1'), inc?.overtimePay ?? '0');
+    // Slot 2 is optional, so only touch it when the fixture asks for a second
+    // job -- that is the path where gross_monthly_wages() has to sum more than
+    // one row for the 122A / 103B pre-fills.
+    if (inc?.grossWages2 !== undefined) {
+      await fillById(page, b64('debtor[0].income.income_amount_2'), inc.grossWages2);
+    }
+    if (inc?.overtimePay2 !== undefined) {
+      await fillById(page, b64('debtor[0].income.overtime_pay_2'), inc.overtimePay2);
+    }
     await clickContinue(page);
 
     // Payroll deductions (all optional).

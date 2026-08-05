@@ -227,7 +227,11 @@ code: |
   b2030_fields = {}
 
   # Header
-  b2030_fields['District'] = current_district
+  # The form's caption line already prints "________ District Of ________", so
+  # the field holds only the state -- writing current_district verbatim would
+  # render "District Of District of Nebraska".
+  import re as _re
+  b2030_fields['District'] = _re.sub(r'^\s*district\s+of\s+', '', current_district, flags=_re.I)
   b2030_fields['Case Number'] = case_number
 
   _d1_name = debtor[0].name.first + " " + debtor[0].name.middle + " " + debtor[0].name.last
@@ -250,39 +254,45 @@ code: |
   b2030_fields['prior_received'] = currency(_received)
   b2030_fields['balance_due'] = currency(_balance)
 
+  # The form_b2030.pdf tick boxes are text fields, not PDF checkboxes: the
+  # template's /Btn widgets carried no appearance state, so a boolean rendered
+  # as a blank box on every assembled form. Write the mark itself.
+  def _tick(on):
+    return 'X' if on else ''
+
   # Section 2: Source of compensation paid
   if attorney_disclosure.source_paid == 'debtor':
-    b2030_fields['source_paid_debtor'] = True
-    b2030_fields['source_paid_other'] = False
+    b2030_fields['source_paid_debtor'] = _tick(True)
+    b2030_fields['source_paid_other'] = _tick(False)
     b2030_fields['source_paid_other_specify'] = ''
   else:
-    b2030_fields['source_paid_debtor'] = False
-    b2030_fields['source_paid_other'] = True
+    b2030_fields['source_paid_debtor'] = _tick(False)
+    b2030_fields['source_paid_other'] = _tick(True)
     b2030_fields['source_paid_other_specify'] = attorney_disclosure.source_paid_other_detail
 
   # Section 3: Source of compensation to be paid
   if attorney_disclosure.source_topay == 'debtor':
-    b2030_fields['source_topay_debtor'] = True
-    b2030_fields['source_topay_other'] = False
+    b2030_fields['source_topay_debtor'] = _tick(True)
+    b2030_fields['source_topay_other'] = _tick(False)
     b2030_fields['source_topay_other_specify'] = ''
   else:
-    b2030_fields['source_topay_debtor'] = False
-    b2030_fields['source_topay_other'] = True
+    b2030_fields['source_topay_debtor'] = _tick(False)
+    b2030_fields['source_topay_other'] = _tick(True)
     b2030_fields['source_topay_other_specify'] = attorney_disclosure.source_topay_other_detail
 
   # Section 4: Fee sharing
   if attorney_disclosure.shares_fees:
-    b2030_fields['no_fee_sharing'] = False
-    b2030_fields['fee_sharing'] = True
+    b2030_fields['no_fee_sharing'] = _tick(False)
+    b2030_fields['fee_sharing'] = _tick(True)
   else:
-    b2030_fields['no_fee_sharing'] = True
-    b2030_fields['fee_sharing'] = False
+    b2030_fields['no_fee_sharing'] = _tick(True)
+    b2030_fields['fee_sharing'] = _tick(False)
 
   # Section 5: Services
-  b2030_fields['service_a'] = attorney_disclosure.service_a
-  b2030_fields['service_b'] = attorney_disclosure.service_b
-  b2030_fields['service_c'] = attorney_disclosure.service_c
-  b2030_fields['service_d'] = attorney_disclosure.service_d
+  b2030_fields['service_a'] = _tick(attorney_disclosure.service_a)
+  b2030_fields['service_b'] = _tick(attorney_disclosure.service_b)
+  b2030_fields['service_c'] = _tick(attorney_disclosure.service_c)
+  b2030_fields['service_d'] = _tick(attorney_disclosure.service_d)
 
   if defined('attorney_disclosure.other_services') and attorney_disclosure.other_services:
     b2030_fields['other_services'] = attorney_disclosure.other_services

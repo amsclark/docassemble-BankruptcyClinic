@@ -129,6 +129,11 @@ export interface IncomeData {
   employer?: string;
   grossWages?: string;
   overtimePay?: string;
+  // Second job (Schedule I offers six slots). Set these to exercise
+  // gross_monthly_wages() summing more than slot 1 -- the means-test and
+  // fee-waiver pre-fills used to read slot 1 only.
+  grossWages2?: string;
+  overtimePay2?: string;
   taxDeduction?: string;
   netRentalBusiness?: string;
   interestAndDividends?: string;

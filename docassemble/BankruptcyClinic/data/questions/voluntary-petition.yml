@@ -354,7 +354,7 @@ code: |
   # Assembled PDFs are FLATTENED (editable = False) so the official B-form
   # "Reset" pushbutton and the embedded form JavaScript cannot survive into the
   # filer's copy -- a tester pressed Reset on an emailed PDF and it wiped the
-  # whole form. 21 of the 27 USCourts templates ship that button.
+  # whole form. 20 of the 27 USCourts templates ship that button.
   # `?pdf_editable=1` opts back into fillable output; the Playwright specs that
   # read AcroForm values use it, real users never do.
   pdf_editable = str(url_args.get('pdf_editable', '')).lower() in ('1', 'true', 'yes')

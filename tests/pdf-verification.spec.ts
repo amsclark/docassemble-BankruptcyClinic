@@ -226,6 +226,23 @@ test.describe('PDF Content Verification Suite', () => {
     expect(getField(f, 'District')).toContain('Nebraska');
     expect(getField(f, 'Debtor 1').toLowerCase()).toContain('irene');
     expect(getField(f, 'Chapter')).toBe('7');
+
+    // The caption line already prints "______ District Of ______", so the field
+    // holds the state alone. Writing current_district verbatim rendered
+    // "District Of District of Nebraska" on the filed form (Phil Martin, UAT
+    // August 2026).
+    expect(getField(f, 'District')).not.toMatch(/district\s+of/i);
+
+    // The tick boxes on this template are TEXT fields, not PDF checkboxes: the
+    // /Btn widgets carried no appearance state, so a boolean rendered as an
+    // empty box on every assembled form. A checked box must carry the mark
+    // itself, and an unchecked one must stay empty.
+    expect(getField(f, 'service_a')).toBe('X');
+    expect(getField(f, 'service_b')).toBe('X');
+    expect(getField(f, 'service_c')).toBe('X');
+    expect(getField(f, 'service_d')).toBe('');
+    expect(getField(f, 'no_fee_sharing')).toBe('X');
+    expect(getField(f, 'fee_sharing')).toBe('');
   });
 
   test('all expected form numbers are present', async () => {
