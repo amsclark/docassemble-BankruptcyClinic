@@ -17,9 +17,16 @@ def test_south_dakota_repealed_furniture_exemption_is_not_offered():
     assert "'household_goods'" not in south_dakota_limits
 
 
-def test_south_dakota_tools_and_life_insurance_citations_are_distinct():
-    assert "'tools': 'Tools of the trade (SDCL 43-45-6)'" in OBJECTS
-    assert "'life_insurance': 'Life insurance proceeds (SDCL 58-12-4)'" in OBJECTS
+def test_south_dakota_has_no_tools_exemption_and_both_life_insurance_citations():
+    south_dakota_block = OBJECTS.split('SOUTH_DAKOTA_EXEMPTIONS = {', 1)[1].split(
+        'NEBRASKA_EXEMPTIONS = {', 1
+    )[0]
+    south_dakota_limits = OBJECTS.split("if 'south dakota' in state_str:", 1)[1].split(
+        'else:', 1
+    )[0]
+    assert "'tools'" not in south_dakota_block
+    assert "'tools'" not in south_dakota_limits
+    assert "'life_insurance': 'Life insurance proceeds (SDCL 58-12-4, 43-45-6)'" in OBJECTS
 
 
 def test_declaration_does_not_preprint_debtor_signatures():
@@ -31,6 +38,6 @@ def test_declaration_does_not_preprint_debtor_signatures():
 
 if __name__ == '__main__':
     test_south_dakota_repealed_furniture_exemption_is_not_offered()
-    test_south_dakota_tools_and_life_insurance_citations_are_distinct()
+    test_south_dakota_has_no_tools_exemption_and_both_life_insurance_citations()
     test_declaration_does_not_preprint_debtor_signatures()
     print('OK: all August 2026 final-UAT regression tests passed')
