@@ -4,18 +4,17 @@ from docassemble.base.util import DAObject, Individual
 SOUTH_DAKOTA_EXEMPTIONS = {
     'homestead': 'Homestead (SDCL 43-31-1 – 43-31-6)',
     'homestead_proceeds': 'Homestead, proceeds of sale (SDCL 43-31-4)',
-    'household_goods': 'Furniture and bedding (SDCL 43-45-5(5))',
     'wildcard': 'Wildcard (SDCL 43-45-4)',
     'personal_property': 'Bible, books, family pictures, burial plots, all wearing apparel, church pew, food & fuel to last one year, and clothing (SDCL 43-45-2)',
     'domestic_support': 'Alimony, maintenance, or support of the debtor (SDCL 43-45-2)',
     'health_aids': 'Health aids (SDCL 43-45-2)',
-    'tools': 'Tools of the trade (SDCL 43-45-5(6))',
+    'tools': 'Tools of the trade (SDCL 43-45-6)',
     'city_employee_pensions': 'City employee pensions (SDCL 9-16-47)',
     'public_employee_pensions': 'Public employee pensions (SDCL 3-12-115)',
     'retirement': 'Retirement (SDCL 43-45-16)',
     'public_assistance': 'Public assistance (SDCL 28-7-16)',
     'wages': 'Wages (SDCL 15-20-12)',
-    'life_insurance': 'Life insurance proceeds (SDCL 58-12-4, 43-45-6)',
+    'life_insurance': 'Life insurance proceeds (SDCL 58-12-4)',
     'workers_comp': 'Workers compensation (SDCL 62-4-42)',
     'unemployment': 'Unemployment (SDCL 61-6-28)',
     'student_loan': 'Student loan (20 U.S.C. § 1095a(d))',
@@ -380,7 +379,6 @@ def get_exemption_limits(user_state, head_of_family=False):
         return {
             'homestead': 0,          # Unlimited
             'homestead_proceeds': 0,  # Unlimited
-            'household_goods': 0,     # Unlimited (SD doesn't specify a dollar limit on furniture/bedding)
             'wildcard': 7000 if head_of_family else 5000,  # SDCL 43-45-4 (William Franck, ERLS, June 2026)
             'personal_property': 0,   # Unlimited
             'health_aids': 0,         # Unlimited
