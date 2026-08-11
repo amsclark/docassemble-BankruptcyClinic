@@ -55,8 +55,12 @@ test('SD filer is asked the head-of-family question for the SDCL 43-45-4 wildcar
   await passDebtorFinal(page);
   await navigatePropertySection(page, SD_SINGLE);
 
-  // The head-of-family question appears at the start of the exemption section
-  // for a South Dakota filer.
+  // The exemption section now opens with the 730-day domicile screen (PR #132).
+  // Answer Yes (lived in SD 2+ years) to reach the head-of-family question.
+  await waitForDaPageLoad(page);
+  await clickYesNoButton(page, 'prop.domicile_two_years', true);
+
+  // The head-of-family question follows for a South Dakota filer.
   await waitForDaPageLoad(page);
   const heading = ((await page.locator('h1').first().textContent()) || '').toLowerCase();
   expect(heading).toContain('head of a family');
