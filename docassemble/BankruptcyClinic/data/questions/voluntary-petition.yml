@@ -1079,13 +1079,6 @@ code: |
   print_101
   conclusion_screen
 ---
-question: |
-  Interview questions complete!
-buttons:
-  - Exit
-section: fin
-mandatory: True
----
 code: |
   debtor[i].name.first
   debtor[i].name.last

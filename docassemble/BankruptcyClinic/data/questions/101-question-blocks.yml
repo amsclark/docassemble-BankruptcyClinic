@@ -1423,7 +1423,13 @@ subquestion: |
 allow downloading: True
 attachment code: |
   conclusion_attachments
-continue button field: conclusion_screen
+# Terminal screen: `event` (not `continue button field`) so there is no
+# button past this point. The old flow continued to an "Interview questions
+# complete!" screen whose only control was Exit — docassemble's Exit deletes
+# the session's answers, so it acted as a reset button and wiped a filer's
+# completed interview (client-reported). The interview now ends here, with
+# the downloads.
+event: conclusion_screen
 section: fin
 ---
 code: |
