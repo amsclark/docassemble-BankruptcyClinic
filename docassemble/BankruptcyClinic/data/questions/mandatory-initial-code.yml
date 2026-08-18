@@ -2,3 +2,18 @@ mandatory: True
 code: |
   menu_items = [ action_menu_item('Review Answers', 'review_answers') ]
 ---
+# Live help / chat. `initial` (not `mandatory`) so availability re-evaluates on
+# every screen load as operators sign in and out of /monitor. Operators must
+# have the admin or advocate privilege and check the "bankruptcy" role on the
+# Monitor page to see these sessions; other interviews on the server are
+# unaffected because they never call set_live_help_status().
+initial: True
+code: |
+  if chat_partners_available('bankruptcy').help > 0:
+    set_live_help_status(availability='available',
+                         mode='help',
+                         partner_roles=['bankruptcy'])
+  else:
+    set_live_help_status(availability='observeonly',
+                         partner_roles=['bankruptcy'])
+---
