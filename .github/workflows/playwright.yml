@@ -4,11 +4,15 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
-  test:
-    timeout-minutes: 60
+  static-gates:
+    # The eight burn-down gates (selectors, yaml-ids, flow, test-completeness,
+    # caps-sync, pdf-fields, namespace-clobber, seek-sim) are pure static
+    # analysis — no docassemble server needed, so they run on every push/PR.
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7
@@ -20,15 +24,30 @@ jobs:
     - name: Interview flow gates (static — no server needed)
       run: |
         chmod +x scripts/*.sh
-        ./scripts/lint-flow-gaps.sh
-        ./scripts/lint-test-completeness.sh
-        python3 scripts/lint_caps_sync.py
-        ./scripts/lint-pdf-fields.sh   # builder keys must exist in the PDF templates (needs pdf-lib from npm ci)
+        npm run lint
+  browser-suite:
+    # The Playwright suite drives a REAL docassemble server; GitHub-hosted
+    # runners have none, which is why every historical run of this workflow
+    # failed. The job runs only when a reachable server URL is configured as
+    # the DA_SERVER_URL repository variable (Settings > Secrets and variables
+    # > Actions > Variables). Until then it is skipped, and the local
+    # container pool (npm run test:pool — see CLAUDE.md) remains the
+    # browser-suite gate.
+    if: ${{ vars.DA_SERVER_URL != '' }}
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+    - uses: actions/setup-node@v7
+      with:
+        node-version: lts/*
+    - name: Install dependencies
+      run: npm ci
     - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
+      run: npx playwright install --with-deps chromium
     - name: Run Playwright tests
-      run: npx playwright test --project=chromium --workers=1
-      timeout-minutes: 30
+      run: BASE_URL="${{ vars.DA_SERVER_URL }}" npx playwright test --project=chromium --workers=1
+      timeout-minutes: 50
     - uses: actions/upload-artifact@v7
       if: ${{ !cancelled() }}
       with:

@@ -83,6 +83,14 @@ test.describe('Roxanne feedback fixes', () => {
     await navigatePropertySection(page, SIMPLE_SINGLE);
     await waitForDaPageLoad(page);
 
+    // Schedule C now opens with the 730-day domicile screen (PR #132), which
+    // replaced the exemption-type question as the first page. Verify the old
+    // question isn't on it either, then answer Yes to move past it.
+    const domicilePage = await page.locator('body').innerText();
+    expect(domicilePage).not.toContain('Which set of exemptions');
+    await clickYesNoButton(page, 'prop.domicile_two_years', true);
+    await waitForDaPageLoad(page);
+
     // The "Which set of exemptions are you claiming?" question is no longer
     // asked — Phil/Roxanne feedback found that NE/SD filers in these districts
     // must claim the state exemption set anyway, so the old prompt only

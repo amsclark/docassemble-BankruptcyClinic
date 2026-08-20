@@ -196,9 +196,26 @@ export async function fillVisibleRequiredFields(
       const base = cb.id.replace(/_\d+$/, '');   // choice index -> group base
       (groups.get(base) || groups.set(base, []).get(base)!).push(cb);
     }
+    // A visible validation error alongside an already-checked group means the
+    // server rejected the current COMBINATION (e.g. the creditor library's
+    // "same creditor in both lists" rule) — the page re-renders with the bad
+    // boxes still checked, so "skip groups with a checked member" resubmits
+    // the same rejected state forever (fuzz seed 71077345 burned all 800
+    // steps this way). A real user unchecks a box; do the same: clear the
+    // group and let the damped re-pick below choose again ("None of the
+    // above" once yesBias decays to 0, which always satisfies the rule).
+    const pageHasError = Array.from(
+      document.querySelectorAll('.invalid-feedback, .da-has-error, .alert-danger, label.error')
+    ).some((e) => (e as HTMLElement).offsetParent !== null && !!e.textContent?.trim());
     for (const members of groups.values()) {
       // Only real choice groups (>=2 members); skip lone yesno checkboxes.
-      if (members.length < 2 || members.some((c) => c.checked)) continue;
+      if (members.length < 2) continue;
+      if (members.some((c) => c.checked)) {
+        if (!pageHasError) continue;
+        for (const c of members) {
+          if (c.checked) (document.querySelector(`label[for="${CSS.escape(c.id)}"]`) as HTMLElement).click();
+        }
+      }
       const labelOf = (c: HTMLInputElement) =>
         (document.querySelector(`label[for="${CSS.escape(c.id)}"]`)?.textContent || '');
       const nota = members.find((c) => /none of the above/i.test(labelOf(c)));
