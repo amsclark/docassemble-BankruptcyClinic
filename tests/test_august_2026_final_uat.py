@@ -1,9 +1,11 @@
 """Regression coverage for Roxanne and William's final August 2026 UAT."""
 
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OBJECTS = (ROOT / 'docassemble/BankruptcyClinic/objects.py').read_text()
+EXEMPTIONS_JS = (ROOT / 'docassemble/BankruptcyClinic/data/static/exemptions.js').read_text()
 
 
 def test_south_dakota_repealed_furniture_exemption_is_not_offered():
@@ -15,6 +17,21 @@ def test_south_dakota_repealed_furniture_exemption_is_not_offered():
     )[0]
     assert "'household_goods'" not in south_dakota_block
     assert "'household_goods'" not in south_dakota_limits
+
+
+def test_south_dakota_repealed_furniture_exemption_is_not_in_the_client_dropdown():
+    """exemptions.js is the second source of truth: getAllExemptionLaws() walks
+    the whole state table into the user-facing <select>, so a repealed law left
+    here is still offered to South Dakota filers even after objects.py is fixed.
+    """
+    south_dakota_js = EXEMPTIONS_JS.split('const southDakotaExemptions = {', 1)[1].split(
+        '\n};', 1
+    )[0]
+    # Only the offered entries count, not comments explaining the removal.
+    offered = re.findall(r"^\s*(\w+)\s*:\s*\{[^}]*?\blaw\s*:\s*'([^']*)'",
+                         south_dakota_js, re.M)
+    assert 'household_goods' not in dict(offered)
+    assert not [law for _, law in offered if '43-45-5(5)' in law]
 
 
 def test_south_dakota_has_no_tools_exemption_and_both_life_insurance_citations():
@@ -38,6 +55,7 @@ def test_declaration_does_not_preprint_debtor_signatures():
 
 if __name__ == '__main__':
     test_south_dakota_repealed_furniture_exemption_is_not_offered()
+    test_south_dakota_repealed_furniture_exemption_is_not_in_the_client_dropdown()
     test_south_dakota_has_no_tools_exemption_and_both_life_insurance_citations()
     test_declaration_does_not_preprint_debtor_signatures()
     print('OK: all August 2026 final-UAT regression tests passed')
