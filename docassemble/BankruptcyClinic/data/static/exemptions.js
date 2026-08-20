@@ -154,41 +154,26 @@ window.getExemptionChoicesForState = function(userState, propertyType) {
   }
 };
 
-// Main function, now expects userState as an extra argument
-function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claiming_sub_100,
+// Main entry point, called from a `script:` block on every question that
+// collects an exemption claim.
+//
+// The parameter list used to begin with a `currentExemptions` argument that no
+// call site ever passed, so every argument landed one position to the left and
+// `userState` was always undefined. The value was overwritten by
+// refreshExemptionContext() before first use anyway, so it is now a local and
+// the signature matches what the YAML actually calls with.
+//
+// `userState` is either the NAME of a state field present on this page (the
+// value is then read live from that element) or a literal state string
+// rendered server-side, e.g. "${ exemption_filing_state }". Pages that collect
+// personal property have no state field of their own, so they pass the literal.
+function checkQuestionExemptions(is_claiming_exemption, claiming_sub_100,
     current_owned_value, exemption_value, exemption_laws, exemption_value_2,
     exemption_laws_2, userState) {
+    // Law-string -> {limit, amount} index for the filing state. Populated by
+    // refreshExemptionContext() below, before any read.
+    var currentExemptions = {};
     // Helper: build choices for the law selects based on current state and property type
-  function setSelectOptions(selectElem, options) {
-      if (!selectElem) return;
-      // Preserve current value if possible
-      const previous = selectElem.value;
-      // Clear and rebuild
-      while (selectElem.options.length) selectElem.remove(0);
-      const placeholder = document.createElement('option');
-      placeholder.value = '';
-      placeholder.textContent = 'Select...';
-      selectElem.appendChild(placeholder);
-      (options || []).forEach(o => {
-        const opt = document.createElement('option');
-        opt.value = o;
-        opt.textContent = o;
-        selectElem.appendChild(opt);
-      });
-      // Restore selection if still valid
-      if (previous && options && options.includes(previous)) {
-        selectElem.value = previous;
-      }
-    }
-
-    function inferPropertyType() {
-      const key = String(exemption_laws || '').toLowerCase();
-      if (key.includes('.ab_vehicles')) return 'vehicle';
-      if (key.includes('.interests[')) return 'real_property';
-      if (key.includes('.annuities[')) return 'annuity';
-      return 'all';
-    }
-
     function buildLawIndex(exemptionsObj) {
       const idx = {};
       try {
@@ -200,22 +185,31 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
       return idx;
     }
 
+  // Every element read here is optional. Most pages omit the second exemption
+  // row, and `claiming_sub_100` is computed server-side (claiming_less_than_full)
+  // so it has no element at all. Read defensively: a missing field degrades to
+  // "no warning" rather than throwing out of the change handler and leaving the
+  // rest of the checks dead.
+  function elemValue(el) { return el ? el.value : ""; }
+  function elemChecked(el) { return el ? el.checked : false; }
+  function clearValidity(el) { if (el && el.setCustomValidity) el.setCustomValidity(""); }
+
   function runExemptionCheck() {
       console.log("running exemption check");
-      var isClaimingExemption = isClaimingExemptionElement.checked;
-      var isCustomExemption = isCustomExemptionElement.checked;
-      var currentValue = currentValueElement.value;
-      var value1 = value1Element.value;
-      var law1 = law1Element.value;
-      var value2 = value2Element.value;
-      var law2 = law2Element.value;
+      var isClaimingExemption = elemChecked(isClaimingExemptionElement);
+      var isCustomExemption = elemChecked(isCustomExemptionElement);
+      var currentValue = elemValue(currentValueElement);
+      var value1 = elemValue(value1Element);
+      var law1 = elemValue(law1Element);
+      var value2 = elemValue(value2Element);
+      var law2 = elemValue(law2Element);
       console.log("current values", isClaimingExemption, isCustomExemption, currentValue, value1, law1, value2, law2);
 
-      currentValueElement.setCustomValidity("");
-      value1Element.setCustomValidity("");
-      law1Element.setCustomValidity("");
-      value2Element.setCustomValidity("");
-      law2Element.setCustomValidity("");
+      clearValidity(currentValueElement);
+      clearValidity(value1Element);
+      clearValidity(law1Element);
+      clearValidity(value2Element);
+      clearValidity(law2Element);
       flash(null, null, true);
 
 
@@ -234,7 +228,7 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
                "the Exemption Summary will confirm the totals.";
       }
 
-  if (!isCustomExemption && law1Element.value && currentExemptions[law1]) {
+  if (!isCustomExemption && law1 && currentExemptions[law1]) {
         if (parseFloat(currentValue) > currentExemptions[law1].limit && currentExemptions[law1].limit !== 0) {
           flash(overCapNote(law1), "warning");
         }
@@ -272,9 +266,14 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
       return btoaVal;
     }
 
+    // Returns an empty list rather than throwing when the field is absent from
+    // this page. Some arguments name variables that are computed server-side
+    // (e.g. `*_claiming_sub_100` via claiming_less_than_full) and so have no
+    // element at all; a throw here would abort the whole setup below.
     function getFormElement(searchString, type) {
-      return document.querySelectorAll(searchString)[0]
-          .getElementsByTagName(type);
+      var container = document.querySelectorAll(searchString)[0];
+      if (!container) return [];
+      return container.getElementsByTagName(type);
     }
 
     function getFormElementByName(searchString) {
@@ -283,15 +282,31 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
 
 
     function addOnChangeListener(element, extraHandler) {
+      if (!element) return;
       element.addEventListener('change', event => {
         try { if (typeof extraHandler === 'function') extraHandler(); } catch(e) { console.log(e); }
         runExemptionCheck();
       });
     }
 
-    // Get exemption elements
-    var isClaimingExemptionElement = getFormElementByName(getBtoaSearchName(is_claiming_exemption))[0];
-    var isNotClaimingExemptionElement = getFormElementByName(getBtoaSearchName(is_claiming_exemption))[1];
+    // Get exemption elements.
+    //
+    // Two different markups have to be supported. On the list-collect pages
+    // (prop.interests[i].*) docassemble names the input after the variable, so
+    // getElementsByName finds it. On the personal-property pages the exemption
+    // fields are `show if`-gated, which makes docassemble emit a generic
+    // `_field_N` name and record the real variable only as `data-saveas` on the
+    // surrounding container -- getElementsByName returns nothing there. Look up
+    // by name first, then fall back to the container, the way the value and law
+    // fields below already do. Without the fallback the claiming-exemption
+    // radio reads as "not claiming" on those 44 pages and every cap check
+    // silently short-circuits.
+    var claimingElements = getFormElementByName(getBtoaSearchName(is_claiming_exemption));
+    if (!claimingElements || !claimingElements.length) {
+      claimingElements = getFormElement(getBtoaSearchString(is_claiming_exemption), "input");
+    }
+    var isClaimingExemptionElement = claimingElements[0];
+    var isNotClaimingExemptionElement = claimingElements[1];
     var isCustomExemptionElement = getFormElement(getBtoaSearchString(claiming_sub_100), "input")[0];
     var isNotCustomExemptionElement = getFormElement(getBtoaSearchString(claiming_sub_100), "input")[1];
     var currentValueElement = getFormElementByName(getBtoaSearchName(current_owned_value))[0];
@@ -303,8 +318,11 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
     var value2Element = getFormElement(getBtoaSearchString(exemption_value_2), "input")[0];
     var law2Element = getFormElement(getBtoaSearchString(exemption_laws_2), "select")[0];
 
-    // Resolve the actual state input element from the provided userState variable name
+    // Resolve the state. `userState` is either the name of a state field on
+    // this page or a literal state string rendered server-side; try the
+    // element first and fall back to treating the argument as the value.
     var stateElement = null;
+    var stateLiteral = null;
     if (userState) {
       stateElement = getFormElementByName(getBtoaSearchName(userState))[0];
       if (!stateElement) {
@@ -312,9 +330,13 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
         var inputs = getFormElement(getBtoaSearchString(userState), 'input');
         if (inputs && inputs.length) stateElement = inputs[0];
       }
+      if (!stateElement) stateLiteral = userState;
     }
-    // Last-resort: find by label caption "State"
-    if (!stateElement) {
+    // Last-resort: find by label caption "State". Skipped when the state
+    // arrived as a literal - on a personal-property page the only "State"
+    // label belongs to an unrelated address, and guessing wrong silently
+    // applies another state's exemption caps.
+    if (!stateLiteral && !stateElement) {
       try {
         var labels = document.querySelectorAll('label');
         for (var i = 0; i < labels.length; i++) {
@@ -337,7 +359,7 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
     }
 
     function refreshExemptionContext() {
-  var stateVal = stateElement ? stateElement.value : null;
+  var stateVal = stateElement ? stateElement.value : stateLiteral;
   // Set the currentExemptions map used by validations, keyed by law string
   currentExemptions = buildLawIndex(getCurrentExemptions(stateVal));
   // Merge in running totals from the exemption tracker if available on this page
@@ -353,29 +375,12 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
       }
     }
   } catch(e) { console.log('Could not read exemption tracker data:', e); }
-      // Populate the law selects with the correct choices for this property type
-      var propertyType = inferPropertyType();
-      var choices = window.getExemptionChoicesForState(stateVal, propertyType);
-      function updateAll(nameExpr, fallbackElem) {
-        var updated = 0;
-        try {
-          var byName = getFormElementByName(getBtoaSearchName(nameExpr));
-          if (byName && byName.length) {
-            for (var i = 0; i < byName.length; i++) {
-              if (byName[i].tagName === 'SELECT') { setSelectOptions(byName[i], choices); updated++; }
-            }
-          }
-        } catch(e) {}
-        try {
-          var byData = getFormElement(getBtoaSearchString(nameExpr), "select");
-          if (byData && byData.length) {
-            for (var j = 0; j < byData.length; j++) { setSelectOptions(byData[j], choices); updated++; }
-          }
-        } catch(e) {}
-        if (!updated && fallbackElem) setSelectOptions(fallbackElem, choices);
-      }
-      updateAll(exemption_laws, law1Element);
-      updateAll(exemption_laws_2, law2Element);
+      // NOTE: the law selects are deliberately NOT repopulated here. They are
+      // rendered server-side from
+      // get_exemption_choices_or_combined(exemption_filing_state, '<category>'),
+      // which is category-specific; this file only distinguishes vehicle /
+      // real_property / annuity and would otherwise overwrite a correct
+      // two-entry list with the entire state table.
     }
 
   // Apply change listener to every element
@@ -393,13 +398,10 @@ function checkQuestionExemptions(currentExemptions, is_claiming_exemption, claim
       try { stateElement.addEventListener('input', refreshExemptionContext); } catch(e) { console.log(e); }
     }
 
-    // Observe DOM changes to law selects and refresh when they appear/re-render
-    try {
-      const mo = new MutationObserver(() => {
-        try { refreshExemptionContext(); } catch(e) { console.log(e); }
-      });
-      mo.observe(document.body, { childList: true, subtree: true });
-    } catch(e) { console.log(e); }
+    // A body-wide MutationObserver used to live here to re-populate the law
+    // selects after a re-render. Now that the selects are left to the server,
+    // the context depends only on the state field, which has its own listener,
+    // so the observer would just rebuild the same index on every DOM change.
 
     // Initial populate/refresh using the current state value (and a slight delay for safety)
     try {

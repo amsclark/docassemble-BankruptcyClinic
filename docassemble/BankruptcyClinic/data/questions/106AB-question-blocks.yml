@@ -536,7 +536,8 @@ script: |
       "prop.household_goods_exemption_value",
       "prop.household_goods_exemption_laws",
       "prop.household_goods_exemption_value_2",
-      "prop.household_goods_exemption_laws_2");
+      "prop.household_goods_exemption_laws_2",
+      "${ exemption_filing_state }");
     checkQuestionExemptions(
       
       "prop.secured_household_goods_is_claiming_exemption",
@@ -545,7 +546,8 @@ script: |
       "prop.secured_household_goods_exemption_value",
       "prop.secured_household_goods_exemption_laws",
       "prop.secured_household_goods_exemption_value_2",
-      "prop.secured_household_goods_exemption_laws_2");
+      "prop.secured_household_goods_exemption_laws_2",
+      "${ exemption_filing_state }");
     checkQuestionExemptions(
       
       "prop.electronics_is_claiming_exemption",
@@ -554,7 +556,8 @@ script: |
       "prop.electronics_exemption_value",
       "prop.electronics_exemption_laws",
       "prop.electronics_exemption_value_2",
-      "prop.electronics_exemption_laws_2");
+      "prop.electronics_exemption_laws_2",
+      "${ exemption_filing_state }");
     checkQuestionExemptions(
       
       "prop.collectibles_is_claiming_exemption",
@@ -563,7 +566,8 @@ script: |
       "prop.collectibles_exemption_value",
       "prop.collectibles_exemption_laws",
       "prop.collectibles_exemption_value_2",
-      "prop.collectibles_exemption_laws_2");
+      "prop.collectibles_exemption_laws_2",
+      "${ exemption_filing_state }");
     checkQuestionExemptions(
       
       "prop.hobby_equipment_is_claiming_exemption",
@@ -572,7 +576,8 @@ script: |
       "prop.hobby_equipment_exemption_value",
       "prop.hobby_equipment_exemption_laws",
       "prop.hobby_equipment_exemption_value_2",
-      "prop.hobby_equipment_exemption_laws_2");
+      "prop.hobby_equipment_exemption_laws_2",
+      "${ exemption_filing_state }");
     checkQuestionExemptions(
       
       "prop.firearms_is_claiming_exemption",
@@ -581,7 +586,8 @@ script: |
       "prop.firearms_exemption_value",
       "prop.firearms_exemption_laws",
       "prop.firearms_exemption_value_2",
-      "prop.firearms_exemption_laws_2");
+      "prop.firearms_exemption_laws_2",
+      "${ exemption_filing_state }");
     checkQuestionExemptions(
       
       "prop.clothes_is_claiming_exemption",
@@ -590,7 +596,8 @@ script: |
       "prop.clothes_exemption_value",
       "prop.clothes_exemption_laws",
       "prop.clothes_exemption_value_2",
-      "prop.clothes_exemption_laws_2");
+      "prop.clothes_exemption_laws_2",
+      "${ exemption_filing_state }");
     checkQuestionExemptions(
       
       "prop.jewelry_is_claiming_exemption",
@@ -599,7 +606,8 @@ script: |
       "prop.jewelry_exemption_value",
       "prop.jewelry_exemption_laws",
       "prop.jewelry_exemption_value_2",
-      "prop.jewelry_exemption_laws_2");
+      "prop.jewelry_exemption_laws_2",
+      "${ exemption_filing_state }");
     checkQuestionExemptions(
       
       "prop.animal_is_claiming_exemption",
@@ -608,7 +616,8 @@ script: |
       "prop.animal_exemption_value",
       "prop.animal_exemption_laws",
       "prop.animal_exemption_value_2",
-      "prop.animal_exemption_laws_2");
+      "prop.animal_exemption_laws_2",
+      "${ exemption_filing_state }");
     checkQuestionExemptions(
       
       "prop.other_household_items_is_claiming_exemption",
@@ -617,7 +626,8 @@ script: |
       "prop.other_household_items_exemption_value",
       "prop.other_household_items_exemption_laws",
       "prop.other_household_items_exemption_value_2",
-      "prop.other_household_items_exemption_laws_2");
+      "prop.other_household_items_exemption_laws_2",
+      "${ exemption_filing_state }");
     }, 1000)
 
   </script>
@@ -1134,7 +1144,8 @@ script: |
       "prop.financial_assets.deposits[i].exemption_value",
       "prop.financial_assets.deposits[i].exemption_laws",
       "prop.financial_assets.deposits[i].exemption_value_2",
-      "prop.financial_assets.deposits[i].exemption_laws_2");
+      "prop.financial_assets.deposits[i].exemption_laws_2",
+      "${ exemption_filing_state }");
   </script>
 allowed to set:
   - prop.financial_assets.deposits[i].complete
@@ -1223,7 +1234,8 @@ script: |
       "prop.financial_assets.bonds_and_stocks[i].exemption_value",
       "prop.financial_assets.bonds_and_stocks[i].exemption_laws",
       "prop.financial_assets.bonds_and_stocks[i].exemption_value_2",
-      "prop.financial_assets.bonds_and_stocks[i].exemption_laws_2");
+      "prop.financial_assets.bonds_and_stocks[i].exemption_laws_2",
+      "${ exemption_filing_state }");
   </script>
 allowed to set:
   - prop.financial_assets.bonds_and_stocks[i].complete
@@ -1308,7 +1320,8 @@ script: |
       "prop.financial_assets.non_traded_stock[i].exemption_value",
       "prop.financial_assets.non_traded_stock[i].exemption_laws",
       "prop.financial_assets.non_traded_stock[i].exemption_value_2",
-      "prop.financial_assets.non_traded_stock[i].exemption_laws_2");
+      "prop.financial_assets.non_traded_stock[i].exemption_laws_2",
+      "${ exemption_filing_state }");
   </script>
 allowed to set:
   - prop.financial_assets.non_traded_stock[i].complete
@@ -1393,7 +1406,8 @@ script: |
       "prop.financial_assets.corporate_bonds[i].exemption_value",
       "prop.financial_assets.corporate_bonds[i].exemption_laws",
       "prop.financial_assets.corporate_bonds[i].exemption_value_2",
-      "prop.financial_assets.corporate_bonds[i].exemption_laws_2");
+      "prop.financial_assets.corporate_bonds[i].exemption_laws_2",
+      "${ exemption_filing_state }");
   </script>
 allowed to set:
   - prop.financial_assets.corporate_bonds[i].complete
@@ -1478,7 +1492,8 @@ script: |
       "prop.financial_assets.retirement_accounts[i].exemption_value",
       "prop.financial_assets.retirement_accounts[i].exemption_laws",
       "prop.financial_assets.retirement_accounts[i].exemption_value_2",
-      "prop.financial_assets.retirement_accounts[i].exemption_laws_2");
+      "prop.financial_assets.retirement_accounts[i].exemption_laws_2",
+      "${ exemption_filing_state }");
   </script>
 allowed to set:
   - prop.financial_assets.retirement_accounts[i].complete
@@ -1572,7 +1587,8 @@ script: |
       "prop.financial_assets.prepayments[i].exemption_value",
       "prop.financial_assets.prepayments[i].exemption_laws",
       "prop.financial_assets.prepayments[i].exemption_value_2",
-      "prop.financial_assets.prepayments[i].exemption_laws_2");
+      "prop.financial_assets.prepayments[i].exemption_laws_2",
+      "${ exemption_filing_state }");
   </script>
 allowed to set:
   - prop.financial_assets.prepayments[i].complete
@@ -1668,7 +1684,8 @@ script: |
       "prop.financial_assets.annuities[i].exemption_value",
       "prop.financial_assets.annuities[i].exemption_laws",
       "prop.financial_assets.annuities[i].exemption_value_2",
-      "prop.financial_assets.annuities[i].exemption_laws_2");
+      "prop.financial_assets.annuities[i].exemption_laws_2",
+      "${ exemption_filing_state }");
   </script>
 allowed to set:
   - prop.financial_assets.annuities[i].complete
@@ -1752,7 +1769,8 @@ script: |
       "prop.financial_assets.edu_accounts[i].exemption_value",
       "prop.financial_assets.edu_accounts[i].exemption_laws",
       "prop.financial_assets.edu_accounts[i].exemption_value_2",
-      "prop.financial_assets.edu_accounts[i].exemption_laws_2");
+      "prop.financial_assets.edu_accounts[i].exemption_laws_2",
+      "${ exemption_filing_state }");
   </script>
 allowed to set:
   - prop.financial_assets.edu_accounts[i].complete
@@ -1810,7 +1828,8 @@ script: |
       "prop.financial_assets.future_property_interest_exemption_value",
       "prop.financial_assets.future_property_interest_exemption_laws",
       "prop.financial_assets.future_property_interest_exemption_value_2",
-      "prop.financial_assets.future_property_interest_exemption_laws_2");
+      "prop.financial_assets.future_property_interest_exemption_laws_2",
+      "${ exemption_filing_state }");
   </script>
 fields:
   - Has interests: prop.financial_assets.has_future_property_interest
@@ -1875,7 +1894,8 @@ script: |
       "prop.financial_assets.ip_interest_exemption_value",
       "prop.financial_assets.ip_interest_exemption_laws",
       "prop.financial_assets.ip_interest_exemption_value_2",
-      "prop.financial_assets.ip_interest_exemption_laws_2");
+      "prop.financial_assets.ip_interest_exemption_laws_2",
+      "${ exemption_filing_state }");
   </script>
 fields:
   - Has interests: prop.financial_assets.has_ip_interest
@@ -1939,7 +1959,8 @@ script: |
       "prop.financial_assets.intangible_interest_exemption_value",
       "prop.financial_assets.intangible_interest_exemption_laws",
       "prop.financial_assets.intangible_interest_exemption_value_2",
-      "prop.financial_assets.intangible_interest_exemption_laws_2");
+      "prop.financial_assets.intangible_interest_exemption_laws_2",
+      "${ exemption_filing_state }");
   </script>
 fields:
   - Has interest: prop.financial_assets.has_intangible_interest
@@ -2001,7 +2022,8 @@ script: |
       "prop.owed_property.tax_refund_exemption_value",
       "prop.owed_property.tax_refund_exemption_laws",
       "prop.owed_property.tax_refund_exemption_value_2",
-      "prop.owed_property.tax_refund_exemption_laws_2");
+      "prop.owed_property.tax_refund_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -2011,7 +2033,8 @@ script: |
       "prop.owed_property.family_support_exemption_value",
       "prop.owed_property.family_support_exemption_laws",
       "prop.owed_property.family_support_exemption_value_2",
-      "prop.owed_property.family_support_exemption_laws_2");
+      "prop.owed_property.family_support_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -2021,7 +2044,8 @@ script: |
       "prop.owed_property.other_amounts_exemption_value",
       "prop.owed_property.other_amounts_exemption_laws",
       "prop.owed_property.other_amounts_exemption_value_2",
-      "prop.owed_property.other_amounts_exemption_laws_2");
+      "prop.owed_property.other_amounts_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -2031,7 +2055,8 @@ script: |
       "prop.owed_property.first_insurance_interest_exemption_value",
       "prop.owed_property.first_insurance_interest_exemption_laws",
       "prop.owed_property.first_insurance_interest_exemption_value_2",
-      "prop.owed_property.first_insurance_interest_exemption_laws_2");
+      "prop.owed_property.first_insurance_interest_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -2041,7 +2066,8 @@ script: |
       "prop.owed_property.second_insurance_interest_exemption_value",
       "prop.owed_property.second_insurance_interest_exemption_laws",
       "prop.owed_property.second_insurance_interest_exemption_value_2",
-      "prop.owed_property.second_insurance_interest_exemption_laws_2");
+      "prop.owed_property.second_insurance_interest_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -2051,7 +2077,8 @@ script: |
       "prop.owed_property.third_insurance_interest_exemption_value",
       "prop.owed_property.third_insurance_interest_exemption_laws",
       "prop.owed_property.third_insurance_interest_exemption_value_2",
-      "prop.owed_property.third_insurance_interest_exemption_laws_2");
+      "prop.owed_property.third_insurance_interest_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -2061,7 +2088,8 @@ script: |
       "prop.owed_property.trust_exemption_value",
       "prop.owed_property.trust_exemption_laws",
       "prop.owed_property.trust_exemption_value_2",
-      "prop.owed_property.trust_exemption_laws_2");
+      "prop.owed_property.trust_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -2071,7 +2099,8 @@ script: |
       "prop.owed_property.third_party_exemption_value",
       "prop.owed_property.third_party_exemption_laws",
       "prop.owed_property.third_party_exemption_value_2",
-      "prop.owed_property.third_party_exemption_laws_2");
+      "prop.owed_property.third_party_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -2081,7 +2110,8 @@ script: |
       "prop.owed_property.contingent_claims_exemption_value",
       "prop.owed_property.contingent_claims_exemption_laws",
       "prop.owed_property.contingent_claims_exemption_value_2",
-      "prop.owed_property.contingent_claims_exemption_laws_2");
+      "prop.owed_property.contingent_claims_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -2091,7 +2121,8 @@ script: |
       "prop.owed_property.other_assets_exemption_value",
       "prop.owed_property.other_assets_exemption_laws",
       "prop.owed_property.other_assets_exemption_value_2",
-      "prop.owed_property.other_assets_exemption_laws_2");
+      "prop.owed_property.other_assets_exemption_laws_2",
+      "${ exemption_filing_state }");
 
   </script>
 fields:
@@ -2591,7 +2622,8 @@ script: |
       "prop.business_property.ar_exemption_value",
       "prop.business_property.ar_exemption_laws",
       "prop.business_property.ar_exemption_value_2",
-      "prop.business_property.ar_exemption_laws_2");
+      "prop.business_property.ar_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -2601,7 +2633,8 @@ script: |
       "prop.business_property.equipment_exemption_value",
       "prop.business_property.equipment_exemption_laws",
       "prop.business_property.equipment_exemption_value_2",
-      "prop.business_property.equipment_exemption_laws_2");
+      "prop.business_property.equipment_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -2611,7 +2644,8 @@ script: |
       "prop.business_property.machinery_exemption_value",
       "prop.business_property.machinery_exemption_laws",
       "prop.business_property.machinery_exemption_value_2",
-      "prop.business_property.machinery_exemption_laws_2");
+      "prop.business_property.machinery_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -2621,7 +2655,8 @@ script: |
       "prop.business_property.inventory_exemption_value",
       "prop.business_property.inventory_exemption_laws",
       "prop.business_property.inventory_exemption_value_2",
-      "prop.business_property.inventory_exemption_laws_2");
+      "prop.business_property.inventory_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -2631,7 +2666,8 @@ script: |
       "prop.business_property.partnership_exemption_value",
       "prop.business_property.partnership_exemption_laws",
       "prop.business_property.partnership_exemption_value_2",
-      "prop.business_property.partnership_exemption_laws_2");
+      "prop.business_property.partnership_exemption_laws_2",
+      "${ exemption_filing_state }");
     checkQuestionExemptions(
       
       "prop.business_property.lists_has_claim",
@@ -2640,7 +2676,8 @@ script: |
       "prop.business_property.lists_exemption_value",
       "prop.business_property.lists_exemption_laws",
       "prop.business_property.lists_exemption_value_2",
-      "prop.business_property.lists_exemption_laws_2");
+      "prop.business_property.lists_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -2650,7 +2687,8 @@ script: |
       "prop.business_property.otherProperty_exemption_value",
       "prop.business_property.otherProperty_exemption_laws",
       "prop.business_property.otherProperty_exemption_value_2",
-      "prop.business_property.otherProperty_exemption_laws_2");
+      "prop.business_property.otherProperty_exemption_laws_2",
+      "${ exemption_filing_state }");
 
   </script>
 fields:
@@ -3051,7 +3089,8 @@ script: |
       "prop.farming_property.animal_exemption_value",
       "prop.farming_property.animal_exemption_laws",
       "prop.farming_property.animal_exemption_value_2",
-      "prop.farming_property.animal_exemption_laws_2");
+      "prop.farming_property.animal_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -3061,7 +3100,8 @@ script: |
       "prop.farming_property.crops_exemption_value",
       "prop.farming_property.crops_exemption_laws",
       "prop.farming_property.crops_exemption_value_2",
-      "prop.farming_property.crops_exemption_laws_2");
+      "prop.farming_property.crops_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -3071,7 +3111,8 @@ script: |
       "prop.farming_property.equipment_exemption_value",
       "prop.farming_property.equipment_exemption_laws",
       "prop.farming_property.equipment_exemption_value_2",
-      "prop.farming_property.equipment_exemption_laws_2");
+      "prop.farming_property.equipment_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -3081,7 +3122,8 @@ script: |
       "prop.farming_property.supplies_exemption_value",
       "prop.farming_property.supplies_exemption_laws",
       "prop.farming_property.supplies_exemption_value_2",
-      "prop.farming_property.supplies_exemption_laws_2");
+      "prop.farming_property.supplies_exemption_laws_2",
+      "${ exemption_filing_state }");
 
     checkQuestionExemptions(
       
@@ -3091,7 +3133,8 @@ script: |
       "prop.farming_property.fishing_exemption_value",
       "prop.farming_property.fishing_exemption_laws",
       "prop.farming_property.fishing_exemption_value_2",
-      "prop.farming_property.fishing_exemption_laws_2");
+      "prop.farming_property.fishing_exemption_laws_2",
+      "${ exemption_filing_state }");
 
   </script>
 fields:
@@ -3314,7 +3357,8 @@ script: |
       "prop.other_prop_exemption_value",
       "prop.other_prop_exemption_laws",
       "prop.other_prop_exemption_value_2",
-      "prop.other_prop_exemption_laws_2");
+      "prop.other_prop_exemption_laws_2",
+      "${ exemption_filing_state }");
   </script>
 fields:
   - note: |
