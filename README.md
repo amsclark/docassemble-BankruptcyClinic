@@ -1,6 +1,18 @@
 # docassemble.BankruptcyClinic
 
-A docassemble extension for Chapter 7 bankruptcy petition preparation, generating official US Bankruptcy Court forms (101, 106A/B, 106C, 106D, 106E/F, 106G, 106H, 106I, 106J, 107, 108, 121, 122A, B2030, and Summary).
+A [docassemble](https://docassemble.org/) interview that turns one conversation with a
+client into a complete, filing-ready Chapter 7 bankruptcy petition packet: 20 official US
+Bankruptcy Court forms (101, 101A/B, 103A/B, 106A/B through 106J, 106 Summary, 106
+Declaration, 107 with continuation sheets, 108, 121, 122A-1 and 2030), plus the creditor
+mailing matrix.
+
+State exemption tables ship for **Nebraska** and **South Dakota**, with statutory caps
+tracked and over-cap claims flagged before filing.
+
+**Website and install guide: <https://amsclark.github.io/docassemble-BankruptcyClinic/>**
+
+Free software under the MIT license. Hosting, new states, and custom work are available
+from the author — see [Hosting and support](https://amsclark.github.io/docassemble-BankruptcyClinic/support/).
 
 ## Prerequisites
 
@@ -58,6 +70,10 @@ npx playwright install chromium
 - `tests/scenario-*.spec.ts` - 5 scenario-driven end-to-end tests
 - `tests/pdf-verification.spec.ts` - Exhaustive PDF field verification (11 sub-tests)
 - `tests/maximalist.spec.ts` - Comprehensive test exercising every form field and list
+
+## License
+
+MIT. See [LICENSE](LICENSE).
 
 ## Author
 

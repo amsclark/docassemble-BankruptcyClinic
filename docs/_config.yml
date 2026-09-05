@@ -1,3 +1,17 @@
 title: BankruptcyClinic
-description: "Free, open-source guided interview that generates a complete, filing-ready Chapter 7 bankruptcy petition packet."
-theme: jekyll-theme-cayman
+description: "Open-source guided interview that assembles a complete, filing-ready Chapter 7 bankruptcy petition. Free to run yourself; hosting and new states available."
+url: "https://amsclark.github.io"
+baseurl: "/docassemble-BankruptcyClinic"
+
+nav:
+  - label: Overview
+    url: /
+  - label: Install it
+    url: /install/
+  - label: Compared to Upsolve
+    url: /compare/
+  - label: Hosting &amp; support
+    url: /support/
+
+exclude:
+  - VARIABLE-MAP.md
