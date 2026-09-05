@@ -7,15 +7,17 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "docassemble.BankruptcyClinic"
 version = "0.0.27"
-description = "A docassemble extension."
+description = "Guided interview that assembles a complete Chapter 7 bankruptcy petition packet."
 readme = "README.md"
+license = "MIT"
 authors = [
     { name = "Alex Clark", email = "alex@clarkmanagementconsulting.com" },
 ]
 dependencies = []
 
 [project.urls]
-Homepage = "https://docassemble.org"
+Homepage = "https://amsclark.github.io/docassemble-BankruptcyClinic/"
+Source = "https://github.com/amsclark/docassemble-BankruptcyClinic"
 
 [tool.setuptools.packages.find]
 where = [

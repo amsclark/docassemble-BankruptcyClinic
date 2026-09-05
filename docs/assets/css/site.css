@@ -1,0 +1,337 @@
+/* BankruptcyClinic — the site is built to read like the paperwork it produces:
+   black court-form rules, grey section bands, answers written in blue ink. */
+
+:root {
+  --paper:  #ffffff;
+  --ground: #e4e6e9;   /* the desk the form sits on */
+  --rule:   #000000;   /* court forms rule in true black */
+  --band:   #dcdee1;   /* the grey section bar */
+  --ink:    #2a2d33;   /* printed body copy */
+  --pen:    #1b3fd8;   /* ballpoint blue: anything a person filled in */
+  --stamp:  #b32025;   /* clerk's stamp: warnings, limits, cautions */
+  --quiet:  #5d636d;
+
+  --measure: 68ch;
+  --gap: clamp(1.75rem, 4vw, 3.25rem);
+  --pad: clamp(1.5rem, 4vw, 3rem);   /* sheet inner padding; the grey band bleeds to it */
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.62;
+  font-synthesis-weight: none;
+}
+
+/* ---------- the sheet ---------- */
+
+.sheet {
+  background: var(--paper);
+  border: 2px solid var(--rule);
+  max-width: 62rem;
+  margin: 0 auto var(--gap);
+  padding: var(--pad);
+}
+
+main { padding: var(--gap) clamp(0.75rem, 3vw, 2rem) 0; }
+
+/* ---------- masthead ---------- */
+
+.masthead {
+  background: var(--paper);
+  border-bottom: 2px solid var(--rule);
+}
+.masthead-inner {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 0.85rem clamp(0.75rem, 3vw, 2rem);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem 1.5rem;
+}
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: var(--rule);
+  margin-right: auto;
+}
+.wordmark-badge {
+  background: var(--rule);
+  color: var(--paper);
+  font-stretch: 78%;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.01em;
+  padding: 0.28rem 0.42rem;
+  line-height: 1;
+}
+.wordmark-name { font-weight: 700; font-size: 1.05rem; letter-spacing: -0.015em; }
+
+.masthead nav { display: flex; flex-wrap: wrap; gap: 0.35rem 1.15rem; }
+.masthead nav a {
+  color: var(--ink);
+  text-decoration: none;
+  font-stretch: 88%;
+  font-size: 0.95rem;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 1px;
+}
+.masthead nav a:hover { border-bottom-color: var(--pen); color: var(--pen); }
+.masthead nav a[aria-current="page"] { border-bottom-color: var(--rule); font-weight: 600; }
+
+/* ---------- type ---------- */
+
+h1, h2, h3, h4 {
+  color: #000;
+  letter-spacing: -0.022em;
+  line-height: 1.1;
+  margin: 0 0 0.6rem;
+  font-weight: 700;
+}
+h1 { font-size: clamp(2.1rem, 5.4vw, 3.4rem); font-stretch: 92%; }
+h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin-top: 2.6rem; }
+h3 { font-size: 1.18rem; margin-top: 1.9rem; letter-spacing: -0.012em; }
+h4 { font-size: 1rem; margin-top: 1.4rem; }
+.sheet > h2:first-child, .sheet > h1:first-child { margin-top: 0; }
+
+p, li { max-width: var(--measure); }
+p { margin: 0 0 1.05rem; }
+ul, ol { padding-left: 1.15rem; margin: 0 0 1.15rem; }
+li { margin-bottom: 0.45rem; }
+
+a { color: var(--pen); text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+
+strong { font-weight: 700; color: #000; }
+
+/* A grey band, like the section headers on an Official Form. */
+.band {
+  background: var(--band);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  margin: 2.6rem calc(var(--pad) * -1) 1.4rem;
+  padding: 0.5rem var(--pad);
+  font-weight: 700;
+  font-stretch: 85%;
+  font-size: 1.05rem;
+  color: #000;
+  max-width: none;
+}
+
+/* A band opening a sheet is that sheet's header bar: flush to the top edge. */
+.sheet > .band:first-child {
+  margin-top: calc(var(--pad) * -1);
+  border-top: 0;
+}
+
+.lede { font-size: 1.16rem; line-height: 1.55; max-width: 42ch; }
+.note { color: var(--quiet); font-size: 0.95rem; }
+
+/* ---------- hero: a form caption box, filled in ---------- */
+
+.hero-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.55rem;
+  margin-bottom: 1.6rem;
+  font-stretch: 80%;
+  font-size: 0.85rem;
+  color: var(--quiet);
+}
+.hero h1 { max-width: 16ch; }
+.hero .lede { margin-top: 1.1rem; }
+
+/* The caption grid: label above a ruled blank, answer written in. */
+.caption {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  border: 1px solid var(--rule);
+  margin: 2rem 0 1.75rem;
+}
+.caption > div {
+  padding: 0.55rem 0.7rem 0.6rem;
+  border-right: 1px solid var(--rule);
+}
+.caption > div:last-child { border-right: 0; }
+.caption .k {
+  font-stretch: 78%;
+  font-size: 0.76rem;
+  color: var(--quiet);
+  display: block;
+  margin-bottom: 0.15rem;
+}
+.caption .v {
+  font-weight: 600;
+  font-size: 1.28rem;
+  color: var(--pen);
+  display: block;
+  line-height: 1.15;
+}
+.caption .v small { font-size: 0.78rem; font-weight: 400; display: block; color: var(--quiet); letter-spacing: 0; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .caption .v { animation: writein 0.5s cubic-bezier(.3,.7,.4,1) backwards; }
+  .caption > div:nth-child(1) .v { animation-delay: 0.25s; }
+  .caption > div:nth-child(2) .v { animation-delay: 0.40s; }
+  .caption > div:nth-child(3) .v { animation-delay: 0.55s; }
+  .caption > div:nth-child(4) .v { animation-delay: 0.70s; }
+}
+@keyframes writein { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+
+/* When the caption wraps to two rows, the cells still need to close. */
+@media (max-width: 34rem) {
+  .caption > div { border-bottom: 1px solid var(--rule); border-right: 0; }
+  .caption > div:last-child { border-bottom: 0; }
+}
+
+/* ---------- actions ---------- */
+
+.actions { display: flex; flex-wrap: wrap; gap: 0.8rem; margin: 1.6rem 0 0; }
+.btn {
+  display: inline-block;
+  padding: 0.62rem 1.15rem;
+  border: 2px solid var(--rule);
+  text-decoration: none;
+  font-weight: 600;
+  background: var(--paper);
+  color: #000;
+}
+.btn:hover { background: var(--pen); border-color: var(--pen); color: var(--paper); }
+.btn-solid { background: var(--rule); color: var(--paper); }
+.btn-solid:hover { background: var(--pen); border-color: var(--pen); }
+
+/* ---------- tables ---------- */
+
+table { border-collapse: collapse; width: 100%; margin: 1.2rem 0 1.5rem; font-size: 0.96rem; }
+th, td { border: 1px solid var(--rule); padding: 0.42rem 0.6rem; text-align: left; vertical-align: top; }
+th { background: var(--band); font-stretch: 85%; font-weight: 700; color: #000; }
+td:first-child { font-weight: 700; white-space: nowrap; font-stretch: 85%; }
+.table-scroll { overflow-x: auto; }
+/* Two-state comparison: keep the verdict column on one line. */
+.verdicts td:nth-child(2) { white-space: nowrap; }
+
+/* ---------- checkbox list: a real checklist, not decoration ---------- */
+
+.checklist { list-style: none; padding-left: 0; }
+.checklist li {
+  position: relative;
+  padding-left: 2rem;
+  margin-bottom: 0.7rem;
+}
+.checklist li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0.35rem;
+  width: 0.95rem; height: 0.95rem;
+  border: 1.5px solid var(--rule);
+}
+.checklist li.yes::after {
+  content: "\2715";
+  position: absolute;
+  left: 0.2rem; top: 0.19rem;
+  color: var(--pen);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.checklist li.no::after {
+  content: "";
+  position: absolute;
+  left: 0.27rem; top: 0.75rem;
+  width: 0.42rem; height: 1.5px;
+  background: var(--stamp);
+}
+
+/* ---------- caution ---------- */
+
+.caution {
+  border: 1px solid var(--stamp);
+  border-left-width: 5px;
+  padding: 0.85rem 1rem;
+  margin: 1.4rem 0;
+  max-width: var(--measure);
+}
+.caution p:last-child { margin-bottom: 0; }
+.caution strong { color: var(--stamp); }
+
+/* ---------- steps: installing is a genuine sequence ---------- */
+
+.step { border-top: 1px solid var(--rule); padding-top: 1.1rem; margin-top: 2.2rem; }
+.step > h3 { margin-top: 0; display: flex; gap: 0.7rem; align-items: baseline; }
+.step-n {
+  background: var(--rule);
+  color: var(--paper);
+  font-stretch: 78%;
+  font-size: 0.8rem;
+  padding: 0.15rem 0.45rem;
+  flex: none;
+  line-height: 1.3;
+}
+
+/* ---------- code ---------- */
+
+pre, code { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; }
+code { font-size: 0.88em; background: #eef0f3; padding: 0.1em 0.32em; }
+pre {
+  background: #f4f5f7;
+  border: 1px solid var(--rule);
+  padding: 0.85rem 1rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0 0 1.2rem;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+
+/* ---------- media ---------- */
+
+video, img { max-width: 100%; height: auto; display: block; border: 1px solid var(--rule); }
+figure { margin: 1.5rem 0; }
+figcaption { font-size: 0.92rem; color: var(--quiet); margin-top: 0.5rem; max-width: var(--measure); }
+
+/* ---------- two-up ---------- */
+
+.cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: 0 2.4rem;
+}
+.cols > * { min-width: 0; }
+.cols p, .cols li { max-width: none; }
+
+/* ---------- footer ---------- */
+
+.colophon {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 1.6rem clamp(0.75rem, 3vw, 2rem) 3.5rem;
+  font-size: 0.93rem;
+  color: var(--quiet);
+  border-top: 1px solid #b9bcc1;
+}
+.colophon p { max-width: none; margin-bottom: 0.4rem; }
+
+/* ---------- accessibility ---------- */
+
+.skip {
+  position: absolute; left: -9999px;
+  background: var(--rule); color: var(--paper); padding: 0.6rem 1rem;
+}
+.skip:focus { left: 0.5rem; top: 0.5rem; z-index: 10; }
+a:focus-visible, .btn:focus-visible {
+  outline: 3px solid var(--pen);
+  outline-offset: 2px;
+}
