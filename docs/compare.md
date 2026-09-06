@@ -151,8 +151,23 @@ hard to put a number in a grant application.
 flattering.** Best Case covers Chapters 7, 11, 12, and 13 in every US district, pulls
 credit reports, and files to CM/ECF. BankruptcyClinic does Chapter 7 only, in Nebraska and
 South Dakota, does not assemble Form 122A-2, and does not e-file — you upload the PDFs
-yourself. If you file Chapter 13, or you file outside those two states today, the
-commercial packages do a job this does not do yet, and the honest advice is to buy one.
+yourself. If you file Chapter 13, or you file outside those two states today, a commercial
+package does a job this does not do yet.
+
+If you need that job done this month, buy one. If you have longer, the gap is a scope of
+work rather than a permanent limit, and there are two ways to close it.
+
+**Commission it.** Your state added, Form 122A-2 built, a local form your district
+requires: that is normal paid work, quoted as a fixed fee.
+[Tell me what you file]({{ '/support/' | relative_url }}) and you get back a scope and a
+price. What I build is contributed to the project, so the next clinic that needs your
+state gets it free.
+
+**Or have someone else do it, or do it yourself.** This is AGPL software and the parts
+worth extending are the parts built to be extended — state exemptions are a table of
+statute, cap, and description, and courts and counties are lists. Any developer can take
+it on, and pull requests are welcome, new state tables most of all. You are not waiting on
+me and you are not locked to me. That is deliberate.
 </div>
 
 ### When the free option is genuinely the better one
