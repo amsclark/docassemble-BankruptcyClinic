@@ -1,7 +1,7 @@
 ---
 layout: default
 title: "BankruptcyClinic — open-source Chapter 7 petition assembly"
-description: "One guided interview produces the whole Chapter 7 petition packet: 20 Official Forms, state exemptions with statutory caps, and the means test. Free and open source; customization and new states available."
+description: "One guided interview produces the whole Chapter 7 petition packet: 21 Official Forms, state exemptions with statutory caps, and the means test. Free and open source; customization and new states available."
 ---
 
 <section class="sheet hero" markdown="1">
@@ -16,7 +16,7 @@ description: "One guided interview produces the whole Chapter 7 petition packet:
 <p class="lede">BankruptcyClinic is a guided interview that turns one sitting with a client into a complete, filing-ready Chapter 7 petition packet.</p>
 
 <div class="caption">
-  <div><span class="k">Official Forms produced</span><span class="v">20<small>101 through 2030</small></span></div>
+  <div><span class="k">Official Forms produced</span><span class="v">21<small>101 through 2030</small></span></div>
   <div><span class="k">Exemption tables</span><span class="v">NE, SD<small>more on request</small></span></div>
   <div><span class="k">Where data lives</span><span class="v">Your server<small>self-hosted</small></span></div>
   <div><span class="k">Cost to run it</span><span class="v">$0<small>AGPL-3.0 license</small></span></div>
