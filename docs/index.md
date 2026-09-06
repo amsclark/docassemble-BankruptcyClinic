@@ -65,6 +65,7 @@ and edit.
 | B 108 | Statement of Intention for Individuals Filing Under Chapter 7 |
 | B 121 | Your Statement About Your Social Security Numbers |
 | B 122A-1 | Chapter 7 Statement of Your Current Monthly Income |
+| B 122A-2 | Chapter 7 Means Test Calculation |
 | B 2030 | Disclosure of Compensation of Attorney for Debtor |
 
 </div>
@@ -97,7 +98,9 @@ trustee objects.
 
 Form 122A-1 uses the US Trustee Program median-income figures for the debtor's state and
 household size, including multi-job wage cases, non-filing spouse income, and Social
-Security exclusions.
+Security exclusions. When annualised income comes out above the median, the interview goes
+on to collect and assemble Form 122A-2, the long-form calculation, using the IRS Collection
+Financial Standards for the filer's county.
 
 ### Cross-section checks that catch court rejections
 

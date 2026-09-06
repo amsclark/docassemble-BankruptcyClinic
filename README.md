@@ -1,10 +1,10 @@
 # docassemble.BankruptcyClinic
 
 A [docassemble](https://docassemble.org/) interview that turns one conversation with a
-client into a complete, filing-ready Chapter 7 bankruptcy petition packet: 20 official US
+client into a complete, filing-ready Chapter 7 bankruptcy petition packet: 21 official US
 Bankruptcy Court forms (101, 101A/B, 103A/B, 106A/B through 106J, 106 Summary, 106
-Declaration, 107 with continuation sheets, 108, 121, 122A-1 and 2030), plus the creditor
-mailing matrix.
+Declaration, 107 with continuation sheets, 108, 121, 122A-1, 122A-2 and 2030), plus the
+creditor mailing matrix.
 
 State exemption tables ship for **Nebraska** and **South Dakota**, with statutory caps
 tracked and over-cap claims flagged before filing.
