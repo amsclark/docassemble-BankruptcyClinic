@@ -10,6 +10,8 @@ nav:
     url: /install/
   - label: How it compares
     url: /compare/
+  - label: FAQ
+    url: /faq/
   - label: Get help
     url: /support/
 
