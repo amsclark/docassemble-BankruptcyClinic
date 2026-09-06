@@ -171,6 +171,7 @@ That is a supported path and it costs nothing.
 
 <div class="actions">
   <a class="btn" href="{{ '/install/' | relative_url }}">Install guide</a>
+  <a class="btn" href="{{ '/faq/' | relative_url }}">FAQ</a>
   <a class="btn" href="https://github.com/amsclark/docassemble-BankruptcyClinic">Source on GitHub</a>
   <a class="btn" href="https://github.com/amsclark/docassemble-BankruptcyClinic/issues">Issues and feature requests</a>
 </div>
