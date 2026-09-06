@@ -77,4 +77,4 @@ MIT. See [LICENSE](LICENSE).
 
 ## Author
 
-Alex Clark, alex@metatheria.solutions
+Alex Clark, alex@clarkmanagementconsulting.com

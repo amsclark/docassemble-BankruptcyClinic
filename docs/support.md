@@ -19,7 +19,7 @@ for. See [who can host it for you](#hosting) below. My work starts once you have
 wherever it lives.
 
 <div class="actions">
-  <a class="btn btn-solid" href="mailto:alex@metatheria.solutions?subject=BankruptcyClinic">Email alex@metatheria.solutions</a>
+  <a class="btn btn-solid" href="mailto:alex@clarkmanagementconsulting.com?subject=BankruptcyClinic">Email me</a>
   <a class="btn" href="https://github.com/amsclark/docassemble-BankruptcyClinic/issues">Report a bug instead</a>
 </div>
 
@@ -136,7 +136,7 @@ server needs.
 
 <div class="band">Get in touch</div>
 
-Email **[alex@metatheria.solutions](mailto:alex@metatheria.solutions?subject=BankruptcyClinic)**
+Email **[alex@clarkmanagementconsulting.com](mailto:alex@clarkmanagementconsulting.com?subject=BankruptcyClinic)**
 and tell me:
 
 - Your organisation, and whether you are a clinic, legal aid office, law school, or firm
