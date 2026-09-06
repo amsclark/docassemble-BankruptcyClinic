@@ -8,7 +8,7 @@ description: "One guided interview produces the whole Chapter 7 petition packet:
 
 <div class="hero-head">
   <span>Free software for bankruptcy clinics and small firms</span>
-  <span>MIT licensed</span>
+  <span>AGPL-3.0 licensed</span>
 </div>
 
 # Your client answers once. Every form fills itself in.
@@ -19,7 +19,7 @@ description: "One guided interview produces the whole Chapter 7 petition packet:
   <div><span class="k">Official Forms produced</span><span class="v">20<small>101 through 2030</small></span></div>
   <div><span class="k">Exemption tables</span><span class="v">NE, SD<small>more on request</small></span></div>
   <div><span class="k">Where data lives</span><span class="v">Your server<small>self-hosted</small></span></div>
-  <div><span class="k">Cost to run it</span><span class="v">$0<small>MIT license</small></span></div>
+  <div><span class="k">Cost to run it</span><span class="v">$0<small>AGPL-3.0 license</small></span></div>
 </div>
 
 <div class="actions">
@@ -161,9 +161,15 @@ You run it. The data stays on your machine.
 
 <div class="band">Free software, paid help</div>
 
-The software is MIT licensed. There is no paid tier, no locked feature, no seat count,
-and no "contact sales" wall in front of anything. Clone it, read it, run it, change it,
-and never speak to me.
+The software is licensed under the [GNU Affero General Public
+License](https://www.gnu.org/licenses/agpl-3.0.html). There is no paid tier, no locked
+feature, no seat count, and no "contact sales" wall in front of anything. Clone it, read
+it, run it, change it, and never speak to me.
+
+The AGPL adds one condition worth knowing before you adopt it: if you change the software
+and run your changed version as a service other people use, you owe those users your
+source. Running it as shipped asks nothing of you.
+[What the licence means in practice]({{ '/install/' | relative_url }}#licence).
 
 What I sell is my time:
 

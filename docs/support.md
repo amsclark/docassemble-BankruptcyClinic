@@ -130,6 +130,12 @@ Hosting it yourself is also completely reasonable — the
 [install guide]({{ '/install/' | relative_url }}) covers it, including the hardening a live
 server needs.
 
+**One licence point before you sign with anyone.** BankruptcyClinic is under the AGPL, so
+if your host modifies it for you and runs that version as your public service, the
+modified source has to be available to the people using the site. Running it unchanged
+asks nothing of you or them. Agree who publishes what before the work starts, not after —
+[the details are here]({{ '/install/' | relative_url }}#licence).
+
 </section>
 
 <section class="sheet" markdown="1">

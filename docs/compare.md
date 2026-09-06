@@ -1,15 +1,24 @@
 ---
 layout: default
-title: "BankruptcyClinic compared to Upsolve"
-description: "Upsolve is free self-help for people with simple Chapter 7 cases. BankruptcyClinic is a tool for the clinic or attorney handling the cases Upsolve has to turn away."
+title: "How BankruptcyClinic compares"
+description: "Upsolve is free self-help for simple pro se cases. NextChapter and Best Case are paid petition software for firms, at $999 to $2,250 a year. Here is where BankruptcyClinic sits against both."
 permalink: /compare/
 ---
 
 <section class="sheet" markdown="1">
 
-# Compared to Upsolve
+# How it compares
 
-<p class="lede">Upsolve is good, and it is not competing with this. It serves the filer. This serves the office representing the filer.</p>
+<p class="lede">Two different things get called the alternative. Upsolve serves the filer directly. NextChapter and Best Case sell petition software to the office. This page covers both, including what the paid ones cost.</p>
+
+</section>
+
+<section class="sheet" markdown="1">
+
+<div class="band">Compared to Upsolve</div>
+
+**Upsolve is good, and it is not competing with this.** It serves the filer. This serves
+the office representing the filer.
 
 [Upsolve](https://upsolve.org/) is a 501(c)(3) nonprofit with a free web app that helps a
 person prepare their own Chapter 7 petition and file it without a lawyer. It has helped a
@@ -81,15 +90,88 @@ and produce Form 2030 disclosing attorney compensation.
 
 ### You can change it
 
-MIT licensed, and the parts you would want to change are the parts that are easiest to
-change. State exemptions are a plain Python dictionary of statute, cap, and description.
-Courts and counties are lists. Adding a state is filling in a table, not rewriting the
-engine. A hosted service, however good, is a thing you use as shipped.
+Licensed under the [AGPL-3.0]({{ '/install/' | relative_url }}#licence), and the parts you
+would want to change are the parts that are easiest to change. State exemptions are a
+plain Python dictionary of statute, cap, and description. Courts and counties are lists.
+Adding a state is filling in a table, not rewriting the engine. A hosted service, however
+good, is a thing you use as shipped.
+
+The licence asks one thing back: if you change it and run your version as a service other
+people use, publish your changes. Running it as shipped asks nothing.
 
 ### It produces the whole packet, not a subset
 
 Twenty Official Forms, the continuation sheets, and the creditor mailing matrix, all from
 one interview.
+
+</section>
+
+<section class="sheet" markdown="1">
+
+<a id="pricing"></a>
+
+<div class="band">What the paid packages cost</div>
+
+The other thing a clinic compares this against is commercial petition software. The two
+that matter are **NextChapter** and **Best Case**, which is owned by Stretto and has been
+the incumbent for decades.
+
+These are the vendors' own published list prices, read from their pricing pages on
+**6 September 2026**. Both auto-renew. Check the current figures before you quote them to
+a board.
+
+<div class="table-scroll" markdown="1">
+
+| | What you pay | Per year |
+|---|---|---|
+| **NextChapter** Pro Basic, unlimited cases | $999/yr | **$999** |
+| **NextChapter** Pro+, unlimited cases | $1,599/yr | **$1,599** |
+| **NextChapter** Whoa package | $1,999/yr | **$1,999** |
+| **Best Case** Cloud | $99/mo per seat | **$1,188** per seat |
+| **Best Case** Desktop, Chapter 7 | $1,750 year one, then $800 | **$1,750** then $800 |
+| **Best Case** Desktop, all chapters | $2,250 year one, then $1,450 | **$2,250** then $1,450 |
+| **BankruptcyClinic** | Server you already run, or ~$16/mo hosted | **$0 to ~$200** |
+
+</div>
+
+Neither vendor caps you at those numbers. NextChapter includes six users and charges $99
+a year for each one after that, and prices its cheaper tiers by case count — $159 covers
+four cases, $649 covers eleven. Its Chapter 13 module, document creator, client portal,
+noticing, and texting are separate annual add-ons from $200 to $500 each. Best Case
+charges $500 for each desktop seat past the third and $170 to $370 for a custom Chapter 13
+plan per jurisdiction. Filing fees, credit counselling courses, credit reports, and
+noticing are extra on both.
+
+**Neither publishes a nonprofit, legal aid, or law school clinic rate.** We looked. A
+discount may exist if you ask; nothing public tells you what to expect, which makes it
+hard to put a number in a grant application.
+
+<div class="caution" markdown="1">
+**A price gap is not a feature gap, and this is where the comparison stops being
+flattering.** Best Case covers Chapters 7, 11, 12, and 13 in every US district, pulls
+credit reports, and files to CM/ECF. BankruptcyClinic does Chapter 7 only, in Nebraska and
+South Dakota, does not assemble Form 122A-2, and does not e-file — you upload the PDFs
+yourself. If you file Chapter 13, or you file outside those two states today, the
+commercial packages do a job this does not do yet, and the honest advice is to buy one.
+</div>
+
+### When the free option is genuinely the better one
+
+The money argument only works if the fit is real. It usually is when:
+
+- **Chapter 7 is what you do.** A clinic that has never filed a 13 is paying a
+  four-chapter price for a one-chapter need.
+- **Your volunteer roster is larger than your case count.** Per-seat pricing punishes
+  the exact staffing model a law school clinic uses: twenty students, forty cases a year.
+  There are no seats here to count.
+- **You need it to work the way your intake works.** A licence buys the software as
+  shipped. This one you can change, and the changes you make are yours.
+- **Someone will ask where the client data lives.** The answer is a server with your name
+  on it, which is a shorter conversation with a funder than a vendor's privacy policy.
+
+Where it stops working is a small firm that files across many states and chapters and
+wants one vendor to call. That is what the commercial packages are for, and $1,750 a year
+is not a lot of money to a firm billing for the work.
 
 </section>
 

@@ -11,8 +11,10 @@ tracked and over-cap claims flagged before filing.
 
 **Website and install guide: <https://amsclark.github.io/docassemble-BankruptcyClinic/>**
 
-Free software under the MIT license. Hosting, new states, and custom work are available
-from the author — see [Hosting and support](https://amsclark.github.io/docassemble-BankruptcyClinic/support/).
+Free software under the GNU Affero General Public License v3.0 or later. New states,
+custom work, and maintenance are available from the author — see
+[Customization and support](https://amsclark.github.io/docassemble-BankruptcyClinic/support/).
+Hosting is not offered; the support page links to people who do host docassemble.
 
 ## Prerequisites
 
@@ -73,7 +75,30 @@ npx playwright install chromium
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+GNU Affero General Public License, version 3 or later (`AGPL-3.0-or-later`).
+See [LICENSE](LICENSE) for the full text.
+
+Copyright © 2026 Alex Clark.
+
+You may run, read, change, and share this software, and you never have to pay for
+it. Two conditions come with that:
+
+- **Changes stay free.** If you distribute a modified version, you distribute it
+  under the AGPL too, source included.
+- **Running it as a service counts.** This is the difference between the AGPL and
+  the ordinary GPL. If you run a modified version on a server and let other people
+  use it over a network, you must offer those users the source of *your* version,
+  even though you never handed them a copy of the software. The interview carries
+  an **About this software** menu item on every screen that makes that offer; if
+  you modify the package, keep it working and point it at your own source.
+
+Running the software unmodified triggers no obligation beyond leaving the notices
+in place. Preparing petitions with it, charging for that work, and running it
+inside a firm or a clinic are all fine.
+
+This is a summary for orientation, not legal advice, and it is not a substitute
+for reading [the licence](LICENSE). If the AGPL is a problem for how you want to
+use this, contact the author.
 
 ## Author
 
