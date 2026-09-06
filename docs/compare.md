@@ -101,8 +101,8 @@ people use, publish your changes. Running it as shipped asks nothing.
 
 ### It produces the whole packet, not a subset
 
-Twenty Official Forms, the continuation sheets, and the creditor mailing matrix, all from
-one interview.
+Twenty-one Official Forms, the continuation sheets, and the creditor mailing matrix,
+all from one interview.
 
 </section>
 
