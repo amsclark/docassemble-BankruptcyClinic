@@ -49,7 +49,6 @@ These are Upsolve's own published eligibility limits, taken from
 | Client owns an LLC, corporation, or partnership | Not supported | Supported as property, business income, and SOFA business disclosures |
 | Landlord has an eviction judgment | Not supported | Supported — Forms 101A and 101B |
 | Pending personal injury claim | Not supported | Supported as a contingent asset on Schedule A/B with its exemption claim |
-| Emergency filing | Not supported | Runs at whatever speed you type |
 | Chapter 13 | Not supported | Not supported. Chapter 7 only |
 
 </div>
