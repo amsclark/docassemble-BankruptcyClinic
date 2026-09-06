@@ -1,7 +1,7 @@
 ---
 layout: default
 title: "BankruptcyClinic — open-source Chapter 7 petition assembly"
-description: "One guided interview produces the whole Chapter 7 petition packet: 20 Official Forms, state exemptions with statutory caps, and the means test. Free and open source; hosting available."
+description: "One guided interview produces the whole Chapter 7 petition packet: 20 Official Forms, state exemptions with statutory caps, and the means test. Free and open source; customization and new states available."
 ---
 
 <section class="sheet hero" markdown="1">
@@ -24,7 +24,7 @@ description: "One guided interview produces the whole Chapter 7 petition packet:
 
 <div class="actions">
   <a class="btn btn-solid" href="{{ '/install/' | relative_url }}">Install it yourself</a>
-  <a class="btn" href="{{ '/support/' | relative_url }}">Have me run it for you</a>
+  <a class="btn" href="{{ '/support/' | relative_url }}">Have me adapt it to your state</a>
 </div>
 
 </section>
@@ -167,14 +167,17 @@ and never speak to me.
 
 What I sell is my time:
 
-- Standing it up and running it for you, so nobody at your organisation has to own a server
 - Adding your state's exemption tables, courts, and counties
 - Custom forms, intake steps, and workflow changes for how your clinic actually works
 - Keeping up with DOJ median-income refreshes and revised court forms
 - Training your attorneys, paralegals, and students
+- Setting it up correctly, once, on a server you or your host already own
+
+I do not host it. [Other people do that well]({{ '/support/' | relative_url }}#hosting),
+and the install guide covers doing it yourself.
 
 <div class="actions">
-  <a class="btn btn-solid" href="{{ '/support/' | relative_url }}">See what that costs and get in touch</a>
+  <a class="btn btn-solid" href="{{ '/support/' | relative_url }}">See what I do and get in touch</a>
   <a class="btn" href="https://github.com/amsclark/docassemble-BankruptcyClinic">Read the source on GitHub</a>
 </div>
 
