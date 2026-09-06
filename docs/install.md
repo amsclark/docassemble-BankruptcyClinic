@@ -24,7 +24,7 @@ server, and this package on top of it.
 | Source | [github.com/amsclark/docassemble-BankruptcyClinic](https://github.com/amsclark/docassemble-BankruptcyClinic) |
 | Package name | `docassemble.BankruptcyClinic` |
 | Entry interview | `docassemble.BankruptcyClinic:data/questions/voluntary-petition.yml` |
-| License | MIT |
+| License | [AGPL-3.0-or-later](#licence) |
 | Bugs and requests | [GitHub issues](https://github.com/amsclark/docassemble-BankruptcyClinic/issues) |
 
 </div>
@@ -181,6 +181,59 @@ docassemble's own [installation documentation](https://docassemble.org/docs/dock
 covers the server side of all of this in detail. The
 [configuration reference](https://docassemble.org/docs/config.html) covers authentication,
 including LDAP and Google or Microsoft sign-in.
+
+</section>
+
+<section class="sheet" markdown="1">
+
+<a id="licence"></a>
+
+<div class="band">What the licence asks of you</div>
+
+BankruptcyClinic is under the [GNU Affero General Public License, version 3 or
+later](https://www.gnu.org/licenses/agpl-3.0.html). You may run it, read it, change it,
+and share it, for any purpose, without paying anyone. Most people who install it owe
+nothing beyond leaving the notices alone.
+
+The AGPL differs from the ordinary GPL in one way, and it is the way that matters for a
+web application: **running a modified version as a network service counts as
+distributing it.** Normally you only owe source to people you hand a copy of the software
+to. Under the AGPL you also owe it to people who merely *use* your server.
+
+<div class="table-scroll" markdown="1">
+
+| What you are doing | What you owe |
+|---|---|
+| Running it as shipped, for your own clinic or firm | Nothing. Keep the notices in place |
+| Preparing petitions with it, including for paying clients | Nothing. Charging for your legal work is not distributing software |
+| Changing it for yourself and never letting outsiders use that server | Nothing |
+| Changing it and letting clients or the public use it over a network | Offer those users your modified source |
+| Handing the modified package to another organisation | Ship it under the AGPL, source included |
+
+</div>
+
+The interview already carries the mechanism for the network case: an **About this
+software** item in the menu on every screen, which names the licence and links to the
+source. If you modify the package, keep that item working and repoint it at your own
+repository. Deleting it does not remove the obligation, it just leaves you out of
+compliance.
+
+Two things the licence does **not** do. It does not reach your other software: a separate
+system that merely talks to this one over an API is not a derivative work. And it does not
+touch the petitions themselves. Documents this interview produces are your client's, with
+no licence conditions of any kind.
+
+<div class="caution" markdown="1">
+**If you use a third-party host.** The obligation follows whoever operates the service. If
+you are running an unmodified package on someone else's infrastructure, nothing changes.
+If you had that host customise it for you, the modified source has to be available to the
+people using the site. Settle that in writing before they start work, not after.
+</div>
+
+This is a plain-language summary to help you decide, not legal advice, and the
+[licence text](https://github.com/amsclark/docassemble-BankruptcyClinic/blob/main/LICENSE)
+governs. If the AGPL blocks something you need,
+[get in touch]({{ '/support/' | relative_url }}) rather than quietly working around it.
 
 </section>
 

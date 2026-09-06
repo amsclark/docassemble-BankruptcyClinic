@@ -9,7 +9,7 @@ name = "docassemble.BankruptcyClinic"
 version = "0.0.27"
 description = "Guided interview that assembles a complete Chapter 7 bankruptcy petition packet."
 readme = "README.md"
-license = "MIT"
+license = "AGPL-3.0-or-later"
 authors = [
     { name = "Alex Clark", email = "alex@clarkmanagementconsulting.com" },
 ]

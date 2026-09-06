@@ -213,3 +213,4 @@ docassemble/BankruptcyClinic/data/questions/creditor-library-admin.yml:delete_cr
 docassemble/BankruptcyClinic/data/questions/creditor-library-admin.yml:nothing_to_delete
 docassemble/BankruptcyClinic/data/questions/creditor-library-picker.yml:creditor_library_picker
 docassemble/BankruptcyClinic/data/questions/final-review.yml:final_review_page
+docassemble/BankruptcyClinic/data/questions/mandatory-initial-code.yml:about this software

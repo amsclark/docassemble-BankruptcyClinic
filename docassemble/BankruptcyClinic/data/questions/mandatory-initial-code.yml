@@ -1,6 +1,53 @@
 mandatory: True
 code: |
-  menu_items = [ action_menu_item('Review Answers', 'review_answers') ]
+  menu_items = [ action_menu_item('Review Answers', 'review_answers'),
+                 action_menu_item('About this software', 'about_this_software') ]
+---
+# AGPL-3.0 section 13: a user interacting with this program over a network must
+# be offered the Corresponding Source. The menu item above puts this screen one
+# click away from EVERY screen in the interview, which is what "prominently
+# offer" requires -- a link buried on the conclusion screen would only reach
+# filers who finish. `continue` returns the user to the question they were on;
+# do NOT use `leave`, which ends the session view.
+id: about this software
+event: about_this_software
+question: |
+  About this software
+subquestion: |
+  This interview runs on **BankruptcyClinic**, free software for preparing a
+  Chapter 7 bankruptcy petition.
+
+  Copyright &copy; 2026 Alex Clark.
+
+  #### You have the right to the source code
+
+  BankruptcyClinic is licensed under the
+  [GNU Affero General Public License, version 3 or later](https://www.gnu.org/licenses/agpl-3.0.html).
+  You may read, run, change, and share it, and you never have to pay for it.
+
+  The complete source code is published here:
+
+  [github.com/amsclark/docassemble-BankruptcyClinic](https://github.com/amsclark/docassemble-BankruptcyClinic)
+
+  The licence gives you the right to the source of the version you are actually
+  using, not just the original. If the organisation running this server has
+  changed the software, they must offer you their changed source as well. If you
+  believe this site has been modified and you cannot find their source, ask the
+  organisation that operates it.
+
+  #### No warranty
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+  PARTICULAR PURPOSE. See the licence for the full terms.
+
+  #### This is still not legal advice
+
+  The licence covers the software. It says nothing about your bankruptcy case.
+  This interview does not give legal advice, and the person who signs the
+  petition remains responsible for what it says.
+buttons:
+  - Back to the interview: continue
 ---
 # Live help / chat. `initial` (not `mandatory`) so availability re-evaluates on
 # every screen load as operators sign in and out of /monitor. Operators must

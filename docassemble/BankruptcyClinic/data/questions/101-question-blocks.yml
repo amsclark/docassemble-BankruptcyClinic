@@ -10,6 +10,12 @@ subquestion: |
   * Bankruptcy fraud is a serious crime; you could be fined and imprisoned if you commit fraud in your bankruptcy case. Making a false statement, concealing property, or obtaining money or property by fraud in connection with a bankruptcy case can result in fines up to $250,000, or imprisonment for up to 20 years, or both. 18 U.S.C. §§ 152, 1341, 1519, and 3571.
 
   Click continue to start filling out the Voluntary Petition for Individuals Filing for Bankruptcy.
+
+  ---
+
+  This interview is free software, licensed under the GNU Affero General Public
+  License. You have the right to read and reuse its source code. Choose
+  **About this software** from the menu for the source code and the full licence.
 continue button field: introduction_screen
 ---
 #Part 0: Location and Case
@@ -1420,6 +1426,14 @@ subquestion: |
 
   Your attorney can help you gather these and tell you the date, time, and place
   of your § 341 meeting.
+
+  ---
+
+  This interview is free software, licensed under the
+  [GNU Affero General Public License](https://www.gnu.org/licenses/agpl-3.0.html).
+  Its source code is at
+  [github.com/amsclark/docassemble-BankruptcyClinic](https://github.com/amsclark/docassemble-BankruptcyClinic),
+  and **About this software** in the menu explains your rights to it.
 allow downloading: True
 attachment code: |
   conclusion_attachments
