@@ -189,6 +189,22 @@ docassemble/BankruptcyClinic/data/questions/108-question-blocks.yml:personal_lea
 docassemble/BankruptcyClinic/data/questions/108-question-blocks.yml:personal_leases_add_another
 docassemble/BankruptcyClinic/data/questions/108-question-blocks.yml:personal_leases_any_exist
 docassemble/BankruptcyClinic/data/questions/121-question-blocks.yml:social_security_numbers_statement
+docassemble/BankruptcyClinic/data/questions/122A-2-question-blocks.yml:means2 additional deductions
+docassemble/BankruptcyClinic/data/questions/122A-2-question-blocks.yml:means2 chapter 13
+docassemble/BankruptcyClinic/data/questions/122A-2-question-blocks.yml:means2 cure amounts
+docassemble/BankruptcyClinic/data/questions/122A-2-question-blocks.yml:means2 health insurance
+docassemble/BankruptcyClinic/data/questions/122A-2-question-blocks.yml:means2 household size
+docassemble/BankruptcyClinic/data/questions/122A-2-question-blocks.yml:means2 housing
+docassemble/BankruptcyClinic/data/questions/122A-2-question-blocks.yml:means2 marital adjustment
+docassemble/BankruptcyClinic/data/questions/122A-2-question-blocks.yml:means2 other necessary expenses
+docassemble/BankruptcyClinic/data/questions/122A-2-question-blocks.yml:means2 other secured debts
+docassemble/BankruptcyClinic/data/questions/122A-2-question-blocks.yml:means2 priority claims
+docassemble/BankruptcyClinic/data/questions/122A-2-question-blocks.yml:means2 review
+docassemble/BankruptcyClinic/data/questions/122A-2-question-blocks.yml:means2 special circumstances
+docassemble/BankruptcyClinic/data/questions/122A-2-question-blocks.yml:means2 unsecured debt
+docassemble/BankruptcyClinic/data/questions/122A-2-question-blocks.yml:means2 vehicle 2 details
+docassemble/BankruptcyClinic/data/questions/122A-2-question-blocks.yml:means2 vehicle count
+docassemble/BankruptcyClinic/data/questions/122A-2-question-blocks.yml:means2 vehicle details
 docassemble/BankruptcyClinic/data/questions/122A-question-blocks.yml:debtor1_current_monthly_income
 docassemble/BankruptcyClinic/data/questions/122A-question-blocks.yml:debtor2_current_monthly_income
 docassemble/BankruptcyClinic/data/questions/122A-question-blocks.yml:household_and_dependents_info

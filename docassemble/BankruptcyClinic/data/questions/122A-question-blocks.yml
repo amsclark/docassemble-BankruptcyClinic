@@ -203,12 +203,18 @@ question: |
   Your current overall income is estimated to be: ${ currency(overall_means_income) }
   <br><br>
 
+  Over a year that is: ${ currency(annualized_means_income) }
+  <br><br>
+
   DOJ median family income for a household of ${ int(monthly_income.median_dependents) } in ${ monthly_income.median_state } is: ${ currency(monthly_income.median_income) }
   <br><br>
-  % if overall_means_income < monthly_income.median_income:
-   Your income is below the median. Chapter 7 OK with NO Presumption of Abuse. Means Test Form is Complete. Form 122A-2 is not required.
+  % if not means_test_long_form_required:
+  Your annual income is at or below the median. Chapter 7 with NO presumption of
+  abuse. Form 122A-1 is complete and Form 122A-2 is not required.
   % else:
-  Your income exceeds the median. Please fill out Form 122A-2 and submit it with your bankruptcy filing.
+  Your annual income is above the median, so the law requires the long-form
+  means test, Official Form 122A-2. The next screens collect what that form
+  needs, and we will fill it in and add it to your filing packet.
   % endif
 continue button field: monthly_income.reviewed
 ---
@@ -266,6 +272,14 @@ code: |
 
   overall_means_income = debtor_1_income + debtor_2_income
 ---
+# Form 122A-1 line 12b multiplies current monthly income by 12 BEFORE the median
+# comparison on line 13. get_median_family_income() returns an ANNUAL figure, so
+# the comparison must use the annualised number. Comparing the monthly figure to
+# an annual median told nearly every filer there was no presumption of abuse and
+# that Form 122A-2 was not required.
+code: |
+  annualized_means_income = overall_means_income * 12
+---
 question: |
   Calculate the median family income that applies to you.
 subquestion: |
@@ -293,6 +307,25 @@ code: |
   # default household size of 1 and would be stale here).
   monthly_income.median_income = get_median_family_income(
     monthly_income.median_state, monthly_income.median_dependents)
+---
+# Does the filer have to file Official Form 122A-2, the long-form means test?
+#
+# Form 122A-1 line 14: line 12b (current monthly income x 12) against line 13
+# (the DOJ median for the state and household size). "Less than or equal to" ->
+# no presumption of abuse, do NOT file 122A-2. "More than" -> fill out 122A-2.
+#
+# A filer whose debts are not primarily consumer debts, or who qualifies for the
+# disabled-veteran or reservist exclusion, does not take the means test at all
+# (11 U.S.C. 707(b)(2)(D)), so the long form is never required for them.
+#
+# This is the ONLY generator of this variable (rule 6). The mandatory block in
+# voluntary-petition.yml gates every 122A-2 screen on it.
+code: |
+  if monthly_income.non_consumer_debts or monthly_income.disabled_veteran or monthly_income.reservists:
+    means_test_long_form_required = False
+  else:
+    means_test_long_form_required = (
+        annualized_means_income > monthly_income.median_income)
 ---
 id: monthly_income_review
 event: form_122a
@@ -440,6 +473,11 @@ code: |
     income['state'] = monthly_income.median_state
     income['dependents'] = monthly_income.median_dependents
     income['medianIncome'] = monthly_income.median_income
-    income['lessThan'] = True if (_cmi1 + _cmi2) < monthly_income.median_income else False
-    income['moreThan'] = True if (_cmi1 + _cmi2) > monthly_income.median_income else False
+    # Line 14 compares line 12b (ANNUALISED current monthly income) with line 13
+    # (the DOJ median, itself an annual figure). Line 14a is "less than or equal
+    # to"; line 14b is "more than". Comparing the MONTHLY figure to the annual
+    # median made line 14a true for nearly every filer.
+    _cmi_annual = (_cmi1 + _cmi2) * 12
+    income['lessThan'] = True if _cmi_annual <= monthly_income.median_income else False
+    income['moreThan'] = True if _cmi_annual > monthly_income.median_income else False
 

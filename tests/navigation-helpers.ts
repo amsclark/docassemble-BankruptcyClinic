@@ -27,7 +27,7 @@ import {
   setCheckbox,
   handleAnotherPage,
 } from './helpers';
-import { TestScenario, MeansTestOptions, CaseDetailsOptions, DebtorProfile, RealPropertyData, VehicleData, DepositData } from './fixtures';
+import { TestScenario, MeansTestOptions, Form122A2Options, CaseDetailsOptions, DebtorProfile, RealPropertyData, VehicleData, DepositData } from './fixtures';
 
 // ════════════════════════════════════════════════════════════════════
 //  INTRO → DEBTOR PAGE
@@ -1192,6 +1192,116 @@ export async function navigateMeansTest(page: Page, opts: MeansTestOptions = {})
   // review_122 (event + continue button field: monthly_income.reviewed).
   await waitForDaPageLoad(page);
   await clickNthByName(page, b64('monthly_income.reviewed'), 0);
+  await waitForDaPageLoad(page);
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  MEANS TEST LONG FORM (Form 122A-2)
+// ════════════════════════════════════════════════════════════════════
+
+/**
+ * Walk the Form 122A-2 screens an above-median filer sees after review_122.
+ *
+ * Stops ON the means2 review screen without clicking `means2.reviewed`, so the
+ * caller can assert on the review text first (the presumption-of-abuse result
+ * differs by scenario). Click it yourself:
+ *
+ *   await clickNthByName(page, b64('means2.reviewed'), 0);
+ *
+ * Every screen here takes its defaults from Schedules I/J and the IRS Standards
+ * except the household counts and the vehicle description, which have none.
+ */
+export async function navigate122A2(page: Page, opts: Form122A2Options = {}) {
+  const household = opts.householdSize ?? '1';
+
+  // means2 marital adjustment (Form 122A-2 line 3) — shown only for a married
+  // filer whose spouse is NOT filing and is not legally separated. Answer No:
+  // all of the spouse's income goes to the household, so nothing is subtracted.
+  if (opts.maritalAdjustment) {
+    await waitForDaPageLoad(page);
+    await selectYesNoRadio(page, 'means2.spouse_income_not_shared', false);
+    await page.waitForTimeout(300);
+    await clickContinue(page);
+  }
+
+  // means2 household size. exemption_people and people_under_65 have no
+  // default; people_65_plus defaults to 0.
+  await waitForDaPageLoad(page);
+  await fillByName(page, b64('means2.exemption_people'), household);
+  await fillByName(page, b64('means2.people_under_65'), household);
+  await clickContinue(page);
+
+  // means2 housing — every field is optional or defaulted (line 10 is $0 for
+  // most filers), so accept the defaults.
+  await waitForDaPageLoad(page);
+  await clickContinue(page);
+
+  // means2 vehicle count — a bare `choices:` field, so a <select>, not radios.
+  await waitForDaPageLoad(page);
+  await selectByName(page, b64('means2.vehicle_count'), '1');
+  await page.waitForTimeout(300);
+  await clickContinue(page);
+
+  // means2 vehicle details — only the description is required.
+  await waitForDaPageLoad(page);
+  await fillByName(
+    page,
+    b64('means2.vehicle1_description'),
+    opts.vehicleDescription ?? '2015 Honda Civic',
+  );
+  await clickContinue(page);
+
+  // means2 other necessary expenses (lines 16-23) — all defaulted from
+  // Schedule I / J.
+  await waitForDaPageLoad(page);
+  await clickContinue(page);
+
+  // means2 health insurance (line 25). "Yes, I actually spend it" hides the
+  // follow-up amount field.
+  await waitForDaPageLoad(page);
+  await selectYesNoRadio(page, 'means2.actually_spend_health', true);
+  await page.waitForTimeout(300);
+  await clickContinue(page);
+
+  // means2 additional deductions (lines 26-31) — all defaulted.
+  await waitForDaPageLoad(page);
+  await clickContinue(page);
+
+  // means2 other secured debts (line 33d rows).
+  await waitForDaPageLoad(page);
+  await selectYesNoRadio(page, 'means2.has_other_secured', false);
+  await page.waitForTimeout(300);
+  await clickContinue(page);
+
+  // means2 cure amounts (line 34).
+  await waitForDaPageLoad(page);
+  await selectYesNoRadio(page, 'means2.has_cure_amount', false);
+  await page.waitForTimeout(300);
+  await clickContinue(page);
+
+  // means2 priority claims (line 35).
+  await waitForDaPageLoad(page);
+  await selectYesNoRadio(page, 'means2.has_priority_claims', false);
+  await page.waitForTimeout(300);
+  await clickContinue(page);
+
+  // means2 chapter 13 administrative expenses (line 36).
+  await waitForDaPageLoad(page);
+  await selectYesNoRadio(page, 'means2.chapter13_eligible', false);
+  await page.waitForTimeout(300);
+  await clickContinue(page);
+
+  // means2 unsecured debt (line 41a) — defaulted from Schedule E/F.
+  await waitForDaPageLoad(page);
+  await clickContinue(page);
+
+  // means2 special circumstances (line 43).
+  await waitForDaPageLoad(page);
+  await selectYesNoRadio(page, 'means2.has_special_circumstances', false);
+  await page.waitForTimeout(300);
+  await clickContinue(page);
+
+  // means2 review — the caller asserts on it and clicks means2.reviewed.
   await waitForDaPageLoad(page);
 }
 

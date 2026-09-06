@@ -89,7 +89,11 @@ test.describe('Roxanne UAT June 2026 — static wiring', () => {
     const objects = readFileSync('docassemble/BankruptcyClinic/objects.py', 'utf8');
     expect(objects).toContain('def get_median_family_income(');
     // Review screen compares against the same figure that lands on the PDF.
-    expect(y122a).toContain('overall_means_income < monthly_income.median_income');
+    // Form 122A-1 line 12b annualises current monthly income before comparing it
+    // with line 13, the DOJ median, which is itself an annual figure.
+    expect(y122a).toContain('annualized_means_income = overall_means_income * 12');
+    expect(y122a).toContain('annualized_means_income > monthly_income.median_income');
+    expect(y122a).toContain('% if not means_test_long_form_required:');
   });
 
   test('Schedule E detail screen is labeled as PRIORITY claims', async ({ page: _ }) => {

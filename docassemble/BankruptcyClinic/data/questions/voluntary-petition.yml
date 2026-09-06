@@ -4,6 +4,7 @@ modules:
   - .get_bk_states_list
   - .objects
   - .creditor_library
+  - .means_test_data
 ---
 include:
   - mandatory-initial-code.yml
@@ -24,6 +25,7 @@ include:
   - 106Dec-question-blocks.yml
   - 108-question-blocks.yml
   - 122A-question-blocks.yml
+  - 122A-2-question-blocks.yml
   - 107-question-blocks.yml
   - 121-question-blocks.yml
   - 2030-question-blocks.yml
@@ -283,6 +285,9 @@ objects:
         object_type=DAObject,
         complete_attribute='complete')
   - monthly_income: |
+      DAObject.using(
+        complete_attribute='complete')
+  - means2: |
       DAObject.using(
         complete_attribute='complete')
   - financial_affairs: |
@@ -912,7 +917,42 @@ code: |
     monthly_income.median_state
     monthly_income.median_dependents
     monthly_income.median_income
+    # review_122 reads this, so define it before the screen renders.
+    means_test_long_form_required
     monthly_income.reviewed
+    #122A-2 - the long-form means test. Only required when annualised current
+    # monthly income is ABOVE the DOJ median (Form 122A-1 line 14b). Every
+    # screen below lives in 122A-2-question-blocks.yml.
+    if means_test_long_form_required:
+      if means2_marital_adjustment_applies:
+        means2.spouse_income_not_shared
+      means2.exemption_people
+      means2.people_under_65
+      means2.people_65_plus
+      # housing_adjustment is the one required field on the housing screen;
+      # the 9b creditor rows above it are optional.
+      means2.housing_adjustment
+      means2.vehicle_count
+      if means2_vehicle_count_number >= 1:
+        means2.vehicle1_description
+      if means2_vehicle_count_number >= 2:
+        means2.vehicle2_description
+      means2.taxes
+      means2.health_insurance
+      means2.family_care
+      means2.has_other_secured
+      means2.has_cure_amount
+      means2.has_priority_claims
+      means2.chapter13_eligible
+      means2.nonpriority_unsecured_total
+      means2.has_special_circumstances
+      means2.reviewed
+      # Assemble Form 122A-2 HERE, under the same guard as its screens, not only
+      # via the _docs list in 101-question-blocks.yml. The mandatory block is the
+      # one source of flow truth (CLAUDE.md rule 1) and is what seek_simulator.py
+      # walks; an attachment reachable only through _docs is never simulated, so
+      # its builder is never checked for show-if gaps or dead ends.
+      attach_122a2
   else:
     # Means test skipped (non-consumer debts / veteran / reservist) — default the
     # household size so downstream code and the 122A PDF always have a value,

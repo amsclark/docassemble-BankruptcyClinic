@@ -170,6 +170,12 @@ def code_assign_targets(tree, extra_roots):
                 r, p = M.chain_to_path(t)
                 if r and p:
                     out.add(M.norm(p))
+        elif isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            # `def helper(...)` in a code block binds that name just as an
+            # assignment does; a later `helper(...)` is not an undefined-variable
+            # seek. Without this the coercion helpers the interview defines
+            # inline (122A `_n`) look like dead-end reads.
+            out.add(M.norm(n.name))
     return out
 
 
@@ -918,6 +924,18 @@ class Sim:
                     targets[0].id not in self.ix.roots and s.value is not None:
                 ap = self._alias_path(s.value, env)
                 if ap:
+                    # The assignment still DEFINES the target. Binding the alias
+                    # and returning early made any code block whose whole body is
+                    # `x = getattr(o, 'a', d)` invisible: the interview variable
+                    # the block exists to define was never marked defined, so
+                    # every OTHER block that read it reported a spurious
+                    # DEAD_END. Found via 122A-2 `means2_state_display`.
+                    # Resolve the target path BEFORE binding the alias — after
+                    # the binding, cpath() would follow the alias and define the
+                    # aliased path instead of the name being assigned.
+                    p0 = self.cpath(targets[0], env)
+                    if p0:
+                        self.st.define(p0, val)
                     env[targets[0].id] = "\x02" + ap
                     return
             for t in targets:
@@ -959,6 +977,10 @@ class Sim:
             self.exec_body(s.body, env)
             for h in s.handlers:
                 self.exec_body(h.body, env)
+        elif isinstance(s, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            # The name is bound here; the body runs later, with parameters this
+            # simulator cannot bind, so it is not executed.
+            self.st.define(s.name)
         # pass/import/etc: nothing
 
     def exec_for(self, s, env):

@@ -45,7 +45,7 @@ These are Upsolve's own published eligibility limits, taken from
 |---|---|---|
 | Client owns a home | Not supported | Supported — homestead exemption with the state's statutory cap, Schedule D mortgage, Form 108 intention |
 | Married couple filing jointly | Not supported | Supported — Debtor 2 throughout, joint exemption logic, both signature blocks |
-| Income above the state median | Not supported | Form 122A-1 computes it and tells you 122A-2 is required. It does not assemble 122A-2 |
+| Income above the state median | Not supported | Supported — Form 122A-1 makes the median comparison, and when it comes out above, Form 122A-2 is collected and assembled with the IRS Collection Financial Standards for the filer's county |
 | Client owns an LLC, corporation, or partnership | Not supported | Supported as property, business income, and SOFA business disclosures |
 | Landlord has an eviction judgment | Not supported | Supported — Forms 101A and 101B |
 | Pending personal injury claim | Not supported | Supported as a contingent asset on Schedule A/B with its exemption claim |
@@ -55,9 +55,10 @@ These are Upsolve's own published eligibility limits, taken from
 </div>
 
 <div class="caution" markdown="1">
-**Be honest about the gap.** Above-median cases still need Form 122A-2 filled in by hand
-or by other software. Everything else on that list is in the interview and covered by the
-test suite.
+**Everything on that list is in the interview and covered by the test suite.** The means
+test is the newest part: Form 122A-2 uses the IRS National, Local, and out-of-pocket
+health care Standards, so the figures are only as current as the tables shipped with it.
+Check them against the U.S. Trustee Program's published standards before you file.
 </div>
 
 </section>
@@ -150,15 +151,15 @@ hard to put a number in a grant application.
 **A price gap is not a feature gap, and this is where the comparison stops being
 flattering.** Best Case covers Chapters 7, 11, 12, and 13 in every US district, pulls
 credit reports, and files to CM/ECF. BankruptcyClinic does Chapter 7 only, in Nebraska and
-South Dakota, does not assemble Form 122A-2, and does not e-file — you upload the PDFs
-yourself. If you file Chapter 13, or you file outside those two states today, a commercial
-package does a job this does not do yet.
+South Dakota, and does not e-file — you upload the PDFs yourself. If you file Chapter 13,
+or you file outside those two states today, a commercial package does a job this does not
+do yet.
 
 If you need that job done this month, buy one. If you have longer, the gap is a scope of
 work rather than a permanent limit, and there are two ways to close it.
 
-**Commission it.** Your state added, Form 122A-2 built, a local form your district
-requires: that is normal paid work, quoted as a fixed fee.
+**Commission it.** Your state added, a local form your district requires, a rule change
+worked in: that is normal paid work, quoted as a fixed fee.
 [Tell me what you file]({{ '/support/' | relative_url }}) and you get back a scope and a
 price. What I build is contributed to the project, so the next clinic that needs your
 state gets it free.

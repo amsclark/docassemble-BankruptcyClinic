@@ -97,11 +97,13 @@ def county_list(input_state: str) -> list:
 		]
 	elif input_state == "South Dakota":
 		return [
+			"Aurora County",
 			"Beadle County",
 		"Bennett County",
 		"Bon Homme County",
 		"Brookings County",
 		"Brown County",
+		"Brule County",
 		"Buffalo County",
 		"Butte County",
 		"Campbell County",
