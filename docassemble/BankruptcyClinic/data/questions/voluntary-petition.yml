@@ -947,6 +947,12 @@ code: |
       means2.nonpriority_unsecured_total
       means2.has_special_circumstances
       means2.reviewed
+      # Assemble Form 122A-2 HERE, under the same guard as its screens, not only
+      # via the _docs list in 101-question-blocks.yml. The mandatory block is the
+      # one source of flow truth (CLAUDE.md rule 1) and is what seek_simulator.py
+      # walks; an attachment reachable only through _docs is never simulated, so
+      # its builder is never checked for show-if gaps or dead ends.
+      attach_122a2
   else:
     # Means test skipped (non-consumer debts / veteran / reservist) — default the
     # household size so downstream code and the 122A PDF always have a value,

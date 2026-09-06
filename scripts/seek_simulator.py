@@ -924,6 +924,18 @@ class Sim:
                     targets[0].id not in self.ix.roots and s.value is not None:
                 ap = self._alias_path(s.value, env)
                 if ap:
+                    # The assignment still DEFINES the target. Binding the alias
+                    # and returning early made any code block whose whole body is
+                    # `x = getattr(o, 'a', d)` invisible: the interview variable
+                    # the block exists to define was never marked defined, so
+                    # every OTHER block that read it reported a spurious
+                    # DEAD_END. Found via 122A-2 `means2_state_display`.
+                    # Resolve the target path BEFORE binding the alias — after
+                    # the binding, cpath() would follow the alias and define the
+                    # aliased path instead of the name being assigned.
+                    p0 = self.cpath(targets[0], env)
+                    if p0:
+                        self.st.define(p0, val)
                     env[targets[0].id] = "\x02" + ap
                     return
             for t in targets:

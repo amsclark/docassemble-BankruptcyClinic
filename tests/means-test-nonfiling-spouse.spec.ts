@@ -18,6 +18,7 @@ import { test, expect } from '@playwright/test';
 import { SIMPLE_SINGLE } from './fixtures';
 import {
   walkToMeansTestStart,
+  navigate122A2,
   navigateCaseDetails,
   navigateBusiness,
   navigateHazardousProperty,
@@ -93,7 +94,17 @@ test('non-filing spouse income is included in the means-test median comparison',
   expect(body).not.toContain('$2,800.00');
 
   await clickNthByName(page, b64('monthly_income.reviewed'), 0);
+
+  // $6,800 x 12 = $81,600 against the NE household-of-1 median of $66,922 (the
+  // debtor files alone and declares no dependants), so this filer is above
+  // median and Form 122A-2 is required. The marital-adjustment screen (line 3)
+  // appears here and nowhere else in the suite: it is shown only when the
+  // spouse is not filing and not legally separated. Keep the 122A-2 household
+  // size at 1 to match the household size the 122A-1 median comparison used.
+  await navigate122A2(page, { maritalAdjustment: true });
+  await clickNthByName(page, b64('means2.reviewed'), 0);
   await waitForDaPageLoad(page);
+
   await navigateCaseDetails(page);
   await navigateBusiness(page);
   await navigateHazardousProperty(page);

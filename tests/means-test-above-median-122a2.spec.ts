@@ -23,6 +23,7 @@ import { test, expect } from '@playwright/test';
 import { SIMPLE_SINGLE } from './fixtures';
 import {
   walkToMeansTestStart,
+  navigate122A2,
   navigateCaseDetails,
   navigateBusiness,
   navigateHazardousProperty,
@@ -32,7 +33,6 @@ import {
 import {
   b64,
   waitForDaPageLoad,
-  fillByName,
   selectByName,
   selectYesNoRadio,
   clickContinue,
@@ -95,83 +95,12 @@ test('an above-median filer is taken through Form 122A-2 and it assembles', asyn
   await clickNthByName(page, b64('monthly_income.reviewed'), 0);
 
   // ── Form 122A-2 ──────────────────────────────────────────────────
-  // means2 household size. exemption_people and people_under_65 have no
-  // default; people_65_plus defaults to 0.
-  await waitForDaPageLoad(page);
-  await fillByName(page, b64('means2.exemption_people'), '1');
-  await fillByName(page, b64('means2.people_under_65'), '1');
-  await clickContinue(page);
-
-  // means2 housing — every field is optional or defaulted (line 10 is $0 for
-  // most filers), so accept the defaults.
-  await waitForDaPageLoad(page);
-  await clickContinue(page);
-
-  // means2 vehicle count — a bare `choices:` field, so a <select>, not radios.
-  await waitForDaPageLoad(page);
-  await selectByName(page, b64('means2.vehicle_count'), '1');
-  await page.waitForTimeout(300);
-  await clickContinue(page);
-
-  // means2 vehicle details — only the description is required.
-  await waitForDaPageLoad(page);
-  await fillByName(page, b64('means2.vehicle1_description'), '2015 Honda Civic');
-  await clickContinue(page);
-
-  // means2 other necessary expenses (lines 16-23) — all defaulted from
-  // Schedule I / J.
-  await waitForDaPageLoad(page);
-  await clickContinue(page);
-
-  // means2 health insurance (line 25). "Yes, I actually spend it" hides the
-  // follow-up amount field.
-  await waitForDaPageLoad(page);
-  await selectYesNoRadio(page, 'means2.actually_spend_health', true);
-  await page.waitForTimeout(300);
-  await clickContinue(page);
-
-  // means2 additional deductions (lines 26-31) — all defaulted.
-  await waitForDaPageLoad(page);
-  await clickContinue(page);
-
-  // means2 other secured debts (line 33d rows).
-  await waitForDaPageLoad(page);
-  await selectYesNoRadio(page, 'means2.has_other_secured', false);
-  await page.waitForTimeout(300);
-  await clickContinue(page);
-
-  // means2 cure amounts (line 34).
-  await waitForDaPageLoad(page);
-  await selectYesNoRadio(page, 'means2.has_cure_amount', false);
-  await page.waitForTimeout(300);
-  await clickContinue(page);
-
-  // means2 priority claims (line 35).
-  await waitForDaPageLoad(page);
-  await selectYesNoRadio(page, 'means2.has_priority_claims', false);
-  await page.waitForTimeout(300);
-  await clickContinue(page);
-
-  // means2 chapter 13 administrative expenses (line 36).
-  await waitForDaPageLoad(page);
-  await selectYesNoRadio(page, 'means2.chapter13_eligible', false);
-  await page.waitForTimeout(300);
-  await clickContinue(page);
-
-  // means2 unsecured debt (line 41a) — defaulted from Schedule E/F.
-  await waitForDaPageLoad(page);
-  await clickContinue(page);
-
-  // means2 special circumstances (line 43).
-  await waitForDaPageLoad(page);
-  await selectYesNoRadio(page, 'means2.has_special_circumstances', false);
-  await page.waitForTimeout(300);
-  await clickContinue(page);
+  // A single filer, so no marital-adjustment screen.
+  await navigate122A2(page);
 
   // means2 review. $9,000 a month against roughly $3,000-$4,000 of allowed
   // deductions leaves 60-month disposable income far over the $17,150 upper
   // threshold in 11 U.S.C. 707(b)(2), so this is the presumption branch.
-  await waitForDaPageLoad(page);
   const review122a2 = ((await page.locator('body').innerText()) || '').toLowerCase();
   expect(review122a2).toContain('presumption of abuse applies');
   await clickNthByName(page, b64('means2.reviewed'), 0);

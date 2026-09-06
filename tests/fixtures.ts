@@ -176,6 +176,20 @@ export interface MeansTestOptions {
   medianIncome?: string;
 }
 
+/** Options for the Form 122A-2 walk (`navigate122A2`), which only an
+ *  above-median filer reaches. */
+export interface Form122A2Options {
+  /** Expect the `means2 marital adjustment` screen. It is shown only when the
+   *  filer is married, the spouse is NOT filing, and they are not legally
+   *  separated (Form 122A-2 line 3). */
+  maritalAdjustment?: boolean;
+  /** Value for both means2.exemption_people and means2.people_under_65.
+   *  Neither has a default. Defaults to '1'. */
+  householdSize?: string;
+  /** Description for the line 13 vehicle. Defaults to a generic car. */
+  vehicleDescription?: string;
+}
+
 export interface ConsumerDebtPaymentData {
   name: string;
   street: string;
