@@ -1474,7 +1474,11 @@ code: |
   _docs.append(attach_108)
   _docs.append(attach_121)
   _docs.append(attach_122a)
-  if defined('attach_122a2'):
+  # Form 122A-2 is filed only when Form 122A-1 line 14b applies. `defined()`
+  # never triggers a seek, so testing it here could never assemble the form —
+  # gate on the flow variable instead, which the mandatory block has already
+  # resolved by this point.
+  if means_test_long_form_required:
     _docs.append(attach_122a2)
   if defined('attach_2030'):
     _docs.append(attach_2030)

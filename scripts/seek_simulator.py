@@ -170,6 +170,12 @@ def code_assign_targets(tree, extra_roots):
                 r, p = M.chain_to_path(t)
                 if r and p:
                     out.add(M.norm(p))
+        elif isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            # `def helper(...)` in a code block binds that name just as an
+            # assignment does; a later `helper(...)` is not an undefined-variable
+            # seek. Without this the coercion helpers the interview defines
+            # inline (122A `_n`) look like dead-end reads.
+            out.add(M.norm(n.name))
     return out
 
 
@@ -959,6 +965,10 @@ class Sim:
             self.exec_body(s.body, env)
             for h in s.handlers:
                 self.exec_body(h.body, env)
+        elif isinstance(s, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            # The name is bound here; the body runs later, with parameters this
+            # simulator cannot bind, so it is not executed.
+            self.st.define(s.name)
         # pass/import/etc: nothing
 
     def exec_for(self, s, env):

@@ -388,15 +388,19 @@ def get_vehicle_operating_cost(vehicle_count):
 
 
 def get_vehicle_ownership_cost(vehicle_count=1):
-    """Lines 13a and 13d. The form claims ownership cost one vehicle at a time,
-    so the per-vehicle figure is what a builder normally wants."""
+    """Lines 13a and 13d. The IRS ownership or leasing standard is a PER-VEHICLE
+    figure and Form 122A-2 claims it one vehicle at a time: line 13a for the
+    first vehicle, line 13d for the second. So this always returns the
+    single-vehicle amount. A count of 0 means no vehicle is claimed.
+    IRS_TRANSPORTATION_OWNERSHIP[2] is the published TWO-vehicle total; use that
+    constant directly where a combined figure is wanted."""
     try:
-        count = int(float(vehicle_count or 1))
+        count = int(float(vehicle_count if vehicle_count is not None else 1))
     except (TypeError, ValueError):
         count = 1
-    if count <= 1:
-        return IRS_TRANSPORTATION_OWNERSHIP[1]
-    return IRS_TRANSPORTATION_OWNERSHIP[2]
+    if count <= 0:
+        return 0
+    return IRS_TRANSPORTATION_OWNERSHIP[1]
 
 
 def get_public_transportation_cost():
