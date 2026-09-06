@@ -185,7 +185,13 @@ test('an above-median filer is taken through Form 122A-2 and it assembles', asyn
   await navigateDynamicPhase(page, ABOVE_MEDIAN);
 
   // The whole point of the spec: 122A-2 must be in the assembled packet.
-  await finishAndAssertAllPdfs(page, {
-    mustInclude: ['101', '106', '107', '22a-1', '122a-2'],
+  const pdfs = await finishAndAssertAllPdfs(page, {
+    mustInclude: ['101', '106', '107', '122a-2'],
   });
+
+  // 122A-1 must still be there too. Its display name is "Form 122A", which is a
+  // substring of "Form 122A-2", so a substring match would pass even if only the
+  // long form assembled. Compare the whole name instead.
+  const names = pdfs.map((p) => p.name.toLowerCase());
+  expect(names, 'Form 122A-1 missing from assembled PDFs').toContain('form 122a');
 });
