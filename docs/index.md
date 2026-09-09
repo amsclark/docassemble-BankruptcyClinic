@@ -32,7 +32,7 @@ description: "One guided interview produces the whole Chapter 7 petition packet:
 <section class="sheet" markdown="1">
 
 <figure>
-<video src="{{ '/videos/04-complete-petition.mp4' | relative_url }}" controls muted playsinline width="900"></video>
+<video src="{{ '/videos/05-complete-petition-hd.mp4' | relative_url }}" controls muted playsinline width="900"></video>
 <figcaption>A full petition assembled in one pass, ending in downloadable PDFs.</figcaption>
 </figure>
 

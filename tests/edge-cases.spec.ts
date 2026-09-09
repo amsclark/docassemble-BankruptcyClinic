@@ -525,6 +525,19 @@ test.describe('Edge Cases – Conditional Logic Branches', () => {
       // transitions, and waitForPageStable doesn't return until none are
       // disabled). Then click No.
       await waitForPageStable(page);
+
+      // The unsecured-creditor screen has no yes/no question in front of it:
+      // voluntary-petition.yml defaults prop.nonpriority_claims.there_are_any
+      // to True, so the interview opens the detail form straight away and its
+      // only "I have none" answer is an action link, not a button this walker
+      // would otherwise find. Take it, the way a filer with no such debts would.
+      const noDebtsLink = page.getByRole('link', { name: /no unsecured debts to list/i });
+      if (await noDebtsLink.count() > 0) {
+        await noDebtsLink.first().click();
+        await waitForPageStable(page);
+        continue;
+      }
+
       const noBtn = page.locator('button.btn-da[value="False"]');
       if (await noBtn.count() > 0) {
         await noBtn.first().click();
@@ -533,9 +546,19 @@ test.describe('Edge Cases – Conditional Logic Branches', () => {
       }
 
       await fillAllVisibleRadiosAsNo(page);
-      
+
       const continueBtn = page.locator('#da-continue-button');
       if (await continueBtn.count() > 0) {
+        // A creditor detail form cannot be advanced by this walker: its
+        // required fields are text and select inputs, which fillAllVisible-
+        // RadiosAsNo does not touch, so the validator refuses every Continue,
+        // re-focuses the first empty field and scrolls back up to it. Playwright
+        // then alternates between scrolling the button into view and finding it
+        // out of view again until the test times out. Stop walking instead.
+        if (await page.locator('.is-invalid, label.error').count() > 0) {
+          console.log(`[BIZ] Blocked at "${heading}" — required fields this walker cannot fill.`);
+          break;
+        }
         await clickContinue(page);
         continue;
       }

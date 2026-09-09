@@ -139,6 +139,15 @@ export async function fillVisibleRequiredFields(
       else if (labelText.includes('zip')) v = '68508';
       // "Schedule A/B line" is number-validated ('N/A' silently blocks)
       else if (labelText.includes('line')) v = random ? String(1 + Math.floor(rnd() * 50)) : '1';
+      // Head counts. `datatype: integer` renders as a plain text input with a
+      // jQuery "whole number" rule, so the 'N/A' default below blocks Continue
+      // for good. This must also win over the 'year' branch further down:
+      // "Of those, how many are under 65 years of age?" contains "year", and
+      // filling it with '2020' is both wrong and refused by the form's own
+      // min/max. Keep the counts small so 122A-2 line 5 stays plausible.
+      else if (labelText.includes('how many') || labelText.includes('number of')) {
+        v = random ? String(1 + Math.floor(rnd() * 3)) : '1';
+      }
       else if (
         labelText.includes('amount') || labelText.includes('income') ||
         labelText.includes('value') || labelText.includes('pay') ||

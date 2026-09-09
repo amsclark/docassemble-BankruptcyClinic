@@ -220,7 +220,9 @@ div.danavdiv { margin-top: 0; padding-top: 0; }
   padding: 0;
 }
 .danav-vertical::before {
-  content: "Sections";
+  /* Decorative caption, kept out of the accessible name -- see the note on
+   * the numbered badge below. */
+  content: "Sections" / "";
   display: block;
   background: var(--bk-band);
   border-bottom: 1px solid var(--bk-rule);
@@ -245,8 +247,13 @@ div.danavdiv { margin-top: 0; padding-top: 0; }
 }
 .danav-vertical .danavlink:last-child { border-bottom: 0; }
 
+/* The `/ ""` is the alternative-text form of `content`. Without it the badge
+ * is glued onto the link's accessible name -- a screen reader announces
+ * "10 Your Income", and any name-based lookup for "Your Income" stops
+ * matching. The number is decoration; the link is already numbered by its
+ * position, so it should carry no accessible name of its own. */
 .danav-vertical .danavlink::before {
-  content: attr(data-index);
+  content: attr(data-index) / "";
   flex: none;
   min-width: 1.35rem;
   text-align: center;
@@ -382,10 +389,22 @@ label.form-label.btn.dalabelauty {
   color: var(--bk-ink);
   font-weight: 500;
   text-align: left;
-  padding: 0.5rem 0.75rem;
+  padding: 0.625rem 0.75rem;
   margin-bottom: 0.4rem;
   white-space: normal;
 }
+
+/* labelauty draws the tick box as a 16px span positioned `absolute; left:10px`
+ * inside the label, and relies on the label reserving a 2rem left gutter for
+ * it (`input.labelauty + label { padding: 10px 10px 10px 2rem }`). The box
+ * padding above replaced that gutter with 0.75rem, which dropped the tick box
+ * on top of the first two letters of every choice. Restore the gutter for
+ * labelauty labels only -- `.da-field-container label.btn` above also matches
+ * plain buttons, which have no icon and must not be indented. The 0.625rem
+ * vertical padding is labelauty's own 10px, so its fixed `top: 11px` lands the
+ * icon on the first line of the label without further adjustment. */
+input.labelauty + label.dalabelauty { padding-left: 2rem; }
+
 label.dalabelauty:hover { background: #eef0f3; color: var(--bk-pen); }
 
 label.dalabelauty.active,
