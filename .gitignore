@@ -43,6 +43,7 @@ share/python-wheels/
 # Playwright Testing Artifacts
 /test-results/
 /test-results-baseline*/
+/test-results-docs-video/
 /playwright-report/
 /playwright/.cache/
 *.webm
