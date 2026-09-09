@@ -67,11 +67,12 @@ features:
   progress bar: True
   navigation back button: false
   question back button: True
+  # A paper navbar, not docassemble's dark one — the masthead of a court form.
+  inverse navbar: False
+  # One stylesheet, and it carries its own font. Nothing here is fetched from a
+  # third party: a filer entering an SSN should not be announced to a CDN.
   css:
-    - https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css
-    - styles.css
-    - https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap
-    - bootstrap-theme.css
+    - bk-theme.css
 ---
 images:
   ssn: ssn-itin-helper.png

@@ -1,0 +1,775 @@
+/* BankruptcyClinic — interview theme.
+ *
+ * The interview is styled to read like the paperwork it produces, which is the
+ * same idea the project site is built on: true-black court-form rules, grey
+ * section bands, and ballpoint blue for anything a person has filled in.
+ * Clerk's-stamp red is reserved for warnings and errors and is used nowhere
+ * else, so that when it appears it means something.
+ *
+ * This restyles Bootstrap 5.3 through its own --bs-* custom properties rather
+ * than replacing it. docassemble's markup, JavaScript and accessibility
+ * behaviour are untouched; only the paint changes.
+ *
+ * IMPORTANT: changing this file requires a version bump in BOTH
+ * docassemble/BankruptcyClinic/__init__.py and setup.py. See ../static/README.md.
+ */
+
+/* ---------------------------------------------------------------- fonts -- */
+
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+  src: url(fonts/archivo-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+  src: url(fonts/archivo-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* --------------------------------------------------------------- tokens -- */
+
+:root {
+  --bk-paper:  #ffffff;  /* the form itself */
+  --bk-ground: #e4e6e9;  /* the desk the form sits on */
+  --bk-rule:   #000000;  /* court forms rule in true black */
+  --bk-band:   #dcdee1;  /* the grey section bar */
+  --bk-ink:    #2a2d33;  /* printed body copy */
+  --bk-pen:    #1b3fd8;  /* ballpoint blue: anything a person filled in */
+  --bk-stamp:  #b32025;  /* clerk's stamp: warnings, limits, errors */
+  --bk-quiet:  #5d636d;  /* printed instructions, secondary copy */
+  --bk-hairline: #b9bcc1;
+
+  --bk-pad: clamp(1.1rem, 3.2vw, 2rem);
+  --bk-measure: 68ch;
+
+  /* Bootstrap's own variables, so every component we do not name follows. */
+  --bs-body-bg: var(--bk-ground);
+  --bs-body-color: var(--bk-ink);
+  --bs-heading-color: var(--bk-rule);
+  --bs-secondary-color: var(--bk-quiet);
+  --bs-emphasis-color: var(--bk-rule);
+  --bs-link-color: var(--bk-pen);
+  --bs-link-hover-color: var(--bk-pen);
+  --bs-border-color: var(--bk-hairline);
+  --bs-border-radius: 0;
+  --bs-border-radius-sm: 0;
+  --bs-border-radius-lg: 0;
+  --bs-border-radius-xl: 0;
+  --bs-border-radius-pill: 0;
+  --bs-focus-ring-color: rgba(27, 63, 216, 0.35);
+  --bs-primary: #000000;
+  --bs-primary-rgb: 0, 0, 0;
+  --bs-danger: var(--bk-stamp);
+  --bs-secondary-bg-subtle: var(--bk-paper);
+  --bs-light-text-emphasis: var(--bk-ink);
+  --bs-font-sans-serif: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* ----------------------------------------------------------------- body -- */
+
+body.dabody {
+  background: var(--bk-ground);
+  color: var(--bk-ink);
+  font-family: var(--bs-font-sans-serif);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  font-synthesis-weight: none;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  color: var(--bk-rule);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+strong, b { font-weight: 700; color: var(--bk-rule); }
+
+a { text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+
+/* --------------------------------------------------------------- navbar -- */
+/* Paper, not a dark bar: the masthead of a form, ruled off in black. */
+
+.danavbarcontainer .navbar {
+  background: var(--bk-paper) !important;
+  border-bottom: 2px solid var(--bk-rule);
+  padding-block: 0.45rem;
+}
+
+#dapagetitle.danavbar-title {
+  color: var(--bk-rule);
+  font-weight: 700;
+  padding-block: 0;
+}
+
+/* The wordmark, set by set_parts(logo=...) in mandatory-initial-code.yml.
+ * docassemble wraps the whole logo string in its own responsive spans, so the
+ * spacing lives on the parts, never on the navbar-brand. */
+.bk-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  line-height: 1;
+}
+.bk-badge {
+  background: var(--bk-rule);
+  color: var(--bk-paper);
+  font-stretch: 78%;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.28rem 0.42rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+.bk-name {
+  font-weight: 700;
+  font-size: 1.02rem;
+  letter-spacing: -0.015em;
+  color: var(--bk-rule);
+}
+
+.danavbarcontainer .navbar .nav-link,
+.danavbarcontainer .navbar .dropdown-toggle {
+  color: var(--bk-ink);
+}
+.danavbarcontainer .navbar .nav-link:hover,
+.danavbarcontainer .navbar .dropdown-toggle:hover { color: var(--bk-pen); }
+
+.dropdown-menu {
+  border: 2px solid var(--bk-rule);
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+}
+.dropdown-item { padding: 0.5rem 0.9rem; }
+.dropdown-item:hover, .dropdown-item:focus {
+  background: var(--bk-pen);
+  color: var(--bk-paper);
+}
+
+.navbar-toggler { border: 2px solid var(--bk-rule); border-radius: 0; }
+.navbar-toggler:focus { box-shadow: none; outline: 3px solid var(--bk-pen); outline-offset: 2px; }
+
+/* ---------------------------------------------------------- the sheet --- */
+/* Each screen is one sheet of the packet, laid on the grey desk. */
+
+#daquestion, #dahelp {
+  background: var(--bk-paper);
+  border: 2px solid var(--bk-rule);
+  padding: var(--bk-pad);
+  margin-bottom: 2rem;
+}
+
+/* The question title is the grey section bar at the head of the sheet: it
+ * bleeds to the sheet's edges the way a band does on an Official Form. */
+.da-page-header {
+  background: var(--bk-band);
+  border-bottom: 1px solid var(--bk-rule);
+  margin: calc(var(--bk-pad) * -1) calc(var(--bk-pad) * -1) 1.4rem;
+  padding: 0.55rem var(--bk-pad) 0.6rem;
+}
+.da-page-header h1,
+.da-page-header .h3 {
+  font-size: clamp(1.15rem, 2.4vw, 1.4rem);
+  font-stretch: 88%;
+  margin: 0;
+}
+
+.da-subquestion { color: var(--bk-ink); }
+.da-subquestion > p,
+.da-subquestion > ul li,
+.da-subquestion > ol li { max-width: var(--bk-measure); }
+.da-subquestion h2, .da-subquestion h3, .da-subquestion h4 {
+  font-size: 1.05rem;
+  font-stretch: 88%;
+  margin-top: 1.7rem;
+  margin-bottom: 0.5rem;
+}
+.da-subquestion hr {
+  border: 0;
+  border-top: 1px solid var(--bk-rule);
+  opacity: 1;
+  margin: 1.6rem 0 1.2rem;
+}
+
+/* ------------------------------------------------------- section index --- */
+/* 22 sections in filing order — a genuine sequence, so it is numbered, and
+ * the numbers come from docassemble's own data-index. */
+
+/* docassemble ships `div.danavdiv { margin-top: 30px }`, which drops the index
+ * below the sheet. The two are panels on the same desk, so they line up. */
+div.danavdiv { margin-top: 0; padding-top: 0; }
+
+.danav-vertical {
+  background: var(--bk-paper);
+  border: 2px solid var(--bk-rule);
+  padding: 0;
+}
+.danav-vertical::before {
+  content: "Sections";
+  display: block;
+  background: var(--bk-band);
+  border-bottom: 1px solid var(--bk-rule);
+  padding: 0.4rem 0.7rem;
+  font-stretch: 80%;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--bk-rule);
+}
+
+.danav-vertical .danavlink {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  border-radius: 0;
+  border-bottom: 1px solid var(--bk-hairline);
+  padding: 0.4rem 0.7rem;
+  font-size: 0.88rem;
+  font-stretch: 90%;
+  line-height: 1.3;
+  color: var(--bk-ink);
+}
+.danav-vertical .danavlink:last-child { border-bottom: 0; }
+
+.danav-vertical .danavlink::before {
+  content: attr(data-index);
+  flex: none;
+  min-width: 1.35rem;
+  text-align: center;
+  background: var(--bk-band);
+  color: var(--bk-quiet);
+  font-size: 0.7rem;
+  font-stretch: 78%;
+  font-weight: 700;
+  padding: 0.1rem 0.2rem;
+  line-height: 1.4;
+}
+
+.danav-vertical a.danavlink:hover { background: #eef0f3; color: var(--bk-pen); }
+
+/* Reached, and reachable: written in. */
+.danav-vertical a.danavlink { color: var(--bk-pen); }
+.danav-vertical a.danavlink::before {
+  background: var(--bk-pen);
+  color: var(--bk-paper);
+}
+
+/* Where you are. */
+.danav-vertical .danavlink.active,
+.danav-vertical a.danavlink.active {
+  background: var(--bk-rule);
+  color: var(--bk-paper);
+  font-weight: 700;
+}
+.danav-vertical .danavlink.active::before {
+  background: var(--bk-paper);
+  color: var(--bk-rule);
+}
+
+/* Not yet reached: still blank on the form. */
+.danav-vertical .danotavailableyet {
+  color: var(--bk-quiet) !important;
+}
+
+/* The mobile strip is a horizontal rail; numbering it would not fit. */
+.danav-horiz {
+  background: var(--bk-paper);
+  border: 2px solid var(--bk-rule);
+  padding: 0.3rem 0.4rem;
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  justify-content: flex-start !important;
+}
+.danav-horiz .danavlink {
+  border-radius: 0;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  font-stretch: 88%;
+  color: var(--bk-pen);
+}
+.danav-horiz .danavlink.active { background: var(--bk-rule); color: var(--bk-paper); }
+.danav-horiz .danotavailableyet { color: var(--bk-quiet) !important; }
+
+/* --------------------------------------------------------------- fields -- */
+
+.da-field-container { margin-bottom: 1.05rem; }
+
+label, .col-form-label, .control-label {
+  font-weight: 600;
+  font-stretch: 92%;
+  color: var(--bk-rule);
+  margin-bottom: 0.22rem;
+}
+
+/* Anything the filer types shows up in ballpoint blue on a ruled white field. */
+.form-control, .form-select, .custom-select, textarea.form-control {
+  background: var(--bk-paper);
+  color: var(--bk-pen);
+  border: 1px solid var(--bk-rule);
+  border-radius: 0;
+  font-weight: 600;
+  padding: 0.42rem 0.6rem;
+}
+.form-control::placeholder { color: var(--bk-quiet); font-weight: 400; }
+.form-control:focus, .form-select:focus {
+  background: #fbfbfd;
+  border-color: var(--bk-pen);
+  color: var(--bk-pen);
+  box-shadow: none;
+  outline: 3px solid var(--bs-focus-ring-color);
+  outline-offset: 0;
+}
+.form-control:disabled, .form-control[readonly] {
+  background: #f1f2f4;
+  color: var(--bk-quiet);
+}
+
+.input-group-text {
+  background: var(--bk-band);
+  border: 1px solid var(--bk-rule);
+  border-radius: 0;
+  color: var(--bk-rule);
+  font-weight: 600;
+}
+
+/* Help text under a field is the small print on a form. */
+.form-text, .dafieldpart small, small.form-text {
+  color: var(--bk-quiet);
+  font-size: 0.86rem;
+}
+
+/* Validation: the only place red appears. Deliberately NOT `:invalid` -- an
+ * empty required field matches that before the filer has touched it, so a
+ * fresh screen would open already stamped in red. docassemble's validator
+ * adds `.is-invalid` when a field is actually wrong; that is the trigger. */
+.form-control.is-invalid, .form-select.is-invalid,
+.was-validated .form-control:invalid, .was-validated .form-select:invalid {
+  border-color: var(--bk-stamp);
+  outline: 2px solid var(--bk-stamp);
+  outline-offset: 0;
+  background: #fffafa;
+}
+.invalid-feedback, .da-has-error, .text-danger {
+  color: var(--bk-stamp) !important;
+  font-weight: 600;
+}
+
+/* -------------------------------------------------- choices as boxes ---- */
+/* docassemble renders radios and checkboxes as labelauty buttons. A choice is
+ * a box you tick on a form, so it is drawn as one. */
+
+label.dalabelauty,
+.da-field-container label.btn,
+label.form-label.btn.dalabelauty {
+  background: var(--bk-paper);
+  border: 1px solid var(--bk-rule);
+  border-radius: 0;
+  color: var(--bk-ink);
+  font-weight: 500;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.4rem;
+  white-space: normal;
+}
+label.dalabelauty:hover { background: #eef0f3; color: var(--bk-pen); }
+
+label.dalabelauty.active,
+input:checked + label.dalabelauty,
+label.dalabelauty.btn-primary.active {
+  background: var(--bk-pen);
+  border-color: var(--bk-pen);
+  color: var(--bk-paper);
+  font-weight: 600;
+}
+
+.form-check-input {
+  border: 1px solid var(--bk-rule);
+  border-radius: 0;
+  background-color: var(--bk-paper);
+}
+.form-check-input:checked {
+  background-color: var(--bk-pen);
+  border-color: var(--bk-pen);
+}
+.form-check-input:focus {
+  border-color: var(--bk-pen);
+  box-shadow: none;
+  outline: 3px solid var(--bs-focus-ring-color);
+}
+
+/* -------------------------------------------------------------- buttons -- */
+
+.btn { border-radius: 0; font-weight: 600; }
+.btn:focus-visible { outline: 3px solid var(--bk-pen); outline-offset: 2px; box-shadow: none; }
+
+.btn-da.btn-primary, .btn-primary {
+  background: var(--bk-rule);
+  border: 2px solid var(--bk-rule);
+  color: var(--bk-paper);
+  padding: 0.55rem 1.15rem;
+}
+.btn-da.btn-primary:hover, .btn-primary:hover,
+.btn-da.btn-primary:focus, .btn-primary:focus {
+  background: var(--bk-pen);
+  border-color: var(--bk-pen);
+  color: var(--bk-paper);
+}
+
+.btn-secondary, .btn-light, .btn-outline-secondary {
+  background: var(--bk-paper);
+  border: 2px solid var(--bk-rule);
+  color: var(--bk-rule);
+}
+.btn-secondary:hover, .btn-light:hover, .btn-outline-secondary:hover {
+  background: var(--bk-pen);
+  border-color: var(--bk-pen);
+  color: var(--bk-paper);
+}
+
+.btn-success { background: var(--bk-rule); border: 2px solid var(--bk-rule); color: var(--bk-paper); }
+.btn-success:hover { background: var(--bk-pen); border-color: var(--bk-pen); }
+.btn-info, .float-end.btn-info {
+  background: var(--bk-paper);
+  border: 2px solid var(--bk-rule);
+  color: var(--bk-rule);
+}
+.btn-info:hover { background: var(--bk-pen); border-color: var(--bk-pen); color: var(--bk-paper); }
+.btn-warning { background: var(--bk-paper); border: 2px solid var(--bk-stamp); color: var(--bk-stamp); }
+.btn-warning:hover { background: var(--bk-stamp); border-color: var(--bk-stamp); color: var(--bk-paper); }
+.btn-danger { background: var(--bk-stamp); border: 2px solid var(--bk-stamp); color: var(--bk-paper); }
+
+.btn-link { color: var(--bk-pen); }
+
+.da-button-set {
+  border-top: 1px solid var(--bk-rule);
+  margin-top: 1.6rem;
+  padding-top: 1.1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+.da-button-set .btn { margin: 0; }
+/* Yes/No screens have no fields, so the rule would sit under the title band
+ * with nothing between them. */
+.da-page-header + .da-button-set,
+.da-page-header + .da-subquestion:empty + .da-button-set {
+  border-top: 0;
+  margin-top: 0.4rem;
+  padding-top: 0;
+}
+
+/* --------------------------------------------------------- progress bar -- */
+/* How much of the packet is filled in — so it is drawn in ink. */
+
+.progress {
+  background: var(--bk-band);
+  border: 1px solid var(--bk-rule);
+  border-radius: 0;
+  height: 0.7rem;
+}
+.progress-bar { background-color: var(--bk-pen); }
+
+/* docassemble emits the bar as the first child of #daquestion, above the form
+ * that carries the title band. Run it along the top edge of the sheet, and
+ * take the band's negative top margin away so the two do not overlap. */
+#daquestion > .progress {
+  /* !important only to beat Bootstrap's own .mt-2 utility, which docassemble
+   * puts on this element in its markup and which we cannot remove. */
+  margin: calc(var(--bk-pad) * -1) calc(var(--bk-pad) * -1) 0 !important;
+  border: 0;
+  border-bottom: 1px solid var(--bk-rule);
+  height: 0.45rem;
+}
+#daquestion > .progress + form .da-page-header { margin-top: 0; }
+
+/* ------------------------------------------------- lists and collections -- */
+
+.dacollect, .da-field-group, fieldset.da-fieldset {
+  border: 1px solid var(--bk-hairline);
+  padding: 0.9rem 1rem 0.4rem;
+  margin-bottom: 1.1rem;
+  background: #fbfbfc;
+}
+.dacollectnum {
+  display: inline-block;
+  background: var(--bk-rule);
+  color: var(--bk-paper);
+  font-stretch: 78%;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.14rem 0.42rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+.dacollectremoved { opacity: 0.5; }
+
+/* --------------------------------------------------------------- tables -- */
+
+table, .table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.95rem;
+  --bs-table-bg: var(--bk-paper);
+  --bs-table-color: var(--bk-ink);
+}
+table th, table td, .table > :not(caption) > * > * {
+  border: 1px solid var(--bk-rule);
+  padding: 0.4rem 0.6rem;
+  vertical-align: top;
+  box-shadow: none;
+}
+table th, .table > thead th {
+  background: var(--bk-band);
+  color: var(--bk-rule);
+  font-stretch: 85%;
+  font-weight: 700;
+  text-align: left;
+}
+
+/* ------------------------------------------------------- review screens -- */
+/* A review screen is the filled-in draft: the answer reads as ink, the
+ * Revisit control as a marginal note. */
+
+.dareview .btn, .review-button, td .btn-info {
+  font-weight: 500;
+  text-align: left;
+  white-space: normal;
+}
+
+/* --------------------------------------------------------------- alerts -- */
+
+.alert {
+  border: 1px solid var(--bk-rule);
+  border-left-width: 5px;
+  border-radius: 0;
+  background: var(--bk-paper);
+  color: var(--bk-ink);
+}
+.alert-danger, .alert-warning {
+  border-color: var(--bk-stamp);
+  background: var(--bk-paper);
+}
+.alert-danger strong, .alert-warning strong { color: var(--bk-stamp); }
+
+/* --------------------------------------------- exemption usage tracker --- */
+/* Built by exemption-tracker.js. It is a ledger of statutory caps against
+ * amounts claimed, so it is drawn as one: ruled, with the bar reading as
+ * how much of the cap has been used. */
+
+.bk-tracker {
+  border: 1px solid var(--bk-rule);
+  margin: 1.3rem 0;
+  font-size: 0.9rem;
+}
+.bk-tracker-title {
+  background: var(--bk-band);
+  border-bottom: 1px solid var(--bk-rule);
+  margin: 0;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.85rem;
+  font-stretch: 82%;
+  font-weight: 700;
+  color: var(--bk-rule);
+}
+.bk-tracker table { border: 0; margin: 0; font-size: 0.88rem; }
+.bk-tracker th, .bk-tracker td { border: 0; border-bottom: 1px solid var(--bk-hairline); }
+.bk-tracker th { background: transparent; border-bottom: 1px solid var(--bk-rule); }
+.bk-tracker tbody tr:last-child td { border-bottom: 0; }
+.bk-tracker .bk-num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.bk-tracker .bk-law { font-stretch: 90%; }
+.bk-tracker-gauge {
+  width: 6rem;
+  height: 0.85rem;
+  border: 1px solid var(--bk-rule);
+  background: var(--bk-paper);
+}
+.bk-tracker-fill { height: 100%; background: var(--bk-pen); }
+/* Only a cap that is used up earns the stamp. */
+.bk-tracker-fill[data-state="near"] { background: var(--bk-quiet); }
+.bk-tracker-fill[data-state="over"] { background: var(--bk-stamp); }
+.bk-tracker-unlimited { color: var(--bk-quiet); font-stretch: 85%; font-size: 0.82rem; }
+
+/* ----------------------------------------------- landing screen only ----- */
+/* body carries question-<id>, so the first screen can be set differently
+ * without affecting any other screen. */
+
+.question-introduction-screen .bk-lede {
+  font-size: 1.14rem;
+  line-height: 1.5;
+  max-width: 46ch;
+  color: var(--bk-ink);
+  margin-bottom: 1.5rem;
+}
+
+/* The packet caption: what this produces, stated as form metadata. */
+.bk-caption {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+  border: 1px solid var(--bk-rule);
+  margin: 0 0 1.8rem;
+}
+.bk-caption > div {
+  padding: 0.5rem 0.7rem 0.55rem;
+  border-right: 1px solid var(--bk-rule);
+}
+.bk-caption > div:last-child { border-right: 0; }
+.bk-caption .k {
+  display: block;
+  font-stretch: 78%;
+  font-size: 0.74rem;
+  color: var(--bk-quiet);
+  margin-bottom: 0.1rem;
+}
+.bk-caption .v {
+  display: block;
+  font-weight: 600;
+  font-size: 1.2rem;
+  line-height: 1.2;
+  color: var(--bk-pen);
+}
+.bk-caption .v small {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 400;
+  color: var(--bk-quiet);
+}
+@media (max-width: 34rem) {
+  /* One cell per row on a phone, so the rules read as horizontal dividers
+   * rather than leaving a half-ruled two-column grid. */
+  .bk-caption { grid-template-columns: 1fr; }
+  .bk-caption > div { border-right: 0; border-bottom: 1px solid var(--bk-rule); }
+  .bk-caption > div:last-child { border-bottom: 0; }
+}
+
+/* A grey band inside the sheet body, bleeding to its edges. */
+.bk-band {
+  background: var(--bk-band);
+  border-top: 1px solid var(--bk-rule);
+  border-bottom: 1px solid var(--bk-rule);
+  margin: 2.2rem calc(var(--bk-pad) * -1) 1.2rem;
+  padding: 0.45rem var(--bk-pad);
+  font-weight: 700;
+  font-stretch: 85%;
+  font-size: 1rem;
+  color: var(--bk-rule);
+  max-width: none;
+}
+
+/* The warnings are the one thing on this screen that must not be skimmed. */
+.bk-caution {
+  border: 1px solid var(--bk-stamp);
+  border-left-width: 5px;
+  padding: 0.85rem 1rem 0.3rem;
+  margin: 0 0 1.4rem;
+  max-width: var(--bk-measure);
+}
+.bk-caution p { margin-bottom: 0.8rem; }
+.bk-caution strong { color: var(--bk-stamp); }
+.bk-cite { color: var(--bk-quiet); font-size: 0.88rem; }
+
+.bk-colophon {
+  border-top: 1px solid var(--bk-hairline);
+  margin-top: 2rem;
+  padding-top: 1rem;
+  color: var(--bk-quiet);
+  font-size: 0.9rem;
+}
+.bk-colophon p { margin-bottom: 0.4rem; max-width: var(--bk-measure); }
+
+/* --------------------------------------------------------------- misc ---- */
+
+code, pre, kbd {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  border-radius: 0;
+}
+code { background: #eef0f3; color: var(--bk-ink); padding: 0.1em 0.3em; }
+
+img, video { max-width: 100%; height: auto; }
+.da-subquestion img { border: 1px solid var(--bk-rule); }
+
+/* docassemble's help pane and chat sit on the same paper. */
+.dachatbox { border: 1px solid var(--bk-rule); border-radius: 0; }
+.dachatmessage { border-radius: 0; }
+
+/* Keyboard users must always be able to see where they are. */
+a:focus-visible, button:focus-visible, .danavlink:focus-visible {
+  outline: 3px solid var(--bk-pen);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* ----------------------------------------------------------- dark mode --- */
+/* docassemble can serve Bootstrap's dark theme. Same design, inverted stock:
+ * dark paper, white rules, and the pen brightened enough to stay legible. */
+
+[data-bs-theme="dark"] {
+  --bk-paper:  #16181c;
+  --bk-ground: #0c0d10;
+  --bk-rule:   #e9eaec;
+  --bk-band:   #24272d;
+  --bk-ink:    #d7d9dd;
+  --bk-pen:    #8fa8ff;
+  --bk-stamp:  #ff7b7b;
+  --bk-quiet:  #9aa0aa;
+  --bk-hairline: #3a3e46;
+
+  --bs-body-bg: var(--bk-ground);
+  --bs-body-color: var(--bk-ink);
+  --bs-heading-color: var(--bk-rule);
+  --bs-link-color: var(--bk-pen);
+  --bs-link-hover-color: var(--bk-pen);
+  --bs-border-color: var(--bk-hairline);
+  --bs-primary: var(--bk-rule);
+  --bs-danger: var(--bk-stamp);
+  --bs-secondary-bg-subtle: var(--bk-paper);
+  --bs-light-text-emphasis: var(--bk-ink);
+  --bs-focus-ring-color: rgba(143, 168, 255, 0.35);
+}
+[data-bs-theme="dark"] .btn-da.btn-primary,
+[data-bs-theme="dark"] .btn-primary,
+[data-bs-theme="dark"] .btn-success {
+  background: var(--bk-rule);
+  border-color: var(--bk-rule);
+  color: var(--bk-ground);
+}
+[data-bs-theme="dark"] .btn-da.btn-primary:hover,
+[data-bs-theme="dark"] .btn-primary:hover,
+[data-bs-theme="dark"] .btn-success:hover {
+  background: var(--bk-pen);
+  border-color: var(--bk-pen);
+  color: var(--bk-ground);
+}
+[data-bs-theme="dark"] .bk-badge,
+[data-bs-theme="dark"] .dacollectnum,
+[data-bs-theme="dark"] .danav-vertical .danavlink.active {
+  background: var(--bk-rule);
+  color: var(--bk-ground);
+}
+[data-bs-theme="dark"] .danav-vertical a.danavlink::before {
+  background: var(--bk-pen);
+  color: var(--bk-ground);
+}
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-control { background: #1c1f24; }
+[data-bs-theme="dark"] code { background: #24272d; }
+[data-bs-theme="dark"] .dacollect,
+[data-bs-theme="dark"] .da-field-group,
+[data-bs-theme="dark"] fieldset.da-fieldset { background: #1a1d22; }

@@ -2,21 +2,61 @@ id: introduction_screen
 question: |
   Voluntary Petition for Individuals Filing for Bankruptcy
 subquestion: |
-  This interview is designed to help you fill out the required forms for Chapter 7 Bankruptcy. These questions are not intended to provide, and should not be understood to provide, legal advice. They are not designed to fully explain, or to be relied upon in interpreting, the law.
+  <p class="bk-lede">Answer these questions once and this fills in your whole
+  Chapter 7 petition packet, ready to print and file.</p>
 
-  ### Read These Important Warnings
-  * Only an attorney can give you legal advice about what can happen as a result of filing for bankruptcy and what your options are. Although the law allows you to represent yourself in bankruptcy court, you should understand that many people find it difficult to represent themselves successfully.
+  <div class="bk-caption">
+  <div><span class="k">Forms filled in</span><span class="v">21<small>101 through 2030</small></span></div>
+  <div><span class="k">Exemptions</span><span class="v">NE, SD<small>with statutory caps</small></span></div>
+  <div><span class="k">Cost</span><span class="v">Free<small>no account needed</small></span></div>
+  </div>
 
-  * Bankruptcy fraud is a serious crime; you could be fined and imprisoned if you commit fraud in your bankruptcy case. Making a false statement, concealing property, or obtaining money or property by fraud in connection with a bankruptcy case can result in fines up to $250,000, or imprisonment for up to 20 years, or both. 18 U.S.C. §§ 152, 1341, 1519, and 3571.
+  <p>You can stop at any point and the questions you have already answered stay
+  as they are. There is a section list beside each screen so you can see how far
+  through the packet you are.</p>
 
-  Click continue to start filling out the Voluntary Petition for Individuals Filing for Bankruptcy.
+  <div class="bk-band">What this interview is not</div>
 
-  ---
+  <p>This interview is designed to help you fill out the required forms for
+  Chapter 7 Bankruptcy. These questions are not intended to provide, and should
+  not be understood to provide, legal advice. They are not designed to fully
+  explain, or to be relied upon in interpreting, the law.</p>
 
-  This interview is free software, licensed under the GNU Affero General Public
-  License. You have the right to read and reuse its source code. Choose
-  **About this software** from the menu for the source code and the full licence.
+  <div class="bk-caution">
+  <p><strong>Only an attorney can give you legal advice</strong> about what can
+  happen as a result of filing for bankruptcy and what your options are.
+  Although the law allows you to represent yourself in bankruptcy court, you
+  should understand that many people find it difficult to represent themselves
+  successfully.</p>
+
+  <p><strong>Bankruptcy fraud is a serious crime;</strong> you could be fined
+  and imprisoned if you commit fraud in your bankruptcy case. Making a false
+  statement, concealing property, or obtaining money or property by fraud in
+  connection with a bankruptcy case can result in fines up to $250,000, or
+  imprisonment for up to 20 years, or both.
+  <span class="bk-cite">18 U.S.C. §§ 152, 1341, 1519, and 3571.</span></p>
+  </div>
+
+  <div class="bk-band">What to have with you</div>
+
+  <p>You do not need any of this to start, and you can come back to a question
+  later. Having it to hand will make the interview quicker:</p>
+
+  <ul>
+  <li>your pay stubs, or other records of what you have earned over the last six months</li>
+  <li>your bills, statements and collection letters, so you can list who you owe</li>
+  <li>details of what you own: vehicles, bank accounts, and your home if you have one</li>
+  <li>your most recent tax return</li>
+  </ul>
+
+  <div class="bk-colophon">
+  <p>This interview is free software, licensed under the GNU Affero General
+  Public License. You have the right to read and reuse its source code. Choose
+  <strong>About this software</strong> from the menu for the source code and the
+  full licence.</p>
+  </div>
 continue button field: introduction_screen
+continue button label: Start the petition
 ---
 #Part 0: Location and Case
 id: district_which

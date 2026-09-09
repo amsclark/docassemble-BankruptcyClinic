@@ -75,7 +75,7 @@ features:
   javascript:
     - exemptions.js
     - exemption-tracker.js
-  css: bootstrap-theme.css
+  css: bk-theme.css
 ---
 id: real_property_interest_details
 section: schedule_ab

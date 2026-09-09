@@ -2,6 +2,12 @@ mandatory: True
 code: |
   menu_items = [ action_menu_item('Review Answers', 'review_answers'),
                  action_menu_item('About this software', 'about_this_software') ]
+  # The navbar wordmark, matching the project site: a form-number badge and the
+  # name. This replaces the interview title in the bar, which on every screen
+  # after the first was a 52-character sentence nobody was reading.
+  # docassemble wraps this whole string in its own responsive spans, so all
+  # spacing lives inside .bk-wordmark, never on the navbar-brand.
+  set_parts(logo='<span class="bk-wordmark"><span class="bk-badge">Ch.&nbsp;7</span><span class="bk-name">BankruptcyClinic</span></span>')
 ---
 # AGPL-3.0 section 13: a user interacting with this program over a network must
 # be offered the Corresponding Source. The menu item above puts this screen one
