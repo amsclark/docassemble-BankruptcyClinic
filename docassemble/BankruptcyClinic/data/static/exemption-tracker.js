@@ -26,26 +26,27 @@ $(document).on('daPageLoad', function() {
 
   if (!trackerData || Object.keys(trackerData).length === 0) return;
 
-  // Build the tracker panel
+  // Build the tracker panel. Presentation lives in bk-theme.css — this file
+  // sets classes and a data-state, never colours, so the panel follows the
+  // interview theme (including dark mode) instead of overriding it inline.
   var panel = document.createElement('div');
   panel.id = 'exemption-tracker-panel';
-  panel.style.cssText = 'background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 16px; margin: 16px 0; font-size: 14px;';
+  panel.className = 'bk-tracker';
 
-  var title = document.createElement('h5');
-  title.textContent = 'Exemption Usage Summary';
-  title.style.cssText = 'margin: 0 0 12px 0; color: #495057;';
+  var title = document.createElement('h2');
+  title.textContent = 'Exemption usage so far';
+  title.className = 'bk-tracker-title';
   panel.appendChild(title);
 
   var table = document.createElement('table');
-  table.style.cssText = 'width: 100%; border-collapse: collapse;';
 
   // Header row
-  var thead = '<thead><tr style="border-bottom: 2px solid #dee2e6;">' +
-    '<th style="text-align:left;padding:4px 8px;">Category</th>' +
-    '<th style="text-align:right;padding:4px 8px;">Limit</th>' +
-    '<th style="text-align:right;padding:4px 8px;">Claimed</th>' +
-    '<th style="text-align:right;padding:4px 8px;">Remaining</th>' +
-    '<th style="text-align:center;padding:4px 8px;width:100px;">Usage</th>' +
+  var thead = '<thead><tr>' +
+    '<th>Exemption</th>' +
+    '<th class="bk-num">Limit</th>' +
+    '<th class="bk-num">Claimed</th>' +
+    '<th class="bk-num">Left</th>' +
+    '<th>Used</th>' +
     '</tr></thead>';
   table.innerHTML = thead;
 
@@ -59,25 +60,30 @@ $(document).on('daPageLoad', function() {
     var isUnlimited = (limit === 0);
 
     var pct = isUnlimited ? 0 : Math.min(100, Math.round((claimed / limit) * 100));
-    var color = isUnlimited ? '#28a745' : (pct < 75 ? '#28a745' : (pct < 100 ? '#ffc107' : '#dc3545'));
+    // Blue while there is room, grey as it runs low, red only once the cap is
+    // reached — red on this interview means "this needs your attention".
+    var state = isUnlimited ? 'ok' : (pct < 75 ? 'ok' : (pct < 100 ? 'near' : 'over'));
 
-    var limitStr = isUnlimited ? 'Unlimited' : '$' + limit.toLocaleString();
-    var remainStr = isUnlimited ? 'Unlimited' : '$' + remaining.toLocaleString();
+    var limitStr = isUnlimited ? '<span class="bk-tracker-unlimited">No limit</span>'
+                               : '$' + limit.toLocaleString();
+    var remainStr = isUnlimited ? '<span class="bk-tracker-unlimited">No limit</span>'
+                                : '$' + remaining.toLocaleString();
 
     var row = document.createElement('tr');
-    row.style.borderBottom = '1px solid #eee';
 
     // Shorten the law string for display
     var shortLaw = law.length > 50 ? law.substring(0, 47) + '...' : law;
 
     row.innerHTML =
-      '<td style="padding:4px 8px;" title="' + law + '">' + shortLaw + '</td>' +
-      '<td style="text-align:right;padding:4px 8px;">' + limitStr + '</td>' +
-      '<td style="text-align:right;padding:4px 8px;">$' + claimed.toLocaleString() + '</td>' +
-      '<td style="text-align:right;padding:4px 8px;">' + remainStr + '</td>' +
-      '<td style="padding:4px 8px;">' +
-        '<div style="background:#e9ecef;border-radius:4px;height:16px;overflow:hidden;">' +
-          '<div style="background:' + color + ';height:100%;width:' + (isUnlimited ? 0 : pct) + '%;transition:width 0.3s;"></div>' +
+      '<td class="bk-law" title="' + law + '">' + shortLaw + '</td>' +
+      '<td class="bk-num">' + limitStr + '</td>' +
+      '<td class="bk-num">$' + claimed.toLocaleString() + '</td>' +
+      '<td class="bk-num">' + remainStr + '</td>' +
+      '<td>' +
+        '<div class="bk-tracker-gauge" role="img" aria-label="' +
+          (isUnlimited ? 'No limit' : pct + ' percent of this exemption used') + '">' +
+          '<div class="bk-tracker-fill" data-state="' + state + '" style="width:' +
+            (isUnlimited ? 0 : pct) + '%"></div>' +
         '</div>' +
       '</td>';
 
